@@ -1,0 +1,12 @@
+#form_submit{
+    background-color: #CC3300;
+}
+
+#editResourceImg{
+    float: left;
+    margin-left: 10px;
+}
+
+#update , #newRC{
+    background-color: #FFCC33;
+}

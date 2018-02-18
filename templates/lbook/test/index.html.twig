@@ -1,0 +1,47 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Tests list</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Order</th>
+            <th>Name</th>
+            <th>Time start</th>
+            <th>Time end</th>
+            <th>Runtime</th>
+            <th>Uptime</th>
+            <th>Uptime</th>
+            <th>Verdict</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for test in tests %}
+            <tr>
+                <td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>
+                <td>{{ test.executionOrder }}</td>
+                <td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>
+                <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ test.timeRun }}</td>
+                <td>{{ test.dutUpTimeStart }}</td>
+                <td>{{ test.dutUpTimeEnd }}</td>
+                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>
+                <td>
+                    <a href="{{ path('test_show', { 'id': test.id }) }}">show</a>
+                    <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('test_new') }}">Create a new test</a>
+        </li>
+    </ul>
+{% endblock %}

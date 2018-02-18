@@ -1,0 +1,183 @@
+<script type="text/javascript">
+    try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
+</script>
+
+{% set route = app.request.get('_route') %}
+{% set url = app.request.scheme ~'://' ~  app.request.httpHost %}
+<ul class="nav nav-list  nav-sidebar">
+    <li class="{% if route == 'default_index' %}active{% endif %}">
+        <a href="{{ url}}">
+            <i class="menu-icon fa fa-tachometer"></i>
+            <span class="menu-text">Home</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+    {#{{asset(('user'))}}#}
+    {#<br/>#}
+    {#<br/>#}
+    {#{{(path('user_index'))}}#}
+    {#<br/>#}
+    {#<br/>#}
+    {#{{asset(path('user_index'))}}#}
+
+    {#{{absolute_url(asset(('user')))}}#}
+    {#<br/>#}
+    {#<br/>#}
+    {#{{absolute_url(path('user_index'))}}#}
+    {#<br/>#}
+    {#<br/>#}
+    {#{{absolute_url(asset(path('user_index')))}}#}
+    <li class="{% if route starts with 'setup_' %}active{% endif %}">
+        <a href="{{asset(path('setup_index'))}}">
+            <i class="menu-icon fa fa-picture-o"></i>
+            <span class="menu-text"> Setups </span>
+        </a>
+
+        <b class="arrow"></b>
+    </li>
+
+    <li class="{% if route starts with 'cycle_' %}active{% endif %}">
+        <a href="{{asset(path('cycle_index'))}}">
+            <i class="menu-icon fa fa-list"></i>
+            <span class="menu-text"> Cycles </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
+    <li class="{% if route starts with 'test_' %}active{% endif %}">
+        {#<a href="{{absolute_url(asset(('user')))}}">#}
+        <a href="{{asset(path('test_index'))}}">
+            <i class="menu-icon fa fa-list-alt"></i>
+            <span class="menu-text bigger-120"> Tests </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
+    <li class="{% if route starts with 'verdict_' %}active{% endif %}">
+        <a href="{{asset(path('verdict_index'))}}">
+            <i class="menu-icon fa fa-list"></i>
+            <span class="menu-text  bigger-120">Verdicts</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
+
+
+    {#<li class="{% if route starts with 'qcc_' %}active{% endif %}">#}
+    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >#}
+    {#<i class="menu-icon fa fa-pencil-square-o"></i>#}
+    {#<span class="menu-text"> QCC </span>#}
+    {#</a>#}
+    {#<b class="arrow"></b>#}
+    {#</li>#}
+
+    {#<li class="{% if route starts with 'event_' %}active{% endif %}">#}
+    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >#}
+    {#<i class="menu-icon fa fa-tag"></i>#}
+    {#<span class="menu-text">Events</span>#}
+    {#</a>#}
+    {#<b class="arrow"></b>#}
+    {#</li>#}
+
+
+    {#<li class="{% if route starts with 'dut' %}active{% endif %}">#}
+    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}" >#}
+    {#<i class="menu-icon fa fa-file-o"></i>#}
+    {#<span class="menu-text">DUT#}
+    {#<span class="badge badge-primary">5</span>#}
+    {#</span>#}
+    {#</a>#}
+    {#<b class="arrow"></b>#}
+    {#</li>#}
+
+    {# ################################### Controll ################################### #}
+    <li class="{% if route in ['types','types_index','types_show'] %}active{% endif %}">
+        <a href="#" class="dropdown-toggle">
+            <i class="menu-icon fa fa-desktop"></i>
+            <span class="menu-text">Controll </span>
+            <b class="arrow fa fa-angle-down"></b>
+        </a>
+        <b class="arrow"></b>
+
+        <ul class="submenu ">
+            <li class="
+{% if route starts with 'types' %}active{% endif %}
+{% if route starts with 'help' %}active{% endif %}
+{% if route starts with 'tepes_' %}active{% endif %}
+">
+                <a href="#" class="dropdown-toggle">
+                    <i class="menu-icon fa fa-caret-right"></i>Types
+                    <b class="arrow fa fa-angle-down"></b>
+                </a>
+                <b class="arrow"></b>
+                <ul class="submenu">
+                    <li class="{% if route starts with 'platform' %}active{% endif %}">
+                        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}">
+                            <i class="menu-icon fa fa-caret-right"></i>Mine Types
+                        </a>
+                        <b class="arrow"></b>
+                    </li>
+                    <li class="{% if route starts with 'adapter' %}active{% endif %}">
+                        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}">
+                            <i class="menu-icon fa fa-caret-right"></i>Hero Types
+                        </a>
+                        <b class="arrow"></b>
+                    </li>
+                </ul>
+            </li>
+
+            {#<li class="{% if route starts with 'dca' %}active{% endif %}">#}
+                {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}">#}
+                    {#<i class="menu-icon fa fa-caret-right"></i>Help#}
+                {#</a>#}
+                {#<b class="arrow"></b>#}
+            {#</li>#}
+
+            <li class="{% if route starts with 'cycle_' %}active{% endif %}">
+                <a href="{{path('cycle_index') }}">
+                    <i class="menu-icon fa fa-caret-right"></i>Cycles
+                </a>
+                <b class="arrow"></b>
+            </li>
+
+            {#<li class="{% if route starts with 'wwwsetupbuild_' %}active{% endif %}">#}
+            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('wwwsetupbuild_index') }}">#}
+            {#<i class="menu-icon fa fa-caret-right"></i>www Setup Builds#}
+            {#</a>#}
+            {#<b class="arrow"></b>#}
+            {#</li>#}
+            {#<li class="{% if route starts with 'wwwsetup_' %}active{% endif %}">#}
+            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('wwwsetup_index') }}">#}
+            {#<i class="menu-icon fa fa-caret-right"></i>www Setups#}
+            {#</a>#}
+            {#<b class="arrow"></b>#}
+            {#</li>#}
+
+            {#<li class="{% if route == 'actionparameter' %}active{% endif %}">#}
+            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('actionparameter') }}">#}
+            {#<i class="menu-icon fa fa-caret-right"></i>Action Params#}
+            {#</a>#}
+            {#<b class="arrow"></b>#}
+            {#</li>#}
+
+            {#<li class="{% if app.request.attributes.get('_route') == 'actionresultdescription' %}active{% endif %}">#}
+            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('actionresultdescription') }}">#}
+            {#<i class="menu-icon fa fa-caret-right"></i>Action Result desc#}
+            {#</a>#}
+            {#<b class="arrow"></b>#}
+            {#</li>#}
+
+        </ul>
+    </li>
+
+
+
+</ul><!-- /.nav-list -->
+
+<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+    <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+</div>
+
+<script type="text/javascript">
+    try{ace.settings.check('sidebar' , 'collapsed')}catch(e){}
+</script>

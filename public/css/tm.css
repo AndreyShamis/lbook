@@ -1,0 +1,274 @@
+
+@media print {
+    a[href]:after {
+        content:none;
+    }
+
+    .row{
+        /*min-height: 1122px;*/
+        min-height: 200px;
+    }
+    /*input[type="checkbox"] {*/
+    /*display: none;*/
+    /*}*/
+    .print-disable{
+        display: none;
+    }
+    /*class="widget-box fullscreen"*/
+    /*th{*/
+        /*display: none;*/
+    /*}*/
+
+
+    .sf-toolbar-block{
+        display: none;
+        content:none;
+    }
+    .sf-toolbar{
+        display: none;
+        content:none;
+    }
+
+    .sf-toolbarreset{
+        display: none;
+        content:none;
+    }
+    .clear-fix{
+        display: none;
+        content:none;
+    }
+    .sf-minitoolbar{
+        display: none;
+        content:none;
+    }
+
+    .widget-box{
+        display: inline-block;
+    }
+
+    body{
+        position: relative;
+        -webkit-region-break-inside: avoid;
+    }
+    .page-br{
+        position: relative;
+        page-break-before: always;
+        page-break-after:  always;
+        -webkit-region-break-inside: avoid;
+    }
+    table
+    { page-break-inside:auto }
+    tr
+    { page-break-inside:avoid; page-break-after:auto }
+    thead
+    { display:table-header-group }
+    tfoot
+    { display:table-footer-group }
+    .widget-header{
+        page-break-inside:avoid; page-break-after:auto;
+        display:table-header-group;
+    }
+    /*.widget-box .widget-header{*/
+        /*!*display:table-header-group;*!*/
+        /*page-break-before:always;;*/
+    /*}*/
+
+    .page-braker-after{
+        /*page-break-after:always;*/
+    }
+
+
+    .page-break	{
+        /*display: block; page-break-before: always; */
+    }
+    .page-braker-before{
+        /*page-break-before: always;*/
+    }
+
+    .page-braker-inside{
+        /*page-break-inside: avoid;*/
+    }
+        /*.print-break-disable{*/
+        /*page-break-inside: avoid;*/
+    /*}*/
+
+    /*.print-break-always{*/
+        /*page-break-before: always;*/
+        /*page-break-after: auto;*/
+    /*}*/
+
+    /*table {*/
+        /*page-break-inside: avoid;*/
+
+    /*}*/
+
+    body {
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+.infobox-cycle{
+    width: 180px !important;
+    height: 58px !important;
+}
+
+.toolbar {
+    float:right;
+}
+.font6
+{
+    font-size: 6px;
+}
+.font7
+{
+    font-size: 7px;
+}
+.font8
+{
+    font-size: 8px;
+}
+.font9
+{
+    font-size: 9px;
+}
+
+.font10
+{
+    font-size: 10px;
+}
+
+.font11
+{
+    font-size: 11px;
+}
+
+.font12
+{
+    font-size: 12px;
+}
+
+.font14
+{
+    font-size: 14px;
+}
+
+.font16
+{
+    font-size: 16px;
+}
+
+.font18
+{
+    font-size: 18px;
+}
+
+.font20
+{
+    font-size: 20px;
+}
+
+.font22
+{
+    font-size: 22px;
+}
+
+.font24
+{
+    font-size: 24px;
+}
+.font28
+{
+    font-size: 28px;
+}
+.font38
+{
+    font-size: 38px;
+}
+.font42
+{
+    font-size: 42px;
+}
+.font46
+{
+    font-size: 46px;
+}
+.font48
+{
+    font-size: 48px;
+}
+/*.sst-list-table{*/
+    /*table-layout: fixed;*/
+/*}*/
+.sst-list-table tbody > tr > td {
+    white-space: nowrap;
+}
+.sst-list-table tbody > tr > td  > span{
+    overflow: hidden;
+    height: 10px !important;
+    max-height: 10px !important;
+    white-space: nowrap;
+}
+.sst-list-table tbody  tr  {
+    white-space: nowrap;
+}
+.sst-list-table  td  {
+    overflow: hidden;
+    height: 10px !important;
+    font-size: 11px;
+    max-height: 10px !important;
+}
+.sst-list-table input[type="checkbox"] {
+    height: 9px !important;
+    white-space: nowrap;
+
+}
+.sst-list-table{
+    margin-bottom: 0px !important;
+}
+
+.label-pass-rate{
+    background-color: #82af6f;
+}
+.green{
+    color: #00CC00;
+}
+.white{
+    color: white;
+}
+.red{
+    color: red;
+}
+
+.yellow{
+    color: #cccc00;
+}
+.orange{
+    color: #cc6600;
+}
+.blue{
+    color: #567dff;
+}
+
+
+colgroup col.success {
+    background-color: #dff0d8;
+}
+colgroup col.error{
+    background-color: #f2dede;
+}
+colgroup col.warning {
+    background-color: #fcf8e3;
+}
+colgroup col.info {
+    background-color: #d9edf7;
+}
+
+.hidden{
+    visibility: hidden;
+}
+
+.reportSummaryTextBox{
+    width:100%;
+    height:120px;
+    font-size:11px;
+}

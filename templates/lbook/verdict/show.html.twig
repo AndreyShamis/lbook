@@ -1,0 +1,32 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Verdicts</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ verdict.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ verdict.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('verdict_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('verdict_edit', { 'id': verdict.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

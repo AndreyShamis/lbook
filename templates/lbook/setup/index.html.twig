@@ -1,0 +1,44 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Setup list</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Short Name</th>
+            <th>OS</th>
+            <th>Owner</th>
+            <th>Check Uptime</th>
+            <th>Disabled</th>
+            <th>Options</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for setup in setups %}
+            <tr>
+                <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
+                <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
+                <td>{{ setup.nameShown }}</td>
+                <td>{{ setup.os }}</td>
+                <td>{{ setup.owner }}</td>
+                <td>{{ setup.checkUpTime }}</td>
+                <td>{{ setup.disabled ? 'Yes':'False' }}</td>
+                <td>
+                    <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>
+                    <a href="{{ path('setup_edit', { 'id': setup.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('setup_new') }}">Create a new setup</a>
+        </li>
+    </ul>
+{% endblock %}

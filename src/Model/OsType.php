@@ -48,4 +48,14 @@ abstract class OsType
             self::OS_FREEBSD,
         ];
     }
+
+    /**
+     * @return array<integer>
+     */
+    public static function getPreferredTypes()
+    {
+        return [
+            self::OS_LINUX,
+        ];
+    }
 }

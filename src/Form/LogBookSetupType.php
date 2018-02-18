@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\LogBookSetup;
 use App\Model\OsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,10 +16,12 @@ class LogBookSetupType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('nameShown')
+            ->add('nameShown',TextType::class,array(
+                'required'=> false,
+                'attr' => array('style' => 'width:auto%;')))
             ->add('disabled')
 //            ->add('os')
-            ->add('os', ChoiceType::class , $this->buildFormType())
+            ->add('os', ChoiceType::class , $this->buildOsFormType())
             ->add('checkUpTime')
             ->add('owner')
         ;
@@ -35,12 +38,12 @@ class LogBookSetupType extends AbstractType
     /**
      * @return array
      */
-    protected function buildFormType(){
-        //      add('type', ChoiceType::class , $this->buildFormType())->
+    protected function buildOsFormType(){
         return  array(
-            'required' => true,
+            'required' => false,
             'choices' => OsType::getAvailableTypes(),
-//            'choices_as_values' => true,
+            'preferred_choices' => OsType::getPreferredTypes(),
+            //'choices_as_values' => true,
             'choice_label' => function($choice) {
                 return OsType::getTypeName($choice);
             },

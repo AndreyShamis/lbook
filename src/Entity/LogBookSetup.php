@@ -27,7 +27,7 @@ class LogBookSetup
     /**
      * @var string
      *
-     * @ORM\Column(name="name_shown", type="string", length=50)
+     * @ORM\Column(name="name_shown", type="string", length=50, nullable=true)
      */
     protected $nameShown = "";
 
@@ -39,9 +39,9 @@ class LogBookSetup
     protected $disabled = false;
 
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="os", type="string", length=50)
+     * @ORM\Column(name="os", type="smallint", nullable=true)
      */
     protected $os = "";
 
@@ -120,7 +120,7 @@ class LogBookSetup
     /**
      * @param string $nameShown
      */
-    public function setNameShown(string $nameShown): void
+    public function setNameShown($nameShown): void
     {
         $this->nameShown = $nameShown;
     }
@@ -150,9 +150,9 @@ class LogBookSetup
     }
 
     /**
-     * @param string $os
+     * @param $os
      */
-    public function setOs(string $os): void
+    public function setOs($os): void
     {
         $this->os = $os;
     }

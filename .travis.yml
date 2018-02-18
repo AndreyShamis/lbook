@@ -1,0 +1,52 @@
+language: php
+sudo: false
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+  - 7.2
+  - nightly
+
+# Define an environment variable
+env:
+  - SYMFONY_VERSION="3.2.*" DB=mysql
+
+services:
+  - mysql
+
+before-install:
+  # execute all of the commands which need to be executed
+  # before installing dependencies
+  - composer self-update
+#  - composer validate
+
+# Install composer dependencies,
+# Create database, schema and fixtures
+install:
+  # install all of the dependencies you need here
+  - composer install --prefer-dist
+#  - composer install --dev --no-interaction --prefer-source
+  - cp app/config/parameters.yml.dist app/config/parameters.yml
+  - php bin/console doctrine:database:create --env=test
+  - php bin/console doctrine:schema:create --env=test
+#  - php bin/console doctrine:fixtures:load -n --env=test
+
+before_script:
+  # execute all of the commands which need to be executed
+  # before running actual tests
+#  - mysql -u root -e 'CREATE DATABASE test'
+#  - bin/doctrine-migrations migrations:migrate
+
+# Run script
+script:
+#  - composer validate --no-check-all --strict  # TODO
+#  An error occurred: gnutls_handshake() failed: Handshake failed.
+#  - php vendor/bin/security-checker security:check
+  - php bin/console lint:yaml config/
+  - ./vendor/bin/simple-phpunit
+
+notifications:
+  email:
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: change  # options: [always|never|change] default: always

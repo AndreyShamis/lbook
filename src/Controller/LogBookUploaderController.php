@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class LogBookUploaderController extends Controller
 {
-    protected static $messageTypes = array();
 
     /**
      * @Route("/", name="upload_index")
@@ -130,13 +129,8 @@ class LogBookUploaderController extends Controller
                 //Get debug level message, convert to upper case
                 $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
 
-                if(isset(self::$messageTypes[$dLevel['name']])){
-                    $msgTypeResult = self::$messageTypes[$dLevel['name']];
-                }
-                else{
-                    $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
-                    self::$messageTypes[$dLevel['name']] = $msgTypeResult;
-                }
+                $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
+
                 $ret_data[$counter]['debugLevel'] = $msgTypeResult;
                 $ret_data[$counter]['msg'] = trim($oneLine[3][0]);
                 $ret_data[$counter]['chain'] = $counter;

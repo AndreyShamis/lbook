@@ -8,28 +8,44 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookMessageTypeRepository extends ServiceEntityRepository
 {
+    protected static $_hashedData = array();
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, LogBookMessageType::class);
     }
 
-    public function findOneOrCreate(array $criteria,$flush = true)
+    /**
+     * @param array $criteria
+     * @param bool $flush
+     * @return LogBookMessageType
+     */
+    public function findOneOrCreate(array $criteria, $flush = true)
     {
         $criteria['name'] = strtoupper($criteria['name']);
-        $entity = $this->findOneBy($criteria);
+        $add_hash = true;
+        if(isset(self::$_hashedData[$criteria['name']])){
+            $entity = self::$_hashedData[$criteria['name']];
+            $add_hash = false;
+        }
+        else{
+            $entity = $this->findOneBy($criteria);
+        }
 
-        if (null === $entity)
-        {
+        if (null === $entity) {
             $entity = new LogBookMessageType();
             $entity->setName($criteria['name']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
             //$this->_em->clear($entity);
-            if($flush == true)
-            {
+            if($flush == true) {
                 $this->_em->flush();
                 //$this->_em->clear($entity);
             }
+
+        }
+        if($add_hash) {
+            self::$_hashedData[$criteria['name']] = $entity;
         }
 
         return $entity;

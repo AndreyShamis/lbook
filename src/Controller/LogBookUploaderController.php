@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class LogBookUploaderController extends Controller
 {
+    protected static $messageTypes = array();
+
     /**
      * @Route("/", name="upload_index")
      * @Method("GET")
@@ -104,7 +106,8 @@ class LogBookUploaderController extends Controller
      * @param  $file
      */
     public function parseFile($file){
-
+        $em = $this->getDoctrine()->getManager();
+        $msgTypeRepo    = $em->getRepository('App:LogBookMessageType');
         $MIN_STR_LEN = 10;
 
         $temp_arr = "";
@@ -146,10 +149,24 @@ class LogBookUploaderController extends Controller
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
             if (count($oneLine[2]) > 0){
-
+                $dLevel = null;
                 //echo $oneLine[1][0] . " ___ " .  $oneLine[2][0] . " ___ " .  $oneLine[3][0] . "<br/>";
                 $ret_data[$counter]['time'] = $this->clean_string($oneLine[1][0]);
-                $ret_data[$counter]['debugLevel'] = $this->clean_string($oneLine[2][0]);
+
+                /*
+                 * Get debug level message, convert to upper case
+                 */
+                $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
+
+                if(isset(self::$messageTypes[$dLevel['name']])){
+                    $msgTypeResult = self::$messageTypes[$dLevel['name']];
+                }
+                else{
+                    $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
+                    self::$messageTypes[$dLevel['name']] = $msgTypeResult;
+                }
+                $ret_data[$counter]['debugLevel'] = $msgTypeResult;
+
                 $ret_data[$counter]['msg'] = trim($oneLine[3][0]);
                 $counter++;
             }

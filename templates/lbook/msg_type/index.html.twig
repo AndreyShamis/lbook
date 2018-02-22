@@ -1,0 +1,34 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>msg_types list</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Options</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for msg_type in msg_types %}
+            <tr>
+                <td><a href="{{ path('msg_type_show', { 'id': msg_type.id }) }}">{{ msg_type.id }}</a></td>
+                <td>{{ msg_type.name }}</td>
+                <td>
+                    <a href="{{ path('msg_type_show', { 'id': msg_type.id }) }}">show</a>
+                    <a href="{{ path('msg_type_edit', { 'id': msg_type.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('msg_type_new') }}">Create a new msg_type</a>
+        </li>
+    </ul>
+{% endblock %}

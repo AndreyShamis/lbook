@@ -63,13 +63,13 @@
 
 
 
-    {#<li class="{% if route starts with 'qcc_' %}active{% endif %}">#}
-    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >#}
-    {#<i class="menu-icon fa fa-pencil-square-o"></i>#}
-    {#<span class="menu-text"> QCC </span>#}
-    {#</a>#}
-    {#<b class="arrow"></b>#}
-    {#</li>#}
+    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
+        <a href="{{asset(path('msg_type_index'))}}" >
+            <i class="menu-icon fa fa-pencil-square-o"></i>
+            <span class="menu-text"> Message Types </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 
     {#<li class="{% if route starts with 'event_' %}active{% endif %}">#}
     {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >#}

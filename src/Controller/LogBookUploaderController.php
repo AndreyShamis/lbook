@@ -124,10 +124,11 @@ class LogBookUploaderController extends Controller
 
             if (count($oneLine[2]) > 0){
                 $last_good_key = $key;
+                $value = $this->clean_string($value);
                 //echo $oneLine[1][0] . " ___ " .  $oneLine[2][0] . " ___ " .  $oneLine[3][0] . "<br/>";
             }
             else{
-                $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $value;
+                $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $this->clean_string($value);
 //                echo count($oneLine[0]) .  " :<pre>";
 //                print_r($oneLine);
 //                echo "</pre><br/>";
@@ -149,7 +150,7 @@ class LogBookUploaderController extends Controller
                 //echo $oneLine[1][0] . " ___ " .  $oneLine[2][0] . " ___ " .  $oneLine[3][0] . "<br/>";
                 $ret_data[$counter]['time'] = $this->clean_string($oneLine[1][0]);
                 $ret_data[$counter]['debugLevel'] = $this->clean_string($oneLine[2][0]);
-                $ret_data[$counter]['msg'] = $this->clean_string($oneLine[3][0]);
+                $ret_data[$counter]['msg'] = trim($oneLine[3][0]);
                 $counter++;
             }
             else{

@@ -103,39 +103,35 @@ class LogBookUploaderController extends Controller
     }
 
     /**
-     * @param  $file
+     * @param String $file
+     * @return array
      */
-    public function parseFile($file){
+    public function parseFile($file)
+    {
         $em = $this->getDoctrine()->getManager();
-        $msgTypeRepo    = $em->getRepository('App:LogBookMessageType');
+        $msgTypeRepo = $em->getRepository('App:LogBookMessageType');
         $MIN_STR_LEN = 10;
+        $ret_data = array();
 
-        $temp_arr = "";
-        $ret_data =array();
-        $file_data               = file_get_contents($file , FILE_USE_INCLUDE_PATH);
+        $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
         $temp_arr = preg_split("/\\r\\n|\\r|\\n/", $file_data);
 
         $last_good_key = -1;
         foreach ($temp_arr as $key => &$value){
-            //preg_match_all('/(\d{4,4}\-\d+\-\d+)\s+(\d+\:\d+:\d+)\s+([\d\w]+)\s+(\w+)\:\s+(.*)/', $value,$oneLine);
-            //preg_match_all('/(\d{2,}.*)\s*\|\s*(.*)/', $value,$oneLine);
-            //preg_match_all('/(\d{2,}.*\d{2,})\s*(\w+)\s*\|\s*(.*)/', $value,$oneLine);
+
             if(strlen($value) < $MIN_STR_LEN){
                 continue;
             }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/', $value,$oneLine);
-
             if (count($oneLine[2]) > 0){
                 $last_good_key = $key;
                 $value = $this->clean_string($value);
-                //echo $oneLine[1][0] . " ___ " .  $oneLine[2][0] . " ___ " .  $oneLine[3][0] . "<br/>";
             }
             else{
                 $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $this->clean_string($value);
 //                echo count($oneLine[0]) .  " :<pre>";
 //                print_r($oneLine);
 //                echo "</pre><br/>";
-
                 //echo "Update by value $value to index  $last_good_key , new value is " .  $temp_arr[$last_good_key] ."  <br/>";
                 $value = "";
             }
@@ -150,12 +146,9 @@ class LogBookUploaderController extends Controller
 
             if (count($oneLine[2]) > 0){
                 $dLevel = null;
-                //echo $oneLine[1][0] . " ___ " .  $oneLine[2][0] . " ___ " .  $oneLine[3][0] . "<br/>";
                 $ret_data[$counter]['time'] = $this->clean_string($oneLine[1][0]);
 
-                /*
-                 * Get debug level message, convert to upper case
-                 */
+                //Get debug level message, convert to upper case
                 $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
 
                 if(isset(self::$messageTypes[$dLevel['name']])){
@@ -166,8 +159,8 @@ class LogBookUploaderController extends Controller
                     self::$messageTypes[$dLevel['name']] = $msgTypeResult;
                 }
                 $ret_data[$counter]['debugLevel'] = $msgTypeResult;
-
                 $ret_data[$counter]['msg'] = trim($oneLine[3][0]);
+                $ret_data[$counter]['chain'] = $counter;
                 $counter++;
             }
             else{

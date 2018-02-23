@@ -12,7 +12,7 @@
             <th>Options</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="searchable">
         {% for cycle in cycles %}
             <tr>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>

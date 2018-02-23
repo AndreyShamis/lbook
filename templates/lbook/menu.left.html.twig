@@ -71,30 +71,30 @@
         <b class="arrow"></b>
     </li>
 
-    {#<li class="{% if route starts with 'event_' %}active{% endif %}">#}
-    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >#}
-    {#<i class="menu-icon fa fa-tag"></i>#}
-    {#<span class="menu-text">Events</span>#}
-    {#</a>#}
-    {#<b class="arrow"></b>#}
-    {#</li>#}
+    <li class="{% if route starts with 'undef_' %}active{% endif %}">
+        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >
+            <i class="menu-icon fa fa-tag"></i>
+            <span class="menu-text">NoNe</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 
 
-    {#<li class="{% if route starts with 'dut' %}active{% endif %}">#}
-    {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}" >#}
-    {#<i class="menu-icon fa fa-file-o"></i>#}
-    {#<span class="menu-text">DUT#}
-    {#<span class="badge badge-primary">5</span>#}
-    {#</span>#}
-    {#</a>#}
-    {#<b class="arrow"></b>#}
-    {#</li>#}
+    <li class="{% if route starts with 'log_' %}active{% endif %}">
+        <a href="{{asset(path('log_index'))}}">
+        <i class="menu-icon fa fa-file-o"></i>
+            <span class="menu-text">Logs/Messages
+            <span class="badge badge-primary">5</span>
+        </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 
     {# ################################### Controll ################################### #}
     <li class="{% if route in ['types','types_index','types_show'] %}active{% endif %}">
         <a href="#" class="dropdown-toggle">
             <i class="menu-icon fa fa-desktop"></i>
-            <span class="menu-text">Controll </span>
+            <span class="menu-text">NoNe </span>
             <b class="arrow fa fa-angle-down"></b>
         </a>
         <b class="arrow"></b>
@@ -111,15 +111,15 @@
                 </a>
                 <b class="arrow"></b>
                 <ul class="submenu">
-                    <li class="{% if route starts with 'platform' %}active{% endif %}">
+                    <li class="{% if route starts with 'undef_' %}active{% endif %}">
                         <a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}">
-                            <i class="menu-icon fa fa-caret-right"></i>Mine Types
+                            <i class="menu-icon fa fa-caret-right"></i>NoNe
                         </a>
                         <b class="arrow"></b>
                     </li>
-                    <li class="{% if route starts with 'adapter' %}active{% endif %}">
+                    <li class="{% if route starts with 'undef_' %}active{% endif %}">
                         <a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}">
-                            <i class="menu-icon fa fa-caret-right"></i>Hero Types
+                            <i class="menu-icon fa fa-caret-right"></i>NoNe
                         </a>
                         <b class="arrow"></b>
                     </li>

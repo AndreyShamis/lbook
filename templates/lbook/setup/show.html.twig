@@ -30,6 +30,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Tests</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -38,6 +39,7 @@
             <tr>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
+                <td>{{ cycle.tests | length }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>

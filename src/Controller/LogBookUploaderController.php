@@ -24,19 +24,11 @@ class LogBookUploaderController extends Controller
      */
     public function index()
     {
-        //$em = $this->getDoctrine()->getManager();
-
-        //$verdicts = $em->getRepository('App:LogBookUpload')->findAll();
-
-        return $this->render('lbook/upload/index.html.twig', array(
-            //'verdicts' => $verdicts,
-        ));
-        // replace this line with your own code!
-        //return $this->render('@Maker/demoPage.html.twig', [ 'path' => str_replace($this->getParameter('kernel.project_dir').'/', '', __FILE__) ]);
+        return $this->render('lbook/upload/index.html.twig', array());
     }
 
     /**
-     * Creates a new verdict entity.
+     * Creates a new Upload entity.
      *
      * @Route("/new", name="upload_new")
      * @Method({"GET", "POST"})
@@ -46,7 +38,6 @@ class LogBookUploaderController extends Controller
     public function newAction(Request $request)
     {
         $obj = new LogBookUpload();
-        //$form = $this->createForm(LogBookUpload::class, $obj);
         $form = $this->createForm('App\Form\LogBookUploadType', $obj);
         $form->handleRequest($request);
 
@@ -69,14 +60,6 @@ class LogBookUploaderController extends Controller
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
             $obj->data = $this->parseFile($copy_info, 2);
-//            $obj->data = $this->parseFile($copy_info, 2);
-//            $obj->data = $this->parseFile($copy_info, 6);
-//            $obj->data = $this->parseFile($copy_info, 4);
-//            $obj->data = $this->parseFile($copy_info, 5);
-//            $obj->data = $this->parseFile($copy_info, 1);
-//            $obj->data = $this->parseFile($copy_info, 2);
-//            $obj->data = $this->parseFile($copy_info, 6);
-//            $obj->data = $this->parseFile($copy_info, 8);
 
             return $this->showAction($obj);
             //return $this->redirectToRoute('upload_show', array('id' => $obj->getId()));
@@ -167,7 +150,6 @@ class LogBookUploaderController extends Controller
                 print_r($oneLine);
                 echo "</pre><br/>";
             }
-
         }
         $em->flush();
         return $ret_data;
@@ -186,6 +168,7 @@ class LogBookUploaderController extends Controller
         //$s = preg_replace('/\s+/', ' ', $s); // reduce all multiple whitespace to a single space
         return $s;
     }
+
 //    /**
 //     * Show upload file info.
 //     *

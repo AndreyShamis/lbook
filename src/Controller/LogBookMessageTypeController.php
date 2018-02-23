@@ -35,7 +35,7 @@ class LogBookMessageTypeController extends Controller
     }
 
     /**
-     * Creates a new verdict entity.
+     * Creates a new Log/Message Type entity.
      *
      * @Route("/new", name="msg_type_new")
      * @Method({"GET", "POST"})
@@ -63,7 +63,7 @@ class LogBookMessageTypeController extends Controller
     }
 
     /**
-     * Finds and displays a verdict entity.
+     * Finds and displays a Log/Message Type entity.
      *
      * @Route("/{id}", name="msg_type_show")
      * @Method("GET")
@@ -81,7 +81,7 @@ class LogBookMessageTypeController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing verdict entity.
+     * Displays a form to edit an existing Log/Message Type entity.
      *
      * @Route("/{id}/edit", name="msg_type_edit")
      * @Method({"GET", "POST"})
@@ -109,7 +109,7 @@ class LogBookMessageTypeController extends Controller
     }
 
     /**
-     * Deletes a verdict entity.
+     * Deletes a Log/Message Type entity.
      *
      * @Route("/{id}", name="msg_type_delete")
      * @Method("DELETE")
@@ -132,7 +132,7 @@ class LogBookMessageTypeController extends Controller
     }
 
     /**
-     * Creates a form to delete a verdict entity.
+     * Creates a form to delete a Log/Message Type entity.
      *
      * @param LogBookMessageType $obj The verdict entity
      *

@@ -100,6 +100,8 @@ class LogBookUploaderController extends Controller
         $logsRepo = $em->getRepository('App:LogBookMessage');
         $testsRepo = $em->getRepository('App:LogBookTest');
 
+        $test = $testsRepo->findOneOrCreate(array("id" => $testId));
+
         $ret_data = array();
 
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
@@ -118,12 +120,19 @@ class LogBookUploaderController extends Controller
             }
             else{
                 $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $this->clean_string($value);
-                $value = "";
+                $value = null;
             }
         }
         //exit;
+
         $counter=0;
         $objectsToClear = array();
+        /*
+         * Test Time section
+         */
+        $testStartTime = new \DateTime('+100 years');
+        $testEndTime = new \DateTime('-100 years');
+
         foreach ($temp_arr as $key => $value){
             if(strlen($value) < $MIN_STR_LEN){
                 continue;
@@ -139,31 +148,23 @@ class LogBookUploaderController extends Controller
                     $oneLine[3][0] = $messageWithDebug[2];
                 }
 
-                $tmp_time = $this->clean_string($oneLine[1][0]);
-                if(strlen($tmp_time) > $SHORT_TIME_LEN){
-                    $timeFormat = 'm/d H:i:s';
-                }
-                else{
-                    $timeFormat = 'H:i:s';
-                }
-                $date = \DateTime::createFromFormat($timeFormat, $tmp_time);
+                $ret_data[$counter] = array(
+                    'logTime'   => $this->getLogTime($oneLine[1][0], $SHORT_TIME_LEN),
+                    'message'   => trim($oneLine[3][0]),
+                    'chain'     => $counter,
+                    'test'      => $test,
+                    'msgType'   => $msgTypeRepo->findOneOrCreate(array(
+                        'name'      => $this->prepareDebugLevel($oneLine[2][0])
+                    )),
+                );
+                $log = $logsRepo->Create($ret_data[$counter], false);
+                $objectsToClear[] = $log;
 
-                //Get debug level message, convert to upper case
-                $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
-                if($dLevel['name'] == 'WARNI'){
-                    $dLevel['name'] = "WARNING";
-                }
-                elseif($dLevel['name'] == 'CRITI'){
-                    $dLevel['name'] = "CRITICAL";
-                }
-                $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
-
-                $ret_data[$counter]['logTime'] = $date;
-                $ret_data[$counter]['msgType'] = $msgTypeResult;
-                $ret_data[$counter]['message'] = trim($oneLine[3][0]);
-                $ret_data[$counter]['chain'] = $counter;
-                $ret_data[$counter]['test'] = $testsRepo->findOneOrCreate(array("id" => $testId));
-                $objectsToClear[] = $logsRepo->Create($ret_data[$counter], false);
+                /*
+                 * Test Time section
+                 */
+                $testStartTime = min($testStartTime, $log->getLogTime());
+                $testEndTime = max($testEndTime, $log->getLogTime());
                 $counter++;
             }
             else{
@@ -172,12 +173,48 @@ class LogBookUploaderController extends Controller
                 echo "</pre><br/>";
             }
         }
+        $test->setTimeStart($testStartTime);
+        $test->setTimeEnd($testEndTime);
         $em->flush();
         foreach ($objectsToClear as $obj){
             $em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         }
 
         return $ret_data;
+    }
+
+    /**
+     * Convert string time to object DateTime
+     * @param string $input
+     * @param int $SHORT_TIME_LEN The length of string without Day and month
+     * @return \DateTime
+     */
+    protected function getLogTime(string $input, $SHORT_TIME_LEN = 8) : \DateTime{
+        $tmp_time = $this->clean_string($input);
+        if(strlen($tmp_time) > $SHORT_TIME_LEN){
+            $timeFormat = 'm/d H:i:s';
+        }
+        else{
+            $timeFormat = 'H:i:s';
+        }
+        return \DateTime::createFromFormat($timeFormat, $tmp_time);
+    }
+
+    /**
+     * Clean and replace some debug Level
+     * @param string $debugLevel
+     * @return string
+     */
+    protected function prepareDebugLevel(string $debugLevel) : string {
+        //Get debug level message, convert to upper case
+        $ret = strtoupper($this->clean_string($debugLevel));
+        if($ret == 'WARNI'){
+            $ret = "WARNING";
+        }
+        elseif($ret == 'CRITI'){
+            $ret = "CRITICAL";
+        }
+        return $ret;
     }
 
     /**

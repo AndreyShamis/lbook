@@ -23,7 +23,7 @@ class LogBookMessageTypeRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookMessageType
      */
-    public function findOneOrCreate(array $criteria, $flush = true)
+    public function findOneOrCreate(array $criteria, $flush = false)
     {
         $criteria['name'] = strtoupper($criteria['name']);
         $add_hash = true;

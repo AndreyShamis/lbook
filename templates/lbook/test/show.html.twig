@@ -35,6 +35,35 @@
             </tr>
         </tbody>
     </table>
+    <h1>Logs list</h1>
+    {% set logs = test.logs %}
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Id</th>
+            <th>Order</th>
+            <th>Log</th>
+            <th>Type</th>
+            <th>Options</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.logTime | date('H:i:s') }}</td>
+                <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
+                <td>{{ log.chain }}</td>
+                <td>{{ log.message | nl2br }}</td>
+                <td>{{ log.msgType }}</td>
+                <td>
+                    <a href="{{ path('log_edit', { 'id': log.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
     <ul>
         <li>

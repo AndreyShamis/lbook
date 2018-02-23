@@ -33,21 +33,20 @@ class LogBookMessageRepository extends ServiceEntityRepository
 //        else{
 //            $entity = $this->findOneBy($criteria);
 //        }
-        unset($criteria['time']);
-        $entity = $this->findOneBy($criteria);
+        
+        $entity = null; //$this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookMessage();
             $entity->setMessage($criteria['message']);
             $entity->setChain($criteria['chain']);
             $entity->setMsgType($criteria['msgType']);
+            $entity->setLogTime($criteria['logTime']);
             $entity->setTest($criteria['test']);
             $this->_em->persist($entity);
-            $this->_em->flush($entity);
-            //$this->_em->clear($entity);
-            if($flush == true) {
-                $this->_em->flush();
-                //$this->_em->clear($entity);
+            if($flush){
+                $this->_em->flush($entity);
             }
+
 
         }
 //        if($add_hash) {

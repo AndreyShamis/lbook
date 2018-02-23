@@ -8,11 +8,53 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookTestRepository extends ServiceEntityRepository
 {
+    /**
+     * @var array Keep hashed entity
+     */
+    protected static $_hashedData = array();
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, LogBookTest::class);
     }
 
+    /**
+     * @param array $criteria
+     * @param bool $flush
+     * @return LogBookTest
+     */
+    public function findOneOrCreate(array $criteria, $flush = false)
+    {
+        $add_hash = true;
+        if(isset(self::$_hashedData[$criteria['id']])){
+            $entity = self::$_hashedData[$criteria['id']];
+            $add_hash = false;
+        }
+        else{
+            $entity = $this->findOneBy($criteria);
+        }
+
+        if (null === $entity) {
+            $entity = new LogBookTest();
+            $entity->setName($criteria['name']);
+//            $entity->setVerdict(false);
+//            $entity->setCycles(0);
+//            $entity->setDisabled(false);
+//            $entity->setOwner(0);   //TODO User, Owner
+//            $entity->setOs(OsType::OS_UNKNOWN);
+            $this->_em->persist($entity);
+            $this->_em->flush($entity);
+            if($flush == true) {
+                $this->_em->flush();
+            }
+
+        }
+        if($add_hash) {
+            self::$_hashedData[$criteria['id']] = $entity;
+        }
+
+        return $entity;
+    }
     /*
     public function findBySomething($value)
     {

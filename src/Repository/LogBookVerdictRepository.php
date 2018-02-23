@@ -23,7 +23,7 @@ class LogBookVerdictRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookVerdict
      */
-    public function findOneOrCreate(array $criteria, $flush = true)
+    public function findOneOrCreate(array $criteria, $flush = false)
     {
         $add_hash = true;
         if(isset(self::$_hashedData[$criteria['name']])){

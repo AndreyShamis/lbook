@@ -48,6 +48,30 @@ class LogBookMessage
     protected $test;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="log_time", type="datetime")
+     */
+    protected $logTime;
+
+    /**
+     * @return \DateTime
+     */
+    public function getLogTime()
+    {
+        return $this->logTime;
+    }
+
+    /**
+     * @param \DateTime $logTime
+     */
+    public function setLogTime(\DateTime $logTime): void
+    {
+        $this->logTime = $logTime;
+    }
+
+
+    /**
      * @return mixed
      */
     public function getTest()

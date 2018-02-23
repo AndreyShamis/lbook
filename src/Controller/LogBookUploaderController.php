@@ -68,7 +68,15 @@ class LogBookUploaderController extends Controller
             $obj->addMessage("File copy info :"  . $copy_info);
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
-            $obj->data = $this->parseFile($copy_info);
+            $obj->data = $this->parseFile($copy_info, 2);
+//            $obj->data = $this->parseFile($copy_info, 2);
+//            $obj->data = $this->parseFile($copy_info, 6);
+//            $obj->data = $this->parseFile($copy_info, 4);
+//            $obj->data = $this->parseFile($copy_info, 5);
+//            $obj->data = $this->parseFile($copy_info, 1);
+//            $obj->data = $this->parseFile($copy_info, 2);
+//            $obj->data = $this->parseFile($copy_info, 6);
+//            $obj->data = $this->parseFile($copy_info, 8);
 
             return $this->showAction($obj);
             //return $this->redirectToRoute('upload_show', array('id' => $obj->getId()));
@@ -84,13 +92,14 @@ class LogBookUploaderController extends Controller
      * @param String $file
      * @return array
      */
-    protected function parseFile($file)
+    protected function parseFile($file, $testId=1)
     {
         $em = $this->getDoctrine()->getManager();
         $msgTypeRepo = $em->getRepository('App:LogBookMessageType');
         $logsRepo = $em->getRepository('App:LogBookMessage');
         $testsRepo = $em->getRepository('App:LogBookTest');
         $MIN_STR_LEN = 10;
+        $SHORT_TIME_LEN = 8;
         $ret_data = array();
 
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
@@ -109,14 +118,10 @@ class LogBookUploaderController extends Controller
             }
             else{
                 $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $this->clean_string($value);
-//                echo count($oneLine[0]) .  " :<pre>";
-//                print_r($oneLine);
-//                echo "</pre><br/>";
-                //echo "Update by value $value to index  $last_good_key , new value is " .  $temp_arr[$last_good_key] ."  <br/>";
                 $value = "";
             }
         }
-
+        //exit;
         $counter=0;
         foreach ($temp_arr as $key => $value){
             if(strlen($value) < $MIN_STR_LEN){
@@ -127,18 +132,32 @@ class LogBookUploaderController extends Controller
             if (count($oneLine[2]) > 0){
                 $dLevel = null;
 
-                $ret_data[$counter]['time'] = $this->clean_string($oneLine[1][0]);
+                //Removing : base_job:0395 utils:0262 ssh_host:0116
+                preg_match('/([\w|\_]*\:\d+\s*)\|\s*(.*)/s', $oneLine[3][0], $messageWithDebug);
+                if(count($messageWithDebug) == 3){
+                    $oneLine[3][0] = $messageWithDebug[2];
+                }
+
+                $tmp_time = $this->clean_string($oneLine[1][0]);
+                if(strlen($tmp_time) > $SHORT_TIME_LEN){
+                    $timeFormat = 'm/d H:i:s';
+                }
+                else{
+                    $timeFormat = 'H:i:s';
+                }
+                $date = \DateTime::createFromFormat($timeFormat, $tmp_time);
 
                 //Get debug level message, convert to upper case
                 $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
 
                 $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
 
+                $ret_data[$counter]['logTime'] = $date;
                 $ret_data[$counter]['msgType'] = $msgTypeResult;
                 $ret_data[$counter]['message'] = trim($oneLine[3][0]);
                 $ret_data[$counter]['chain'] = $counter;
-                $ret_data[$counter]['test'] = $testsRepo->findOneBy(array("id" => 1));
-                $logsRepo->findOneOrCreate($ret_data[$counter]);
+                $ret_data[$counter]['test'] = $testsRepo->findOneOrCreate(array("id" => $testId));
+                $logsRepo->findOneOrCreate($ret_data[$counter], false);
                 $counter++;
             }
             else{
@@ -146,7 +165,9 @@ class LogBookUploaderController extends Controller
                 print_r($oneLine);
                 echo "</pre><br/>";
             }
+
         }
+        $em->flush();
         return $ret_data;
     }
 

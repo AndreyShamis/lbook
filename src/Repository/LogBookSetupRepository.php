@@ -24,7 +24,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookSetup
      */
-    public function findOneOrCreate(array $criteria, $flush = true)
+    public function findOneOrCreate(array $criteria, $flush = false)
     {
         $add_hash = true;
         if(isset(self::$_hashedData[$criteria['name']])){

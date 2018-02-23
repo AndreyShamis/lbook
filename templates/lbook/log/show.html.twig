@@ -17,6 +17,12 @@
                 <th>Log</th>
                 <td>{{ log.message }}</td>
             </tr>
+
+            <tr>
+                <th>Time</th>
+                <td>{{ log.logTime | date('m/d H:i:s') }}</td>
+            </tr>
+
         </tbody>
     </table>
 

@@ -98,6 +98,24 @@ class LogBookTest
     protected $logs;
 
     /**
+     * @return mixed
+     */
+    public function getLogs()
+    {
+        return $this->logs;
+    }
+
+    /**
+     * @param mixed $logs
+     */
+    public function setLogs($logs): void
+    {
+        $this->logs = $logs;
+    }
+
+
+
+    /**
      * @PreFlush
      */
     public function calculateRunTime(){

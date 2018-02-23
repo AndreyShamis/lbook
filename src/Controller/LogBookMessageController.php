@@ -9,29 +9,72 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 /**
- * Uploader controller.
+ * Log controller.
  *
  * @Route("log")
  */
 class LogBookMessageController extends Controller
 {
     /**
-     * @Route("/", name="log_index")
+     * Paginator Helper
+     *
+     * Pass through a query object, current page & limit
+     * the offset is calculated from the page and limit
+     * returns an `Paginator` instance, which you can call the following on:
+     *
+     *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
+     *     $paginator->count() # Count of ALL posts (ie: `20` posts)
+     *     $paginator->getIterator() # ArrayIterator
+     *
+     * @param Doctrine\ORM\Query $dql   DQL Query Object
+     * @param integer            $page  Current page (defaults to 1)
+     * @param integer            $limit The total number per page (defaults to 5)
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function index()
+    public function paginate($dql, $page = 1, $limit = 20)
+    {
+        $paginator = new Paginator($dql);
+        $paginator->getQuery()
+            ->setFirstResult($limit * ($page - 1)) // Offset
+            ->setMaxResults($limit); // Limit
+        return $paginator;
+    }
+
+    /**
+     * @Route("/page/{page}", name="log_index")
+     * @Method("GET")
+     * @Template(template="lbook/log/index.html.twig")
+     * @param int $page
+     * @return Response
+     */
+    public function index($page = 1)
     {
         $em = $this->getDoctrine()->getManager();
+        $limit = 100;
+        $logs = $em->getRepository('App:LogBookMessage');
+        $paginator = $this->paginate($logs->createQueryBuilder('t'), $page, $limit);
+        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
 
-        $messages = $em->getRepository('App:LogBookMessage')->findAll();
+        // You can also call the count methods (check PHPDoc for `paginate()`)
+        $totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
+        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
+        $iterator = $paginator->getIterator(); # ArrayIterator
 
+        $maxPages = ceil($totalPosts / $limit);
+        $thisPage = $page;
         return $this->render('lbook/log/index.html.twig', array(
-            'logs' => $messages,
+            //'logs'     => $logs,
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
         ));
-        // replace this line with your own code!
-        //return $this->render('@Maker/demoPage.html.twig', [ 'path' => str_replace($this->getParameter('kernel.project_dir').'/', '', __FILE__) ]);
     }
 
     /**

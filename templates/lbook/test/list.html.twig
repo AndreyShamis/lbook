@@ -1,9 +1,12 @@
+
 {% extends 'lbook/default/index.html.twig' %}
 
 {% block content %}
-    <h1>Tests list</h1>
-    <div>Count : {{ tests | length }} <a href="{{ path('_test_index') }}">View with paginator</a></div>
+    <h1>Tests list with paginato</h1>
+    <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
+    {% set pagePath = "_test_index" %}
+    {% include "lbook/paginator.html.twig" %}
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
@@ -22,11 +25,12 @@
         <tbody class="searchable">
         {% set break = false %}
         {% set counter = 0 %}
-        {% for test in tests if not break %}
-        {% set counter=counter+1 %}
-        {% if counter == 250 %}
-            {% set break = true %}
-        {% endif %}
+        {% for test in iterator if not break %}
+
+            {% if counter == 250 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
             <tr>
                 <td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>
                 <td>{{ test.executionOrder }}</td>

@@ -9,14 +9,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-
+/**
+ * Verdict controller.
+ *
+ * @Route("verdict")
+ */
 class LogBookVerdictController extends Controller
 {
 
     /**
      * Lists all verdict entities.
      *
-     * @Route("/verdict", name="verdict_index")
+     * @Route("/", name="verdict_index")
      * @Method("GET")
      */
     public function index()

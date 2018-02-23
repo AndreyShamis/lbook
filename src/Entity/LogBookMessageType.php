@@ -24,8 +24,8 @@ class LogBookMessageType
     /**
      * @var string
      *
-     * @Assert\NotBlank(message="Please provide Message Type Name")
      * @ORM\Column(name="name", type="string", length=20)
+     * @Assert\NotBlank(message="Please provide Message Type Name")
      */
     protected $name = "";
 

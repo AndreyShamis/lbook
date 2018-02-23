@@ -11,6 +11,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
 
 /**
  * Log controller.
@@ -30,7 +32,7 @@ class LogBookMessageController extends Controller
      *     $paginator->count() # Count of ALL posts (ie: `20` posts)
      *     $paginator->getIterator() # ArrayIterator
      *
-     * @param Doctrine\ORM\Query $dql   DQL Query Object
+     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
      * @param integer            $page  Current page (defaults to 1)
      * @param integer            $limit The total number per page (defaults to 5)
      *

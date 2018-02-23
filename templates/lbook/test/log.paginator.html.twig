@@ -18,14 +18,14 @@
         <ul class="pagination pagination-sm">
             {# `«` arrow  #}
             <li {{ thisPage == 1 ? 'class="disabled"' }} >
-                <a href="{{ path(pagePath, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+                <a href="{{ path(pagePath, {id: testId, page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
             </li>
 
             {% if left < thisPage and  start < left %}
 
                 {% for i in 1..start %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path( pagePath, {page: i}) }}" style="background-color:#EAEAEA;">{{ i }}</a>
+                        <a class="page-link" href="{{ path( pagePath, {id: testId, page: i}) }}"  style="background-color:#EAEAEA;">{{ i }}</a>
                     </li>
 
                 {% endfor %}
@@ -36,7 +36,7 @@
 
                 {% for i in left..right %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path(pagePath, {page: i}) }}">{{ i }}</a>
+                        <a class="page-link" href="{{ path(pagePath, {id: testId, page: i}) }}">{{ i }}</a>
                     </li>
                 {% endfor %}
 
@@ -46,7 +46,7 @@
 
                 {% for i in end..maxPages %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path(pagePath, {page: i}) }}" style="background-color:#EAEAEA">{{ i }}</a>
+                        <a class="page-link" href="{{ path(pagePath, {id: testId, page: i}) }}" style="background-color:#EAEAEA">{{ i }}</a>
                     </li>
                 {% endfor %}
 
@@ -54,7 +54,7 @@
 
             {# `»` arrow #}
             <li {{ thisPage == maxPages ? 'class="disabled"' }}>
-                <a href="{{ path(pagePath, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+                <a href="{{ path(pagePath, {id: testId, page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
             </li>
         </ul>
     {% endif %}

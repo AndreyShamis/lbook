@@ -37,6 +37,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
 
 /**
  * Test controller.
@@ -57,7 +59,7 @@ class LogBookTestController extends Controller
      *     $paginator->count() # Count of ALL posts (ie: `20` posts)
      *     $paginator->getIterator() # ArrayIterator
      *
-     * @param Doctrine\ORM\Query $dql   DQL Query Object
+     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
      * @param integer            $page  Current page (defaults to 1)
      * @param integer            $limit The total number per page (defaults to 5)
      *
@@ -170,6 +172,51 @@ class LogBookTestController extends Controller
             'delete_form' => $deleteForm->createView(),
         ));
     }
+
+    /**
+     * Finds and displays a test entity.
+     *
+     * @Route("/{id}/page/{page}", name="test_show_full")
+     * @Method("GET")
+     * @param LogBookTest $test
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFullAction(LogBookTest $test, $page=1)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $limit = 300;
+//        $logs = $em->getRepository('App:LogBookMessage');
+//        $paginator = $this->paginate($logs->createQueryBuilder('t'), $page, $limit);
+
+        //$query->setParameters(array("userId"=>$user->getId()));
+        $logs = $em->getRepository('App:LogBookMessage');
+        $qb = $logs->createQueryBuilder('t')
+            ->where('t.test = :test')
+            ->setParameter('test', $test->getId());
+        $paginator = $this->paginate($qb, $page, $limit);
+        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
+
+        // You can also call the count methods (check PHPDoc for `paginate()`)
+        $totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
+        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
+        $iterator = $paginator->getIterator(); # ArrayIterator
+
+        $maxPages = ceil($totalPosts / $limit);
+        $thisPage = $page;
+
+        $deleteForm = $this->createDeleteForm($test);
+
+        return $this->render('lbook/test/show.full.html.twig', array(
+            'test'          => $test,
+            'size'          => $totalPosts,
+            'maxPages'      => $maxPages,
+            'thisPage'      => $thisPage,
+            'iterator'      => $iterator,
+            'paginator'     => $paginator,
+            'delete_form'   => $deleteForm->createView(),
+        ));
+    }
+
 
     /**
      * Displays a form to edit an existing test entity.

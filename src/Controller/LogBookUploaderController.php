@@ -61,10 +61,13 @@ class LogBookUploaderController extends Controller
             $obj->file_info = $file;
             $obj->data = $this->parseFile($copy_info, 1);
 
-//            /**
-//             * Stress section
-//             */
-//            for($i = 0 ; $i<500;$i++){
+            /**
+             * Stress section
+             */
+//            for($i = 0 ; $i<1;$i++){
+//                $obj->data = $this->parseFile($copy_info, 1);
+//                $obj->data = $this->parseFile($copy_info, 1);
+//                $obj->data = $this->parseFile($copy_info, 1);
 //                $obj->data = $this->parseFile($copy_info, 1);
 //                $obj->data = $this->parseFile($copy_info, 2);
 //                $obj->data = $this->parseFile($copy_info, 4);
@@ -120,6 +123,7 @@ class LogBookUploaderController extends Controller
         }
         //exit;
         $counter=0;
+        $objectsToClear = array();
         foreach ($temp_arr as $key => $value){
             if(strlen($value) < $MIN_STR_LEN){
                 continue;
@@ -156,7 +160,7 @@ class LogBookUploaderController extends Controller
                 $ret_data[$counter]['message'] = trim($oneLine[3][0]);
                 $ret_data[$counter]['chain'] = $counter;
                 $ret_data[$counter]['test'] = $testsRepo->findOneOrCreate(array("id" => $testId));
-                $logsRepo->Create($ret_data[$counter], false);
+                $objectsToClear[] = $logsRepo->Create($ret_data[$counter], false);
                 $counter++;
             }
             else{
@@ -166,8 +170,10 @@ class LogBookUploaderController extends Controller
             }
         }
         $em->flush();
+        foreach ($objectsToClear as $obj){
+            $em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+        }
 
-        $em->clear();   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         return $ret_data;
     }
 

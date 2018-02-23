@@ -33,7 +33,7 @@ class LogBookTest
      * @var DateTime
      *
      * @ORM\Column(name="time_start", type="datetime")
-     * @Assert\DateTime()
+     * //@Assert\DateTime()
      */
     protected $timeStart;
 
@@ -41,7 +41,7 @@ class LogBookTest
      * @var DateTime
      *
      * @ORM\Column(name="time_end", type="datetime")
-     * @Assert\DateTime()
+     * //@Assert\DateTime()
      */
     protected $timeEnd;
 

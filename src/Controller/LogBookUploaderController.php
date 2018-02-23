@@ -88,6 +88,8 @@ class LogBookUploaderController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $msgTypeRepo = $em->getRepository('App:LogBookMessageType');
+        $logsRepo = $em->getRepository('App:LogBookMessage');
+        $testsRepo = $em->getRepository('App:LogBookTest');
         $MIN_STR_LEN = 10;
         $ret_data = array();
 
@@ -124,6 +126,7 @@ class LogBookUploaderController extends Controller
 
             if (count($oneLine[2]) > 0){
                 $dLevel = null;
+
                 $ret_data[$counter]['time'] = $this->clean_string($oneLine[1][0]);
 
                 //Get debug level message, convert to upper case
@@ -131,9 +134,11 @@ class LogBookUploaderController extends Controller
 
                 $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
 
-                $ret_data[$counter]['debugLevel'] = $msgTypeResult;
-                $ret_data[$counter]['msg'] = trim($oneLine[3][0]);
+                $ret_data[$counter]['msgType'] = $msgTypeResult;
+                $ret_data[$counter]['message'] = trim($oneLine[3][0]);
                 $ret_data[$counter]['chain'] = $counter;
+                $ret_data[$counter]['test'] = $testsRepo->findOneBy(array("id" => 1));
+                $logsRepo->findOneOrCreate($ret_data[$counter]);
                 $counter++;
             }
             else{

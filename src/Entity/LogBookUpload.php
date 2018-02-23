@@ -44,7 +44,7 @@ class LogBookUpload
     /**
      *
      * @Assert\NotBlank(message="Please, upload the log file as a DEBUG or INFO format file.")
-     * @Assert\File(mimeTypes={ "text/plain" })
+     * //@Assert\File(mimeTypes={ "text/plain" })
      */
     private $logFile;
 

@@ -1,0 +1,38 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Logs list</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Order</th>
+            <th>Log</th>
+            <th>Type</th>
+            <th>Options</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
+                <td>{{ log.chain }}</td>
+                <td>{{ log.message }}</td>
+                <td>{{ log.msgType }}</td>
+                <td>
+                    <a href="{{ path('log_show', { 'id': log.id }) }}">show</a>
+                    <a href="{{ path('log_edit', { 'id': log.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('log_new') }}">Create a new msg_type</a>
+        </li>
+    </ul>
+{% endblock %}

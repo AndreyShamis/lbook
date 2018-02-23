@@ -1,6 +1,11 @@
 {% extends 'lbook/default/index.html.twig' %}
 
 {% block content %}
-    <h1>upload</h1>
+    <h1>Upload done!</h1>
     {{ dump(upload) }}
+    <ul>
+        <li>
+            <a href="{{ path('upload_new') }}">Upload File</a>
+        </li>
+    </ul>
 {% endblock %}

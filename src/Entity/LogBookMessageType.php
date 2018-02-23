@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookMessageTypeRepository")
  * @ORM\Table(name="lbook_msg_types")
+ * @UniqueEntity("name", message="Message Type with this name already exist")
  */
 class LogBookMessageType
 {

@@ -32,7 +32,7 @@ class LogBookUpload
      */
     public function addMessage(string $message)
     {
-        $this->message = $this->message . "\n<br/>" . $message;
+        $this->message = $this->message . "\n" . $message;
     }
     /**
      * @param string $message

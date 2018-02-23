@@ -11,6 +11,7 @@ namespace App\Model;
 
 abstract class OsType
 {
+    const OS_UNKNOWN = 0;
     const OS_LINUX = 1;
     const OS_WINDOWS = 2;
     const OS_ANDROID = 3;
@@ -22,6 +23,7 @@ abstract class OsType
         self::OS_WINDOWS => 'Windows',
         self::OS_ANDROID => 'Android',
         self::OS_FREEBSD  => 'FreeBSD',
+        self::OS_UNKNOWN  => 'Unknown',
     ];
 
     /**
@@ -42,6 +44,7 @@ abstract class OsType
     public static function getAvailableTypes()
     {
         return [
+            self::OS_UNKNOWN,
             self::OS_LINUX,
             self::OS_WINDOWS,
             self::OS_ANDROID,

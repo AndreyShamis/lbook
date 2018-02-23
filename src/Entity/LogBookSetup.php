@@ -3,10 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookSetupRepository")
  * @ORM\Table(name="lbook_setups")
+ * @UniqueEntity("name", message="Setup with this name already exist")
  */
 class LogBookSetup
 {

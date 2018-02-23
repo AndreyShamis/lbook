@@ -61,11 +61,11 @@ class LogBookUploaderController extends Controller
 //                $this->getParameter('brochures_directory'),
 //                $fileName
 //            );
-            $obj->addMessage("New file name is " . $fileName);
-            $obj->addMessage("File ext "  .$file->guessExtension());
+            $obj->addMessage("New file name is :" . $fileName);
+            $obj->addMessage("File ext :"  .$file->guessExtension());
             $copy_info = $file->move("../uploads/", $fileName);
 
-            $obj->addMessage("File copy info "  . $copy_info);
+            $obj->addMessage("File copy info :"  . $copy_info);
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
             $obj->data = $this->parseFile($copy_info);

@@ -8,6 +8,9 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookMessageTypeRepository extends ServiceEntityRepository
 {
+    /**
+     * @var array Keep hashed entity
+     */
     protected static $_hashedData = array();
 
     public function __construct(RegistryInterface $registry)

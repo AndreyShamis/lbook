@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>Logs list</h1>
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    {% set pagePath = "log_index" %}
+    {% include "lbook/paginator.html.twig" %}
 
     <table class="records_list table table-striped table-condensed">
         <thead>
@@ -14,8 +18,14 @@
             <th>Options</th>
         </tr>
         </thead>
-        <tbody>
-        {% for log in logs %}
+        <tbody class="searchable">
+        {% set break = false %}
+        {% set counter = 0 %}
+        {% for log in iterator if not break %}
+            {% if counter == 250 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
             <tr>
                 <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
                 <td>{{ log.logTime|date('Y-m-d H:i:s') }}</td>

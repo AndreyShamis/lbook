@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Uploader controller.
+ * LogType controller.
  *
  * @Route("msg_type")
  */

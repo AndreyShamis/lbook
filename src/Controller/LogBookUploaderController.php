@@ -59,7 +59,18 @@ class LogBookUploaderController extends Controller
             $obj->addMessage("File copy info :"  . $copy_info);
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
-            $obj->data = $this->parseFile($copy_info, 2);
+            $obj->data = $this->parseFile($copy_info, 1);
+
+//            /**
+//             * Stress section
+//             */
+//            for($i = 0 ; $i<500;$i++){
+//                $obj->data = $this->parseFile($copy_info, 1);
+//                $obj->data = $this->parseFile($copy_info, 2);
+//                $obj->data = $this->parseFile($copy_info, 4);
+//                $obj->data = $this->parseFile($copy_info, 5);
+//            }
+
 
             return $this->showAction($obj);
             //return $this->redirectToRoute('upload_show', array('id' => $obj->getId()));
@@ -77,12 +88,15 @@ class LogBookUploaderController extends Controller
      */
     protected function parseFile($file, $testId=1)
     {
+        $MIN_STR_LEN = 10;
+        $SHORT_TIME_LEN = 8;
+
         $em = $this->getDoctrine()->getManager();
+
         $msgTypeRepo = $em->getRepository('App:LogBookMessageType');
         $logsRepo = $em->getRepository('App:LogBookMessage');
         $testsRepo = $em->getRepository('App:LogBookTest');
-        $MIN_STR_LEN = 10;
-        $SHORT_TIME_LEN = 8;
+
         $ret_data = array();
 
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
@@ -152,6 +166,8 @@ class LogBookUploaderController extends Controller
             }
         }
         $em->flush();
+
+        $em->clear();   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         return $ret_data;
     }
 

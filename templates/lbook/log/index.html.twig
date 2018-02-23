@@ -7,19 +7,20 @@
         <thead>
         <tr>
             <th>Id</th>
+            <th>Time</th>
             <th>Order</th>
             <th>Log</th>
             <th>Type</th>
             <th>Options</th>
-
         </tr>
         </thead>
         <tbody>
         {% for log in logs %}
             <tr>
                 <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
+                <td>{{ log.logTime|date('Y-m-d H:i:s') }}</td>
                 <td>{{ log.chain }}</td>
-                <td>{{ log.message }}</td>
+                <td>{{ log.message | nl2br  }}</td>
                 <td>{{ log.msgType }}</td>
                 <td>
                     <a href="{{ path('log_show', { 'id': log.id }) }}">show</a>

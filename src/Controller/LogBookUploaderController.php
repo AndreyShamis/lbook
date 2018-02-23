@@ -153,6 +153,9 @@ class LogBookUploaderController extends Controller
                 if($dLevel['name'] == 'WARNI'){
                     $dLevel['name'] = "WARNING";
                 }
+                elseif($dLevel['name'] == 'CRITI'){
+                    $dLevel['name'] = "CRITICAL";
+                }
                 $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
 
                 $ret_data[$counter]['logTime'] = $date;

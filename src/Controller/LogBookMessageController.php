@@ -63,7 +63,7 @@ class LogBookMessageController extends Controller
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
 
         // You can also call the count methods (check PHPDoc for `paginate()`)
-        $totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
+        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
         $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
         $iterator = $paginator->getIterator(); # ArrayIterator
 

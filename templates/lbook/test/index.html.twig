@@ -10,6 +10,7 @@
             <th>Id</th>
             <th>Order</th>
             <th>Name</th>
+            <th>Logs</th> {# TODO Remove due performance #}
             <th>Time start</th>
             <th>Time end</th>
             <th>Runtime</th>
@@ -31,6 +32,7 @@
                 <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.id }}</a></td>
                 <td>{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td>{{ test.logs | length }}</td> {# TODO Remove due performance #}
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun }}</td>

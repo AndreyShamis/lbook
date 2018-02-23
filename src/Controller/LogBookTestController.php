@@ -112,7 +112,6 @@ class LogBookTestController extends Controller
      *
      * @Route("/", name="test_index")
      * @Method("GET")
-     * @Template(template="lbook/test/index.html.twig")
      */
     public function index()
     {
@@ -122,9 +121,10 @@ class LogBookTestController extends Controller
         $query  = $em->getRepository('App:LogBookTest')->createQueryBuilder('a');
         $query->setMaxResults(100);
         $tests = $query->getQuery()->execute();
-        return array(
+        return $this->render('lbook/test/index.html.twig', array(
             'tests' => $tests,
-        );
+        ));
+
     }
 
     /**

@@ -59,7 +59,7 @@ class LogBookUploaderController extends Controller
             $obj->addMessage("File copy info :"  . $copy_info);
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
-            $obj->data = $this->parseFile($copy_info, 4);
+            $obj->data = $this->parseFile($copy_info, 1);
 
             /**
              * Stress section

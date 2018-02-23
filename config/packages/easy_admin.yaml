@@ -2,3 +2,8 @@ easy_admin:
     entities:
         # List the entity class name you want to manage
         - App\Entity\LogBookTest
+        - App\Entity\LogBookCycle
+        - App\Entity\LogBookMessage
+        - App\Entity\LogBookMessageType
+        - App\Entity\LogBookVerdict
+

@@ -5,6 +5,8 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookTestRepository")
@@ -31,6 +33,7 @@ class LogBookTest
      * @var DateTime
      *
      * @ORM\Column(name="time_start", type="datetime")
+     * @Assert\DateTime()
      */
     protected $timeStart;
 
@@ -38,6 +41,7 @@ class LogBookTest
      * @var DateTime
      *
      * @ORM\Column(name="time_end", type="datetime")
+     * @Assert\DateTime()
      */
     protected $timeEnd;
 

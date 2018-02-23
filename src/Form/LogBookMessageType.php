@@ -6,16 +6,20 @@ use App\Entity\LogBookMessage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class LogBookMessageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('message')
             ->add('msgType')
             ->add('chain')
             ->add('test')
+            ->add('logTime')
+            ->add('message',TextareaType::class, array(
+                'attr' => array('class' => 'form-control', 'rows' => '25'),
+            ))
         ;
     }
 

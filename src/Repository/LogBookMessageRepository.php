@@ -23,17 +23,10 @@ class LogBookMessageRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookMessage
      */
-    public function findOneOrCreate(array $criteria, $flush = true)
+    public function Create(array $criteria, $flush = true)
     {
-//        $add_hash = true;
-//        if(isset(self::$_hashedData[$criteria['name']])){
-//            $entity = self::$_hashedData[$criteria['name']];
-//            $add_hash = false;
-//        }
-//        else{
-//            $entity = $this->findOneBy($criteria);
-//        }
-        
+
+
         $entity = null; //$this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookMessage();
@@ -46,15 +39,46 @@ class LogBookMessageRepository extends ServiceEntityRepository
             if($flush){
                 $this->_em->flush($entity);
             }
-
-
         }
-//        if($add_hash) {
-//            self::$_hashedData[$criteria['name']] = $entity;
-//        }
-
         return $entity;
     }
+
+//    /**
+//     * @param array $criteria
+//     * @param bool $flush
+//     * @return LogBookMessage
+//     */
+//    public function findOneOrCreate(array $criteria, $flush = true)
+//    {
+////        $add_hash = true;
+////        if(isset(self::$_hashedData[$criteria['name']])){
+////            $entity = self::$_hashedData[$criteria['name']];
+////            $add_hash = false;
+////        }
+////        else{
+////            $entity = $this->findOneBy($criteria);
+////        }
+//
+//        $entity = null; //$this->findOneBy($criteria);
+//        if (null === $entity) {
+//            $entity = new LogBookMessage();
+//            $entity->setMessage($criteria['message']);
+//            $entity->setChain($criteria['chain']);
+//            $entity->setMsgType($criteria['msgType']);
+//            $entity->setLogTime($criteria['logTime']);
+//            $entity->setTest($criteria['test']);
+//            $this->_em->persist($entity);
+//            if($flush){
+//                $this->_em->flush($entity);
+//            }
+//
+//
+//        }
+////        if($add_hash) {
+////            self::$_hashedData[$criteria['name']] = $entity;
+////        }
+//        return $entity;
+//    }
     /*
     public function findBySomething($value)
     {

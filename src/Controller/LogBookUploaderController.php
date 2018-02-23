@@ -149,7 +149,9 @@ class LogBookUploaderController extends Controller
 
                 //Get debug level message, convert to upper case
                 $dLevel['name'] = strtoupper($this->clean_string($oneLine[2][0]));
-
+                if($dLevel['name'] == 'WARNI'){
+                    $dLevel['name'] = "WARNING";
+                }
                 $msgTypeResult = $msgTypeRepo->findOneOrCreate($dLevel);
 
                 $ret_data[$counter]['logTime'] = $date;
@@ -157,7 +159,7 @@ class LogBookUploaderController extends Controller
                 $ret_data[$counter]['message'] = trim($oneLine[3][0]);
                 $ret_data[$counter]['chain'] = $counter;
                 $ret_data[$counter]['test'] = $testsRepo->findOneOrCreate(array("id" => $testId));
-                $logsRepo->findOneOrCreate($ret_data[$counter], false);
+                $logsRepo->Create($ret_data[$counter], false);
                 $counter++;
             }
             else{

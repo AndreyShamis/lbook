@@ -14,18 +14,30 @@
                 <td>{{ log.chain }}</td>
             </tr>
             <tr>
-                <th>Log</th>
-                <td>{{ log.message }}</td>
+                <th>Test</th>
+                <td><a target="_blank" href="{{ path('test_show', { 'id': log.test.id }) }}">{{ log.test }}</a></td>
             </tr>
-
+            <tr>
+                <th>Type</th>
+                <td>{{ log.msgType }}</td>
+            </tr>
             <tr>
                 <th>Time</th>
-                <td>{{ log.logTime | date('m/d H:i:s') }}</td>
+                <td>{{ log.logTime | date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+
+                <th>Log</th>
+                <td>
+                    <div class="well">
+                        {#<h4 class="green smaller lighter"></h4>#}
+                        {{ log.message | nl2br }}
+                    </div>
+                </td>
             </tr>
 
         </tbody>
     </table>
-
     <ul>
         <li>
             <a href="{{ path('log_index') }}">Back to the list</a>

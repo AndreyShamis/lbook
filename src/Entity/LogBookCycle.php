@@ -26,7 +26,7 @@ class LogBookCycle
     protected $name = "";
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="cycle", cascade={"persist"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="cycle", cascade={"all"}, fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="tests", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"executionOrder" = "ASC"})
      */

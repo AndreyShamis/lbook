@@ -39,6 +39,8 @@ class LogBookTestRepository extends ServiceEntityRepository
             $entity->setName($criteria['name']);
             //$entity->setVerdict($criteria['verdict']);
             $entity->setCycle($criteria['cycle']);
+            $entity->setLogFile($criteria['logFile']);
+            $entity->setLogFileSize($criteria['logFileSize']);
             $entity->setExecutionOrder($criteria['executionOrder']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);

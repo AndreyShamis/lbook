@@ -109,13 +109,19 @@ class LogBookUploaderController extends Controller
 //            );
             $obj->addMessage("New file name is :" . $fileName);
             $obj->addMessage("File ext :"  .$file->guessExtension());
-            $copy_info = $file->move("../uploads/", $fileName);
-
-            $obj->addMessage("File copy info :"  . $copy_info);
+            $new_file = $file->move("../uploads/", $fileName);
+            $obj->new_file_info = $new_file;
+            $obj->new_file_info_path = $new_file->getPath();
+            $obj->new_file_info_getBasename = $new_file->getBasename();
+            $obj->new_file_info_getFilename = $new_file->getFilename();
+            $obj->new_file_info_getFileInfo = $new_file->getFileInfo();
+            $obj->new_file_info_getRealPath = $new_file->getRealPath();
+            $obj->new_file_info_getPathInfo = $new_file->getPathInfo();
+            $obj->new_file_info_getPathname = $new_file->getPathname();
+            $obj->new_file_info_getCTime = $new_file->getCTime();
+            $obj->new_file_info_getSize = $new_file->getSize();
+            $obj->addMessage("File copy info :"  . $new_file);
             $obj->setLogFile($fileName);
-            $obj->file_info = $file;
-
-            //$test = $testsRepo->findOneOrCreate(array("id" => 1));
 
             $cycle = $this->cycleRepo->findOneBy(array("id" => 1));
 
@@ -124,26 +130,13 @@ class LogBookUploaderController extends Controller
                 "id" => 1,
                 "name" => $testName,
                 "cycle" => $cycle,
+                "logFile" => $new_file->getFilename(),
+                "logFileSize" => $new_file->getSize(),
                 "executionOrder" => $this->getTestNewExecutionOrder($cycle),
                 ));
-            $obj->data = $this->parseFile($copy_info, $test);
-
-            /**
-             * Stress section
-             */
-//            for($i = 0 ; $i<1;$i++){
-//                $obj->data = $this->parseFile($copy_info, 1);
-//                $obj->data = $this->parseFile($copy_info, 1);
-//                $obj->data = $this->parseFile($copy_info, 1);
-//                $obj->data = $this->parseFile($copy_info, 1);
-//                $obj->data = $this->parseFile($copy_info, 2);
-//                $obj->data = $this->parseFile($copy_info, 4);
-//                $obj->data = $this->parseFile($copy_info, 5);
-//            }
-
+            $obj->data = $this->parseFile($new_file, $test);
 
             return $this->showAction($obj);
-            //return $this->redirectToRoute('upload_show', array('id' => $obj->getId()));
         }
 
         return $this->render('lbook/verdict/new.html.twig', array(

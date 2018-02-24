@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookTestRepository")
@@ -96,6 +97,55 @@ class LogBookTest
      * @ORM\OrderBy({"chain" = "ASC"})
      */
     protected $logs;
+
+    /**
+     * @var string
+     * @ORM\Column(name="log_file", type="string", length=1500)
+     * @Assert\NotBlank(message="Please, provide log file as a DEBUG or INFO format file.")
+     * @Assert\File(mimeTypes={"text/plain", "application/octet-stream"})
+     */
+    private $logFile = "";
+    /**
+     * @var integer
+     * @ORM\Column(name="log_file_size", type="integer", length=11)
+     */
+    private $logFileSize = 0;
+
+    /**
+     * @return int
+     */
+    public function getLogFileSize(): int
+    {
+        return $this->logFileSize;
+    }
+
+    /**
+     * @param int $logFileSize
+     */
+    public function setLogFileSize(int $logFileSize): void
+    {
+        $this->logFileSize = $logFileSize;
+    }
+
+
+    public function getLogFile()
+    {
+        return $this->logFile;
+    }
+
+    public function setLogFile(string $logFile)
+    {
+        $this->logFile = $logFile;
+
+        return $this;
+    }
+
+    public function setUploadedFile(UploadedFile $file)
+    {
+        $this->setLogFile($file->getPath());
+
+        return $this;
+    }
 
     /**
      * @return mixed

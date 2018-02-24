@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Entity\LogBookMessageType;
 use ArrayObject;
 use ReflectionClass;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -37,8 +38,41 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFunction('function_name', [$this, 'doSomething']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
+            new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new \Twig_SimpleFunction('inarray', array($this, 'inArray')),
         ];
+    }
+
+    public function logTypeToTableColor(LogBookMessageType $msgType){
+        $ret = "";
+        $tmp = strtolower($msgType->getName());
+        switch ($tmp){
+            case 'pass':
+                $ret = "log-success";
+                break;
+            case 'fail':
+                $ret = "log-fail";
+                break;
+            case 'error':
+                $ret = "log-error";
+                break;
+            case 'info':
+                $ret = "log-info";
+                break;
+            case 'warning':
+                $ret = "log-warning";
+                break;
+            case 'debug':
+                $ret = "log-debug";
+                break;
+            case 'critical':
+                $ret = "log-critical";
+                break;
+            default:
+                break;
+        }
+        //"alert alert-block " .
+        return $ret;
     }
 
     public function verdictToBadge($verdict){

@@ -58,7 +58,7 @@
 
         <div class="widget-body" style="display: block;">
             <div class="widget-main no-padding">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered">
                     <thead class="thin-border-bottom">
                     <tr>
                         <th><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
@@ -66,7 +66,6 @@
                         <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>
                         <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
                         <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Type</th>
-                        <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Options</th>
                     </tr>
                     </thead>
 
@@ -79,15 +78,12 @@
                         {% set break = true %}
                     {% endif %}
                     {% set counter = counter+1 %}
-                        <tr>
+                        <tr class="{{ logTypeToTableColor(log.msgType) }}">
                             <td>{{ log.logTime | date('H:i:s') }}</td>
                             <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
                             <td>{{ log.chain }}</td>
                             <td>{{ log.message | nl2br }}</td>
                             <td>{{ log.msgType }}</td>
-                            <td>
-                                <a href="{{ path('log_edit', { 'id': log.id }) }}">edit</a>
-                            </td>
                         </tr>
                     {% endfor %}
                     {#<tr>#}

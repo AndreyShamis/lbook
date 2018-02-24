@@ -10,3 +10,19 @@
 #update , #newRC{
     background-color: #FFCC33;
 }
+.log-success{background-color: #d8efdb;
+}
+.log-fail{background-color: #ffb499;}
+.log-error{background-color: #f9ef90;}
+.log-warning{background-color: #f0f5dc;}
+.log-info{
+    /*background-color:#00acd6*/
+}
+.log-critical{background-color:#ff7665;
+}
+.log-debug{
+    /*color: #ada6a6;*/
+    background-color: #d8d8d8;
+    border-color: #6a858e;
+}
+.log-debug hr{border-top-color:#a6e1ec;}

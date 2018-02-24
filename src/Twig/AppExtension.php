@@ -68,6 +68,9 @@ class AppExtension extends AbstractExtension
             case 'critical':
                 $ret = "log-critical";
                 break;
+            case 'test_na':
+                $ret = "log-na";
+                break;
             default:
                 break;
         }
@@ -87,6 +90,9 @@ class AppExtension extends AbstractExtension
                 break;
             case 'error':
                 $ret = "badge-warning";
+                break;
+            case 'test_na':
+                $ret = "badge-info";
                 break;
             default:
                 break;

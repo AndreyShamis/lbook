@@ -37,11 +37,9 @@ class LogBookTestRepository extends ServiceEntityRepository
         if (null === $entity) {
             $entity = new LogBookTest();
             $entity->setName($criteria['name']);
-//            $entity->setVerdict(false);
-//            $entity->setCycles(0);
-//            $entity->setDisabled(false);
-//            $entity->setOwner(0);   //TODO User, Owner
-//            $entity->setOs(OsType::OS_UNKNOWN);
+            //$entity->setVerdict($criteria['verdict']);
+            $entity->setCycle($criteria['cycle']);
+            $entity->setExecutionOrder($criteria['executionOrder']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
             if($flush == true) {

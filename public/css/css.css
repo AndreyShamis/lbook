@@ -12,6 +12,7 @@
 }
 .log-success{background-color: #d8efdb;
 }
+.log-na{background-color: #a0fcff;}
 .log-fail{background-color: #ffb499;}
 .log-error{background-color: #f9ef90;}
 .log-warning{background-color: #f0f5dc;}

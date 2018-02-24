@@ -2,13 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookCycle;
+use App\Entity\LogBookMessage;
+use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
+use App\Entity\LogBookVerdict;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DependencyInjection\ContainerInterface as Container;
+
 
 /**
  * Uploader controller.
@@ -17,6 +23,24 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class LogBookUploaderController extends Controller
 {
+    protected $em = null;
+    protected $testsRepo = null;
+    protected $cycleRepo = null;
+    protected $verdictRepo = null;
+    protected $msgTypeRepo = null;
+    protected $logsRepo = null;
+    protected $container;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+        $this->em = $this->getDoctrine()->getManager();
+        $this->testsRepo = $this->em->getRepository('App:LogBookTest');
+        $this->cycleRepo = $this->em->getRepository('App:LogBookCycle');
+        $this->verdictRepo = $this->em->getRepository('App:LogBookVerdict');
+        $this->msgTypeRepo = $this->em->getRepository('App:LogBookMessageType');
+        $this->logsRepo = $this->em->getRepository('App:LogBookMessage');
+    }
 
     /**
      * @Route("/", name="upload_index")
@@ -27,6 +51,37 @@ class LogBookUploaderController extends Controller
         return $this->render('lbook/upload/index.html.twig', array());
     }
 
+    protected function getTestNewExecutionOrder(LogBookCycle $cycle){
+        /**
+         * Find proper execution order | The correct Way
+         */
+        $latestTestInCycle = $this->testsRepo->findOneBy(array("cycle" => $cycle->getId()), array('executionOrder' => 'DESC'));
+        if($latestTestInCycle !== null){
+            $executionOrder = $latestTestInCycle->getExecutionOrder() + 1;
+        }
+        else{
+            $executionOrder = 0;
+        }
+        /**
+         * Find proper execution order | Incorrect Way
+         */
+//        $cycleTestsCount = $this->testsRepo->count(array("cycle" => $cycle->getId()));
+//        $executionOrderFound = false;
+//        $executionOrder = $cycleTestsCount;
+//        while (!$executionOrderFound){
+//            $count = $this->testsRepo->count(array(
+//                "cycle" => $cycle->getId(),
+//                "executionOrder" => $executionOrder,
+//            ));
+//            if($count > 0){
+//                $executionOrder++;
+//            }
+//            else{
+//                $executionOrderFound = true;
+//            }
+//        }
+        return $executionOrder;
+    }
     /**
      * Creates a new Upload entity.
      *
@@ -59,7 +114,19 @@ class LogBookUploaderController extends Controller
             $obj->addMessage("File copy info :"  . $copy_info);
             $obj->setLogFile($fileName);
             $obj->file_info = $file;
-            $obj->data = $this->parseFile($copy_info, 1);
+
+            //$test = $testsRepo->findOneOrCreate(array("id" => 1));
+
+            $cycle = $this->cycleRepo->findOneBy(array("id" => 1));
+
+            $testName = $file->getClientOriginalName();
+            $test = $this->testsRepo->findOneOrCreate(array(
+                "id" => 1,
+                "name" => $testName,
+                "cycle" => $cycle,
+                "executionOrder" => $this->getTestNewExecutionOrder($cycle),
+                ));
+            $obj->data = $this->parseFile($copy_info, $test);
 
             /**
              * Stress section
@@ -87,20 +154,13 @@ class LogBookUploaderController extends Controller
 
     /**
      * @param String $file
+     * @param LogBookTest $test
      * @return array
      */
-    protected function parseFile($file, $testId=1)
+    protected function parseFile($file, LogBookTest $test)
     {
         $MIN_STR_LEN = 10;
         $SHORT_TIME_LEN = 8;
-
-        $em = $this->getDoctrine()->getManager();
-
-        $msgTypeRepo = $em->getRepository('App:LogBookMessageType');
-        $logsRepo = $em->getRepository('App:LogBookMessage');
-        $testsRepo = $em->getRepository('App:LogBookTest');
-
-        $test = $testsRepo->findOneOrCreate(array("id" => $testId));
 
         $ret_data = array();
 
@@ -108,33 +168,51 @@ class LogBookUploaderController extends Controller
         $temp_arr = preg_split("/\\r\\n|\\r|\\n/", $file_data);
 
         $last_good_key = -1;
-        foreach ($temp_arr as $key => &$value){
+        $newTempArr = array();
+        foreach ($temp_arr as $key => $value){
 
             if(strlen($value) < $MIN_STR_LEN){
+                $value = null;
                 continue;
             }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/', $value,$oneLine);
             if (count($oneLine[2]) > 0){
                 $last_good_key = $key;
-                $value = $this->clean_string($value);
+                $newTempArr[$key] = $this->clean_string($value);
             }
             else{
-                $temp_arr[$last_good_key] = $temp_arr[$last_good_key] . "\n" . $this->clean_string($value);
-                $value = null;
+                $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->clean_string($value);
             }
+            unset($temp_arr[$key]);
         }
-        //exit;
+        unset($temp_arr);
+        unset($file_data);
+        unset($last_good_key);
+        unset($oneLine);
 
         $counter=0;
         $objectsToClear = array();
+
+        $testName = null;
+        $testNameFound = false;
+        $tmpTestNameFlag_TestPrint = false;
+        $tmpTestNameFlag_AutotestTestPrint = false;
+        $tmpTestNameFlag_ControlTestPrint = false;
+
+        $testVerdict = null;
         /*
          * Test Time section
          */
         $testStartTime = new \DateTime('+100 years');
         $testEndTime = new \DateTime('-100 years');
 
-        foreach ($temp_arr as $key => $value){
-            if(strlen($value) < $MIN_STR_LEN){
+        /**
+         * If in previous FOR used "&" and use same array
+         * Dont remove & from  &$value -> will cause to additional duplicated line
+         */
+        foreach ($newTempArr as $key => $value){
+
+            if($value === null || strlen($value) < $MIN_STR_LEN){
                 continue;
             }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
@@ -142,29 +220,106 @@ class LogBookUploaderController extends Controller
             if (count($oneLine[2]) > 0){
                 $dLevel = null;
 
+                /**
+                 * Clean double DEBUG OUTPUT
+                 */
                 //Removing : base_job:0395 utils:0262 ssh_host:0116
                 preg_match('/([\w|\_]*\:\d+\s*)\|\s*(.*)/s', $oneLine[3][0], $messageWithDebug);
                 if(count($messageWithDebug) == 3){
                     $oneLine[3][0] = $messageWithDebug[2];
                 }
+                /**
+                 *
+                 */
+                $msg_str = trim($oneLine[3][0]);
+                $msgType_str = $oneLine[2][0];
+                $logTime_str = $oneLine[1][0];
 
+                /*
+                 * Test verdict section
+                 */
+                //
+                if($msgType_str === "INFO"){
+                    preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
+                    if(count($possibleVerdict) == 2){
+                        $testVerdict = $this->parseVerdict($possibleVerdict[1]);
+                        if($testVerdict !== null){
+                            if($testVerdict->getName() == 'ABORT' || $testVerdict->getName() == 'PASS' || $testVerdict->getName() == 'ERROR' || $testVerdict->getName() == 'FAIL' || $testVerdict->getName() == 'TEST_NA'){
+                                $msgType_str = $testVerdict->getName();
+                            }
+//                            elseif($testVerdict->getName() == 'TEST_NA'){
+//                                $msgType_str = "ERROR";
+//                            }
+                        }
+                    }
+                    else{
+                        preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/D', $msg_str, $possibleMessageType);
+                        if(count($possibleMessageType) == 3){
+                            if($possibleMessageType[1] == "GOOD"){
+                                $possibleMessageType[1] = "PASS";
+                            }
+                            if($possibleMessageType[1] == "WARN"){
+                                $possibleMessageType[1] = "WARNING";
+                            }
+                            $msgType_str = $possibleMessageType[1];
+                        }
+                    }
+                }
+
+                /**
+                 *
+                 */
                 $ret_data[$counter] = array(
-                    'logTime'   => $this->getLogTime($oneLine[1][0], $SHORT_TIME_LEN),
-                    'message'   => trim($oneLine[3][0]),
+                    'logTime'   => $this->getLogTime($logTime_str, $SHORT_TIME_LEN),
+                    'message'   => $msg_str,
                     'chain'     => $counter,
                     'test'      => $test,
-                    'msgType'   => $msgTypeRepo->findOneOrCreate(array(
-                        'name'      => $this->prepareDebugLevel($oneLine[2][0])
+                    'msgType'   => $this->msgTypeRepo->findOneOrCreate(array(
+                        'name'      => $this->prepareDebugLevel($msgType_str)
                     )),
                 );
-                $log = $logsRepo->Create($ret_data[$counter], false);
+                $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
+
+                /**
+                 * Test Name section
+                 */
+                if(!$testNameFound && $log->getMsgType() == "INFO"){
+                    $tmpName = null;
+
+                    if(!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint){
+                        $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
+                        if($tmpName !== null){
+                            $tmpTestNameFlag_AutotestTestPrint = true;
+                        }
+                    }
+                    else if(!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint){
+                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
+                        if($tmpName !== null){
+                            $tmpTestNameFlag_TestPrint = true;
+                        }
+                    }
+                    else if(!$tmpTestNameFlag_ControlTestPrint){
+                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log);
+                        if($tmpName !== null){
+                            $tmpTestNameFlag_ControlTestPrint = true;
+                            $testNameFound = true;
+                        }
+                    }
+
+                    if($tmpName !== null){
+                        $testName = $tmpName;
+                    }
+                }
 
                 /*
                  * Test Time section
                  */
                 $testStartTime = min($testStartTime, $log->getLogTime());
                 $testEndTime = max($testEndTime, $log->getLogTime());
+                /**
+                 *
+                 */
                 $counter++;
             }
             else{
@@ -173,16 +328,136 @@ class LogBookUploaderController extends Controller
                 echo "</pre><br/>";
             }
         }
+        /**
+         * Test Verdict section
+         */
+        if($testVerdict !== null){
+            $test->setVerdict($testVerdict);
+        }
+        else{
+            $test->setVerdict($this->parseVerdict("ERROR"));
+        }
         $test->setTimeStart($testStartTime);
         $test->setTimeEnd($testEndTime);
-        $em->flush();
+        if($testName !== null && strlen($testName) > 0) {
+            $test->setName($testName);
+        }
+        $this->em->flush();
         foreach ($objectsToClear as $obj){
-            $em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+            $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         }
 
         return $ret_data;
     }
 
+    /**
+     * Parse from string Test Verdict
+     * @param string $input
+     * @return LogBookVerdict
+     */
+    protected function parseVerdict(string $input) : LogBookVerdict{
+        $input = strtolower(trim($input));
+        $criteria['name'] = strtoupper($input);
+        switch ($input){
+            case 'pass':
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                break;
+            case 'good':
+                $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'PASS'));
+                break;
+            case 'test_na':
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                break;
+            case 'fail':
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                break;
+            case 'error':
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                break;
+            case 'warn':
+                $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'WARNING'));
+                break;
+            case 'warning':
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                break;
+            default:
+                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'UNKNOWN'));
+                break;
+        }
+        return $ret;
+    }
+
+    /**
+     * Used to parse Control print of test name with version, grup test name and test version
+     * @param LogBookMessage $log
+     * @param bool $includeVersion
+     * @return null|string
+     */
+    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true){
+        $ret = null;
+        preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)]*)\]\s*\(ver\.\s*(\d+\.?\d*)\,/', $log->getMessage(), $possibleName);
+        if(count($possibleName) == 3){
+            $dirty = $possibleName[0];
+            $testName = $possibleName[1];
+            $testVersion = $possibleName[2];
+            if (strlen($dirty) > 0 && strlen($testName) > 0 && strlen($testVersion) > 0) {
+                if($includeVersion){
+                    $ret = $testName . " " . $testVersion;
+                }
+                else{
+                    $ret = $testName;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Used to parse test print of test name with version, grup test name and test version
+     * @param LogBookMessage $log
+     * @param bool $includeVersion
+     * @return null|string
+     */
+    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true){
+        $ret = null;
+        preg_match('/\=+\s*Initialize\s*(.*)\s*test\s*\(ver\.\s*(\d+\.?\d*)\)/', $log->getMessage(), $possibleName);
+        if(count($possibleName) == 3){
+            $dirty = $possibleName[0];
+            $testName = $possibleName[1];
+            $testVersion = $possibleName[2];
+            if (strlen($dirty) > 0 && strlen($testName) > 0 && strlen($testVersion) > 0) {
+                if($includeVersion){
+                    $ret = $testName . " " . $testVersion;
+                }
+                else{
+                    $ret = $testName;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Used to parse Autotest print of test start, grup test name
+     * @param LogBookMessage $log
+     * @return null
+     */
+    protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log){
+        $ret = null;
+        preg_match('/START\s*([\w\/]*)\s*/', $log->getMessage(), $possibleName);
+        if(count($possibleName) == 2){
+            $dirty = $possibleName[0];
+            $testName = $possibleName[1];
+            if (strlen($dirty) > 0 && strlen($testName) > 0 ) {
+                $ret = $testName;
+            }
+        }
+
+        return $ret;
+    }
     /**
      * Convert string time to object DateTime
      * @param string $input

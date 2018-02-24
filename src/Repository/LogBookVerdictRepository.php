@@ -20,11 +20,11 @@ class LogBookVerdictRepository extends ServiceEntityRepository
 
     /**
      * @param array $criteria
-     * @param bool $flush
      * @return LogBookVerdict
      */
-    public function findOneOrCreate(array $criteria, $flush = false)
+    public function findOneOrCreate(array $criteria)
     {
+        $criteria['name'] = strtoupper($criteria['name']);
         $add_hash = true;
         if(isset(self::$_hashedData[$criteria['name']])){
             $entity = self::$_hashedData[$criteria['name']];
@@ -39,12 +39,6 @@ class LogBookVerdictRepository extends ServiceEntityRepository
             $entity->setName($criteria['name']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-            //$this->_em->clear($entity);
-            if($flush == true) {
-                $this->_em->flush();
-                //$this->_em->clear($entity);
-            }
-
         }
         if($add_hash) {
             self::$_hashedData[$criteria['name']] = $entity;

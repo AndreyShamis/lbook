@@ -20,6 +20,47 @@ class LogBookSetupRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param string $setupName
+     * @return LogBookSetup|null
+     */
+    public function findByName(string $setupName)
+    {
+        if(isset(self::$_hashedData[$setupName])){
+            $entity = self::$_hashedData[$setupName];
+        }
+        else{
+            /** @var LogBookSetup $entity */
+            $entity = $this->findOneBy(array("name" => $setupName));
+            if($entity !== null){
+                self::$_hashedData[$setupName] = $entity;
+                self::$_hashedData[$entity->getId()] = $entity;
+            }
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param int $setupId
+     * @return LogBookSetup|null
+     */
+    public function findById(int $setupId)
+    {
+        if(isset(self::$_hashedData[$setupId])){
+            $entity = self::$_hashedData[$setupId];
+        }
+        else{
+            /** @var LogBookSetup $entity */
+            $entity = $this->findOneBy(array("id" => $setupId));
+            if($entity !== null){
+                self::$_hashedData[$setupId] = $entity;
+                self::$_hashedData[$entity->getName()] = $entity;
+            }
+        }
+
+        return $entity;
+    }
+    /**
      * @param array $criteria
      * @param bool $flush
      * @return LogBookSetup
@@ -39,7 +80,6 @@ class LogBookSetupRepository extends ServiceEntityRepository
             $entity = new LogBookSetup();
             $entity->setName($criteria['name']);
             $entity->setCheckUpTime(false);
-            $entity->setCycles(0);
             $entity->setDisabled(false);
             $entity->setOwner(0);   //TODO User, Owner
             $entity->setOs(OsType::OS_UNKNOWN);

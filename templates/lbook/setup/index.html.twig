@@ -25,7 +25,7 @@
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.os }}</td>
                 <td>{{ setup.owner }}</td>
-                <td>{{ setup.checkUpTime }}</td>
+                <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>
                 <td>
                     <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>

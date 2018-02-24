@@ -7,6 +7,7 @@ use App\Entity\LogBookMessage;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
+use App\Entity\LogBookSetup;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
-
+use App\Utils\RandomName;
 
 /**
  * Uploader controller.
@@ -29,6 +30,7 @@ class LogBookUploaderController extends Controller
     protected $verdictRepo = null;
     protected $msgTypeRepo = null;
     protected $logsRepo = null;
+    protected $setupRepo = null;
     protected $container;
 
     public function __construct(Container $container)
@@ -40,6 +42,7 @@ class LogBookUploaderController extends Controller
         $this->verdictRepo = $this->em->getRepository('App:LogBookVerdict');
         $this->msgTypeRepo = $this->em->getRepository('App:LogBookMessageType');
         $this->logsRepo = $this->em->getRepository('App:LogBookMessage');
+        $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
     }
 
     /**
@@ -82,6 +85,29 @@ class LogBookUploaderController extends Controller
 //        }
         return $executionOrder;
     }
+
+    protected function generateSetupName() : string {
+        $setup_name = "";
+        $setupNameFound = false;
+        $counter = 0;
+        $post_fix = "";
+        while(!$setupNameFound){
+            $setup_name = RandomName::asClassName(RandomName::getRandomTerm()) . $post_fix;
+            $setup = $this->setupRepo->findByName($setup_name);
+            if($setup === null){
+                $setupNameFound = true;
+                break;
+            }
+            $counter++;
+            if($counter%100==0){
+                $post_fix = rand(1,9999);
+            }
+            if($counter%1000==0){
+                $post_fix = $counter . rand(1,9999);
+            }
+        }
+        return $setup_name;
+    }
     /**
      * Creates a new Upload entity.
      *
@@ -107,6 +133,38 @@ class LogBookUploaderController extends Controller
 //                $this->getParameter('brochures_directory'),
 //                $fileName
 //            );
+            /** @var LogBookSetup $setup */
+            $setup = null;
+            $setup_id = -1;
+            $setup_name = "";//$this->clean_string("Test Setup");
+            if($setup_id > 0){
+                $obj->addMessage("Searching setup by ID :" . $setup_id);
+                $setup = $this->setupRepo->findById($setup_id);
+                if($setup !== null){
+                    $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+                }
+            }
+
+            if($setup === null && strlen($setup_name) > 0){
+                $obj->addMessage("Searching setup by NAME :" . $setup_name);
+                $setup = $this->setupRepo->findByName($setup_name);
+                if($setup !== null){
+                    $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+                }
+            }
+
+            if($setup === null){
+                if(strlen($setup_name) < 3){
+                    $setup_name = $this->generateSetupName();
+                    $obj->addMessage("Generating new setup NAME :" . $setup_name);
+                }
+                $obj->addMessage("Creating setup  :" . $setup_name);
+                $setup = $this->setupRepo->findOneOrCreate(array(
+                        "name" => $setup_name,
+                    )
+                );
+            }
+
             $obj->addMessage("New file name is :" . $fileName);
             $obj->addMessage("File ext :"  .$file->guessExtension());
             $new_file = $file->move("../uploads/", $fileName);

@@ -32,6 +32,8 @@ class LogBookUploaderController extends Controller
     protected $logsRepo = null;
     protected $setupRepo = null;
     protected $container;
+    protected $_MIN_LOG_STR_LEN = 10;
+    protected $_SHORT_TIME_LEN = 8;
 
     public function __construct(Container $container)
     {
@@ -108,6 +110,42 @@ class LogBookUploaderController extends Controller
         }
         return $setup_name;
     }
+
+    final protected function bringSetup(LogBookUpload &$obj, int $setupId, string $setupName) : LogBookSetup{
+
+        /** @var LogBookSetup $setup */
+        $setup = null;
+        if($setupId > 0){
+            $obj->addMessage("Searching setup by ID :" . $setupId);
+            $setup = $this->setupRepo->findById($setupId);
+            if($setup !== null){
+                $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+            }
+        }
+
+        if($setup === null && strlen($setupName) > 0){
+            $obj->addMessage("Searching setup by NAME :" . $setupName);
+            $setup = $this->setupRepo->findByName($setupName);
+            if($setup !== null){
+                $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+            }
+        }
+
+        if($setup === null){
+            if(strlen($setupName) < 3){
+                $setupName = $this->generateSetupName();
+                $obj->addMessage("Generating new setup NAME :" . $setupName);
+            }
+            $obj->addMessage("Creating setup  :" . $setupName);
+            $setup = $this->setupRepo->findOneOrCreate(array(
+                    "name" => $setupName,
+                )
+            );
+        }
+
+        return $setup;
+    }
+
     /**
      * Creates a new Upload entity.
      *
@@ -133,37 +171,10 @@ class LogBookUploaderController extends Controller
 //                $this->getParameter('brochures_directory'),
 //                $fileName
 //            );
-            /** @var LogBookSetup $setup */
-            $setup = null;
             $setup_id = -1;
             $setup_name = "";//$this->clean_string("Test Setup");
-            if($setup_id > 0){
-                $obj->addMessage("Searching setup by ID :" . $setup_id);
-                $setup = $this->setupRepo->findById($setup_id);
-                if($setup !== null){
-                    $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
-                }
-            }
-
-            if($setup === null && strlen($setup_name) > 0){
-                $obj->addMessage("Searching setup by NAME :" . $setup_name);
-                $setup = $this->setupRepo->findByName($setup_name);
-                if($setup !== null){
-                    $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
-                }
-            }
-
-            if($setup === null){
-                if(strlen($setup_name) < 3){
-                    $setup_name = $this->generateSetupName();
-                    $obj->addMessage("Generating new setup NAME :" . $setup_name);
-                }
-                $obj->addMessage("Creating setup  :" . $setup_name);
-                $setup = $this->setupRepo->findOneOrCreate(array(
-                        "name" => $setup_name,
-                    )
-                );
-            }
+            /** @var LogBookSetup $setup */
+            $setup = $this->bringSetup($obj, $setup_id, $setup_name);
 
             $obj->addMessage("New file name is :" . $fileName);
             $obj->addMessage("File ext :"  .$file->guessExtension());
@@ -203,26 +214,12 @@ class LogBookUploaderController extends Controller
         ));
     }
 
-    /**
-     * @param String $file
-     * @param LogBookTest $test
-     * @return array
-     */
-    protected function parseFile($file, LogBookTest $test)
-    {
-        $MIN_STR_LEN = 10;
-        $SHORT_TIME_LEN = 8;
-
-        $ret_data = array();
-
-        $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
-        $temp_arr = preg_split("/\\r\\n|\\r|\\n/", $file_data);
-
-        $last_good_key = -1;
+    final protected function prepareLogArray(array &$temp_arr){
         $newTempArr = array();
+        $last_good_key = -1;
         foreach ($temp_arr as $key => $value){
 
-            if(strlen($value) < $MIN_STR_LEN){
+            if(strlen($value) < $this->_MIN_LOG_STR_LEN){
                 $value = null;
                 continue;
             }
@@ -237,9 +234,21 @@ class LogBookUploaderController extends Controller
             unset($temp_arr[$key]);
         }
         unset($temp_arr);
+        return $newTempArr;
+    }
+    /**
+     * @param String $file
+     * @param LogBookTest $test
+     * @return array
+     */
+    protected function parseFile($file, LogBookTest $test)
+    {
+        $ret_data = array();
+        $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
+        $tmp_log_arr = preg_split("/\\r\\n|\\r|\\n/", $file_data);
+        $newTempArr = $this->prepareLogArray($tmp_log_arr);
+
         unset($file_data);
-        unset($last_good_key);
-        unset($oneLine);
 
         $counter=0;
         $objectsToClear = array();
@@ -262,34 +271,22 @@ class LogBookUploaderController extends Controller
          * Dont remove & from  &$value -> will cause to additional duplicated line
          */
         foreach ($newTempArr as $key => $value){
-
-            if($value === null || strlen($value) < $MIN_STR_LEN){
-                continue;
-            }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
             if (count($oneLine[2]) > 0){
                 $dLevel = null;
-
-                /**
-                 * Clean double DEBUG OUTPUT
-                 */
+                /** Clean double DEBUG OUTPUT **/
                 //Removing : base_job:0395 utils:0262 ssh_host:0116
                 preg_match('/([\w|\_]*\:\d+\s*)\|\s*(.*)/s', $oneLine[3][0], $messageWithDebug);
                 if(count($messageWithDebug) == 3){
                     $oneLine[3][0] = $messageWithDebug[2];
                 }
-                /**
-                 *
-                 */
+                /** **/
                 $msg_str = trim($oneLine[3][0]);
                 $msgType_str = $oneLine[2][0];
                 $logTime_str = $oneLine[1][0];
 
-                /*
-                 * Test verdict section
-                 */
-                //
+                /** Test verdict section **/
                 if($msgType_str === "INFO"){
                     preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
                     if(count($possibleVerdict) == 2){
@@ -298,9 +295,6 @@ class LogBookUploaderController extends Controller
                             if($testVerdict->getName() == 'ABORT' || $testVerdict->getName() == 'PASS' || $testVerdict->getName() == 'ERROR' || $testVerdict->getName() == 'FAIL' || $testVerdict->getName() == 'TEST_NA'){
                                 $msgType_str = $testVerdict->getName();
                             }
-//                            elseif($testVerdict->getName() == 'TEST_NA'){
-//                                $msgType_str = "ERROR";
-//                            }
                         }
                     }
                     else{
@@ -317,11 +311,9 @@ class LogBookUploaderController extends Controller
                     }
                 }
 
-                /**
-                 *
-                 */
+                /** **/
                 $ret_data[$counter] = array(
-                    'logTime'   => $this->getLogTime($logTime_str, $SHORT_TIME_LEN),
+                    'logTime'   => $this->getLogTime($logTime_str),
                     'message'   => $msg_str,
                     'chain'     => $counter,
                     'test'      => $test,
@@ -332,9 +324,7 @@ class LogBookUploaderController extends Controller
                 $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
-                /**
-                 * Test Name section
-                 */
+                /*** Test Name section **/
                 if(!$testNameFound && $log->getMsgType() == "INFO"){
                     $tmpName = null;
 
@@ -363,14 +353,10 @@ class LogBookUploaderController extends Controller
                     }
                 }
 
-                /*
-                 * Test Time section
-                 */
+                /** Test Time section **/
                 $testStartTime = min($testStartTime, $log->getLogTime());
                 $testEndTime = max($testEndTime, $log->getLogTime());
-                /**
-                 *
-                 */
+                /** **/
                 $counter++;
             }
             else{
@@ -515,9 +501,9 @@ class LogBookUploaderController extends Controller
      * @param int $SHORT_TIME_LEN The length of string without Day and month
      * @return \DateTime
      */
-    protected function getLogTime(string $input, $SHORT_TIME_LEN = 8) : \DateTime{
+    protected function getLogTime(string $input) : \DateTime{
         $tmp_time = $this->clean_string($input);
-        if(strlen($tmp_time) > $SHORT_TIME_LEN){
+        if(strlen($tmp_time) > $this->_SHORT_TIME_LEN){
             $timeFormat = 'm/d H:i:s';
         }
         else{

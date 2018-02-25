@@ -33,7 +33,8 @@ class LogBookUploaderController extends Controller
     protected $setupRepo = null;
     protected $container;
     protected $_MIN_LOG_STR_LEN = 10;
-    protected $_SHORT_TIME_LEN = 8;
+    protected $_SHORT_TIME_LEN = 8;     // 12:48:45
+    protected $_MEDIUM_TIME_LEN = 14;   // 02/22 11:36:56
 
     public function __construct(Container $container)
     {
@@ -229,7 +230,12 @@ class LogBookUploaderController extends Controller
                 $newTempArr[$key] = $this->clean_string($value);
             }
             else{
-                $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->clean_string($value);
+                if($last_good_key > 0){
+                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->clean_string($value);
+                }
+//                else{
+//                    // Skip first lines
+//                }
             }
             unset($temp_arr[$key]);
         }
@@ -503,7 +509,8 @@ class LogBookUploaderController extends Controller
      */
     protected function getLogTime(string $input) : \DateTime{
         $tmp_time = $this->clean_string($input);
-        if(strlen($tmp_time) > $this->_SHORT_TIME_LEN){
+        $len = strlen($tmp_time);
+        if($len > $this->_SHORT_TIME_LEN && $len == $this->_MEDIUM_TIME_LEN){
             $timeFormat = 'm/d H:i:s';
         }
         else{

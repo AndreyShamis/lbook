@@ -89,8 +89,10 @@ class LogBookTestController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $limit = 40;
-        $tests = $em->getRepository('App:LogBookTest');
-        $paginator = $this->paginate($tests->createQueryBuilder('t'), $page, $limit);
+        $testRepo = $em->getRepository('App:LogBookTest');
+        $query = $testRepo->createQueryBuilder('t')
+            ->orderBy('t.id', "DESC");
+        $paginator = $this->paginate($query, $page, $limit);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
@@ -100,7 +102,7 @@ class LogBookTestController extends Controller
         $maxPages = ceil($totalPosts / $limit);
         $thisPage = $page;
         return array(
-//            'tests'     => $tests,
+//            'tests'     => $testRepo,
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
@@ -119,8 +121,11 @@ class LogBookTestController extends Controller
     {
         set_time_limit(180);
         $em = $this->getDoctrine()->getManager();
-        $query  = $em->getRepository('App:LogBookTest')->createQueryBuilder('a');
-        $query->setMaxResults(100);
+        $testRepo = $em->getRepository('App:LogBookTest');
+        //$query  = $logs->createQueryBuilder('a');
+        $query = $testRepo->createQueryBuilder('t')
+            ->orderBy('t.id', "DESC")
+            ->setMaxResults(300);
         $tests = $query->getQuery()->execute();
         return $this->render('lbook/test/index.html.twig', array(
             'tests' => $tests,
@@ -193,7 +198,7 @@ class LogBookTestController extends Controller
         try{
 
             $em = $this->getDoctrine()->getManager();
-            $limit = 300;
+            $limit = 500;
             $logs = $em->getRepository('App:LogBookMessage');
             $qb = $logs->createQueryBuilder('t')
                 ->where('t.test = :test')

@@ -59,4 +59,40 @@ class LogBookUpload
 
         return $this;
     }
+
+    protected $setup;
+
+    protected $cycle;
+
+    /**
+     * @return mixed
+     */
+    public function getCycle()
+    {
+        return $this->cycle;
+    }
+
+    /**
+     * @param mixed $cycle
+     */
+    public function setCycle($cycle): void
+    {
+        $this->cycle = $cycle;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSetup()
+    {
+        return $this->setup;
+    }
+
+    /**
+     * @param mixed $setup
+     */
+    public function setSetup($setup): void
+    {
+        $this->setup = $setup;
+    }
 }

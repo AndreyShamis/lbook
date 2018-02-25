@@ -209,7 +209,7 @@ class LogBookUploaderController extends Controller
             return $this->showAction($obj);
         }
 
-        return $this->render('lbook/verdict/new.html.twig', array(
+        return $this->render('lbook/upload/new.html.twig', array(
             'verdict' => $obj,
             'form' => $form->createView(),
         ));

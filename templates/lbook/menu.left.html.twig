@@ -7,7 +7,7 @@
 <ul class="nav nav-list  nav-sidebar">
     <li class="{% if route == 'default_index' %}active{% endif %}">
         <a href="{{ url}}">
-            <i class="menu-icon fa fa-tachometer"></i>
+            <i class="menu-icon fa fa-home"></i>
             <span class="menu-text">Home</span>
         </a>
         <b class="arrow"></b>
@@ -29,7 +29,7 @@
     {#{{absolute_url(asset(path('user_index')))}}#}
     <li class="{% if route starts with 'setup_' %}active{% endif %}">
         <a href="{{asset(path('setup_index'))}}">
-            <i class="menu-icon fa fa-picture-o"></i>
+            <i class="menu-icon fa fa-desktop"></i>
             <span class="menu-text"> Setups </span>
         </a>
 
@@ -38,7 +38,7 @@
 
     <li class="{% if route starts with 'cycle_' %}active{% endif %}">
         <a href="{{asset(path('cycle_index'))}}">
-            <i class="menu-icon fa fa-list"></i>
+            <i class="menu-icon fa fa-cogs"></i>
             <span class="menu-text"> Cycles </span>
         </a>
         <b class="arrow"></b>
@@ -55,30 +55,27 @@
 
     <li class="{% if route starts with 'verdict_' %}active{% endif %}">
         <a href="{{asset(path('verdict_index'))}}">
-            <i class="menu-icon fa fa-list"></i>
+            <i class="menu-icon fa  fa-filter"></i>
             <span class="menu-text  bigger-120">Verdicts</span>
         </a>
         <b class="arrow"></b>
     </li>
 
-
-
     <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
         <a href="{{asset(path('msg_type_index'))}}" >
-            <i class="menu-icon fa fa-pencil-square-o"></i>
-            <span class="menu-text"> Message Types </span>
-        </a>
-        <b class="arrow"></b>
-    </li>
-
-    <li class="{% if route starts with 'undef_' %}active{% endif %}">
-        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}" >
             <i class="menu-icon fa fa-tag"></i>
-            <span class="menu-text">NoNe</span>
+            <span class="menu-text">Upload</span>
         </a>
         <b class="arrow"></b>
     </li>
 
+    <li class="{% if route starts with 'upload_' %}active{% endif %}">
+        <a href="{{asset(path('upload_new'))}}" >
+            <i class="menu-icon fa fa-cloud-upload"></i>
+            <span class="menu-text">Upload</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 
     <li class="{% if route starts with 'log_' %}active{% endif %}">
         <a href="{{asset(path('log_index'))}}">

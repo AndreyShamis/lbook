@@ -18,7 +18,12 @@ class LogBookUpload
     private $id;
 
     protected $message="";
-
+    /**
+     *
+     * @Assert\NotBlank(message="Please, upload the log file as a DEBUG or INFO format file.")
+     * //@Assert\File(mimeTypes={ "text/plain" })
+     */
+    private $logFile;
 
     /**
      * @return string
@@ -41,12 +46,7 @@ class LogBookUpload
     {
         $this->message = $message;
     }
-    /**
-     *
-     * @Assert\NotBlank(message="Please, upload the log file as a DEBUG or INFO format file.")
-     * //@Assert\File(mimeTypes={ "text/plain" })
-     */
-    private $logFile;
+
 
     public function getLogFile()
     {

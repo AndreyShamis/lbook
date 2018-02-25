@@ -15,6 +15,13 @@ class LogBookCycleType extends AbstractType
             ->add('name')
             ->add('setup')
             ->add('passRate')
+            ->add('timeStart')
+            ->add('timeEnd')
+            ->add('period')
+            ->add('updatedAt')
+            ->add('createdAt')
+            ->add('testsTimeSum')
+
         ;
     }
 

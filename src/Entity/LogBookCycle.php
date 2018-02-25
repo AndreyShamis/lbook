@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookCycleRepository")
  * @ORM\Table(name="lbook_cycles")
+ * @ORM\HasLifecycleCallbacks()
  */
 class LogBookCycle
 {
@@ -38,6 +40,50 @@ class LogBookCycle
      * @ORM\OrderBy({"id" = "DESC"})
      */
     protected $setup;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="pass_rate", type="float")
+     */
+    protected $passRate = 0;
+
+    /**
+     * @PreFlush
+     */
+    public function updatePassRate(){
+        $passCount = 0;
+        $allCount = count($this->getTests());
+        foreach ($this->getTests() as $test){
+            /** @var LogBookTest $test */
+            if($test->getVerdict() == "PASS"){
+                $passCount++;
+            }
+        }
+        if($allCount > 0){
+            $this->setPassRate($passCount*100/$allCount);
+        }
+        else{
+            $this->setPassRate(100);
+        }
+
+    }
+    /**
+     * @return float
+     */
+    public function getPassRate(): float
+    {
+        return $this->passRate;
+    }
+
+    /**
+     * @param float $passRate
+     * @param int $precision
+     */
+    public function setPassRate(float $passRate, $precision=2): void
+    {
+        $this->passRate = round($passRate, $precision);
+    }
 
 
     /**

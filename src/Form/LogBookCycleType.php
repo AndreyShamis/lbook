@@ -14,6 +14,7 @@ class LogBookCycleType extends AbstractType
         $builder
             ->add('name')
             ->add('setup')
+            ->add('passRate')
         ;
     }
 

@@ -33,12 +33,14 @@ use App\Entity\LogBookTest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * Test controller.
@@ -162,14 +164,20 @@ class LogBookTestController extends Controller
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookTest $test)
+    public function showAction(LogBookTest $test=null)
     {
-        $deleteForm = $this->createDeleteForm($test);
+        try{
 
-        return $this->render('lbook/test/show.html.twig', array(
-            'test' => $test,
-            'delete_form' => $deleteForm->createView(),
-        ));
+            $deleteForm = $this->createDeleteForm($test);
+
+            return $this->render('lbook/test/show.html.twig', array(
+                'test' => $test,
+                'delete_form' => $deleteForm->createView(),
+            ));
+        }
+        catch (\Throwable $ex){
+            return $this->testNotFound($test, $ex);
+        }
     }
 
     /**
@@ -180,38 +188,69 @@ class LogBookTestController extends Controller
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookTest $test, $page=1)
+    public function showFullAction(LogBookTest $test=null, $page=1)
     {
-        $em = $this->getDoctrine()->getManager();
-        $limit = 300;
-//        $logs = $em->getRepository('App:LogBookMessage');
-//        $paginator = $this->paginate($logs->createQueryBuilder('t'), $page, $limit);
+        try{
 
-        //$query->setParameters(array("userId"=>$user->getId()));
-        $logs = $em->getRepository('App:LogBookMessage');
-        $qb = $logs->createQueryBuilder('t')
-            ->where('t.test = :test')
-            ->setParameter('test', $test->getId());
-        $paginator = $this->paginate($qb, $page, $limit);
-        $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
+            $em = $this->getDoctrine()->getManager();
+            $limit = 300;
+            $logs = $em->getRepository('App:LogBookMessage');
+            $qb = $logs->createQueryBuilder('t')
+                ->where('t.test = :test')
+                ->setParameter('test', $test->getId());
+            $paginator = $this->paginate($qb, $page, $limit);
+            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $iterator = $paginator->getIterator(); # ArrayIterator
 
-        $maxPages = ceil($totalPosts / $limit);
-        $thisPage = $page;
+            $maxPages = ceil($totalPosts / $limit);
+            $thisPage = $page;
 
-        $deleteForm = $this->createDeleteForm($test);
+            $deleteForm = $this->createDeleteForm($test);
 
-        return $this->render('lbook/test/show.full.html.twig', array(
-            'test'          => $test,
-            'size'          => $totalPosts,
-            'maxPages'      => $maxPages,
-            'thisPage'      => $thisPage,
-            'iterator'      => $iterator,
-            'paginator'     => $paginator,
-            'delete_form'   => $deleteForm->createView(),
-        ));
+            return $this->render('lbook/test/show.full.html.twig', array(
+                'test'          => $test,
+                'size'          => $totalPosts,
+                'maxPages'      => $maxPages,
+                'thisPage'      => $thisPage,
+                'iterator'      => $iterator,
+                'paginator'     => $paginator,
+                'delete_form'   => $deleteForm->createView(),
+            ));
+        }
+        catch (\Throwable $ex){
+            return $this->testNotFound($test, $ex);
+        }
     }
 
+    /**
+     * @param LogBookTest|null $test
+     * @param \Throwable $ex
+     * @return Response
+     */
+    protected function testNotFound(LogBookTest $test=null, \Throwable $ex){
+        global $request;
+        $possibleId = 0;
+        try{
+            $possibleId = $request->attributes->get('id');
+        }
+        catch (\Exception $ex){
+
+        }
+        if($test === null){
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => sprintf('Test with provided ID:[%s] not found', $possibleId),
+                'message' =>  $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
+        else{
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => 'Unknown error',
+                'message' => $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
+    }
 
     /**
      * Displays a form to edit an existing test entity.
@@ -248,20 +287,24 @@ class LogBookTestController extends Controller
      * @Method("DELETE")
      * @param Request $request
      * @param LogBookTest $test
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response
      */
     public function deleteAction(Request $request, LogBookTest $test)
     {
-        $form = $this->createDeleteForm($test);
-        $form->handleRequest($request);
+        try{
+            $form = $this->createDeleteForm($test);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($test);
-            $em->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->remove($test);
+                $em->flush();
+            }
+            return $this->redirectToRoute('test_index');
         }
-
-        return $this->redirectToRoute('test_index');
+        catch (\Throwable $ex){
+            return $this->testNotFound($test, $ex);
+        }
     }
 
     /**
@@ -269,14 +312,19 @@ class LogBookTestController extends Controller
      *
      * @param LogBookTest $test The test entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface | Response
      */
     private function createDeleteForm(LogBookTest $test)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('test_delete', array('id' => $test->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-            ;
+        try{
+            return $this->createFormBuilder()
+                ->setAction($this->generateUrl('test_delete', array('id' => $test->getId())))
+                ->setMethod('DELETE')
+                ->getForm();
+        }
+        catch (\Throwable $ex){
+            return $this->testNotFound($test, $ex);
+        }
+
     }
 }

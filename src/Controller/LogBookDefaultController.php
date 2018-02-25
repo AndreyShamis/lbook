@@ -26,10 +26,12 @@ class LogBookDefaultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $tests = $em->getRepository('App:LogBookTest')->findAll();
+        $cycles = $em->getRepository('App:LogBookCycle')->findAll();
+        $setups = $em->getRepository('App:LogBookSetup')->findAll();
 
         return $this->render('lbook/default/index.html.twig', array(
-            'tests' => $tests,
+            'cycles' => $cycles,
+            'setups' => $setups,
         ));
     }
 }

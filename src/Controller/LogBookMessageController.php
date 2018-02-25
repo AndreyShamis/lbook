@@ -57,7 +57,7 @@ class LogBookMessageController extends Controller
     public function index($page = 1)
     {
         $em = $this->getDoctrine()->getManager();
-        $limit = 100;
+        $limit = 1000;
         $logs = $em->getRepository('App:LogBookMessage');
         $paginator = $this->paginate($logs->createQueryBuilder('t'), $page, $limit);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20

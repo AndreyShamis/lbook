@@ -22,7 +22,7 @@
         {% set break = false %}
         {% set counter = 0 %}
         {% for log in iterator if not break %}
-            {% if counter == 250 %}
+            {% if counter == 10000 %}
                 {% set break = true %}
             {% endif %}
             {% set counter = counter+1 %}

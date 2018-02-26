@@ -12,6 +12,7 @@ class LogBookBuildRepository extends ServiceEntityRepository
      * @var array Keep hashed entity
      */
     protected static $_hashedData = array();
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, LogBookBuild::class);
@@ -23,7 +24,6 @@ class LogBookBuildRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria)
     {
-        $criteria['name'] = strtoupper($criteria['name']);
         $add_hash = true;
         if(isset(self::$_hashedData[$criteria['name']])){
             $entity = self::$_hashedData[$criteria['name']];

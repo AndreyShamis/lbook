@@ -120,7 +120,7 @@ class LogBookUploaderController extends Controller
         return $setup_name;
     }
 
-    final protected function bringSetup(LogBookUpload &$obj, int $setupId, string $setupName) : LogBookSetup{
+    final protected function bringSetup(LogBookUpload &$obj, string $setupName = "", int $setupId = -1) : LogBookSetup{
 
         /** @var LogBookSetup $setup */
         $setup = null;
@@ -166,32 +166,54 @@ class LogBookUploaderController extends Controller
      */
     public function newCliAction(Request $request)
     {
-        //curl --max-time 120 --form file=@autoserv.DEBUG --form setup=1 --form cycle=1 --form executionID=2602161043 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new_cli
+        //curl --max-time 120 --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form executionID=2602161043 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new_cli
         $obj = new LogBookUpload();
         $p_data = $request->request;
+        /** @var LogBookCycle $cycle */
+        $cycle = null;
+
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
-
+            $cycle_id = $request->request->get('cycle');
+            $setup_name = $request->request->get('setup');
+            $cycle_token = $request->request->get('token');
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
 
-            $cycle_id = $request->request->get('cycle');
-            $setup_id = $request->request->get('setup');
 
-            /** @var LogBookCycle $cycle */
-            $cycle = $this->cycleRepo->findOneBy(array("id" => $cycle_id));
+            if($cycle_token !== null && $cycle_token != ""){
+                $obj->addMessage("INFO: Token provided use him : " . $cycle_token);
+                $cycle = $this->cycleRepo->findOneBy(array("uploadToken" => $cycle_token));
+                if($cycle === null){
+                    $obj->addMessage("ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup");
+                    /**
+                     * TODO create new cycle? -> Need Parse Setup
+                     */
+                }
+            }
+
+            if($cycle === null){
+                $cycle = $this->cycleRepo->findOneBy(array("id" => $cycle_id));
+            }
 
             if($cycle !== null){
-                $obj->addMessage("Cycle found, take SETUP from cycle");
+                $obj->addMessage("INFO: Cycle found, take SETUP from cycle");
                 $setup = $cycle->getSetup();
             }
             else{
-                $obj->addMessage("Cycle not found, take setup from POST");
-                $setup_name = "";//$request->query->get('build');//$this->clean_string("Test Setup");
+                $obj->addMessage("ERROR: Cycle not found, take setup from POST");
                 /** @var LogBookSetup $setup */
-                $setup = $this->bringSetup($obj, $setup_id, $setup_name);
-            }
+                $setup = $this->bringSetup($obj, $setup_name);
 
+                if($setup !== null){
+                    $obj->addMessage("ERROR: TODO Require to create new cycle ");
+                    /** TODO Require to create new cycle */
+                }
+                else{
+                    $obj->addMessage("ERROR: TODO - cycle not found, setup not found, Create Setup and then Cycle");
+                    /** TODO - cycle not found, setup not found, Create Setup and then Cycle */
+                }
+            }
             $obj->addMessage("File name is :" . $fileName . ". \tFile ext :"  .$file->guessExtension());
             /** @var UploadedFile $new_file */
             $new_file = $file->move("../uploads/", $fileName);
@@ -265,22 +287,13 @@ class LogBookUploaderController extends Controller
                 $obj->addMessage("Cycle not found, take setup from POST");
                 $setup_name = "";//$request->query->get('build');//$this->clean_string("Test Setup");
                 /** @var LogBookSetup $setup */
-                $setup = $this->bringSetup($obj, $setup_id, $setup_name);
+                $setup = $this->bringSetup($obj,$setup_name , $setup_id);
             }
 
             $obj->addMessage("New file name is :" . $fileName);
             $obj->addMessage("File ext :"  .$file->guessExtension());
             $new_file = $file->move("../uploads/", $fileName);
             $obj->new_file_info = $new_file;
-            $obj->new_file_info_path = $new_file->getPath();
-            $obj->new_file_info_getBasename = $new_file->getBasename();
-            $obj->new_file_info_getFilename = $new_file->getFilename();
-            $obj->new_file_info_getFileInfo = $new_file->getFileInfo();
-            $obj->new_file_info_getRealPath = $new_file->getRealPath();
-            $obj->new_file_info_getPathInfo = $new_file->getPathInfo();
-            $obj->new_file_info_getPathname = $new_file->getPathname();
-            $obj->new_file_info_getCTime = $new_file->getCTime();
-            $obj->new_file_info_getSize = $new_file->getSize();
             $obj->addMessage("File copy info :"  . $new_file);
             $obj->setLogFile($fileName);
 

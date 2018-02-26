@@ -119,6 +119,13 @@ class LogBookCycle
      */
     protected $dut;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="upload_token", type="string", length=255, options={"default"=""})
+     */
+    protected $uploadToken = "";
+
     function __construct()
     {
         $this->updatedAt = $this->createdAt = new \DateTime();
@@ -174,6 +181,24 @@ class LogBookCycle
         }
 
     }
+
+    /**
+     * @return string
+     */
+    public function getUploadToken(): string
+    {
+        return $this->uploadToken;
+    }
+
+    /**
+     * @param string $uploadToken
+     */
+    public function setUploadToken(string $uploadToken): void
+    {
+        $this->uploadToken = $uploadToken;
+    }
+
+
 
     /**
      * @return mixed

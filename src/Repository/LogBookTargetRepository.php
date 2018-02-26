@@ -17,7 +17,7 @@ class LogBookTargetRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, LogBookTarget::class);
     }
-    
+
     /**
      * @param array $criteria
      * @return LogBookTarget

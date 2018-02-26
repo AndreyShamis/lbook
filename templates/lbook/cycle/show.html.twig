@@ -8,8 +8,8 @@
             <tr>
                 <th>Name</th>
                 <td><span class="label label-info label-white">{{ cycle.name }}</span></td>
-                <th>Id / Build</th>
-                <td>{{ cycle.id }} / {{ cycle.build }}</td>
+                <th>Id</th>
+                <td>{{ cycle.id }}</td>
                 <th>
                     <span title="Time in seconds between min tests time to max tests time">Period</span>
                     /
@@ -18,6 +18,16 @@
                 <td>{{ cycle.period |  ExecutionTimeInHours}} / {{ cycle.testsTimeSum |  ExecutionTimeInHours}} </td>
                 <th>Pass Rate</th>
                 <td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>
+            </tr>
+            <tr>
+                <th>Controller</th>
+                <td><span class="label label-success label-white middle">{{ cycle.controller }}</span></td>
+                <th>DUT</th>
+                <td><span class="label label-success label-white middle">{{ cycle.dut }}</span></td>
+                <th>Uploader</th>
+                <td><span class="label label-success label-white middle">{{ cycle.targetUploader }}</span></td>
+                <th>Build</th>
+                <td><span class="label label-success label-white middle">{{ cycle.build }}</span></td>
             </tr>
             <tr>
                 <th>Start Time</th>
@@ -44,7 +54,7 @@
                     </table>
                 </td>
             </tr>
-            {% set already_printed = ['id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum'] %}
+            {% set already_printed = ['id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
             {% for key, value in cycle|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>

@@ -100,6 +100,25 @@ class LogBookCycle
      */
     protected $testsTimeSum = 0;
 
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTarget", cascade={"persist"})
+     * @ORM\JoinColumn(name="target_uploader", fieldName="id", referencedColumnName="id")
+     */
+    protected $targetUploader;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTarget", cascade={"persist"})
+     * @ORM\JoinColumn(name="controller", fieldName="id", referencedColumnName="id")
+     */
+    protected $controller;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTarget", cascade={"persist"})
+     * @ORM\JoinColumn(name="dut", fieldName="id", referencedColumnName="id")
+     */
+    protected $dut;
+
     function __construct()
     {
         $this->updatedAt = $this->createdAt = new \DateTime();
@@ -155,6 +174,58 @@ class LogBookCycle
         }
 
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDut()
+    {
+        return $this->dut;
+    }
+
+    /**
+     * @param mixed $dut
+     */
+    public function setDut($dut): void
+    {
+        $this->dut = $dut;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getTargetUploader()
+    {
+        return $this->targetUploader;
+    }
+
+    /**
+     * @param mixed $targetUploader
+     */
+    public function setTargetUploader($targetUploader): void
+    {
+        $this->targetUploader = $targetUploader;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * @param mixed $controller
+     */
+    public function setController($controller): void
+    {
+        $this->controller = $controller;
+    }
+
+
+
     /**
      * @return LogBookBuild
      */

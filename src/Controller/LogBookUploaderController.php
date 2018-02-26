@@ -33,6 +33,7 @@ class LogBookUploaderController extends Controller
     protected $logsRepo = null;
     protected $setupRepo = null;
     protected $buildRepo = null;
+    protected $targetRepo = null;
     protected $container;
     protected $_MIN_LOG_STR_LEN = 10;
     protected $_MIN_CLEAN_LOG_STR_LEN = 1;
@@ -52,6 +53,7 @@ class LogBookUploaderController extends Controller
         $this->logsRepo = $this->em->getRepository('App:LogBookMessage');
         $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
+        $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
     }
 
     /**
@@ -213,6 +215,13 @@ class LogBookUploaderController extends Controller
             $obj->data = $this->parseFile($new_file, $test);
 
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array("name" => 'Some Build')));
+            $remote_ip = $request->getClientIp();
+            $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
+            $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
+
+            $cycle->setTargetUploader($uploader);
+            $cycle->setController($uploader);
+            $cycle->setDut($dut);
             $this->em->flush();
             return $this->showAction($obj);
         }

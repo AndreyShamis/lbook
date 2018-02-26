@@ -18,10 +18,8 @@ class LogBookCycleType extends AbstractType
             ->add('timeStart')
             ->add('timeEnd')
             ->add('period')
-            ->add('updatedAt')
-            ->add('createdAt')
             ->add('testsTimeSum')
-
+            ->add('build')
         ;
     }
 

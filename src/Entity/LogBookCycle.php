@@ -44,6 +44,12 @@ class LogBookCycle
     protected $setup;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookBuild", cascade={"persist"})
+     * @ORM\JoinColumn(name="build", fieldName="id", referencedColumnName="id")
+     */
+    protected $build;
+
+    /**
      * @var float
      *
      * @ORM\Column(name="pass_rate", type="float")
@@ -53,7 +59,7 @@ class LogBookCycle
     /**
      * @var DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
      */
     protected $createdAt;
@@ -61,7 +67,7 @@ class LogBookCycle
     /**
      * @var DateTime
      *
-     * @ORM\Column(name="updated_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
      */
     protected $updatedAt;
@@ -94,6 +100,77 @@ class LogBookCycle
      */
     protected $testsTimeSum = 0;
 
+    function __construct()
+    {
+        $this->updatedAt = $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @PreFlush
+     */
+    public function updateTimes(){
+        $testsTimeSum = 0;
+        $min_time = new \DateTime('+100 years');
+        $max_time = new \DateTime('-100 years');
+        $tests = $this->getTests();
+        if(is_array($tests)){
+            foreach ($tests as $test){
+                /** @var LogBookTest $test */
+                $max_time = max($max_time, $test->getTimeEnd());
+                $min_time = min($min_time, $test->getTimeStart());
+                $testsTimeSum += $test->getTimeRun();
+            }
+        }
+        else{
+            $min_time = new \DateTime();
+            $max_time = new \DateTime();
+        }
+        $this->setTimeStart($min_time);
+        $this->setTimeEnd($max_time);
+        $this->setPeriod($this->getTimeEnd()->getTimestamp() -$this->getTimeStart()->getTimestamp());
+        $this->setTestsTimeSum($testsTimeSum);
+    }
+
+    /**
+     * @PreFlush
+     */
+    public function updatePassRate(){
+        $passCount = 0;
+        $tests = $this->getTests();
+        $allCount = 0;
+        if(is_array($tests)){
+            $allCount = count($tests);
+            foreach ($tests as $test){
+                /** @var LogBookTest $test */
+                if($test->getVerdict() == "PASS"){
+                    $passCount++;
+                }
+            }
+        }
+        if($allCount > 0){
+            $this->setPassRate($passCount*100/$allCount);
+        }
+        else{
+            $this->setPassRate(100);
+        }
+
+    }
+    /**
+     * @return LogBookBuild
+     */
+    public function getBuild()
+    {
+        return $this->build;
+    }
+
+    /**
+     * @param mixed $build
+     */
+    public function setBuild($build): void
+    {
+        $this->build = $build;
+    }
+
     /**
      * @return int
      */
@@ -113,7 +190,7 @@ class LogBookCycle
     /**
      * @return DateTime
      */
-    public function getTimeStart(): DateTime
+    public function getTimeStart()
     {
         return $this->timeStart;
     }
@@ -129,7 +206,7 @@ class LogBookCycle
     /**
      * @return DateTime
      */
-    public function getTimeEnd(): DateTime
+    public function getTimeEnd()
     {
         return $this->timeEnd;
     }
@@ -158,46 +235,6 @@ class LogBookCycle
         $this->period = $period;
     }
 
-
-    /**
-     * @PreFlush
-     */
-    public function updateTimes(){
-        $testsTimeSum = 0;
-        $min_time = new \DateTime('+100 years');
-        $max_time = new \DateTime('-100 years');
-        foreach ($this->getTests() as $test){
-            /** @var LogBookTest $test */
-            $max_time = max($max_time, $test->getTimeEnd());
-            $min_time = min($min_time, $test->getTimeStart());
-            $testsTimeSum += $test->getTimeRun();
-        }
-        $this->setTimeStart($min_time);
-        $this->setTimeEnd($max_time);
-        $this->setPeriod($this->getTimeEnd()->getTimestamp() -$this->getTimeStart()->getTimestamp());
-        $this->setTestsTimeSum($testsTimeSum);
-    }
-
-    /**
-     * @PreFlush
-     */
-    public function updatePassRate(){
-        $passCount = 0;
-        $allCount = count($this->getTests());
-        foreach ($this->getTests() as $test){
-            /** @var LogBookTest $test */
-            if($test->getVerdict() == "PASS"){
-                $passCount++;
-            }
-        }
-        if($allCount > 0){
-            $this->setPassRate($passCount*100/$allCount);
-        }
-        else{
-            $this->setPassRate(100);
-        }
-
-    }
     /**
      * @return float
      */
@@ -292,7 +329,7 @@ class LogBookCycle
     /**
      * @return DateTime
      */
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt() : DateTime
     {
         return $this->createdAt;
     }
@@ -308,13 +345,14 @@ class LogBookCycle
     /**
      * @return DateTime
      */
-    public function getUpdatedAt(): DateTime
+    public function getUpdatedAt() : DateTime
     {
         return $this->updatedAt;
     }
 
     /**
      * @PreFlush
+     * @PrePersist
      */
     public function setUpdatedAt(): void
     {

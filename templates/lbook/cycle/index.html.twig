@@ -10,6 +10,7 @@
             <th>Name</th>
             <th>Setup</th>
             <th>Pass Rate</th>
+            <th>Build</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -20,6 +21,7 @@
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>
                 <td>{{ cycle.passRate }}%</td>
+                <td>{{ cycle.build }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
@@ -31,7 +33,7 @@
 
     <ul>
         <li>
-            <a href="{{ path('cycle_new') }}">Create a new setup</a>
+            <a href="{{ path('cycle_new') }}">Create a new Cycle</a>
         </li>
     </ul>
 {% endblock %}

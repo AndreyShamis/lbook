@@ -3,6 +3,10 @@
 {% block content %}
     <h1>Upload done!</h1>
     {{ dump(upload) }}
+    {% for key, value in _context  %}
+        <h2>{{ key }}</h2>
+        {{ dump(value) }}
+    {% endfor %}
     <ul>
         <li>
             <a href="{{ path('upload_new') }}">Upload File</a>

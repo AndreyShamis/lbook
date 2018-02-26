@@ -8,6 +8,7 @@ use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
+use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -33,8 +34,11 @@ class LogBookUploaderController extends Controller
     protected $setupRepo = null;
     protected $container;
     protected $_MIN_LOG_STR_LEN = 10;
-    protected $_SHORT_TIME_LEN = 8;     // 12:48:45
-    protected $_MEDIUM_TIME_LEN = 14;   // 02/22 11:36:56
+    protected $_MIN_CLEAN_LOG_STR_LEN = 1;
+    protected $_SHORT_TIME_LEN = 8;             // 12:48:45
+    protected $_SHORT_MILISEC_TIME_LEN = 12;    // 02:44:38.820
+    protected $_MEDIUM_TIME_LEN = 14;           // 02/22 11:36:56
+    protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
 
     public function __construct(Container $container)
     {
@@ -289,6 +293,9 @@ class LogBookUploaderController extends Controller
                 }
                 /** **/
                 $msg_str = trim($oneLine[3][0]);
+                if(strlen($msg_str) < $this->_MIN_CLEAN_LOG_STR_LEN){
+                    continue;
+                }
                 $msgType_str = $oneLine[2][0];
                 $logTime_str = $oneLine[1][0];
 
@@ -490,7 +497,7 @@ class LogBookUploaderController extends Controller
      */
     protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log){
         $ret = null;
-        preg_match('/START\s*([\w\/]*)\s*/', $log->getMessage(), $possibleName);
+        preg_match('/START\s*([\w\.\/]*)\s*/', $log->getMessage(), $possibleName);
         if(count($possibleName) == 2){
             $dirty = $possibleName[0];
             $testName = $possibleName[1];
@@ -510,13 +517,34 @@ class LogBookUploaderController extends Controller
     protected function getLogTime(string $input) : \DateTime{
         $tmp_time = $this->clean_string($input);
         $len = strlen($tmp_time);
-        if($len > $this->_SHORT_TIME_LEN && $len == $this->_MEDIUM_TIME_LEN){
+        $timeFormat = 'U.u';
+        $ret = \DateTime::createFromFormat('U', time());
+
+        if($len == $this->_MEDIUM_TIME_LEN){
             $timeFormat = 'm/d H:i:s';
         }
-        else{
+        else if($len == $this->_SHORT_TIME_LEN) {
             $timeFormat = 'H:i:s';
         }
-        return \DateTime::createFromFormat($timeFormat, $tmp_time);
+        else if($len == $this->_SHORT_MILISEC_TIME_LEN){
+            $timeFormat = 'H:i:s.u';
+        }
+        else if($len == $this->_MEDIUM_MILISEC_TIME_LEN){
+            $timeFormat = 'm/d H:i:s.u';
+        }
+        else{
+            $try_format = new DateTime($tmp_time);
+            $tmp_time = $try_format->format('U.u');
+        }
+
+        try{
+            $ret = \DateTime::createFromFormat($timeFormat, $tmp_time);
+        }
+        catch (\Exception $ex){
+            print_r($ex);
+            exit();
+        }
+        return $ret;
     }
 
     /**

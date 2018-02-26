@@ -61,14 +61,6 @@
         <b class="arrow"></b>
     </li>
 
-    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
-        <a href="{{asset(path('msg_type_index'))}}" >
-            <i class="menu-icon fa fa-tag"></i>
-            <span class="menu-text">Upload</span>
-        </a>
-        <b class="arrow"></b>
-    </li>
-
     <li class="{% if route starts with 'upload_' %}active{% endif %}">
         <a href="{{asset(path('upload_new'))}}" >
             <i class="menu-icon fa fa-cloud-upload"></i>
@@ -83,6 +75,14 @@
             <span class="menu-text">Logs/Messages
             <span class="badge badge-primary">5</span>
         </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
+    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
+        <a href="{{asset(path('msg_type_index'))}}" >
+            <i class="menu-icon fa fa-tag"></i>
+            <span class="menu-text" title="Message/Log types">Log Types</span>
         </a>
         <b class="arrow"></b>
     </li>

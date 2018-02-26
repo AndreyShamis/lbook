@@ -6,4 +6,7 @@ easy_admin:
         - App\Entity\LogBookMessage
         - App\Entity\LogBookMessageType
         - App\Entity\LogBookVerdict
+        - App\Entity\LogBookBuild
+        - App\Entity\LogBookSetup
+        - App\Entity\LogBookUser
 

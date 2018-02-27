@@ -143,7 +143,7 @@ class LogBookCycle
     /**
      * @return DateTime
      */
-    public function getTokenExpiration(): DateTime
+    public function getTokenExpiration()
     {
         return $this->tokenExpiration;
     }

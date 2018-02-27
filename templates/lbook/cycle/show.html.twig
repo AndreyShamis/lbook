@@ -40,6 +40,16 @@
                 <td>{{ cycle.createdAt|date('Y-m-d H:i:s') }}</td>
             </tr>
             <tr>
+                <th></th>
+                <td></td>
+                <th></th>
+                <td></td>
+                <th>Token</th>
+                <td>{{ cycle.uploadToken }}</td>
+                <th>Token EXP</th>
+                <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
                 <th>Tests</th>
                 <td>{{ cycle.tests|length }}</td>
                 <th>Setup</th>
@@ -54,7 +64,7 @@
                     </table>
                 </td>
             </tr>
-            {% set already_printed = ['id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+            {% set already_printed = ['uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
             {% for key, value in cycle|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>

@@ -136,7 +136,7 @@ class LogBookSetupController extends Controller
      *
      * @param LogBookSetup $obj The test entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface | Response
      */
     private function createDeleteForm(LogBookSetup $obj)
     {

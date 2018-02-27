@@ -136,7 +136,7 @@ class LogBookVerdictController extends Controller
      *
      * @param LogBookVerdict $obj The verdict entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface | Response
      */
     private function createDeleteForm(LogBookVerdict $obj)
     {

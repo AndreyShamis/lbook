@@ -181,7 +181,7 @@ class LogBookMessageController extends Controller
      *
      * @param LogBookMessage $obj The verdict entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface | Response
      */
     private function createDeleteForm(LogBookMessage $obj)
     {

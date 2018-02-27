@@ -97,6 +97,10 @@ class LogBookUploaderController extends Controller
         return $executionOrder;
     }
 
+    protected function generateCycleName() : string {
+        return RandomName::asClassName(RandomName::getRandomTerm());
+    }
+
     protected function generateSetupName() : string {
         $setup_name = "";
         $setupNameFound = false;
@@ -171,7 +175,8 @@ class LogBookUploaderController extends Controller
         $p_data = $request->request;
         /** @var LogBookCycle $cycle */
         $cycle = null;
-
+        /** @var LogBookSetup $setup */
+        $setup = null;
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
@@ -189,6 +194,18 @@ class LogBookUploaderController extends Controller
                     /**
                      * TODO create new cycle? -> Need Parse Setup
                      */
+                    $setup = $this->bringSetup($obj, $setup_name);
+                    $cycle = $this->cycleRepo->findOneOrCreate(array(
+                        'name' => $this->generateCycleName(),   // TODO provide cycle name
+                        'setup' => $setup,
+                        'uploadToken' => $cycle_token,
+                        //'tokenExpiration' => new \DateTime('+7 days');,   // Done in constructor
+                    ));
+                    if($cycle === null){
+                        $obj->addMessage("CRITICAL: Failed to generate cycle");
+                        // exit();
+                    }
+                    $obj->addMessage("ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup");
                 }
                 else{
                     /**
@@ -196,10 +213,15 @@ class LogBookUploaderController extends Controller
                      */
                 }
             }
-
-            if($cycle === null){
-                $cycle = $this->cycleRepo->findOneBy(array("id" => $cycle_id));
+            else{
+                /**
+                 * TODO Token not provided -> EXIT?
+                 */
             }
+//
+//            if($cycle === null){
+//                $cycle = $this->cycleRepo->findOneBy(array("id" => $cycle_id));
+//            }
 
             if($cycle !== null){
                 $obj->addMessage("INFO: Cycle found, take SETUP from cycle");
@@ -207,7 +229,6 @@ class LogBookUploaderController extends Controller
             }
             else{
                 $obj->addMessage("ERROR: Cycle not found, take setup from POST");
-                /** @var LogBookSetup $setup */
                 $setup = $this->bringSetup($obj, $setup_name);
 
                 if($setup !== null){

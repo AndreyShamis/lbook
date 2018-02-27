@@ -60,7 +60,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
         return $entity;
     }
-    
+
     /**
      * @param array $criteria
      * @param bool $flush

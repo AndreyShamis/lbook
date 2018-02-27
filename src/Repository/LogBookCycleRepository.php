@@ -27,7 +27,7 @@ class LogBookCycleRepository extends ServiceEntityRepository
             $entity = new LogBookCycle();
             $entity->setName($criteria['name']);
             $entity->setSetup($criteria['setup']);
-            $entity->setUploadToken($criteria['token']);
+            $entity->setUploadToken($criteria['uploadToken']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
 

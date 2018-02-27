@@ -126,10 +126,37 @@ class LogBookCycle
      */
     protected $uploadToken = "";
 
+    /**
+     * @var DateTime Time till token can be used
+     *
+     * @ORM\Column(name="token_expiration", type="datetime", nullable=true)
+     */
+    protected $tokenExpiration;
+
+
     function __construct()
     {
         $this->updatedAt = $this->createdAt = new \DateTime();
+        $this->tokenExpiration  = new \DateTime('+7 days');
     }
+
+    /**
+     * @return DateTime
+     */
+    public function getTokenExpiration(): DateTime
+    {
+        return $this->tokenExpiration;
+    }
+
+    /**
+     * @param DateTime $tokenExpiration
+     */
+    public function setTokenExpiration(DateTime $tokenExpiration): void
+    {
+        $this->tokenExpiration = $tokenExpiration;
+    }
+
+
 
     /**
      * @PreFlush

@@ -148,7 +148,7 @@ class LogBookSetup
     /**
      * @return string
      */
-    public function getOs(): string
+    public function getOs()
     {
         return $this->os;
     }

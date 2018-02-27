@@ -156,8 +156,6 @@ class LogBookCycle
         $this->tokenExpiration = $tokenExpiration;
     }
 
-
-
     /**
      * @PreFlush
      */
@@ -166,7 +164,7 @@ class LogBookCycle
         $min_time = new \DateTime('+100 years');
         $max_time = new \DateTime('-100 years');
         $tests = $this->getTests();
-        if(is_array($tests)){
+        if(is_object($tests)){
             foreach ($tests as $test){
                 /** @var LogBookTest $test */
                 $max_time = max($max_time, $test->getTimeEnd());
@@ -191,7 +189,7 @@ class LogBookCycle
         $passCount = 0;
         $tests = $this->getTests();
         $allCount = 0;
-        if(is_array($tests)){
+        if(is_object($tests)){
             $allCount = count($tests);
             foreach ($tests as $test){
                 /** @var LogBookTest $test */

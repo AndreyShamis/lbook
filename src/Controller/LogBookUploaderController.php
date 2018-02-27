@@ -190,6 +190,11 @@ class LogBookUploaderController extends Controller
                      * TODO create new cycle? -> Need Parse Setup
                      */
                 }
+                else{
+                    /**
+                     * TODO Check token exp date
+                     */
+                }
             }
 
             if($cycle === null){

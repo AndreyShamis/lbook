@@ -136,12 +136,12 @@ class LogBookCycleController extends Controller
      *
      * @param LogBookCycle $obj The cycle entity
      *
-     * @return \Symfony\Component\Form\Form The form
+     * @return \Symfony\Component\Form\FormInterface | Response
      */
     private function createDeleteForm(LogBookCycle $obj)
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('setup_delete', array('id' => $obj->getId())))
+            ->setAction($this->generateUrl('cycle_delete', array('id' => $obj->getId())))
             ->setMethod('DELETE')
             ->getForm()
             ;

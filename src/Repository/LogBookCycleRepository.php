@@ -8,11 +8,32 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookCycleRepository extends ServiceEntityRepository
 {
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, LogBookCycle::class);
     }
 
+    /**
+     * @param array $criteria
+     * @return LogBookCycle
+     */
+    public function findOneOrCreate(array $criteria)
+    {
+
+        $entity = $this->findOneBy($criteria);
+
+        if (null === $entity) {
+            $entity = new LogBookCycle();
+            $entity->setName($criteria['name']);
+            $entity->setSetup($criteria['setup']);
+            $entity->setUploadToken($criteria['token']);
+            $this->_em->persist($entity);
+            $this->_em->flush($entity);
+
+        }
+        return $entity;
+    }
     /*
     public function findBySomething($value)
     {

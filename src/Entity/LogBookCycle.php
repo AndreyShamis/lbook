@@ -193,7 +193,7 @@ class LogBookCycle
             $allCount = count($tests);
             foreach ($tests as $test){
                 /** @var LogBookTest $test */
-                if($test->getVerdict() == "PASS"){
+                if(strcasecmp($test->getVerdict(), "PASS") == 0){
                     $passCount++;
                 }
             }

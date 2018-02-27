@@ -12,6 +12,7 @@
             <th>OS</th>
             <th>Owner</th>
             <th>Check Uptime</th>
+            <th>Cycles</th>
             <th>Disabled</th>
             <th>Options</th>
 
@@ -26,6 +27,7 @@
                 <td>{{ setup.os }}</td>
                 <td>{{ setup.owner }}</td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
+                <td>{{ setup.cycles | length }}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>
                 <td>
                     <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>

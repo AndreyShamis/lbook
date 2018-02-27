@@ -9,6 +9,7 @@
             <th>Id</th>
             <th>Name</th>
             <th>Setup</th>
+            <th>Tests</th>
             <th>Pass Rate</th>
             <th>Build</th>
             <th>Controller</th>
@@ -25,6 +26,7 @@
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>
+                <td>{{ cycle.tests | length }}</td>
                 <td>{{ cycle.passRate }}%</td>
                 <td>{{ cycle.build }}</td>
                 <td>{{ cycle.controller }}</td>

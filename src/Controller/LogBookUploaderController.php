@@ -564,9 +564,9 @@ class LogBookUploaderController extends Controller
             $test->setName($testName);
         }
         $this->em->flush();
-        foreach ($objectsToClear as $obj){
-            $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-        }
+//        foreach ($objectsToClear as $obj){
+//            $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+//        }
 
         return $ret_data;
     }

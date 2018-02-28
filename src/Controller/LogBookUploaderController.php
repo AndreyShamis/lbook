@@ -41,6 +41,7 @@ class LogBookUploaderController extends Controller
     protected $_SHORT_MILISEC_TIME_LEN = 12;    // 02:44:38.820
     protected $_MEDIUM_TIME_LEN = 14;           // 02/22 11:36:56
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
+    protected $log_first_lines = array();
 
     public function __construct(Container $container)
     {
@@ -372,9 +373,12 @@ class LogBookUploaderController extends Controller
                 if($last_good_key > 0){
                     $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->clean_string($value);
                 }
-//                else{
-//                    // Skip first lines
-//                }
+                else{
+                    // add first lines without time to array
+                    $this->log_first_lines[] = $this->clean_string($value);
+                    // or
+                    // Skip first lines
+                }
             }
             unset($temp_arr[$key]);
         }

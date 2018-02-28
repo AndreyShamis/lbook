@@ -64,7 +64,7 @@
                     </table>
                 </td>
             </tr>
-            {% set already_printed = ['uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+            {% set already_printed = ['dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
             {% for key, value in cycle|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>

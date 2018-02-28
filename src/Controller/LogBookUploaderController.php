@@ -261,7 +261,7 @@ class LogBookUploaderController extends Controller
                 "executionOrder" => $this->getTestNewExecutionOrder($cycle),
             ));
             $obj->data = $this->parseFile($new_file, $test);
-
+            $this->em->refresh($cycle);
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array("name" => 'Some Build')));
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
@@ -338,7 +338,7 @@ class LogBookUploaderController extends Controller
                 "executionOrder" => $this->getTestNewExecutionOrder($cycle),
                 ));
             $obj->data = $this->parseFile($new_file, $test);
-
+            $this->em->refresh($cycle);
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array("name" => 'Some Build')));
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));

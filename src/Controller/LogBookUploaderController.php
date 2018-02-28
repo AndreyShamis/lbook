@@ -428,14 +428,13 @@ class LogBookUploaderController extends Controller
         $tmpTestNameFlag_ControlTestPrint = false;
 
         $testVerdict = null;
-
+        
 //        if(count($this->log_first_lines)){
 //            /**
 //             * TODO : Need First time in test
 //             */
 //            $counter = $this->recoverFirstLines($newTempArr);
 //        }
-
         /*
          * Test Time section
          */
@@ -540,9 +539,11 @@ class LogBookUploaderController extends Controller
                 $counter++;
             }
             else{
-                echo count($oneLine) .  " $value:<pre>";
-                print_r($oneLine);
-                echo "</pre><br/>";
+                if($counter > 0){
+                    echo count($oneLine) .  " $value:<pre>";
+                    print_r($oneLine);
+                    echo "</pre><br/>";
+                }
             }
         }
         /**

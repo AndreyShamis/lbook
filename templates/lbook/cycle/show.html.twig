@@ -80,7 +80,7 @@
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
-            <th>Id</th>
+            <th>id</th>
             <th>Order</th>
             <th>Name</th>
             <th>Time start</th>
@@ -89,14 +89,14 @@
             <th>Uptime</th>
             <th>Uptime</th>
             <th>Verdict</th>
-            <th>Actions</th>
+            {#<th>Actions</th>#}
         </tr>
         </thead>
         <tbody>
         {% for test in tests %}
             <tr>
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
-                <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td>{{ test.id }}</td>
                 <td>{{ test.executionOrder }}</td>
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
                 <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.name }}</a></td>
@@ -108,10 +108,10 @@
                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">
                         {{ test.verdict }}
                     </span></td>
-                <td>
-                    <a href="{{ path('test_show', { 'id': test.id }) }}">show</a>
-                    <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>
-                </td>
+                {#<td>#}
+                    {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
+                    {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                {#</td>#}
             </tr>
         {% endfor %}
         </tbody>

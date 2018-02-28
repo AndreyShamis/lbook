@@ -8,6 +8,7 @@ use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
+use ArrayIterator;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -383,8 +384,26 @@ class LogBookUploaderController extends Controller
             unset($temp_arr[$key]);
         }
         unset($temp_arr);
+
         return $newTempArr;
     }
+
+    /**
+     * @param $newTempArr
+     * @return int
+     */
+    protected function recoverFirstLines(&$newTempArr) : int {
+
+        if(count($newTempArr) && count($this->log_first_lines)){
+            // TODO Put first lines into start of $newTempArr
+            $reverted = new ArrayIterator(array_reverse($this->log_first_lines));
+            foreach($reverted as $tmp){
+                array_unshift($newTempArr, $tmp);
+            }
+        }
+        return count($this->log_first_lines);
+    }
+
     /**
      * @param String $file
      * @param LogBookTest $test
@@ -409,11 +428,20 @@ class LogBookUploaderController extends Controller
         $tmpTestNameFlag_ControlTestPrint = false;
 
         $testVerdict = null;
+
+//        if(count($this->log_first_lines)){
+//            /**
+//             * TODO : Need First time in test
+//             */
+//            $counter = $this->recoverFirstLines($newTempArr);
+//        }
+
         /*
          * Test Time section
          */
         $testStartTime = new \DateTime('+100 years');
         $testEndTime = new \DateTime('-100 years');
+
 
         /**
          * If in previous FOR used "&" and use same array

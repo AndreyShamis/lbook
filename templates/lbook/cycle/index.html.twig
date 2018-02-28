@@ -17,6 +17,7 @@
             <th>Uploader</th>
             <th>Period</th>
             <th>Test time</th>
+            <th>Updated</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -34,6 +35,7 @@
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeInHours}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeInHours}}</td>
+                <td>{{ cycle.updatedAt |date('m-d H:i:s') }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>

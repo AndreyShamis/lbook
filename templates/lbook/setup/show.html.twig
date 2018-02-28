@@ -31,6 +31,13 @@
             <th>Id</th>
             <th>Name</th>
             <th>Tests</th>
+            <th>Pass Rate</th>
+            <th>Controller</th>
+            <th>DUT</th>
+            <th>Uploader</th>
+            <th>Period</th>
+            <th>Test time</th>
+            <th>Updated</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -40,6 +47,13 @@
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
                 <td>{{ cycle.tests | length }}</td>
+                <td>{{ cycle.passRate }}%</td>
+                <td>{{ cycle.controller }}</td>
+                <td>{{ cycle.dut }}</td>
+                <td>{{ cycle.targetUploader }}</td>
+                <td>{{ cycle.period |  ExecutionTimeInHours}}</td>
+                <td>{{ cycle.testsTimeSum |  ExecutionTimeInHours}}</td>
+                <td>{{ cycle.updatedAt |date('m-d H:i:s') }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>

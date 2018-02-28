@@ -182,7 +182,7 @@ class LogBookUploaderController extends Controller
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
-            $cycle_id = $request->request->get('cycle');
+            $cycle_name = $request->request->get('cycle');
             $setup_name = $request->request->get('setup');
             $cycle_token = $request->request->get('token');
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
@@ -197,8 +197,11 @@ class LogBookUploaderController extends Controller
                      * TODO create new cycle? -> Need Parse Setup
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
+                    if(strlen($cycle_name) < 1){
+                        $cycle_name = $this->generateCycleName();
+                    }
                     $cycle = $this->cycleRepo->findOneOrCreate(array(
-                        'name' => $this->generateCycleName(),   // TODO provide cycle name
+                        'name' => $cycle_name,   // TODO provide cycle name
                         'setup' => $setup,
                         'uploadToken' => $cycle_token,
                         //'tokenExpiration' => new \DateTime('+7 days');,   // Done in constructor
@@ -428,7 +431,7 @@ class LogBookUploaderController extends Controller
         $tmpTestNameFlag_ControlTestPrint = false;
 
         $testVerdict = null;
-        
+
 //        if(count($this->log_first_lines)){
 //            /**
 //             * TODO : Need First time in test

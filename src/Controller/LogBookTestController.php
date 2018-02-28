@@ -274,8 +274,10 @@ class LogBookTestController extends Controller
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            /** @var LogBookCycle $cycle */
+            $cycle = $test->getCycle();
+            $cycle->setDirty(true);
             $this->getDoctrine()->getManager()->flush();
-
             return $this->redirectToRoute('test_edit', array('id' => $test->getId()));
         }
 
@@ -305,7 +307,6 @@ class LogBookTestController extends Controller
                 /** @var LogBookCycle $cycle */
                 $cycle = $test->getCycle();
                 $cycle->setDirty(true);
-
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($test);
                 $em->flush();

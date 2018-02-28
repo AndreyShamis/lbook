@@ -101,8 +101,8 @@ class LogBookTest
     /**
      * @var string
      * @ORM\Column(name="log_file", type="string", length=1500)
-     * @Assert\NotBlank(message="Please, provide log file as a DEBUG or INFO format file.")
-     * @Assert\File(mimeTypes={"text/plain", "application/octet-stream"})
+     * //@//Assert\NotBlank(message="Please, provide log file as a DEBUG or INFO format file.")
+     * @Assert\File(mimeTypes={"text/plain", "application/octet-stream"}, groups = {"create"})
      */
     private $logFile = "";
     /**

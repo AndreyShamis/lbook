@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\ORM\Mapping\PostUpdate;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping as ORM;
@@ -133,12 +134,35 @@ class LogBookCycle
      */
     protected $tokenExpiration;
 
+    /**
+     * @var boolean Flag to mark that need call all PreFlush function
+     *
+     * @ORM\Column(name="dirty", type="boolean", options={"default"="0"})
+     */
+    protected $dirty = 0;
 
     function __construct()
     {
         $this->updatedAt = $this->createdAt = new \DateTime();
         $this->tokenExpiration  = new \DateTime('+7 days');
     }
+
+    /**
+     * @return bool
+     */
+    public function isDirty(): bool
+    {
+        return $this->dirty;
+    }
+
+    /**
+     * @param bool $dirty
+     */
+    public function setDirty(bool $dirty): void
+    {
+        $this->dirty = $dirty;
+    }
+
 
     /**
      * @return DateTime
@@ -154,6 +178,13 @@ class LogBookCycle
     public function setTokenExpiration(DateTime $tokenExpiration): void
     {
         $this->tokenExpiration = $tokenExpiration;
+    }
+
+    /**
+     * @PreFlush
+     */
+    public function unsetDirty(){
+        $this->setDirty(false);
     }
 
     /**

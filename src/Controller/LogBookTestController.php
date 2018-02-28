@@ -29,6 +29,7 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -301,6 +302,10 @@ class LogBookTestController extends Controller
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                /** @var LogBookCycle $cycle */
+                $cycle = $test->getCycle();
+                $cycle->setDirty(true);
+
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($test);
                 $em->flush();

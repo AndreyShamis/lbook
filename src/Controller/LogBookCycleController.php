@@ -76,7 +76,7 @@ class LogBookCycleController extends Controller
 
         return $this->render('lbook/cycle/show.html.twig', array(
             'cycle' => $obj,
-            'delete_form' => $deleteForm->createView(),
+//            'delete_form' => $deleteForm->createView(),
         ));
     }
 

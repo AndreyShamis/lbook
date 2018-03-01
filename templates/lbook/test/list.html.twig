@@ -26,7 +26,6 @@
         {% set break = false %}
         {% set counter = 0 %}
         {% for test in iterator if not break %}
-
             {% if counter == 10000 %}
                 {% set break = true %}
             {% endif %}
@@ -48,7 +47,6 @@
         {% endfor %}
         </tbody>
     </table>
-
     <ul>
         <li>
             <a href="{{ path('test_new') }}">Create a new test</a>

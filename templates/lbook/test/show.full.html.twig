@@ -152,7 +152,7 @@
         </li>
         {#<li>#}
             {#{{ form_start(delete_form) }}#}
-            {#<input type="submit" value="Delete">#}
+            {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
             {#{{ form_end(delete_form) }}#}
         {#</li>#}
     </ul>

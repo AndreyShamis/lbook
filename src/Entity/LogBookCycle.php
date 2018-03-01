@@ -141,11 +141,89 @@ class LogBookCycle
      */
     protected $dirty = 0;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_count", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsCount = 0;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_pass", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsPass = 0;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_fail", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsFail = 0;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_error", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsError = 0;
+
+
     function __construct()
     {
         $this->updatedAt = $this->createdAt = new \DateTime();
         $this->tokenExpiration  = new \DateTime('+7 days');
     }
+
+    /**
+     * @return int
+     */
+    public function getTestsPass(): int
+    {
+        return $this->testsPass;
+    }
+
+    /**
+     * @param int $testsPass
+     */
+    public function setTestsPass(int $testsPass)
+    {
+        $this->testsPass = $testsPass;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsFail(): int
+    {
+        return $this->testsFail;
+    }
+
+    /**
+     * @param int $testsFail
+     */
+    public function setTestsFail(int $testsFail)
+    {
+        $this->testsFail = $testsFail;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsError(): int
+    {
+        return $this->testsError;
+    }
+
+    /**
+     * @param int $testsError
+     */
+    public function setTestsError(int $testsError)
+    {
+        $this->testsError = $testsError;
+    }
+
 
     /**
      * @return bool
@@ -161,6 +239,22 @@ class LogBookCycle
     public function setDirty(bool $dirty): void
     {
         $this->dirty = $dirty;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsCount(): int
+    {
+        return $this->testsCount;
+    }
+
+    /**
+     * @param int $testsCount
+     */
+    public function setTestsCount(int $testsCount)
+    {
+        $this->testsCount = $testsCount;
     }
 
 
@@ -218,6 +312,8 @@ class LogBookCycle
      */
     public function updatePassRate(){
         $passCount = 0;
+        $failCount = 0;
+        $errorCount = 0;
         $tests = $this->getTests();
         $allCount = 0;
         if(is_object($tests)){
@@ -227,10 +323,20 @@ class LogBookCycle
                 if(strcasecmp($test->getVerdict(), "PASS") == 0){
                     $passCount++;
                 }
+                else if(strcasecmp($test->getVerdict(), "FAIL") == 0){
+                    $failCount++;
+                }
+                else if(strcasecmp($test->getVerdict(), "ERROR") == 0){
+                    $errorCount++;
+                }
             }
         }
+        $this->setTestsPass($passCount);
+        $this->setTestsFail($failCount);
+        $this->setTestsError($errorCount);
+        $this->setTestsCount($allCount);
         if($allCount > 0){
-            $this->setPassRate($passCount*100/$allCount);
+            $this->setPassRate($this->getTestsPass()*100/$this->getTestsCount());
         }
         else{
             $this->setPassRate(100);

@@ -35,7 +35,7 @@
                 <td>{{ test.logs | length }}</td> {# TODO Remove due performance #}
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ test.timeRun | ExecutionTimeInHours}}</td>
+                <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 <td>{{ test.dutUpTimeStart }}</td>
                 <td>{{ test.dutUpTimeEnd }}</td>
                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>

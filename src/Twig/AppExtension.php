@@ -19,6 +19,7 @@ class AppExtension extends AbstractExtension
     {
         return array(
             new \Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
+            new \Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
             new \Twig_SimpleFilter('TimeToHour', array($this, 'TimeToHour')),
             new \Twig_SimpleFilter('getPercentage', array($this, 'getPercentage')),
             new \Twig_SimpleFilter('cast_to_array', array($this, 'cast_to_array')),
@@ -169,14 +170,32 @@ class AppExtension extends AbstractExtension
         $seconds  =   $time%60;
         $minutes  =   ($time/60)%60;
         $hours    =   number_format (floor($time/60/60));
-        $min_print = sprintf('%02d',$minutes);
+        $min_print = sprintf('%02d', $minutes);
         if($min_print == "00"){
-            return ($hours  . "h");
+            return ($hours . "h");
         }
-        return ($hours  . "h " . sprintf('%02d',$minutes) . "m");
-        //return ($mon . "m " . $days . "d " . sprintf('%02d',$hours)  . "h " . sprintf('%02d',$minutes) . "m " . sprintf('%02d',$seconds) ."s");
+        return ($hours . "h " . sprintf('%02d', $minutes) . "m");
     }
 
+    /**
+     * @param $time
+     * @return string
+     */
+    function ExecutionTimeGeneric(int $time): string{
+        $seconds  =   $time%60;
+        $minutes  =   ($time/60)%60;
+        $hours    =   number_format (floor($time/60/60));
+        $hour_print = sprintf('%dh',$hours);
+        $min_print = sprintf('%02dm',$minutes);
+        $sec_print = sprintf('%02ds',$seconds);
+        if ($hours > 0){
+            $ret = sprintf("%s %s %s", $hour_print, $min_print, $sec_print);
+        }
+        else{
+            $ret = sprintf("%s %s", $min_print, $sec_print);
+        }
+        return $ret;
+    }
 
     /**
      * @param $time

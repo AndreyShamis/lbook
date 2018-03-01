@@ -53,8 +53,8 @@
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
-                <td>{{ cycle.period |  ExecutionTimeInHours}}</td>
-                <td>{{ cycle.testsTimeSum |  ExecutionTimeInHours}}</td>
+                <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
+                <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.updatedAt |date('m-d H:i:s') }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>

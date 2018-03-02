@@ -31,7 +31,9 @@
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>
                 <td>
                     <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>
+                    {% if is_granted('edit', setup) %}
                     <a href="{{ path('setup_edit', { 'id': setup.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

@@ -13,7 +13,7 @@
                 <th>Name</th>
                 <td>{{ setup.name }}</td>
             </tr>
-            {% set already_printed = ['id', 'name', 'cycles'] %}
+            {% set already_printed = ['moderators', 'id', 'name', 'cycles'] %}
             {% for key, value in setup|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>
@@ -70,7 +70,9 @@
             <a href="{{ path('setup_index') }}">Back to the list</a>
         </li>
         <li>
-            <a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a>
+            {% if is_granted('edit', setup) %}
+                <a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a>
+            {% endif %}
         </li>
         {#<li>#}
             {#{{ form_start(delete_form) }}#}

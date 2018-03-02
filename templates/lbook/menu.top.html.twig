@@ -27,14 +27,14 @@
                     <a data-toggle="dropdown" href="#" class="dropdown-toggle">
                         <img class="nav-user-photo" src="{{app.request.scheme ~'://' ~  app.request.httpHost ~  app.request.getBaseURL }}/assets/avatars/mycomputer.png" alt="User Photo" />
                         <span class="user-info">
-                            <small>Welcome,</small>
+                            <small>Welcome,</small>{{ app.user.username }}
                         </span>
 
                         <i class="ace-icon fa fa-caret-down"></i>
                     </a>
                     <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
                         <li>
-                            <a href="" target="_blank">
+                            <a href="/logout" target="">
                                 <i class="ace-icon fa fa-globe"></i>
                                 Logout
                             </a>

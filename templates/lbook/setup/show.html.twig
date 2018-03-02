@@ -13,7 +13,7 @@
                 <th>Name</th>
                 <td>{{ setup.name }}</td>
             </tr>
-            {% set already_printed = ['id', 'name', 'cycles'] %}
+            {% set already_printed = ['moderators', 'id', 'name', 'cycles'] %}
             {% for key, value in setup|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>
@@ -58,7 +58,9 @@
                 <td>{{ cycle.updatedAt |date('m-d H:i:s') }}</td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
+                    {% if is_granted('edit', setup) %}
                     <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -69,9 +71,10 @@
         <li>
             <a href="{{ path('setup_index') }}">Back to the list</a>
         </li>
-        <li>
-            <a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a>
-        </li>
+        {% if is_granted('edit', setup) %}
+        <li><a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a></li>
+        {% endif %}
+
         {#<li>#}
             {#{{ form_start(delete_form) }}#}
                 {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}

@@ -75,7 +75,7 @@
                 <th>Count</th>
                 <td>{{ cycle.testsCount }}</td>
             </tr>
-            {% set already_printed = ['testsPass', 'testsFail', 'testsError', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+            {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
             {% for key, value in cycle|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>
@@ -131,13 +131,17 @@
         <li>
             <a href="{{ path('cycle_index') }}">Back to the list</a>
         </li>
+        {% if is_granted('edit', cycle.setup) %}
         <li>
             <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a>
         </li>
-        {#<li>#}
-            {#{{ form_start(delete_form) }}#}
-                {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
-            {#{{ form_end(delete_form) }}#}
-        {#</li>#}
+        {% endif %}
+        {% if is_granted('delete', cycle.setup) %}
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
+            {{ form_end(delete_form) }}
+        </li>
+        {% endif %}
     </ul>
 {% endblock %}

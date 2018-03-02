@@ -1,0 +1,33 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Users list</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Active</th>
+            <th>Options</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{{ path('user_show', { 'id': user.id }) }}">{{ user.id }}</a></td>
+                <td><a href="{{ path('user_show', { 'id': user.id }) }}">{{ user.username }}</a></td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.isActive ? 'Yes':'DISABLED' }}</td>
+                <td>
+                    <a href="{{ path('user_show', { 'id': user.id }) }}">show</a>
+                    <a href="{{ path('user_edit', { 'id': user.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

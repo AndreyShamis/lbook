@@ -31,7 +31,7 @@ class LogBookDefaultController extends Controller
         $setups = $em->getRepository('App:LogBookSetup')->findAll();
 
         return $this->render('lbook/default/index.html.twig', array(
-            'cycles' => $cycles,
+//            'cycles' => $cycles,
             'setups' => $setups,
         ));
     }

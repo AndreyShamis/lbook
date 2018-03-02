@@ -19,8 +19,9 @@ class LogBookDefaultController extends Controller
     /**
      * Lists all test entities.
      *
-     * @Route("/", name="logbook_index")
+     * @Route("/", name="home_index")
      * @Method("GET")
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function index()
     {
@@ -33,5 +34,38 @@ class LogBookDefaultController extends Controller
             'cycles' => $cycles,
             'setups' => $setups,
         ));
+    }
+
+    /**
+     * @Route("/send_email", name="send_email_example")
+     * @param \Swift_Mailer $mailer
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function emailExample(\Swift_Mailer $mailer){
+
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('hicam.golda@gmail.com')
+            ->setTo('lolnik@gmail.com')
+            ->setBody(
+                $this->renderView(
+                // templates/emails/registration.html.twig
+                    'lbook/email/test.html.twig',
+                    array('name' => "Test Name")
+                ),
+                'text/html'
+            )
+            /*
+             * If you also want to include a plaintext version of the message
+            ->addPart(
+                $this->renderView(
+                    'emails/registration.txt.twig',
+                    array('name' => $name)
+                ),
+                'text/plain'
+            )
+            */
+        ;
+        $mailer->send($message);
+        return $this->index();
     }
 }

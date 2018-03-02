@@ -91,6 +91,7 @@ class LogBookCycleController extends Controller
      */
     public function editAction(Request $request, LogBookCycle $obj)
     {
+        $this->denyAccessUnlessGranted('edit', $obj->getSetup());
         $deleteForm = $this->createDeleteForm($obj);
         $editForm = $this->createForm('App\Form\LogBookCycleType', $obj);
         $editForm->handleRequest($request);
@@ -119,6 +120,7 @@ class LogBookCycleController extends Controller
      */
     public function deleteAction(Request $request, LogBookCycle $obj)
     {
+        $this->denyAccessUnlessGranted('delete', $obj->getSetup());
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 

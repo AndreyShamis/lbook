@@ -269,6 +269,7 @@ class LogBookTestController extends Controller
      */
     public function editAction(Request $request, LogBookTest $test)
     {
+        $this->denyAccessUnlessGranted('edit', $test->getCycle()->getSetup());
         $deleteForm = $this->createDeleteForm($test);
         $editForm = $this->createForm('App\Form\LogBookTestType', $test);
         $editForm->handleRequest($request);
@@ -299,6 +300,7 @@ class LogBookTestController extends Controller
      */
     public function deleteAction(Request $request, LogBookTest $test)
     {
+        $this->denyAccessUnlessGranted('delete', $test->getCycle()->getSetup());
         try{
             $form = $this->createDeleteForm($test);
             $form->handleRequest($request);

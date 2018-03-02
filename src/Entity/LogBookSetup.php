@@ -57,11 +57,14 @@ class LogBookSetup
     protected $checkUpTime = false;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="owner", type="integer", options={"unsigned"=true})
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
      */
     protected $owner = 0;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
+     */
+    protected $moderators;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\LogBookCycle", mappedBy="setup", cascade={"all"}, fetch="EXTRA_LAZY")
@@ -69,6 +72,69 @@ class LogBookSetup
      * @ORM\OrderBy({"id" = "DESC"})
      */
     protected $cycles;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_private", type="boolean", options={"default"=false})
+     */
+    protected $isPrivate = false;
+
+    public function __construct()
+    {
+        $this->moderators = array();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param mixed $owner
+     */
+    public function setOwner($owner): void
+    {
+        $this->owner = $owner;
+    }
+
+
+
+    /**
+     * @return bool
+     */
+    public function isPrivate(): bool
+    {
+        return $this->isPrivate;
+    }
+
+    /**
+     * @param bool $isPrivate
+     */
+    public function setIsPrivate(bool $isPrivate): void
+    {
+        $this->isPrivate = $isPrivate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModerators()
+    {
+        return $this->moderators;
+    }
+
+    /**
+     * @param mixed $moderators
+     */
+    public function setModerators($moderators): void
+    {
+        $this->moderators = $moderators;
+    }
+
 
     /**
      * @return mixed
@@ -159,23 +225,6 @@ class LogBookSetup
     public function setOs($os): void
     {
         $this->os = $os;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getOwner(): int
-    {
-        return $this->owner;
-    }
-
-    /**
-     * @param int $owner
-     */
-    public function setOwner(int $owner): void
-    {
-        $this->owner = $owner;
     }
 
     /**

@@ -1,14 +1,52 @@
 security:
+    encoders:
+        App\Entity\LogBookUser: bcrypt
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
+        our_db_provider:
+            entity:
+                class: App\Entity\LogBookUser
+                #property: username
+#        my_ldap_provider:
+#            ldap:
+#                service:            ~
+#                base_dn:            ~
+#                search_dn:          ~
+#                search_password:    ~
+#                default_roles:      'ROLE_USER'
+#                uid_key:            'sAMAccountName'
+#                filter:             '({uid_key}={username})'
         in_memory: { memory: ~ }
+
+
     firewalls:
+        login:
+            pattern:  ^/login$
+            security: false
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern: ^/(_(profiler|wdt)|css|images|images|assets|js)/
             security: false
         main:
-            anonymous: true
-
+            #pattern:    ^/
+            #http_basic: ~
+            anonymous: ~
+            logout:
+                path:                 /logout
+                target:               /
+                success_handler:      ~
+                invalidate_session:   true
+                delete_cookies:
+                    name:
+                        path:                 null
+                        domain:               null
+                handlers:             []
+            form_login:
+                use_referer: true
+                login_path: login
+                check_path: login
+                default_target_path: home_index
+                always_use_default_target_path: true
+            provider: our_db_provider
             # activate different ways to authenticate
 
             # http_basic: true
@@ -16,9 +54,15 @@ security:
 
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
-
+    role_hierarchy:
+        ROLE_ADMIN:       [ROLE_USER, ROLE_EVENT_CREATE]
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/upload(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

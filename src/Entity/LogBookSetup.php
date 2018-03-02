@@ -64,11 +64,38 @@ class LogBookSetup
     protected $owner = 0;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
+     */
+    protected $moderators;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\LogBookCycle", mappedBy="setup", cascade={"all"}, fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="cycles", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"id" = "DESC"})
      */
     protected $cycles;
+
+    public function __construct()
+    {
+        $this->moderators = array();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModerators()
+    {
+        return $this->moderators;
+    }
+
+    /**
+     * @param mixed $moderators
+     */
+    public function setModerators($moderators): void
+    {
+        $this->moderators = $moderators;
+    }
+
 
     /**
      * @return mixed

@@ -24,6 +24,7 @@ class LogBookSetupType extends AbstractType
             ->add('os', ChoiceType::class , $this->buildOsFormType())
             ->add('checkUpTime')
             ->add('owner')
+            ->add('moderators')
         ;
     }
 

@@ -13,6 +13,30 @@
             <a href="{{ path('cycle_index') }}">Back to the list</a>
         </li>
         <li>
+            {% if is_granted("ROLE") %}
+                Hi {{ app.user.username }} ROLE
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
+                {{ form_end(delete_form) }}
+            {% endif %}
+        </li>
+        <li>
+            {% if is_granted("ROLE_ADMIN") %}
+                Hi {{ app.user.username }} ROLE_ADMIN
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
+                {{ form_end(delete_form) }}
+            {% endif %}
+        </li>
+        <li>
+            {% if is_granted("ROLE_USER") %}
+                Hi {{ app.user.username }} ROLE_USER
+                {{ form_start(delete_form) }}
+                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
+                {{ form_end(delete_form) }}
+            {% endif %}
+        </li>
+        <li>
             {{ form_start(delete_form) }}
                 <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
             {{ form_end(delete_form) }}

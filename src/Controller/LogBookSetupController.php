@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookSetup;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,11 +73,20 @@ class LogBookSetupController extends Controller
      */
     public function showAction(LogBookSetup $obj)
     {
-        $deleteForm = $this->createDeleteForm($obj);
+        $user= $this->get('security.token_storage')->getToken()->getUser();
+        /** @var PersistentCollection $moderators */
+        $moderators = $obj->getModerators();
+        //if(in_array($user, $moderators)){
+        if($moderators->contains($user)){
+            $deleteForm = $this->createDeleteForm($obj)->createView();
+        }
+        else{
+            $deleteForm = null;
+        }
 
         return $this->render('lbook/setup/show.html.twig', array(
             'setup' => $obj,
-            'delete_form' => $deleteForm->createView(),
+            'delete_form' => $deleteForm,
         ));
     }
 
@@ -91,7 +101,21 @@ class LogBookSetupController extends Controller
      */
     public function editAction(Request $request, LogBookSetup $obj)
     {
-        $deleteForm = $this->createDeleteForm($obj);
+        $user= $this->get('security.token_storage')->getToken()->getUser();
+
+        // check for "edit" access: calls all voters
+        $this->denyAccessUnlessGranted('edit', $obj);
+        /** @var PersistentCollection $moderators */
+        $moderators = $obj->getModerators();
+        //if(in_array($user, $moderators)){
+        if($moderators->contains($user)){
+            $deleteForm = $this->createDeleteForm($obj)->createView();
+        }
+        else{
+            $deleteForm = null;
+        }
+
+
         $editForm = $this->createForm('App\Form\LogBookSetupType', $obj);
         $editForm->handleRequest($request);
 
@@ -104,7 +128,7 @@ class LogBookSetupController extends Controller
         return $this->render('lbook/setup/edit.html.twig', array(
             'setup' => $obj,
             'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'delete_form' => $deleteForm,
         ));
     }
 
@@ -119,6 +143,7 @@ class LogBookSetupController extends Controller
      */
     public function deleteAction(Request $request, LogBookSetup $obj)
     {
+        $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 

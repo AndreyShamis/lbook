@@ -40,7 +40,9 @@
                 <td>{{ test.dutUpTimeEnd }}</td>
                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>
                 <td>
+                    {% if is_granted('edit', test.cycle.setup) %}
                     <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

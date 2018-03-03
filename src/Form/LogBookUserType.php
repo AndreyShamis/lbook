@@ -39,7 +39,7 @@ class LogBookUserType extends AbstractType
             ;
         }
 
-        if($options["data"] === $options['current_user']){
+        //if($options["data"] === $options['current_user']){
             /** @var LogBookUser $edited_user */
             $edited_user = $options["data"];
             if(!$edited_user->isLdapUser()){
@@ -49,7 +49,7 @@ class LogBookUserType extends AbstractType
                     'second_options' => array('label' => 'Repeat Password'),
                 ));
             }
-        }
+       // }
     }
 
     public function configureOptions(OptionsResolver $resolver)

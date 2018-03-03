@@ -47,7 +47,7 @@ class LogBookSecurityController extends Controller
                 if($user !== null){
                     //$encoded_pass = $passwordEncoder->encodePassword($user, $password);
                     //$salt = $user->getSalt();
-                    if($passwordEncoder->isPasswordValid($user, $password)){
+                    if($passwordEncoder->isPasswordValid($user, $password) && $user->getIsActive()){
                         // The password matches ! then proceed to set the user in session
 
                         //Handle getting or creating the user entity likely with a posted form
@@ -64,6 +64,9 @@ class LogBookSecurityController extends Controller
                         $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
                         return $this->render('lbook/default/index.html.twig', array(
                         ));
+                    }
+                    elseif (!$user->getIsActive()){
+                        throw new AuthenticationException('The user is disabled.');
                     }
                     else
                     {

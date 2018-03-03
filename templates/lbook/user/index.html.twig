@@ -22,8 +22,12 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.isActive ? 'Yes':'DISABLED' }}</td>
                 <td>
+                    {% if is_granted('view', user) %}
                     <a href="{{ path('user_show', { 'id': user.id }) }}">show</a>
+                    {% endif %}
+                    {% if is_granted('edit', user) %}
                     <a href="{{ path('user_edit', { 'id': user.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

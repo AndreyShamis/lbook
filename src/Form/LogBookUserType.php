@@ -22,7 +22,7 @@ class LogBookUserType extends AbstractType
             ->add('username', TextType::class)
         ;
 
-        if(in_array("edit_enabled", $options) && $options["edit_enabled"] === true){
+        if(in_array("edit_enabled", $options) && $options["edit_enabled"] === true && $options["can_change_permissions"] === true){
             $builder
                 ->add('isActive')
                 ->add('roles', ChoiceType::class, [
@@ -63,6 +63,7 @@ class LogBookUserType extends AbstractType
             'data_class' => LogBookUser::class,
             'edit_enabled' => false,
             'current_user' => null,
+            'can_change_permissions' => false,
         ));
     }
 

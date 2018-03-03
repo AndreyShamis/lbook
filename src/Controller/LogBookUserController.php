@@ -66,11 +66,12 @@ class LogBookUserController extends Controller
         // check for "edit" access: calls all voters
         $this->denyAccessUnlessGranted('edit', $obj);
         $current_user= $this->get('security.token_storage')->getToken()->getUser();
+        $can_change_permissions = $this->isGranted('ROLE_ADMIN');
         $editForm = $this->get('form.factory')->create('App\Form\LogBookUserType', $obj, array(
             'edit_enabled' => true,
             'current_user' => $current_user,
+            'can_change_permissions' => $can_change_permissions,
         ));
-        //$editForm = $this->createForm('App\Form\LogBookUserType', $obj);
         //$editForm = $this->createForm('App\Form\LogBookUserType', $obj);
         $editForm->handleRequest($request);
 

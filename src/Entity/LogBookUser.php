@@ -36,7 +36,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     private $password;
 
     /**
-     * @Assert\NotBlank()
+     * //@Assert\NotBlank()
      * @Assert\Length(max=4096)
      */
     private $plainPassword;
@@ -52,12 +52,19 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @ORM\Column(name="is_active", type="boolean")
      */
-    private $isActive;
+    protected $isActive;
 
     /**
      * @ORM\Column(type="json_array")
      */
-    private $roles = [];
+    protected $roles = [];
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_ldap_user", type="boolean", options={"default"="0"})
+     */
+    protected $isLdapUser = 0;
 
     /**
      *
@@ -107,6 +114,24 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
             return "";
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function isLdapUser(): bool
+    {
+        return $this->isLdapUser;
+    }
+
+    /**
+     * @param bool $isLdapUser
+     */
+    public function setIsLdapUser(bool $isLdapUser): void
+    {
+        $this->isLdapUser = $isLdapUser;
+    }
+
+
 
     /**
      * @return string
@@ -184,10 +209,10 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     {
         $roles = $this->roles;
         // give everyone ROLE_USER!
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
-        }
         if(is_array($roles)){
+            if (!in_array('ROLE_USER', $roles)) {
+                $roles[] = 'ROLE_USER';
+            }
             return $roles;
         }
         else{

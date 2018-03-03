@@ -14,17 +14,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LogBookUserType extends AbstractType
 {
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('email', EmailType::class)
             ->add('username', TextType::class)
         ;
-        $builder->add('plainPassword', RepeatedType::class, array(
-            'type' => PasswordType::class,
-            'first_options'  => array('label' => 'Password'),
-            'second_options' => array('label' => 'Repeat Password'),
-        ));
+
         if(in_array("edit_enabled", $options) && $options["edit_enabled"] === true){
             $builder
                 ->add('isActive')
@@ -41,8 +38,17 @@ class LogBookUserType extends AbstractType
                 ])
             ;
         }
-        else{
 
+        if($options["data"] === $options['current_user']){
+            /** @var LogBookUser $edited_user */
+            $edited_user = $options["data"];
+            if(!$edited_user->isLdapUser()){
+                $builder->add('plainPassword', RepeatedType::class, array(
+                    'type' => PasswordType::class,
+                    'first_options'  => array('label' => 'Password'),
+                    'second_options' => array('label' => 'Repeat Password'),
+                ));
+            }
         }
     }
 
@@ -55,6 +61,7 @@ class LogBookUserType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => LogBookUser::class,
             'edit_enabled' => false,
+            'current_user' => null,
         ));
     }
 

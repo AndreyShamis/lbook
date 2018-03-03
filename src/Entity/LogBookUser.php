@@ -209,15 +209,13 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     {
         $roles = $this->roles;
         // give everyone ROLE_USER!
-        if(is_array($roles)){
-            if (!in_array('ROLE_USER', $roles)) {
-                $roles[] = 'ROLE_USER';
-            }
-            return $roles;
+        if(!is_array($roles)){
+            $roles = array();
         }
-        else{
-            return array();
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
         }
+        return $roles;
     }
 
     /**

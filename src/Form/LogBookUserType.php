@@ -44,6 +44,7 @@ class LogBookUserType extends AbstractType
             $edited_user = $options["data"];
             if(!$edited_user->isLdapUser()){
                 $builder->add('plainPassword', RepeatedType::class, array(
+                    'required' => false,
                     'type' => PasswordType::class,
                     'first_options'  => array('label' => 'Password'),
                     'second_options' => array('label' => 'Repeat Password'),

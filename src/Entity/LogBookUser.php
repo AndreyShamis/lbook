@@ -149,7 +149,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $password
      */
-    public function setPlainPassword(string $password = "")
+    public function setPlainPassword($password = "")
     {
         $this->plainPassword = $password;
     }

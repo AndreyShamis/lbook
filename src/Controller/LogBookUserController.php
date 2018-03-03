@@ -44,6 +44,8 @@ class LogBookUserController extends Controller
      */
     public function showAction(LogBookUser $obj)
     {
+        // check for "edit" access: calls all voters
+        $this->denyAccessUnlessGranted('view', $obj);
         return $this->render('lbook/user/show.html.twig', array(
             'user' => $obj,
         ));
@@ -61,6 +63,8 @@ class LogBookUserController extends Controller
      */
     public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
     {
+        // check for "edit" access: calls all voters
+        $this->denyAccessUnlessGranted('edit', $obj);
         $current_user= $this->get('security.token_storage')->getToken()->getUser();
         $editForm = $this->get('form.factory')->create('App\Form\LogBookUserType', $obj, array(
             'edit_enabled' => true,

@@ -2,14 +2,14 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\LogBookSetup;
 use App\Entity\LogBookUser;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
-class LogBookSetupVoter extends Voter
+class LogBookUserVoter extends Voter
 {
     // these strings are just invented: you can use anything
     const VIEW = 'view';
@@ -40,7 +40,7 @@ class LogBookSetupVoter extends Voter
         }
 
         // only vote on Post objects inside this voter
-        if (!$subject instanceof LogBookSetup) {
+        if (!$subject instanceof LogBookUser) {
             return false;
         }
 
@@ -56,74 +56,78 @@ class LogBookSetupVoter extends Voter
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
-        $user = $token->getUser();
+        $logedin_user = $token->getUser();
 
-        if (!$user instanceof LogBookUser) {
+        if (!$logedin_user instanceof LogBookUser) {
             // the user must be logged in; if not, deny access
             return false;
         }
 
         // you know $subject is a Post object, thanks to supports
-        /** @var LogBookSetup $setup */
-        $setup = $subject;
+        /** @var LogBookUser $edited_user */
+        $edited_user = $subject;
 
         // ROLE_SUPER_ADMIN can do anything! The power!
-        if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN'))) {
+        if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN'))) {
             return true;
         }
 
 
         switch ($attribute) {
             case self::VIEW:
-                return $this->canView($setup, $user);
+                return $this->canView($edited_user, $logedin_user);
             case self::EDIT:
-                return $this->canEdit($setup, $user);
+                return $this->canEdit($edited_user, $logedin_user);
             case self::DELETE:
-                return $this->canDelete($setup, $user);
+                return $this->canDelete($edited_user, $logedin_user);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
     /**
-     * @param LogBookSetup $setup
-     * @param LogBookUser $user
+     * @param LogBookUser $edited_user
+     * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canView(LogBookSetup $setup, LogBookUser $user)
+    private function canView(LogBookUser $edited_user, LogBookUser $logedin_user)
     {
-        if(!$setup->isPrivate()){
-            return true;
-        }
-        // if they can edit, they can view
-        else if ($this->canEdit($setup, $user)) {
-            return true;
-        }
-        return false;
+//        if (!$edited_user->isPrivate()) {
+//            return true;
+//        } // if they can edit, they can view
+//        else if ($this->canEdit($edited_user, $logedin_user)) {
+//            return true;
+//        }
+        return true;
     }
 
     /**
-     * @param LogBookSetup $setup
-     * @param LogBookUser $user
+     * @param LogBookUser $edited_user
+     * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canEdit(LogBookSetup $setup, LogBookUser $user)
+    private function canEdit(LogBookUser $edited_user, LogBookUser $logedin_user)
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
-        return $user === $setup->getOwner() || $setup->getModerators()->contains($user);
+        /** @var PersistentCollection $logedin_user_roles */
+        $logedin_user_roles = $logedin_user->getRoles();
+        return $logedin_user->getId() === $edited_user->getId()
+            || $logedin_user_roles->contains('ROLE_ADMIN')
+            || $logedin_user_roles->contains('ROLE_SUPER_ADMIN');
     }
 
     /**
-     * @param LogBookSetup $setup
-     * @param LogBookUser $user
+     * @param LogBookUser $edited_user
+     * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canDelete(LogBookSetup $setup, LogBookUser $user)
+    private function canDelete(LogBookUser $edited_user, LogBookUser $logedin_user)
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
-        return $user === $setup->getOwner();
-        //return $this->canEdit($setup, $user);
+        /** @var PersistentCollection $logedin_user_roles */
+        $logedin_user_roles = $logedin_user->getRoles();
+        return $logedin_user_roles->contains('ROLE_SUPER_ADMIN') && !$edited_user->isLdapUser();
     }
 }

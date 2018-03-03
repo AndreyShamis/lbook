@@ -32,6 +32,8 @@
 
     <ul>
         <li><a href="{{ path('user_index') }}">Back to the list</a></li>
+        {% if is_granted('edit', user) %}
         <li><a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a></li>
+        {% endif %}
     </ul>
 {% endblock %}

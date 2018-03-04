@@ -72,7 +72,7 @@ class LogBookCycleController extends Controller
      */
     public function showAction(LogBookCycle $obj)
     {
-        $deleteForm = $this->createDeleteForm($obj);
+        //$deleteForm = $this->createDeleteForm($obj);
 
         return $this->render('lbook/cycle/show.html.twig', array(
             'cycle' => $obj,

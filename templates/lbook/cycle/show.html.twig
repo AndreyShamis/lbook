@@ -136,12 +136,12 @@
             <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a>
         </li>
         {% endif %}
-        {% if is_granted('delete', cycle.setup) %}
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
-            {{ form_end(delete_form) }}
-        </li>
-        {% endif %}
+        {#{% if is_granted('delete', cycle.setup) %}#}
+        {#<li>#}
+            {#{{ form_start(delete_form) }}#}
+                {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+            {#{{ form_end(delete_form) }}#}
+        {#</li>#}
+        {#{% endif %}#}
     </ul>
 {% endblock %}

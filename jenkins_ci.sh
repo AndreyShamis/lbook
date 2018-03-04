@@ -1,15 +1,31 @@
 #!/bin/bash -xe
 
 info() {
-  echo -e "\033[1;33m[Info]    $1  \033[0m"
+    echo -e "\033[1;33m[Info]    $1  \033[0m"
 }
 
 error() {
-  echo -e "\033[1;31m[Error]   $1  \033[0m"
+    echo -e "\033[1;31m[Error]   $1  \033[0m"
 }
 
 success() {
-  echo -e "\033[1;32m[Success] $1 \033[0m"
+    echo -e "\033[1;32m[Success] $1 \033[0m"
+}
+
+save_proxy(){
+    info "Save HTTPS and https ENVs"
+    TMP_HTTPS_PROXY_SMALL=${https_proxy}
+    TMP_HTTPS_PROXY_BIG=${HTTPS_PROXY}
+    export https_proxy=""
+    export HTTPS_PROXY=""
+    success " ----> Proxy ENVs saved <----"
+}
+
+restore_proxy(){
+    info "Restore proxy ENVs"
+    export https_proxy=${TMP_HTTPS_PROXY_SMALL}
+    export HTTPS_PROXY=${TMP_HTTPS_PROXY_BIG}
+    success "Proxy restored"
 }
 
 # Requirements
@@ -18,12 +34,7 @@ success() {
 #sudo apt install php7.0-xml
 #sudo apt install php7.0-mbstring
 
-info "Save HTTPS and https ENVs"
-TMP_HTTPS_PROXY_SMALL=${https_proxy}
-TMP_HTTPS_PROXY_BIG=${HTTPS_PROXY}
-export https_proxy=""
-export HTTPS_PROXY=""
-success " ----> Proxy ENVs saved <----"
+save_proxy
 
 info "Print composer info"
 composer -V
@@ -70,11 +81,7 @@ info "Start Check YAML files"
 php bin/console lint:yaml config/
 success "Finish Check YAML files"
 
-
-info "Restore proxy ENVs"
-export https_proxy=${TMP_HTTPS_PROXY_SMALL}
-export HTTPS_PROXY=${TMP_HTTPS_PROXY_BIG}
-success "Proxy restored"
+restore_proxy
 
 info "Start unittests"
 #sudo apt install php7.0-mbstring

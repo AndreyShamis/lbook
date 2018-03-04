@@ -12,7 +12,16 @@ success() {
   echo -e "\033[1;32m[Success] $1 \033[0m"
 }
 
+# Requirements
+#sudo apt install php7.0-ldap
+#sudo apt install php7.0-zip
+#sudo apt install php7.0-xml
+#sudo apt install php7.0-mbstring
 
+info "Save HTTPS and https ENVs"
+TMP_HTTPS_PROXY_SMALL=${https_proxy}
+TMP_HTTPS_PROXY_BIG=${HTTPS_PROXY}
+success " ----> Proxy ENVs saved <----"
 
 info "Print composer info"
 composer -V
@@ -39,7 +48,7 @@ ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
 #sudo apt-get install php7.0-zip
-#"sudo apt-get install php7.0-xml"
+#sudo apt-get install php7.0-xml
 composer  -vvv update
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
@@ -60,8 +69,12 @@ php bin/console lint:yaml config/
 success "Finish Check YAML files"
 
 
-info "Start unittests"
+info "Restore proxy ENVs"
+export https_proxy=${TMP_HTTPS_PROXY_SMALL}
+export HTTPS_PROXY=${TMP_HTTPS_PROXY_BIG}
+success "Proxy restored"
 
+info "Start unittests"
 #sudo apt install php7.0-mbstring
 ./vendor/bin/simple-phpunit
 success "Finish unittests"

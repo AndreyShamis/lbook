@@ -21,6 +21,8 @@ success() {
 info "Save HTTPS and https ENVs"
 TMP_HTTPS_PROXY_SMALL=${https_proxy}
 TMP_HTTPS_PROXY_BIG=${HTTPS_PROXY}
+export https_proxy=""
+export HTTPS_PROXY=""
 success " ----> Proxy ENVs saved <----"
 
 info "Print composer info"

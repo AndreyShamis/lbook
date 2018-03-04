@@ -55,7 +55,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     protected $isActive;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json", columnDefinition="TEXT NOT NULL")
      */
     protected $roles = [];
 

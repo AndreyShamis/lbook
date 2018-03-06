@@ -107,13 +107,14 @@ class LogBookSetupController extends Controller
         $this->denyAccessUnlessGranted('edit', $obj);
         /** @var PersistentCollection $moderators */
         $moderators = $obj->getModerators();
+        $deleteForm = $this->createDeleteForm($obj);
         //if(in_array($user, $moderators)){
-        if($moderators->contains($user)){
-            $deleteForm = $this->createDeleteForm($obj)->createView();
-        }
-        else{
-            $deleteForm = null;
-        }
+//        if($moderators->contains($user)){
+//            $deleteForm = $this->createDeleteForm($obj)->createView();
+//        }
+//        else{
+//            $deleteForm = null;
+//        }
 
 
         $editForm = $this->createForm('App\Form\LogBookSetupType', $obj);
@@ -128,7 +129,7 @@ class LogBookSetupController extends Controller
         return $this->render('lbook/setup/edit.html.twig', array(
             'setup' => $obj,
             'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm,
+            'delete_form' => $deleteForm->createView(),
         ));
     }
 

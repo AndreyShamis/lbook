@@ -176,7 +176,7 @@ class LogBookSetup
     /**
      * @return string
      */
-    public function getNameShown(): string
+    public function getNameShown(): ?string
     {
         if(strlen($this->nameShown)>0){
             return $this->nameShown;
@@ -190,7 +190,7 @@ class LogBookSetup
     /**
      * @param string $nameShown
      */
-    public function setNameShown($nameShown): void
+    public function setNameShown(string $nameShown=null): void
     {
         $this->nameShown = $nameShown;
     }

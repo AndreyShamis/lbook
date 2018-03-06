@@ -13,7 +13,11 @@
                 <th>Name</th>
                 <td>{{ setup.name }}</td>
             </tr>
-            {% set already_printed = ['moderators', 'id', 'name', 'cycles'] %}
+            <tr>
+                <th>Short Name</th>
+                <td>{{ setup.nameShown }}</td>
+            </tr>
+            {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown'] %}
             {% for key, value in setup|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>

@@ -31,6 +31,41 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     protected $username = "";
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="first_name", type="string", length=255)
+     */
+    protected $firstName = "";
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="last_name", type="string", length=255)
+     */
+    protected $lastName = "";
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="another_id", type="string", length=255)
+     */
+    protected $anotherId = "";
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="full_name", type="string", length=255)
+     */
+    protected $fullName = "";
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="mobile", type="string", length=255)
+     */
+    protected $mobile = "";
+
+    /**
      * @ORM\Column(type="string", length=64)
      */
     private $password;
@@ -114,6 +149,90 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
             return "";
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->fullName;
+    }
+
+    /**
+     * @param string $fullName
+     */
+    public function setFullName(string $fullName)
+    {
+        $this->fullName = $fullName;
+    }
+
+    
+
+    /**
+     * @return string
+     */
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @param string $firstName
+     */
+    public function setFirstName(string $firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param string $lastName
+     */
+    public function setLastName(string $lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAnotherId(): string
+    {
+        return $this->anotherId;
+    }
+
+    /**
+     * @param string $anotherId
+     */
+    public function setAnotherId(string $anotherId)
+    {
+        $this->anotherId = $anotherId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMobile(): string
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param string $mobile
+     */
+    public function setMobile(string $mobile)
+    {
+        $this->mobile = $mobile;
+    }
+
+
 
     /**
      * @return bool

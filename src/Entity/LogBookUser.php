@@ -140,20 +140,16 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      *
      * @return string The username
      */
-    public function getUsername() : string
+    public function getUsername(): ?string
     {
-        if(is_string($this->username)){
-            return $this->username;
-        }
-        else{
-            return "";
-        }
+        return $this->username;
+
     }
 
     /**
      * @return string
      */
-    public function getFullName(): string
+    public function getFullName(): ?string
     {
         return $this->fullName;
     }
@@ -161,20 +157,15 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $fullName
      */
-    public function setFullName(string $fullName="")
+    public function setFullName(string $fullName=null)
     {
-        if($fullName === null){
-            $this->fullName = "";
-        }
-        else{
-            $this->fullName = $fullName;
-        }
+        $this->fullName = $fullName;
     }
 
     /**
      * @return string
      */
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -182,20 +173,15 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $firstName
      */
-    public function setFirstName(string $firstName="")
+    public function setFirstName(string $firstName=null)
     {
-        if($firstName === null){
-            $this->firstName = "";
-        }
-        else{
-            $this->firstName = $firstName;
-        }
+        $this->firstName = $firstName;
     }
 
     /**
      * @return string
      */
-    public function getLastName(): string
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
@@ -203,24 +189,16 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName="")
+    public function setLastName(string $lastName=null)
     {
-        if($lastName === null){
-            $this->lastName = "";
-        }
-        else{
-            $this->lastName = $lastName;
-        }
+        $this->lastName = $lastName;
     }
 
     /**
      * @return string
      */
-    public function getAnotherId(): string
+    public function getAnotherId(): ?string
     {
-        if($this->anotherId === null){
-            return "";
-        }
         return $this->anotherId;
     }
 
@@ -229,37 +207,23 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function setAnotherId(string $anotherId="")
     {
-        if($anotherId === null){
-            $this->anotherId = "";
-        }
-        else{
-            $this->anotherId = $anotherId;
-        }
+        $this->anotherId = $anotherId;
     }
 
     /**
      * @return string
      */
-    public function getMobile(): string
+    public function getMobile(): ?string
     {
-        if($this->mobile === null){
-            return "";
-        }
         return $this->mobile;
     }
 
     /**
      * @param string $mobile
      */
-    public function setMobile($mobile)
+    public function setMobile(string $mobile=null)
     {
-        if($mobile === null){
-            $this->mobile = "";
-        }
-        else{
-            $this->mobile = $mobile;
-        }
-
+        $this->mobile = $mobile;
     }
 
     /**
@@ -323,7 +287,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -331,7 +295,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void
+    public function setEmail(string $email=null): void
     {
         $this->email = $email;
     }

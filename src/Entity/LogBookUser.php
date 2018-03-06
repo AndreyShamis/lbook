@@ -163,10 +163,13 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function setFullName(string $fullName)
     {
-        $this->fullName = $fullName;
+        if($fullName === null){
+            $this->fullName = "";
+        }
+        else{
+            $this->fullName = $fullName;
+        }
     }
-
-
 
     /**
      * @return string
@@ -181,7 +184,12 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function setFirstName(string $firstName)
     {
-        $this->firstName = $firstName;
+        if($firstName === null){
+            $this->firstName = "";
+        }
+        else{
+            $this->firstName = $firstName;
+        }
     }
 
     /**
@@ -197,7 +205,12 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function setLastName(string $lastName)
     {
-        $this->lastName = $lastName;
+        if($lastName === null){
+            $this->lastName = "";
+        }
+        else{
+            $this->lastName = $lastName;
+        }
     }
 
     /**
@@ -205,6 +218,9 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function getAnotherId(): string
     {
+        if($this->anotherId === null){
+            return "";
+        }
         return $this->anotherId;
     }
 
@@ -213,7 +229,12 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function setAnotherId(string $anotherId)
     {
-        $this->anotherId = $anotherId;
+        if($anotherId === null){
+            $this->anotherId = "";
+        }
+        else{
+            $this->anotherId = $anotherId;
+        }
     }
 
     /**
@@ -221,18 +242,25 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function getMobile(): string
     {
+        if($this->mobile === null){
+            return "";
+        }
         return $this->mobile;
     }
 
     /**
      * @param string $mobile
      */
-    public function setMobile(string $mobile)
+    public function setMobile($mobile)
     {
-        $this->mobile = $mobile;
+        if($mobile === null){
+            $this->mobile = "";
+        }
+        else{
+            $this->mobile = $mobile;
+        }
+
     }
-
-
 
     /**
      * @return bool

@@ -66,9 +66,10 @@ class LogBookSecurityController extends Controller
                 $ret_arr["lastName"] = $entry->getAttribute("$LDAP_LASTNAME_STR")[0];
                 $ret_arr["firstName"] = $entry->getAttribute("$LDAP_FIRSTNAME")[0];
                 $ret_arr["fullName"] = $entry->getAttribute("$LDAP_FULLNAME_STR")[0];
-                $ret_arr["employeeId"] = $entry->getAttribute("$LDAP_ID_STR")[0];
+                $ret_arr["anotherId"] = $entry->getAttribute("$LDAP_ID_STR")[0];
                 $ret_arr["sitecode"] = $entry->getAttribute($LDAP_SITECODE_STR)[0];
                 $ret_arr["mobile"] = $entry->getAttribute("$LDAP_MOBILE_STR")[0];
+                $ret_arr["ldapUser"] = true;
             }
         }
         catch (ConnectionException $ex){
@@ -88,19 +89,29 @@ class LogBookSecurityController extends Controller
     {
 
         $error = $authUtils->getLastAuthenticationError();
+        /** @var LogBookUser $user */
+        $user = null;
         try{
             if($request->isMethod('POST')){
                 $user_name = $request->request->get('_username');
                 $password = $request->request->get('_password');
-//                $use_ldap = getenv("USE_LDAP");
-//                if($use_ldap === "true"){
-//                    $ldapUser = $this->ldapLogin($user_name, $password);
-//                }
-
                 // Retrieve the security encoder of symfony
                 $user_manager = $this->getDoctrine()->getManager()->getRepository("App:LogBookUser");
-                /** @var LogBookUser $user */
-                $user = $user_manager->loadUserByUsername($user_name);
+
+                $use_ldap = getenv("USE_LDAP");
+                if($use_ldap === "true"){
+                    $ldapUserArr = $this->ldapLogin($user_name, $password);
+                    if(is_array($ldapUserArr)){
+                        $user = $user_manager->loadUserByUsername($ldapUserArr["username"]);
+                        if($user === null){
+                            /** Need to create the user in DataBase **/
+                            $user = $user_manager->create($ldapUserArr);
+                        }
+                    }
+                }
+                else{
+                    $user = $user_manager->loadUserByUsername($user_name);
+                }
 
                 if($user !== null){
                     //$encoded_pass = $passwordEncoder->encodePassword($user, $password);

@@ -126,9 +126,11 @@ class LogBookTest
     {
         $this->logFileSize = $logFileSize;
     }
-
-
-    public function getLogFile()
+    
+    /**
+     * @return null|string
+     */
+    public function getLogFile(): ?string
     {
         return $this->logFile;
     }
@@ -172,9 +174,9 @@ class LogBookTest
     }
 
     /**
-     * @return mixed
+     * @return LogBookCycle
      */
-    public function getCycle()
+    public function getCycle(): ?LogBookCycle
     {
         return $this->cycle;
     }
@@ -188,9 +190,9 @@ class LogBookTest
     }
 
     /**
-     * @return mixed
+     * @return LogBookVerdict
      */
-    public function getVerdict()
+    public function getVerdict(): ?LogBookVerdict
     {
 //        if($this->verdict === null){
 //            $this->verdict = new LogBookVerdict();

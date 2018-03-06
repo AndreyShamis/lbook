@@ -161,7 +161,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $fullName
      */
-    public function setFullName(string $fullName)
+    public function setFullName(string $fullName="")
     {
         if($fullName === null){
             $this->fullName = "";
@@ -182,7 +182,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $firstName
      */
-    public function setFirstName(string $firstName)
+    public function setFirstName(string $firstName="")
     {
         if($firstName === null){
             $this->firstName = "";
@@ -203,7 +203,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName)
+    public function setLastName(string $lastName="")
     {
         if($lastName === null){
             $this->lastName = "";
@@ -227,7 +227,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @param string $anotherId
      */
-    public function setAnotherId(string $anotherId)
+    public function setAnotherId(string $anotherId="")
     {
         if($anotherId === null){
             $this->anotherId = "";

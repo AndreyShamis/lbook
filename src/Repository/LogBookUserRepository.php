@@ -33,4 +33,32 @@ class LogBookUserRepository extends EntityRepository implements UserLoaderInterf
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @param array $criteria
+     * @return LogBookUser
+     */
+    public function create(array $criteria)
+    {
+        $criteria['username'] = strtolower($criteria['username']);
+
+        $entity = $this->findOneBy(array("username" => $criteria['username']));
+
+        if (null === $entity) {
+            $entity = new LogBookUser();
+            $entity->setUsername($criteria['username']);
+            $entity->setEmail($criteria['email']);
+            $entity->setFullName($criteria['fullName']);
+            $entity->setLastName($criteria['lastName']);
+            $entity->setFirstName($criteria['firstName']);
+            $entity->setAnotherId($criteria['anotherId']);
+            $entity->setMobile($criteria['mobile']);
+            $entity->setIsLdapUser($criteria['ldapUser']);
+            $entity->setPassword($criteria['dummyPassword']);
+            $this->_em->persist($entity);
+            $this->_em->flush($entity);
+        }
+
+        return $entity;
+    }
 }

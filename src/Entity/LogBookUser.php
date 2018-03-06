@@ -166,7 +166,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
         $this->fullName = $fullName;
     }
 
-    
+
 
     /**
      * @return string

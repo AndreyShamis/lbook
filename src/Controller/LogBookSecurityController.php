@@ -26,7 +26,7 @@ class LogBookSecurityController extends Controller
 
     }
 
-    protected function ldapLogin($user, $password){
+    protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder){
         $ret_arr = array();
         try{
             $ldap_server = getenv("LDAP_SERVER");
@@ -37,7 +37,7 @@ class LogBookSecurityController extends Controller
             $LDAP_EMAIL_STR = getenv("LDAP_EMAIL_STR");
             $LDAP_FULLNAME_STR = getenv("LDAP_FULLNAME_STR");
             $LDAP_LASTNAME_STR = getenv("LDAP_LASTNAME_STR");
-            $LDAP_FIRSTNAME = getenv("LDAP_FIRSTNAME");
+            $LDAP_FIRSTNAME_STR = getenv("LDAP_FIRSTNAME_STR");
             $LDAP_ID_STR = getenv("LDAP_ID_STR");
             $LDAP_MOBILE_STR = getenv("LDAP_MOBILE_STR");
             $LDAP_SITECODE_STR = getenv("LDAP_SITECODE_STR");
@@ -61,14 +61,16 @@ class LogBookSecurityController extends Controller
             $results = $query->execute();
 
             foreach ($results as $entry) {
-                $ret_arr["username"] = $entry->getAttribute("$LDAP_USERNAME_STR")[0];
-                $ret_arr["email"] = $entry->getAttribute("$LDAP_EMAIL_STR")[0];
-                $ret_arr["lastName"] = $entry->getAttribute("$LDAP_LASTNAME_STR")[0];
-                $ret_arr["firstName"] = $entry->getAttribute("$LDAP_FIRSTNAME")[0];
-                $ret_arr["fullName"] = $entry->getAttribute("$LDAP_FULLNAME_STR")[0];
-                $ret_arr["employeeId"] = $entry->getAttribute("$LDAP_ID_STR")[0];
+                $ret_arr["username"] = $entry->getAttribute($LDAP_USERNAME_STR)[0];
+                $ret_arr["email"] = $entry->getAttribute($LDAP_EMAIL_STR)[0];
+                $ret_arr["lastName"] = $entry->getAttribute($LDAP_LASTNAME_STR)[0];
+                $ret_arr["firstName"] = $entry->getAttribute($LDAP_FIRSTNAME_STR)[0];
+                $ret_arr["fullName"] = $entry->getAttribute($LDAP_FULLNAME_STR)[0];
+                $ret_arr["anotherId"] = $entry->getAttribute($LDAP_ID_STR)[0];
                 $ret_arr["sitecode"] = $entry->getAttribute($LDAP_SITECODE_STR)[0];
-                $ret_arr["mobile"] = $entry->getAttribute("$LDAP_MOBILE_STR")[0];
+                $ret_arr["mobile"] = $entry->getAttribute($LDAP_MOBILE_STR)[0];
+                $ret_arr["dummyPassword"] = $passwordEncoder->encodePassword(new LogBookUser(), "dummyPassword");
+                $ret_arr["ldapUser"] = true;
             }
         }
         catch (ConnectionException $ex){
@@ -88,24 +90,44 @@ class LogBookSecurityController extends Controller
     {
 
         $error = $authUtils->getLastAuthenticationError();
+        /** @var LogBookUser $user */
+        $user = null;
+        $ldapLogin = false;
         try{
             if($request->isMethod('POST')){
                 $user_name = $request->request->get('_username');
                 $password = $request->request->get('_password');
-//                $use_ldap = getenv("USE_LDAP");
-//                if($use_ldap === "true"){
-//                    $ldapUser = $this->ldapLogin($user_name, $password);
-//                }
-
                 // Retrieve the security encoder of symfony
                 $user_manager = $this->getDoctrine()->getManager()->getRepository("App:LogBookUser");
-                /** @var LogBookUser $user */
-                $user = $user_manager->loadUserByUsername($user_name);
+
+                $use_ldap = getenv("USE_LDAP");
+                if($use_ldap === "true"){
+                    $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
+                    if(is_array($ldapUserArr)){
+                        $ldapLogin = true;
+                        $user = $user_manager->loadUserByUsername($ldapUserArr["username"]);
+                        if($user === null){
+                            /** Need to create the user in DataBase **/
+                            $user = $user_manager->create($ldapUserArr);
+                        }
+                    }
+                }
+                else{
+                    $user = $user_manager->loadUserByUsername($user_name);
+                }
 
                 if($user !== null){
                     //$encoded_pass = $passwordEncoder->encodePassword($user, $password);
                     //$salt = $user->getSalt();
-                    if($passwordEncoder->isPasswordValid($user, $password) && $user->getIsActive()){
+                    if (!$user->getIsActive()){
+                        throw new AuthenticationException('The user is disabled.');
+                    }
+                    if(
+                    ($passwordEncoder->isPasswordValid($user, $password) && !$ldapLogin && $user->getIsActive())
+                            ||
+                    ($ldapLogin && $user->isLdapUser() && $user->getIsActive())
+                    )
+                        {
                         // The password matches ! then proceed to set the user in session
 
                         //Handle getting or creating the user entity likely with a posted form
@@ -122,9 +144,6 @@ class LogBookSecurityController extends Controller
                         $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
                         return $this->render('lbook/default/index.html.twig', array(
                         ));
-                    }
-                    elseif (!$user->getIsActive()){
-                        throw new AuthenticationException('The user is disabled.');
                     }
                     else
                     {

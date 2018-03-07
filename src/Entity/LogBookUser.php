@@ -203,9 +203,9 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * @param string $anotherId
+     * @param string|null $anotherId
      */
-    public function setAnotherId(string $anotherId="")
+    public function setAnotherId(string $anotherId=null)
     {
         $this->anotherId = $anotherId;
     }

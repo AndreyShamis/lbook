@@ -33,35 +33,35 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="first_name", type="string", length=255)
+     * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
      */
     protected $firstName = "";
 
     /**
      * @var string
      *
-     * @ORM\Column(name="last_name", type="string", length=255)
+     * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      */
     protected $lastName = "";
 
     /**
      * @var string
      *
-     * @ORM\Column(name="another_id", type="string", length=255)
+     * @ORM\Column(name="another_id", type="string", length=255, nullable=true)
      */
     protected $anotherId = "";
 
     /**
      * @var string
      *
-     * @ORM\Column(name="full_name", type="string", length=255)
+     * @ORM\Column(name="full_name", type="string", length=255, nullable=true)
      */
     protected $fullName = "";
 
     /**
      * @var string
      *
-     * @ORM\Column(name="mobile", type="string", length=255)
+     * @ORM\Column(name="mobile", type="string", length=255, nullable=true)
      */
     protected $mobile = "";
 

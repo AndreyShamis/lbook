@@ -1,3 +1,8 @@
 index:
     path: /
     controller: App\Controller\LogBookDefaultController::index
+
+easy_admin_bundle:
+    resource: "@EasyAdminBundle/Controller/AdminController.php"
+    type:     annotation
+    prefix:   /lbadmin

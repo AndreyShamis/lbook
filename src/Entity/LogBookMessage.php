@@ -152,5 +152,8 @@ class LogBookMessage
         $this->chain = $chain;
     }
 
-
+    public function __toString(): string
+    {
+        return $this->getMessage();
+    }
 }

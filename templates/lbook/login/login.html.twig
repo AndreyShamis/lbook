@@ -32,7 +32,7 @@
                                         <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                                         <div>{{ error.message }}</div>
                                     {% endif %}
-                                    <form action="{{ path('login') }}" method="post">
+                                    <form action="{{ path('login') }}" method="post" id="loginForm">
                                         <fieldset>
                                             <label class="block clearfix">
                                                 <span class="block input-icon input-icon-right">
@@ -43,7 +43,7 @@
 
                                             <label class="block clearfix">
                                                 <span class="block input-icon input-icon-right">
-                                                    <input type="password" id="password" name="_password" class="form-control" placeholder="Password" />
+                                                    <input type="password" id="password" name="_password" class="form-control submit-password" placeholder="Password" />
                                                     <i class="ace-icon fa fa-lock"></i>
                                                 </span>
                                             </label>
@@ -56,10 +56,10 @@
                                                     <span class="lbl"> Remember Me</span>
                                                 </label>
 
-                                                <button type="button" class="width-35 pull-right btn btn-sm btn-primary">
+                                                <button type="button" class="width-35 pull-right btn btn-sm btn-primary submit-span">
                                                     <i class="ace-icon fa fa-key"></i>
                                                     <span class="bigger-110">Login</span>
-                                                    <button type="submit">login</button>
+                                                    {#<button type="submit">login</button>#}
                                                 </button>
                                             </div>
                                             <div class="space-4"></div>
@@ -245,6 +245,23 @@
         $('#id-text2').attr('class', 'grey');
         $('#id-company-text').attr('class', 'blue');
 
+        $(document).ready(function(){
+            var spanSubmit = $('.submit-span');
+
+            spanSubmit.on('click', function() {
+                $(this).closest('form').submit();
+                // Will also work, but might fail if nesting is changed:
+                // $(this).parent().submit();
+            });
+
+            var passwordSubmit = $('.submit-password');
+            passwordSubmit.keypress(function (e) {
+                if (e.which == 13) {
+                    $(this).closest('form').submit();
+                    return false;    //<---- Add this line
+                }
+            });
+        });
 
         //you don't need this, just used for changing background
         jQuery(function($) {
@@ -269,8 +286,6 @@
             //
             //     e.preventDefault();
             // });
-
-
         });
     </script>
 

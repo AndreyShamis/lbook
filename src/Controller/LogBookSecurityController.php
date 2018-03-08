@@ -165,6 +165,7 @@ class LogBookSecurityController extends Controller
         return $this->render('lbook/login/login.html.twig', array(
             'last_username' => $lastUsername,
             'error'         => $error,
+            'company_name'  => getenv("COMPANY_NAME"),
         ));
 
     }

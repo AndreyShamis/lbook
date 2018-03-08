@@ -93,6 +93,8 @@ class LogBookSecurityController extends Controller
         /** @var LogBookUser $user */
         $user = null;
         $ldapLogin = false;
+        $use_ldap = getenv("USE_LDAP");
+        $use_only_ldap = getenv("USE_ONLY_LDAP");
         try{
             if($request->isMethod('POST')){
                 $user_name = $request->request->get('_username');
@@ -100,7 +102,6 @@ class LogBookSecurityController extends Controller
                 // Retrieve the security encoder of symfony
                 $user_manager = $this->getDoctrine()->getManager()->getRepository("App:LogBookUser");
 
-                $use_ldap = getenv("USE_LDAP");
                 if($use_ldap === "true"){
                     $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
                     if(is_array($ldapUserArr)){
@@ -165,6 +166,9 @@ class LogBookSecurityController extends Controller
         return $this->render('lbook/login/login.html.twig', array(
             'last_username' => $lastUsername,
             'error'         => $error,
+            'company_name'  => getenv("COMPANY_NAME"),
+            'use_ldap'      => $use_ldap,
+            'use_only_ldap' => $use_only_ldap,
         ));
 
     }

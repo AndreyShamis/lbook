@@ -9,12 +9,13 @@
             <div class="col-sm-10 col-sm-offset-1">
                 <div class="login-container">
                     <div class="center">
+                        <br/>
                         <h1>
                             <i class="ace-icon fa fa-leaf green"></i>
                             <span class="red">LogBOOK</span>
                             <span class="white" id="id-text2">Application</span>
                         </h1>
-                        <h4 class="blue" id="id-company-text">&copy; Company Name</h4>
+                        <h2 class="blue" id="id-company-text">{{ company_name }}</h2>
                     </div>
 
                     <div class="space-6"></div>
@@ -65,12 +66,12 @@
                                             <div class="space-4"></div>
                                         </fieldset>
                                     </form>
-
-                                    {#<div class="social-or-login center">#}
-                                        {#<span class="bigger-110">Or Login Using</span>#}
-                                    {#</div>#}
-
-                                    {#<div class="space-6"></div>#}
+                                    {% if use_ldap %}
+                                    <div class="social-or-login center">
+                                        <span class="bigger-110">Use LDAP account</span>
+                                    </div>
+                                    {% endif %}
+                                    <div class="space-6"></div>
 
                                     {#<div class="social-login center">#}
                                         {#<a class="btn btn-primary">#}
@@ -86,14 +87,14 @@
                                         {#</a>#}
                                     {#</div>#}
                                 </div><!-- /.widget-main -->
-
+                                {% if not use_only_ldap %}
                                 <div class="toolbar clearfix">
-                                    {#<div>#}
+                                    <div>
                                         {#<a href="#" data-target="#forgot-box" class="forgot-password-link">#}
                                             {#<i class="ace-icon fa fa-arrow-left"></i>#}
                                             {#I forgot my password#}
                                         {#</a>#}
-                                    {#</div>#}
+                                    </div>
 
                                     <div>
                                         <a href="#" data-target="#signup-box" class="user-signup-link">
@@ -102,6 +103,7 @@
                                         </a>
                                     </div>
                                 </div>
+                                {% endif %}
                             </div><!-- /.widget-body -->
                         </div><!-- /.login-box -->
 

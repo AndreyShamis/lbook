@@ -68,11 +68,14 @@ info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all --strict  # TODO
 success " ----> Check that the composer.json for different errors, like autoload issue <----"
 
-#TODO
+# TODO
 #info "Check the composer.lock for security issues"
 #php vendor/bin/security-checker security:check
-info "Adding symfony/phpunit-bridge"
-composer require  symfony/phpunit-bridge
+
+# Disable require unit test - should be in composer
+#info "Adding symfony/phpunit-bridge"
+#composer require  symfony/phpunit-bridge
+
 #info "Start Check DataBase"
 #php bin/console doctrine:schema:validate -e=prod
 #success "Finish Check DataBase"

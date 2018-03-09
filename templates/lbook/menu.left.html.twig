@@ -53,13 +53,13 @@
         <b class="arrow"></b>
     </li>
 
-    <li class="{% if route starts with 'verdict_' %}active{% endif %}">
-        <a href="{{asset(path('verdict_index'))}}">
-            <i class="menu-icon fa  fa-filter"></i>
-            <span class="menu-text  bigger-120">Verdicts</span>
-        </a>
-        <b class="arrow"></b>
-    </li>
+    {#<li class="{% if route starts with 'verdict_' %}active{% endif %}">#}
+        {#<a href="{{asset(path('verdict_index'))}}">#}
+            {#<i class="menu-icon fa  fa-filter"></i>#}
+            {#<span class="menu-text  bigger-120">Verdicts</span>#}
+        {#</a>#}
+        {#<b class="arrow"></b>#}
+    {#</li>#}
 
     <li class="{% if route starts with 'upload_' %}active{% endif %}">
         <a href="{{asset(path('upload_new'))}}" >
@@ -69,26 +69,26 @@
         <b class="arrow"></b>
     </li>
 
-    <li class="{% if route starts with 'log_' %}active{% endif %}">
-        <a href="{{asset(path('log_index'))}}">
-        <i class="menu-icon fa fa-file-o"></i>
-            <span class="menu-text">Logs/Messages
-            <span class="badge badge-primary">5</span>
-        </span>
-        </a>
-        <b class="arrow"></b>
-    </li>
+    {#<li class="{% if route starts with 'log_' %}active{% endif %}">#}
+        {#<a href="{{asset(path('log_index'))}}">#}
+        {#<i class="menu-icon fa fa-file-o"></i>#}
+            {#<span class="menu-text">Logs/Messages#}
+            {#<span class="badge badge-primary">5</span>#}
+        {#</span>#}
+        {#</a>#}
+        {#<b class="arrow"></b>#}
+    {#</li>#}
 
-    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
-        <a href="{{asset(path('msg_type_index'))}}" >
-            <i class="menu-icon fa fa-tag"></i>
-            <span class="menu-text" title="Message/Log types">Log Types</span>
-        </a>
-        <b class="arrow"></b>
-    </li>
+    {#<li class="{% if route starts with 'msg_type_' %}active{% endif %}">#}
+        {#<a href="{{asset(path('msg_type_index'))}}" >#}
+            {#<i class="menu-icon fa fa-tag"></i>#}
+            {#<span class="menu-text" title="Message/Log types">Log Types</span>#}
+        {#</a>#}
+        {#<b class="arrow"></b>#}
+    {#</li>#}
 
     {# ################################### Controll ################################### #}
-    <li class="{% if route in ['types','types_index','types_show'] %}active{% endif %}">
+    <li class="{% if route in ['types', 'verdict_index', 'user_index', 'msg_type_index', 'log_index'] %}active{% endif %}">
         <a href="#" class="dropdown-toggle">
             <i class="menu-icon fa fa-desktop"></i>
             <span class="menu-text">Other</span>
@@ -96,11 +96,11 @@
         </a>
         <b class="arrow"></b>
 
-        <ul class="submenu ">
+        <ul class="submenu">
             <li class="
-{% if route starts with 'types' %}active{% endif %}
-{% if route starts with 'help' %}active{% endif %}
-{% if route starts with 'tepes_' %}active{% endif %}
+{% if route starts with 'verdict_' %}active{% endif %}
+{% if route starts with 'msg_type_' %}active{% endif %}
+{% if route starts with 'types_' %}active{% endif %}
 ">
                 <a href="#" class="dropdown-toggle">
                     <i class="menu-icon fa fa-caret-right"></i>Types
@@ -108,27 +108,20 @@
                 </a>
                 <b class="arrow"></b>
                 <ul class="submenu">
-                    <li class="{% if route starts with 'undef_' %}active{% endif %}">
-                        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}">
-                            <i class="menu-icon fa fa-caret-right"></i>NoNe
+                    <li class="{% if route starts with 'verdict_' %}active{% endif %}">
+                        <a href="{{asset(path('verdict_index'))}}">
+                            <i class="menu-icon fa fa-caret-right"></i>Verdicts
                         </a>
                         <b class="arrow"></b>
                     </li>
-                    <li class="{% if route starts with 'undef_' %}active{% endif %}">
-                        <a href="{{app.request.scheme ~'://' ~ app.request.httpHost }}">
-                            <i class="menu-icon fa fa-caret-right"></i>NoNe
+                    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">
+                        <a href="{{asset(path('msg_type_index'))}}">
+                            <i class="menu-icon fa fa-caret-right"></i>Log Types
                         </a>
                         <b class="arrow"></b>
                     </li>
                 </ul>
             </li>
-
-            {#<li class="{% if route starts with 'dca' %}active{% endif %}">#}
-                {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost  }}">#}
-                    {#<i class="menu-icon fa fa-caret-right"></i>Help#}
-                {#</a>#}
-                {#<b class="arrow"></b>#}
-            {#</li>#}
 
             <li class="{% if route starts with 'user_' %}active{% endif %}">
                 <a href="{{path('user_index') }}">
@@ -137,33 +130,12 @@
                 <b class="arrow"></b>
             </li>
 
-            {#<li class="{% if route starts with 'wwwsetupbuild_' %}active{% endif %}">#}
-            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('wwwsetupbuild_index') }}">#}
-            {#<i class="menu-icon fa fa-caret-right"></i>www Setup Builds#}
-            {#</a>#}
-            {#<b class="arrow"></b>#}
-            {#</li>#}
-            {#<li class="{% if route starts with 'wwwsetup_' %}active{% endif %}">#}
-            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('wwwsetup_index') }}">#}
-            {#<i class="menu-icon fa fa-caret-right"></i>www Setups#}
-            {#</a>#}
-            {#<b class="arrow"></b>#}
-            {#</li>#}
-
-            {#<li class="{% if route == 'actionparameter' %}active{% endif %}">#}
-            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('actionparameter') }}">#}
-            {#<i class="menu-icon fa fa-caret-right"></i>Action Params#}
-            {#</a>#}
-            {#<b class="arrow"></b>#}
-            {#</li>#}
-
-            {#<li class="{% if app.request.attributes.get('_route') == 'actionresultdescription' %}active{% endif %}">#}
-            {#<a href="{{app.request.scheme ~'://' ~ app.request.httpHost ~ path('actionresultdescription') }}">#}
-            {#<i class="menu-icon fa fa-caret-right"></i>Action Result desc#}
-            {#</a>#}
-            {#<b class="arrow"></b>#}
-            {#</li>#}
-
+            <li class="{% if route starts with 'log_' %}active{% endif %}">
+                <a href="{{asset(path('log_index'))}}">
+                    <i class="menu-icon fa fa-caret-right"></i>Logs
+                </a>
+                <b class="arrow"></b>
+            </li>
         </ul>
     </li>
 

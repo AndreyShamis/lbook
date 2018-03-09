@@ -130,7 +130,7 @@ class LogBookCycle
     /**
      * @var DateTime Time till token can be used
      *
-     * @ORM\Column(name="token_expiration", type="datetime", nullable=true)
+     * @ORM\Column(name="token_expiration", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $tokenExpiration;
 

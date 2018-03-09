@@ -26,6 +26,7 @@ use App\Utils\RandomName;
  */
 class LogBookUploaderController extends Controller
 {
+    /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em = null;
     protected $testsRepo = null;
     protected $cycleRepo = null;
@@ -204,7 +205,7 @@ class LogBookUploaderController extends Controller
                         'name' => $cycle_name,   // TODO provide cycle name
                         'setup' => $setup,
                         'uploadToken' => $cycle_token,
-                        //'tokenExpiration' => new \DateTime('+7 days');,   // Done in constructor
+                        //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
                     ));
                     if($cycle === null){
                         $obj->addMessage("CRITICAL: Failed to generate cycle");
@@ -506,6 +507,14 @@ class LogBookUploaderController extends Controller
                 $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
+//                if($counter%20000 == 0){
+//                    $this->em->flush();
+//                    foreach ($objectsToClear as $obj){
+//                        $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+//                    }
+//                    unset($objectsToClear);
+//                    $objectsToClear = array();
+//                }
                 /*** Test Name section **/
                 if(!$testNameFound && $log->getMsgType() == "INFO"){
                     $tmpName = null;

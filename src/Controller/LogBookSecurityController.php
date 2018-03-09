@@ -6,6 +6,7 @@ use App\Entity\LogBookUser;
 use PHPUnit\Runner\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Ldap\Exception\ConnectionException;
@@ -85,16 +86,17 @@ class LogBookSecurityController extends Controller
      * @param AuthenticationUtils $authUtils
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return Response
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function login(Request $request, AuthenticationUtils $authUtils, UserPasswordEncoderInterface $passwordEncoder)
     {
-
         $error = $authUtils->getLastAuthenticationError();
         /** @var LogBookUser $user */
         $user = null;
         $ldapLogin = false;
         $use_ldap = getenv("USE_LDAP");
         $use_only_ldap = getenv("USE_ONLY_LDAP");
+        $key = '_security.main.target_path'; #where "main" is your firewall name
         try{
             if($request->isMethod('POST')){
                 $user_name = $request->request->get('_username');
@@ -143,6 +145,13 @@ class LogBookSecurityController extends Controller
                         // Fire the login event manually
                         $event = new InteractiveLoginEvent($request, $token);
                         $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
+
+                        if ($this->container->get('session')->has($key)) {
+                            //set the url based on the link they were trying to access before being authenticated
+                            $url = $this->container->get('session')->get($key);
+                            return new RedirectResponse($url);
+                        }
+
                         return $this->render('lbook/default/index.html.twig', array(
                         ));
                     }

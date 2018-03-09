@@ -25,17 +25,34 @@
 
                 <li class="light-blue">
                     <a data-toggle="dropdown" href="#" class="dropdown-toggle">
-                        <img class="nav-user-photo" src="{{app.request.scheme ~'://' ~  app.request.httpHost ~  app.request.getBaseURL }}/assets/avatars/mycomputer.png" alt="User Photo" />
+                        <img class="nav-user-photo" src="/assets/avatars/mycomputer.png" alt="User Photo" />
                         <span class="user-info">
                             <small>Welcome,</small>{{ app.user.username| default('') }}
                         </span>
 
                         <i class="ace-icon fa fa-caret-down"></i>
                     </a>
+
                     <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                        {% if app.user is not null %}
+                        <li>
+                            <a href="#">
+                                <i class="ace-icon fa fa-cog"></i>
+                                Settings{WIP}
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{asset(path('user_show', { 'id': app.user.id }))}}">
+                                <i class="ace-icon fa fa-user"></i>
+                                Profile
+                            </a>
+                        </li>
+
+                        <li class="divider"></li>
                         <li>
                             <a href="/logout" target="">
-                                <i class="ace-icon fa fa-globe"></i>
+                                <i class="ace-icon fa fa-power-off"></i>
                                 Logout
                             </a>
                         </li>
@@ -52,6 +69,14 @@
                         {#Link to site#}
                         {#</a>#}
                         {#</li>#}
+                        {% else %}
+                            <li>
+                                <a href="/login" target="">
+                                    <i class="ace-icon fa fa-key"></i>
+                                    Login
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="divider"></li>
                     </ul>
                 </li>

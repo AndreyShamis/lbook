@@ -23,37 +23,65 @@ class RandomStringTest extends TestCase
     public function testGenerateRandomString()
     {
         $length = 1200;
-        $value = RandomString::generateRandomString($length);
-        $this->assertEquals($length, strlen($value));
+        $value1 = RandomString::generateRandomString($length);
+        $this->assertEquals($length, strlen($value1));
 
-        $this->assertTrue($this->findSpecial($value) === false);
+        $this->assertTrue($this->findSpecial($value1) === false);
+
+        $value2 = RandomString::generateRandomString($length);
+        $this->assertEquals($length, strlen($value2));
+
+        $this->assertTrue($this->findSpecial($value2) === false);
+
+        $this->assertTrue($value1 != $value2);
     }
 
     public function testGenerateRandomStringWithSpecial()
     {
         $length = 1200;
-        $value = RandomString::generateRandomString($length, true);
-        $this->assertEquals($length, strlen($value));
+        $value1 = RandomString::generateRandomString($length, true);
+        $this->assertEquals($length, strlen($value1));
 
-        $this->assertTrue($this->findSpecial($value));
+        $this->assertTrue($this->findSpecial($value1));
+
+        $value2 = RandomString::generateRandomString($length, true);
+        $this->assertEquals($length, strlen($value2));
+
+        $this->assertTrue($this->findSpecial($value2));
+
+        $this->assertTrue($value1 != $value2);
     }
 
     public function testGenerateRandomStringShuffle()
     {
         $length = 1200;
-        $value = RandomString::generateRandomStringShuffle($length);
-        $this->assertEquals($length, strlen($value));
+        $value1 = RandomString::generateRandomStringShuffle($length);
+        $this->assertEquals($length, strlen($value1));
 
-        $this->assertTrue($this->findSpecial($value) === false);
+        $this->assertTrue($this->findSpecial($value1) === false);
+
+        $value2 = RandomString::generateRandomStringShuffle($length);
+        $this->assertEquals($length, strlen($value2));
+
+        $this->assertTrue($this->findSpecial($value2) === false);
+
+        $this->assertTrue($value1 != $value2);
     }
 
     public function testGenerateRandomStringShuffleWithSpecial()
     {
         $length = 1200;
-        $value = RandomString::generateRandomStringShuffle($length, true);
-        $this->assertEquals($length, strlen($value));
+        $value1 = RandomString::generateRandomStringShuffle($length, true);
+        $this->assertEquals($length, strlen($value1));
 
-        $this->assertTrue($this->findSpecial($value));
+        $this->assertTrue($this->findSpecial($value1));
+
+        $value2 = RandomString::generateRandomStringShuffle($length, true);
+        $this->assertEquals($length, strlen($value2));
+
+        $this->assertTrue($this->findSpecial($value2));
+
+        $this->assertTrue($value1 != $value2);
     }
 
     public function testGenerateRandomStringRange()

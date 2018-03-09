@@ -46,7 +46,6 @@ class LogBookTest
      */
     protected $timeEnd;
 
-
     /**
      * @var integer
      *
@@ -68,7 +67,6 @@ class LogBookTest
      */
     protected $executionOrder = 0;
 
-
     /**
      * @var integer
      *
@@ -82,7 +80,6 @@ class LogBookTest
      * @ORM\Column(name="dut_up_time_end", type="smallint", options={"unsigned"=true})
      */
     protected $dutUpTimeEnd = 0;
-
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookCycle", inversedBy="tests", cascade={"persist"})
@@ -107,7 +104,7 @@ class LogBookTest
     private $logFile = "";
     /**
      * @var integer
-     * @ORM\Column(name="log_file_size", type="integer", length=11)
+     * @ORM\Column(name="log_file_size", type="integer", length=11, options={"unsigned"=true})
      */
     private $logFileSize = 0;
 
@@ -126,7 +123,7 @@ class LogBookTest
     {
         $this->logFileSize = $logFileSize;
     }
-    
+
     /**
      * @return null|string
      */
@@ -135,6 +132,10 @@ class LogBookTest
         return $this->logFile;
     }
 
+    /**
+     * @param string $logFile
+     * @return $this
+     */
     public function setLogFile(string $logFile)
     {
         $this->logFile = $logFile;
@@ -142,6 +143,10 @@ class LogBookTest
         return $this;
     }
 
+    /**
+     * @param UploadedFile $file
+     * @return $this
+     */
     public function setUploadedFile(UploadedFile $file)
     {
         $this->setLogFile($file->getPath());
@@ -165,12 +170,13 @@ class LogBookTest
         $this->logs = $logs;
     }
 
-
     /**
      * @PreFlush
      */
-    public function calculateRunTime(){
-        $this->setTimeRun($this->getTimeEnd()->getTimestamp() -$this->getTimeStart()->getTimestamp());
+    public function calculateRunTime()
+    {
+        $run_time = abs($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
+        $this->setTimeRun($run_time);
     }
 
     /**
@@ -194,9 +200,7 @@ class LogBookTest
      */
     public function getVerdict(): ?LogBookVerdict
     {
-//        if($this->verdict === null){
-//            $this->verdict = new LogBookVerdict();
-//        }
+
         return $this->verdict;
     }
 
@@ -207,8 +211,6 @@ class LogBookTest
     {
         $this->verdict = $verdict;
     }
-
-
 
     /**
      * @return int
@@ -312,7 +314,9 @@ class LogBookTest
         $this->timeRun = $timeRun;
     }
 
-
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getName();
@@ -349,6 +353,4 @@ class LogBookTest
     {
         $this->dutUpTimeEnd = $dutUpTimeEnd;
     }
-
-
 }

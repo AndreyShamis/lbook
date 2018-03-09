@@ -6,6 +6,7 @@
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
+            <th></th>
             <th>Id</th>
             <th>Name</th>
             <th>Setup</th>
@@ -24,6 +25,11 @@
         <tbody class="searchable">
         {% for cycle in cycles %}
             <tr>
+                <td>
+                    {%  if date(cycle.updatedAt) > date('-30minutes') %}
+                    <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
+                    {% endif %}
+                </td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>

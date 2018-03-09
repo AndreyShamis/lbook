@@ -80,7 +80,7 @@ class LogBookTestController extends Controller
     /**
      * Lists all Tests entities.
      *
-     * @Route("/page/{page}", name="_test_index")
+     * @Route("/page/{page}", name="test_index")
      * @Method("GET")
      * @Template(template="lbook/test/list.html.twig")
      * @param int $page
@@ -88,8 +88,9 @@ class LogBookTestController extends Controller
      */
     public function listAction($page = 1)
     {
+        set_time_limit(10);
         $em = $this->getDoctrine()->getManager();
-        $limit = 40;
+        $limit = 100;
         $testRepo = $em->getRepository('App:LogBookTest');
         $query = $testRepo->createQueryBuilder('t')
             ->orderBy('t.id', "DESC");
@@ -115,7 +116,7 @@ class LogBookTestController extends Controller
     /**
      * Lists all test entities.
      *
-     * @Route("/", name="test_index")
+     * @Route("/", name="_test_index")
      * @Method("GET")
      */
     public function index()

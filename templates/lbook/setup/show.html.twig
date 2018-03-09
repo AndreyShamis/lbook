@@ -32,6 +32,7 @@
     <table class="records_list table table-striped table-condensed table-hover">
         <thead>
         <tr>
+            <th></th>
             <th>Id</th>
             <th>Name</th>
             <th>Tests</th>
@@ -49,6 +50,11 @@
         <tbody>
         {% for cycle in cycles %}
             <tr>
+                <td>
+                    {%  if date(cycle.updatedAt) > date('-60minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
+                    {% endif %}
+                </td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
                 <td>{{ cycle.tests | length }}</td>

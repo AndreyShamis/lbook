@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        logging: false
+        profiling: false

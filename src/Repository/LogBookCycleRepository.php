@@ -20,7 +20,6 @@ class LogBookCycleRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria)
     {
-
         $entity = $this->findOneBy($criteria);
 
         if (null === $entity) {
@@ -30,10 +29,10 @@ class LogBookCycleRepository extends ServiceEntityRepository
             $entity->setUploadToken($criteria['uploadToken']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-
         }
         return $entity;
     }
+
     /*
     public function findBySomething($value)
     {

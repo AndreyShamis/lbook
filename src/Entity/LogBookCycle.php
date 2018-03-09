@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Utils\RandomString;
 use DateTime;
-use Doctrine\ORM\Mapping\PostUpdate;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping as ORM;
@@ -169,11 +169,12 @@ class LogBookCycle
      */
     protected $testsError = 0;
 
-
     function __construct()
     {
-        $this->updatedAt = $this->createdAt = new \DateTime();
-        $this->tokenExpiration  = new \DateTime('+7 days');
+        $this->setUpdatedAt();
+        $this->setCreatedAt();
+        $this->setTokenExpiration(new \DateTime('+7 days'));
+        $this->setUploadToken(RandomString::generateRandomString(50));
     }
 
     /**
@@ -256,7 +257,6 @@ class LogBookCycle
     {
         $this->testsCount = $testsCount;
     }
-
 
     /**
      * @return DateTime
@@ -341,7 +341,6 @@ class LogBookCycle
         else{
             $this->setPassRate(100);
         }
-
     }
 
     /**
@@ -360,8 +359,6 @@ class LogBookCycle
         $this->uploadToken = $uploadToken;
     }
 
-
-
     /**
      * @return mixed
      */
@@ -377,7 +374,6 @@ class LogBookCycle
     {
         $this->dut = $dut;
     }
-
 
     /**
      * @return mixed
@@ -410,8 +406,6 @@ class LogBookCycle
     {
         $this->controller = $controller;
     }
-
-
 
     /**
      * @return LogBookBuild

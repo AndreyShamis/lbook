@@ -7,8 +7,13 @@ framework:
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
-        handler_id: ~
+        #handler_id: ~
 
+        # required for solve issue Notice: SessionHandler::gc(): ps_files_cleanup_dir: opendir
+        handler_id:           session.handler.native_file
+        save_path:            '%kernel.cache_dir%/sessions'
+        gc_divisor:           1000
+        gc_probability:       1
     #esi: true
     #fragments: true
     php_errors:

@@ -17,8 +17,8 @@ namespace App\Utils;
 final class RandomString
 {
 
-    protected static $_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    protected static $_special = '~!@#$%^&*(){}[],./?';
+    public static $_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    public static $_special = '~!@#$%^&*(){}[],./?';
 
     /**
      * @param int $length

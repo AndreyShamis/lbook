@@ -17,8 +17,8 @@ namespace App\Utils;
 final class RandomString
 {
 
-    public static $_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    public static $_special = '~!@#$%^&*(){}[],./?';
+    public static $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    public static $special = '~!@#$%^&*(){}[],./?';
 
     /**
      * @param int $length
@@ -31,10 +31,10 @@ final class RandomString
             $length = 1;
         }
         if($useSpecial){
-            $chars = RandomString::$_chars . RandomString::$_special;
+            $chars = RandomString::$chars . RandomString::$special;
         }
         else{
-            $chars = RandomString::$_chars;
+            $chars = RandomString::$chars;
         }
 
         $charsSize = strlen($chars);
@@ -53,10 +53,10 @@ final class RandomString
     public static function generateRandomStringShuffle($length = 20, $useSpecial = false): String
     {
         if($useSpecial){
-            $chars = RandomString::$_chars . RandomString::$_special;
+            $chars = RandomString::$chars . RandomString::$special;
         }
         else{
-            $chars = RandomString::$_chars;
+            $chars = RandomString::$chars;
         }
         return substr(str_shuffle(str_repeat($x=$chars, ceil($length/strlen($x)) )),1, $length);
     }

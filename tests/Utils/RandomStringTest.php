@@ -9,7 +9,7 @@ class RandomStringTest extends TestCase
 {
     protected function findSpecial($value): bool
     {
-        $chars = str_split(RandomString::$_special);
+        $chars = str_split(RandomString::$special);
         $specialFound = false;
         foreach ($chars as $char){
             if(strpos($value, $char) !== false){

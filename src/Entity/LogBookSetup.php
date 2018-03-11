@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\OsType;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookSetupRepository")
@@ -83,6 +84,21 @@ class LogBookSetup
     {
         $this->moderators = array();
     }
+
+    /**
+     * @return OsType|null
+     */
+    public function getOs()
+    {
+        return $this->os ;
+    }
+
+
+    public function setOs($os): void
+    {
+        $this->os = $os;
+    }
+
 
     /**
      * @return mixed
@@ -204,22 +220,6 @@ class LogBookSetup
     public function setDisabled(bool $disabled): void
     {
         $this->disabled = $disabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOs()
-    {
-        return $this->os;
-    }
-
-    /**
-     * @param $os
-     */
-    public function setOs($os): void
-    {
-        $this->os = $os;
     }
 
     /**

@@ -20,6 +20,11 @@ class OsType
     const OS_ANDROID = 3;
     const OS_FREEBSD = 4;
 
+    public function __construct($id = 0)
+    {
+        $this->os = $this::getTypeName($id);
+    }
+
     /**
      * @var integer
      *
@@ -70,6 +75,22 @@ class OsType
         return [
             self::OS_LINUX,
         ];
+    }
+
+    /**
+     * @return int
+     */
+    public function getOs(): int
+    {
+        return $this->os;
+    }
+
+    /**
+     * @param int $os
+     */
+    public function setOs(int $os): void
+    {
+        $this->os = $os;
     }
 
     /**

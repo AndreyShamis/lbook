@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookSetup;
+use App\Entity\OsType;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -51,6 +52,9 @@ class LogBookSetupController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $ost = OsType::getTypeName($obj->getOs());
+            $ost2 = new OsType($obj->getOs());
+            $obj->setOs($ost2);
             $em->persist($obj);
             $em->flush();
 

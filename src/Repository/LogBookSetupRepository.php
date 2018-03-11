@@ -5,14 +5,14 @@ namespace App\Repository;
 use App\Entity\LogBookSetup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Model\OsType;
+use App\Entity\OsType;
 
 class LogBookSetupRepository extends ServiceEntityRepository
 {
     /**
      * @var array Keep hashed entity
      */
-    protected static $_hashedData = array();
+    protected static $hashedData = array();
 
     public function __construct(RegistryInterface $registry)
     {
@@ -25,15 +25,15 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function findByName(string $setupName)
     {
-        if(isset(self::$_hashedData[$setupName])){
-            $entity = self::$_hashedData[$setupName];
+        if(isset(self::$hashedData[$setupName])){
+            $entity = self::$hashedData[$setupName];
         }
         else{
             /** @var LogBookSetup $entity */
             $entity = $this->findOneBy(array("name" => $setupName));
             if($entity !== null){
-                self::$_hashedData[$setupName] = $entity;
-                self::$_hashedData[$entity->getId()] = $entity;
+                self::$hashedData[$setupName] = $entity;
+                self::$hashedData[$entity->getId()] = $entity;
             }
         }
 
@@ -46,15 +46,15 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function findById(int $setupId)
     {
-        if(isset(self::$_hashedData[$setupId])){
-            $entity = self::$_hashedData[$setupId];
+        if(isset(self::$hashedData[$setupId])){
+            $entity = self::$hashedData[$setupId];
         }
         else{
             /** @var LogBookSetup $entity */
             $entity = $this->findOneBy(array("id" => $setupId));
             if($entity !== null){
-                self::$_hashedData[$setupId] = $entity;
-                self::$_hashedData[$entity->getName()] = $entity;
+                self::$hashedData[$setupId] = $entity;
+                self::$hashedData[$entity->getName()] = $entity;
             }
         }
 
@@ -69,8 +69,8 @@ class LogBookSetupRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria, $flush = false)
     {
         $add_hash = true;
-        if(isset(self::$_hashedData[$criteria['name']])){
-            $entity = self::$_hashedData[$criteria['name']];
+        if(isset(self::$hashedData[$criteria['name']])){
+            $entity = self::$hashedData[$criteria['name']];
             $add_hash = false;
         }
         else{
@@ -92,7 +92,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
         }
         if($add_hash) {
-            self::$_hashedData[$criteria['name']] = $entity;
+            self::$hashedData[$criteria['name']] = $entity;
         }
 
         return $entity;

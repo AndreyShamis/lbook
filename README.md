@@ -8,7 +8,39 @@ For upload can be used curl with post log file.
 - max_execution_time
 
 ## MySQL
-- Will be added
+
+# A larger buffer pool requires less disk I/O to access the same table data more than once.
+# On a dedicated database server, you might set the buffer pool size to 80% of the machine's
+# physical memory size. Be aware of the following potential issues when configuring buffer pool size,
+# and be prepared to scale back the size of the buffer pool if necessary.
+~~~
+innodb_buffer_pool_size     = 16G
+
+#This sets the size of the InnoDB’s redo log files which, in MySQL world, are often called simply transaction logs. 
+#And right until MySQL 5.6.8 the default value of innodb_log_file_size=5M was the single biggest InnoDB 
+#performance killer. Starting with MySQL 5.6.8, the default was raised to 48M which, for many intensive systems, 
+#is still way too low.
+#As a rule of thumb you should set this to accommodate ~1-2h worth of writes and if you’re in a hurry, 
+#having this set to 1-2G will give you pretty good performance with pretty much any workload.
+innodb_log_file_size = 1G
+
+# For MyISAM tables
+tmpdir                      = /var/mysqltmp
+
+~~~
+~~~ bash
+# For MyISAM tables
+mkdir /var/mysqltmp
+id -u mysql
+id -g mysql
+~~~
+Edit /etc/fstab
+~~~
+tmpfs           /var/mysqltmp                   tmpfs rw,gid=125,uid=117,size=16G,nr_inodes=10k,mode=0700 0 0
+~~~
+### Set timezone
+sudo dpkg-reconfigure tzdata
+
 ## LDAP (optional)
 
 # Requirements

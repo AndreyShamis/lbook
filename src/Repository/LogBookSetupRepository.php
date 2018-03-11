@@ -25,10 +25,9 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function findByName(string $setupName)
     {
-        if(isset(self::$hashedData[$setupName])){
+        if (isset(self::$hashedData[$setupName])) {
             $entity = self::$hashedData[$setupName];
-        }
-        else{
+        } else {
             /** @var LogBookSetup $entity */
             $entity = $this->findOneBy(array("name" => $setupName));
             if($entity !== null){
@@ -46,13 +45,12 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function findById(int $setupId)
     {
-        if(isset(self::$hashedData[$setupId])){
+        if (isset(self::$hashedData[$setupId])) {
             $entity = self::$hashedData[$setupId];
-        }
-        else{
+        } else {
             /** @var LogBookSetup $entity */
             $entity = $this->findOneBy(array("id" => $setupId));
-            if($entity !== null){
+            if ($entity !== null) {
                 self::$hashedData[$setupId] = $entity;
                 self::$hashedData[$entity->getName()] = $entity;
             }
@@ -69,11 +67,10 @@ class LogBookSetupRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria, $flush = false)
     {
         $add_hash = true;
-        if(isset(self::$hashedData[$criteria['name']])){
+        if (isset(self::$hashedData[$criteria['name']])) {
             $entity = self::$hashedData[$criteria['name']];
             $add_hash = false;
-        }
-        else{
+        } else {
             $entity = $this->findOneBy($criteria);
         }
 
@@ -91,7 +88,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
             }
 
         }
-        if($add_hash) {
+        if ($add_hash) {
             self::$hashedData[$criteria['name']] = $entity;
         }
 

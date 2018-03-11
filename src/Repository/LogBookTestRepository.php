@@ -11,7 +11,7 @@ class LogBookTestRepository extends ServiceEntityRepository
     /**
      * @var array Keep hashed entity
      */
-    protected static $_hashedData = array();
+    protected static $hashedData = array();
 
     public function __construct(RegistryInterface $registry)
     {
@@ -26,11 +26,10 @@ class LogBookTestRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria, $flush = false)
     {
         $add_hash = true;
-        if(isset(self::$_hashedData[$criteria['id']])){
-            $entity = self::$_hashedData[$criteria['id']];
+        if (isset(self::$hashedData[$criteria['id']])) {
+            $entity = self::$hashedData[$criteria['id']];
             $add_hash = false;
-        }
-        else{
+        } else {
             $entity = $this->findOneBy($criteria);
         }
 
@@ -49,8 +48,8 @@ class LogBookTestRepository extends ServiceEntityRepository
             }
 
         }
-        if($add_hash) {
-            self::$_hashedData[$criteria['id']] = $entity;
+        if ($add_hash) {
+            self::$hashedData[$criteria['id']] = $entity;
         }
 
         return $entity;

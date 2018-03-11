@@ -11,7 +11,7 @@ class LogBookVerdictRepository extends ServiceEntityRepository
     /**
      * @var array Keep hashed entity
      */
-    protected static $_hashedData = array();
+    protected static $hashedData = array();
 
     public function __construct(RegistryInterface $registry)
     {
@@ -26,11 +26,10 @@ class LogBookVerdictRepository extends ServiceEntityRepository
     {
         $criteria['name'] = strtoupper($criteria['name']);
         $add_hash = true;
-        if(isset(self::$_hashedData[$criteria['name']])){
-            $entity = self::$_hashedData[$criteria['name']];
+        if (isset(self::$hashedData[$criteria['name']])) {
+            $entity = self::$hashedData[$criteria['name']];
             $add_hash = false;
-        }
-        else{
+        } else {
             $entity = $this->findOneBy($criteria);
         }
 
@@ -40,8 +39,8 @@ class LogBookVerdictRepository extends ServiceEntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
-        if($add_hash) {
-            self::$_hashedData[$criteria['name']] = $entity;
+        if ($add_hash) {
+            self::$hashedData[$criteria['name']] = $entity;
         }
 
         return $entity;

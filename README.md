@@ -8,7 +8,29 @@ For upload can be used curl with post log file.
 - max_execution_time
 
 ## MySQL
-- Will be added
+
+# A larger buffer pool requires less disk I/O to access the same table data more than once.
+# On a dedicated database server, you might set the buffer pool size to 80% of the machine's
+# physical memory size. Be aware of the following potential issues when configuring buffer pool size,
+# and be prepared to scale back the size of the buffer pool if necessary.
+~~~
+innodb_buffer_pool_size     = 16G
+
+# For MyISAM tables
+tmpdir                      = /var/mysqltmp
+
+~~~
+~~~ bash
+# For MyISAM tables
+mkdir /var/mysqltmp
+id -u mysql
+id -g mysql
+~~~
+Edit /etc/fstab
+~~~
+tmpfs           /var/mysqltmp                   tmpfs rw,gid=125,uid=117,size=16G,nr_inodes=10k,mode=0700 0 0
+~~~
+
 ## LDAP (optional)
 
 # Requirements

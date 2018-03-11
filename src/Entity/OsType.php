@@ -1,21 +1,31 @@
 <?php
 /**
- * Created by PhpStorm.
  * User: Andrey Shamis
  * Date: 18/02/18
  * Time: 08:15
  */
 
-namespace App\Model;
+namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 
-abstract class OsType
+/**
+ * @ORM\Embeddable
+ */
+class OsType
 {
     const OS_UNKNOWN = 0;
     const OS_LINUX = 1;
     const OS_WINDOWS = 2;
     const OS_ANDROID = 3;
     const OS_FREEBSD = 4;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="os", type="smallint", nullable=true)
+     */
+    protected $os = "";
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -30,7 +40,7 @@ abstract class OsType
      * @param  string $typeShortName
      * @return string
      */
-    public static function getTypeName($typeShortName)
+    public static function getTypeName($typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
             return "Unknown type ($typeShortName)";
@@ -41,7 +51,7 @@ abstract class OsType
     /**
      * @return array<integer>
      */
-    public static function getAvailableTypes()
+    public static function getAvailableTypes(): array
     {
         return [
             self::OS_UNKNOWN,
@@ -55,10 +65,18 @@ abstract class OsType
     /**
      * @return array<integer>
      */
-    public static function getPreferredTypes()
+    public static function getPreferredTypes(): array
     {
         return [
             self::OS_LINUX,
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this::getTypeName($this->os);
     }
 }

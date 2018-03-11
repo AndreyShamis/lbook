@@ -19,7 +19,6 @@ class LogBookTarget
      */
     protected $id;
 
-
     /**
      * @var string
      *

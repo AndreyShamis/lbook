@@ -22,7 +22,6 @@ class LogBookCycle
      */
     protected $id;
 
-
     /**
      * @var string
      *
@@ -289,15 +288,14 @@ class LogBookCycle
         $min_time = new \DateTime('+100 years');
         $max_time = new \DateTime('-100 years');
         $tests = $this->getTests();
-        if(is_object($tests)){
-            foreach ($tests as $test){
+        if (is_object($tests)) {
+            foreach ($tests as $test) {
                 /** @var LogBookTest $test */
                 $max_time = max($max_time, $test->getTimeEnd());
                 $min_time = min($min_time, $test->getTimeStart());
                 $testsTimeSum += $test->getTimeRun();
             }
-        }
-        else{
+        } else {
             $min_time = new \DateTime();
             $max_time = new \DateTime();
         }
@@ -316,17 +314,15 @@ class LogBookCycle
         $errorCount = 0;
         $tests = $this->getTests();
         $allCount = 0;
-        if(is_object($tests)){
+        if (is_object($tests)) {
             $allCount = count($tests);
-            foreach ($tests as $test){
+            foreach ($tests as $test) {
                 /** @var LogBookTest $test */
-                if(strcasecmp($test->getVerdict(), "PASS") == 0){
+                if (strcasecmp($test->getVerdict(), "PASS") == 0) {
                     $passCount++;
-                }
-                else if(strcasecmp($test->getVerdict(), "FAIL") == 0){
+                } else if (strcasecmp($test->getVerdict(), "FAIL") == 0) {
                     $failCount++;
-                }
-                else if(strcasecmp($test->getVerdict(), "ERROR") == 0){
+                } else if(strcasecmp($test->getVerdict(), "ERROR") == 0) {
                     $errorCount++;
                 }
             }
@@ -335,10 +331,9 @@ class LogBookCycle
         $this->setTestsFail($failCount);
         $this->setTestsError($errorCount);
         $this->setTestsCount($allCount);
-        if($allCount > 0){
+        if ($allCount > 0) {
             $this->setPassRate($this->getTestsPass()*100/$this->getTestsCount());
-        }
-        else{
+        } else {
             $this->setPassRate(100);
         }
     }
@@ -520,11 +515,10 @@ class LogBookCycle
     {
         $this->tests = $tests;
     }
+
     /**
      * @return mixed
      */
-
-
     public function getId()
     {
         return $this->id;
@@ -610,7 +604,4 @@ class LogBookCycle
     {
         $this->updatedAt = new \DateTime();
     }
-
-
-
 }

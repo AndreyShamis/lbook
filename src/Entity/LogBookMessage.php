@@ -70,7 +70,6 @@ class LogBookMessage
         $this->logTime = $logTime;
     }
 
-
     /**
      * @return mixed
      */
@@ -86,7 +85,6 @@ class LogBookMessage
     {
         $this->test = $test;
     }
-
 
     /**
      * @return mixed

@@ -25,6 +25,10 @@ class LogBookUpload
      */
     private $logFile;
 
+    protected $setup;
+
+    protected $cycle;
+
     /**
      * @return string
      */
@@ -47,7 +51,6 @@ class LogBookUpload
         $this->message = $message;
     }
 
-
     public function getLogFile()
     {
         return $this->logFile;
@@ -59,10 +62,6 @@ class LogBookUpload
 
         return $this;
     }
-
-    protected $setup;
-
-    protected $cycle;
 
     /**
      * @return mixed

@@ -143,7 +143,6 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     public function getUsername(): ?string
     {
         return $this->username;
-
     }
 
     /**
@@ -242,17 +241,14 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
         $this->isLdapUser = $isLdapUser;
     }
 
-
-
     /**
      * @return string
      */
     public function getPlainPassword() : string
     {
-        if(is_string($this->plainPassword)){
+        if (is_string($this->plainPassword)) {
             return $this->plainPassword;
-        }
-        else{
+        } else {
             return "";
         }
     }
@@ -270,7 +266,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function getIsActive() : bool
     {
-        if(is_bool($this->isActive)){
+        if (is_bool($this->isActive)) {
             return $this->isActive;
         }
         return false;
@@ -320,7 +316,7 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
     {
         $roles = $this->roles;
         // give everyone ROLE_USER!
-        if(!is_array($roles)){
+        if (!is_array($roles)) {
             $roles = array();
         }
         if (!in_array('ROLE_USER', $roles)) {
@@ -347,10 +343,9 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
      */
     public function getPassword() : string
     {
-        if(is_string($this->password)){
+        if (is_string($this->password)) {
             return $this->password;
-        }
-        else{
+        } else {
             return "";
         }
     }
@@ -485,10 +480,11 @@ class LogBookUser implements AdvancedUserInterface, \Serializable
         return $this->isActive;
     }
 
-
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getUsername();
     }
-
 }

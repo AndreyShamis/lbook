@@ -20,7 +20,6 @@ class LogBookMessageType
      */
     protected $id;
 
-
     /**
      * @var string
      *

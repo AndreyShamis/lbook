@@ -265,7 +265,7 @@ class LogBookTest
      */
     public function getTimeStart(): DateTime
     {
-        if($this->timeStart === null){
+        if ($this->timeStart === null) {
             $this->timeStart = new DateTime();
         }
         return $this->timeStart;
@@ -284,7 +284,7 @@ class LogBookTest
      */
     public function getTimeEnd(): DateTime
     {
-        if($this->timeEnd === null){
+        if ($this->timeEnd === null) {
             $this->timeEnd = new DateTime();
         }
         return $this->timeEnd;

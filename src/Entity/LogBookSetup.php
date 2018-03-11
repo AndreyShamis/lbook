@@ -42,12 +42,6 @@ class LogBookSetup
      */
     protected $disabled = false;
 
-//    /**
-//     * @var integer
-//     *
-//     * @ORM\Column(name="os", type="smallint", nullable=true)
-//     */
-
     /**
      * @ORM\Embedded(class = "OsType")
      */
@@ -105,8 +99,6 @@ class LogBookSetup
     {
         $this->owner = $owner;
     }
-
-
 
     /**
      * @return bool
@@ -183,13 +175,11 @@ class LogBookSetup
      */
     public function getNameShown(): ?string
     {
-        if(strlen($this->nameShown)>0){
+        if (strlen($this->nameShown)>0) {
             return $this->nameShown;
-        }
-        else{
+        } else {
             return $this->getName();
         }
-
     }
 
     /**
@@ -263,7 +253,4 @@ class LogBookSetup
     {
         $this->cycles = $cycles;
     }
-
-
-
 }

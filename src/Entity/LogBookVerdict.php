@@ -20,7 +20,6 @@ class LogBookVerdict
      */
     protected $id;
 
-
     /**
      * @var string
      *
@@ -61,6 +60,9 @@ class LogBookVerdict
         $this->name = $name;
     }
 
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getName();

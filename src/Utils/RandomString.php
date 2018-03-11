@@ -7,7 +7,6 @@
 
 namespace App\Utils;
 
-
 /**
  * Class RandomString
  * Is some place used rand : according to http://php.net/manual/en/function.rand.php
@@ -16,7 +15,6 @@ namespace App\Utils;
  */
 final class RandomString
 {
-
     public static $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     public static $special = '~!@#$%^&*(){}[],./?';
 
@@ -25,15 +23,14 @@ final class RandomString
      * @param bool $useSpecial
      * @return String
      */
-    public static function generateRandomString($length = 20, $useSpecial = false): String
+    public static function generateRandomString($length = 20, $useSpecial = false): string
     {
-        if($length < 1){
+        if ($length < 1) {
             $length = 1;
         }
-        if($useSpecial){
+        if ($useSpecial) {
             $chars = RandomString::$chars . RandomString::$special;
-        }
-        else{
+        } else {
             $chars = RandomString::$chars;
         }
 
@@ -50,12 +47,11 @@ final class RandomString
      * @param bool $useSpecial
      * @return String
      */
-    public static function generateRandomStringShuffle($length = 20, $useSpecial = false): String
+    public static function generateRandomStringShuffle($length = 20, $useSpecial = false): string
     {
-        if($useSpecial){
+        if ($useSpecial) {
             $chars = RandomString::$chars . RandomString::$special;
-        }
-        else{
+        } else {
             $chars = RandomString::$chars;
         }
         return substr(str_shuffle(str_repeat($x=$chars, ceil($length/strlen($x)) )),1, $length);
@@ -65,7 +61,7 @@ final class RandomString
      * @param int $length
      * @return String
      */
-    public static function generateRandomStringRange($length = 20): String
+    public static function generateRandomStringRange($length = 20): string
     {
         $keys = array_merge(range(0,9), range('a', 'z'));
         $key = "";
@@ -80,7 +76,7 @@ final class RandomString
      * @param int $length
      * @return String
      */
-    public static function generateRandomStringSha1($length = 20): String
+    public static function generateRandomStringSha1($length = 20): string
     {
         $tmp_ret = "";
         while(strlen($tmp_ret) < $length){
@@ -94,7 +90,7 @@ final class RandomString
      * @param int $length
      * @return String
      */
-    public static function generateRandomStringMd5($length = 20): String
+    public static function generateRandomStringMd5($length = 20): string
     {
         $tmp_ret = "";
         while(strlen($tmp_ret) < $length){

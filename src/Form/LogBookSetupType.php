@@ -45,7 +45,7 @@ class LogBookSetupType extends AbstractType
             'choices' => OsType::getAvailableTypes(),
             'preferred_choices' => OsType::getPreferredTypes(),
             //'choices_as_values' => true,
-            'choice_label' => function($choice) {
+            'choice_label' => function ($choice) {
                 return OsType::getTypeName($choice);
             },
         );

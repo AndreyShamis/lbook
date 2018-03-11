@@ -207,16 +207,14 @@ class LogBookSetup
     }
 
     /**
-     * @return string
+     * @return OsType|null
      */
-    public function getOs()
+    public function getOs(): ?OsType
     {
         return $this->os;
     }
 
-    /**
-     * @param $os
-     */
+
     public function setOs($os): void
     {
         $this->os = $os;

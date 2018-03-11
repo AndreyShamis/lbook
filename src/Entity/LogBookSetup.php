@@ -62,6 +62,7 @@ class LogBookSetup
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="owner", referencedColumnName="id", nullable=true)
      */
     protected $owner = 0;
 

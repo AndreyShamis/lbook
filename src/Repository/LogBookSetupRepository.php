@@ -82,7 +82,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
             $entity->setName($criteria['name']);
             $entity->setCheckUpTime(false);
             $entity->setDisabled(false);
-            $entity->setOwner(0);   //TODO User, Owner
+            $entity->setOwner(null);   //TODO User, Owner
             $entity->setOs(OsType::OS_UNKNOWN);
             $this->_em->persist($entity);
             $this->_em->flush($entity);

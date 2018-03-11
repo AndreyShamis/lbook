@@ -5,14 +5,14 @@
  * Time: 08:15
  */
 
-namespace App\Model;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Embeddable
  */
-abstract class OsType
+class OsType
 {
     const OS_UNKNOWN = 0;
     const OS_LINUX = 1;
@@ -70,5 +70,13 @@ abstract class OsType
         return [
             self::OS_LINUX,
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this::getTypeName($this->os);
     }
 }

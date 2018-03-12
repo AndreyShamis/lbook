@@ -24,7 +24,7 @@
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
                 <td>{{ setup.nameShown }}</td>
-                <td>{{ setup.os }}</td>
+                <td>{{ setup.osStr }}</td>
                 <td>{{ setup.owner }}</td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.cycles | length }}</td>

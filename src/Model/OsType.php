@@ -33,7 +33,7 @@ abstract class OsType
     public static function getTypeName($typeShortName): string
     {
         if (!isset(static::$typeName[$typeShortName])) {
-            return "Unknown type ($typeShortName)";
+            return static::$typeName[static::OS_UNKNOWN];
         }
         return static::$typeName[$typeShortName];
     }

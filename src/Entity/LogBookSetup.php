@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\OsType;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -214,6 +215,14 @@ class LogBookSetup
     public function getOs()
     {
         return $this->os;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOsStr()
+    {
+        return OsType::getTypeName($this->getOs());
     }
 
     /**

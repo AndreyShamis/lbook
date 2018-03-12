@@ -15,6 +15,12 @@ doctrine:
         # With Symfony 3.3, remove the `resolve:` prefix
         url: '%env(resolve:DATABASE_URL)%'
     orm:
+#        query_cache_driver:
+#            type: apcu
+#        metadata_cache_driver:
+#            type: apcu
+#        result_cache_driver:
+#            type: apcu
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true

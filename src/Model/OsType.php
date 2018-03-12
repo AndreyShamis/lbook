@@ -5,27 +5,17 @@
  * Time: 08:15
  */
 
-namespace App\Entity;
+namespace App\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Embeddable
- */
-class OsType
+abstract class OsType
 {
     const OS_UNKNOWN = 0;
     const OS_LINUX = 1;
     const OS_WINDOWS = 2;
     const OS_ANDROID = 3;
     const OS_FREEBSD = 4;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="os", type="smallint", nullable=true)
-     */
-    protected $os = "";
 
     /** @var array user friendly named type */
     protected static $typeName = [
@@ -70,13 +60,5 @@ class OsType
         return [
             self::OS_LINUX,
         ];
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this::getTypeName($this->os);
     }
 }

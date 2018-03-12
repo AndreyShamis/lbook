@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\LogBookSetup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use App\Entity\OsType;
+use App\Model\OsType;
 
 class LogBookSetupRepository extends ServiceEntityRepository
 {

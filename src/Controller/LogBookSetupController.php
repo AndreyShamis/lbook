@@ -52,9 +52,6 @@ class LogBookSetupController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $ost = OsType::getTypeName($obj->getOs());
-            $ost2 = new OsType($obj->getOs());
-            $obj->setOs($ost2);
             $em->persist($obj);
             $em->flush();
 

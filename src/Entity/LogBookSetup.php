@@ -44,9 +44,11 @@ class LogBookSetup
     protected $disabled = false;
 
     /**
-     * @ORM\Embedded(class = "OsType")
+     * @var integer
+     *
+     * @ORM\Column(name="os", type="smallint", nullable=true)
      */
-    protected $os;
+    protected $os = 0;
 
     /**
      * @var bool

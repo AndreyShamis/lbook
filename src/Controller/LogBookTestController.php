@@ -73,6 +73,8 @@ class LogBookTestController extends Controller
         $paginator = new Paginator($dql);
         $paginator->getQuery()
             ->setFirstResult($limit * ($page - 1)) // Offset
+//            ->useQueryCache(true)    // here
+//            ->useResultCache(true)  // and here
             ->setMaxResults($limit); // Limit
         return $paginator;
     }

@@ -1,4 +1,6 @@
 {
+    "name": "andrey-shamis/lbook",
+    "description": "LogBook is a tool which allows easy store logs and then show them on the web",
     "type": "project",
     "license": "proprietary",
     "require": {

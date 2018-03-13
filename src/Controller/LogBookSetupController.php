@@ -46,7 +46,10 @@ class LogBookSetupController extends Controller
     public function newAction(Request $request)
     {
         $obj = new LogBookSetup();
-        $form = $this->createForm('App\Form\LogBookSetupType', $obj);
+        $form = $this->get('form.factory')->create('App\Form\LogBookSetupType', $obj, array(
+            'user' => $this->get('security.token_storage')->getToken()->getUser(),
+        ));
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -117,7 +120,9 @@ class LogBookSetupController extends Controller
 //        }
 
 
-        $editForm = $this->createForm('App\Form\LogBookSetupType', $obj);
+        $editForm = $this->get('form.factory')->create('App\Form\LogBookSetupType', $obj, array(
+            'user' => $user,
+        ));
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

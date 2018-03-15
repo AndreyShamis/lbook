@@ -63,6 +63,7 @@ class LogBookTestRepository extends ServiceEntityRepository
         foreach ($tests as $test){
             /** @var LogBookTest $test */
             $msgRepo->deleteByTestId($test->getId());
+            $this->_em->detach($test);
         }
         $qd = $this->createQueryBuilder('t')
             ->delete()

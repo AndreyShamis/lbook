@@ -56,14 +56,18 @@ class LogBookTestRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    public function deleteByCycle(LogBookCycle $cycle)
+    public function deleteByCycle(LogBookCycle &$cycle)
     {
         $msgRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
         foreach ($cycle->getTests() as $test){
             /** @var LogBookTest $test */
             $msgRepo->deleteByTestId($test->getId());
+            $this->delete($test);
             $this->_em->detach($test);
         }
+        /**
+         * Additional clean | optional and may be removed
+         */
         $qd = $this->createQueryBuilder('t')
             ->delete()
             ->where('t.cycle = :cycle')
@@ -73,7 +77,7 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     }
 
-    public function delete(LogBookTest $test)
+    public function delete(LogBookTest &$test)
     {
         $this->_em->remove($test);
         $this->_em->flush($test);

@@ -183,8 +183,6 @@ class LogBookCycleController extends Controller
 
             $cycleRepo = $em->getRepository('App:LogBookCycle');
             $cycleRepo->delete($obj);
-            $em->remove($obj);
-            $em->flush();
         }
 
         return $this->redirectToRoute('cycle_index');

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -54,6 +55,17 @@ class LogBookTestRepository extends ServiceEntityRepository
 
         return $entity;
     }
+
+    public function deleteByCycle(LogBookCycle $cycle)
+    {
+        $qd = $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.cycle = :cycle')
+            ->setParameter('cycle', $cycle->getId());
+        $query = $qd->getQuery();
+        $query->execute();
+    }
+    
     /*
     public function findBySomething($value)
     {

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LogBookMessage;
+use App\Entity\LogBookTest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -43,6 +44,15 @@ class LogBookMessageRepository extends ServiceEntityRepository
         return $entity;
     }
 
+    public function deleteByTest(LogBookTest $test)
+    {
+        $qd = $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.test = :test')
+            ->setParameter('test', $test->getId());
+        $query = $qd->getQuery();
+        $query->execute();
+    }
 //    /**
 //     * @param array $criteria
 //     * @param bool $flush

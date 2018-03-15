@@ -58,9 +58,8 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     public function deleteByCycle(LogBookCycle $cycle)
     {
-        $tests = $cycle->getTests();
         $msgRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
-        foreach ($tests as $test){
+        foreach ($cycle->getTests() as $test){
             /** @var LogBookTest $test */
             $msgRepo->deleteByTestId($test->getId());
             $this->_em->detach($test);

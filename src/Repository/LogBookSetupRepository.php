@@ -98,12 +98,14 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
     public function delete(LogBookSetup $setup)
     {
-        $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
+        $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
         $cycles = $setup->getCycles();
         foreach ($cycles as $cycle){
-            $testRepo->deleteByCycle($cycle);
+            $cycleRepo->delete($cycle);
         }
+        $this->_em->remove($setup);
+        $this->_em->flush($setup);
     }
 
     /*

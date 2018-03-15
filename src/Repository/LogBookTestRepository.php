@@ -70,8 +70,14 @@ class LogBookTestRepository extends ServiceEntityRepository
             ->setParameter('cycle', $cycle->getId());
         $query = $qd->getQuery();
         $query->execute();
+
     }
 
+    public function delete(LogBookTest $test)
+    {
+        $this->_em->remove($test);
+        $this->_em->flush($test);
+    }
     /*
     public function findBySomething($value)
     {

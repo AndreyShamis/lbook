@@ -33,6 +33,15 @@ class LogBookCycleRepository extends ServiceEntityRepository
         return $entity;
     }
 
+
+    public function delete(LogBookCycle $cycle)
+    {
+        $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
+        $testRepo->deleteByCycle($cycle);
+        $this->_em->remove($cycle);
+        $this->_em->flush($cycle);
+
+    }
     /*
     public function findBySomething($value)
     {

@@ -180,6 +180,9 @@ class LogBookCycleController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+
+            $cycleRepo = $em->getRepository('App:LogBookCycle');
+            $cycleRepo->delete($obj);
             $em->remove($obj);
             $em->flush();
         }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LogBookSetup;
+use App\Entity\LogBookCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Model\OsType;
@@ -94,6 +95,17 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
         return $entity;
     }
+
+    public function delete(LogBookSetup $setup)
+    {
+        $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
+        /** @var LogBookCycle $cycle */
+        $cycles = $setup->getCycles();
+        foreach ($cycles as $cycle){
+            $testRepo->deleteByCycle($cycle);
+        }
+    }
+
     /*
     public function findBySomething($value)
     {

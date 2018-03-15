@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
+use App\Entity\LogBookTest;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -155,6 +157,10 @@ class LogBookSetupController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+
+            $setupRepo = $em->getRepository('App:LogBookSetup');
+            $setupRepo->delete($obj);
+            $em->refresh($obj);
             $em->remove($obj);
             $em->flush();
         }

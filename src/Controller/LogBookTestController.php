@@ -166,7 +166,7 @@ class LogBookTestController extends Controller
     /**
      * Finds and displays a test entity.
      *
-     * @Route("/{id}", name="test_show")
+     * @Route("/{id}", name="test_show_full")
      * @Method("GET")
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response
@@ -190,7 +190,7 @@ class LogBookTestController extends Controller
     /**
      * Finds and displays a test entity.
      *
-     * @Route("/{id}/page/{page}", name="test_show_full")
+     * @Route("/{id}/page/{page}", name="test_show")
      * @Method("GET")
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response

@@ -31,9 +31,9 @@
             {% endif %}
             {% set counter = counter+1 %}
             <tr>
-                <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.id }}</a></td>
                 <td>{{ test.executionOrder }}</td>
-                <td><a href="{{ path('test_show_full', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>

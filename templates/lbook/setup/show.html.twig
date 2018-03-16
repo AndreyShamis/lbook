@@ -1,22 +1,21 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
-    <h1>Setups</h1>
-
+    <h1>Setup [{{ setup.id }}] : {{ setup.name }}</h1>
     <table class="records_list table table-striped table-condensed">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ setup.id }}</td>
-            </tr>
+            {#<tr>#}
+                {#<th>Id</th>#}
+                {#<td>{{ setup.id }}</td>#}
+            {#</tr>#}
             <tr>
                 <th>OS</th>
                 <td><span class="label label-lg label-yellow">{{ setup.osStr }}</span></td>
             </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ setup.name }}</td>
-            </tr>
+            {#<tr>#}
+                {#<th>Name</th>#}
+                {#<td>{{ setup.name }}</td>#}
+            {#</tr>#}
             <tr>
                 <th>Short Name</th>
                 <td>{{ setup.nameShown }}</td>
@@ -74,6 +73,7 @@
         </tbody>
     </table>
     {%  set cycles = setup.cycles %}
+    {% include "lbook/search.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover">
         <thead>
         <tr>
@@ -92,7 +92,7 @@
             <th>Options</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="searchable">
         {% for cycle in cycles %}
             <tr>
                 <td>

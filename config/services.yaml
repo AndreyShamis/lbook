@@ -36,3 +36,8 @@ services:
                 options:
                     protocol_version: 3
                     referrals: false
+    twig.extension.date:
+       class: Twig_Extensions_Extension_Date
+       arguments: ["@translator"]
+       tags:
+            - { name: twig.extension }

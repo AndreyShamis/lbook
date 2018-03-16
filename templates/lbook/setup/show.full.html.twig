@@ -24,13 +24,19 @@
             </td>
         </tr>
         <tr>
-            <th>Disabled / Visibility / Check Yptime</th>
+            <th>Disabled / Visibility / Check Uptime</th>
             <td>
+                <span class="blue">
                 {{ setup.disabled ? '<i class="ace-icon fa fa-lock"></i> Yes':'<i class="ace-icon fa fa-unlock"></i> False' }}
+                </span>
                 /
+                <span class="green">
                 {{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}
+                </span>
                 /
-                {{ setup.checkUpTime ? 'Yes':'No' }}
+                <span class="yellow">
+                {{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}
+                </span>
             </td>
         </tr>
         <tr>
@@ -127,10 +133,10 @@
                     {% endif %}
                 </td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
+                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                 <td>{{ cycle.tests | length }}</td>
-                <td>{{ cycle.build }}</td>
-                <td>{{ cycle.passRate }}%</td>
+                <td>{{ shortString(cycle.build, 25) }}</td>
+                <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>

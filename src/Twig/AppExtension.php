@@ -4,47 +4,69 @@ namespace App\Twig;
 
 use App\Entity\LogBookMessageType;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Twig_SimpleFilter;
+use Twig_SimpleFunction;
 
 class AppExtension extends AbstractExtension
 {
-
     private $parser;
 
+    /**
+     * Define twig filters
+     * @return array|\Twig_Filter[]
+     */
     public function getFilters()
     {
-
         return array(
-            new \Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
-            new \Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
-            new \Twig_SimpleFilter('TimeToHour', array($this, 'TimeToHour')),
-            new \Twig_SimpleFilter('getPercentage', array($this, 'getPercentage')),
-            new \Twig_SimpleFilter('cast_to_array', array($this, 'cast_to_array')),
-            new \Twig_SimpleFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))
-            ),
-            new \Twig_SimpleFilter('time_ago', function ($time) {
-                return $this->ExecutionTimeInHours(time()-$time);
-            }),
+            new Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
+            new Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
+            new Twig_SimpleFilter('TimeToHour', array($this, 'TimeToHour')),
+            new Twig_SimpleFilter('getPercentage', array($this, 'getPercentage')),
+            new Twig_SimpleFilter('cast_to_array', array($this, 'cast_to_array')),
+            new Twig_SimpleFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
+            new Twig_SimpleFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
+            new Twig_SimpleFilter('time_ago', function ($time) { return $this->ExecutionTimeInHours(time() - $time);}),
             new TwigFilter('filter_name', [$this, 'doSomething'], ['is_safe' => ['html']]),
-
         );
-
     }
+
+    /**
+     * Define TWIG function
+     * @return array
+     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('function_name', [$this, 'doSomething']),
+            new TwigFunction('passRateToColor', [$this, 'passRateToColor']),
+            new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
-            new \Twig_SimpleFunction('inarray', array($this, 'inArray')),
+            new Twig_SimpleFunction('inarray', array($this, 'inArray')),
         ];
     }
 
-    public function logTypeToTableColor(LogBookMessageType $msgType){
+    /**
+     * Receive input, if string len > len, cut the string to the len and return with postfix
+     * @param string $input
+     * @param int $len
+     * @param string $postFix
+     * @return string
+     */
+    public function shortString(string $input, int $len = 20, string $postFix = "..."): string
+    {
+        if (strlen($input) > $len) {
+            return substr($input, 0, $len) . $postFix;
+        }
+        return $input;
+    }
+
+    public function logTypeToTableColor(LogBookMessageType $msgType)
+    {
         $ret = "";
         $tmp = strtolower($msgType->getName());
         switch ($tmp){
@@ -79,10 +101,43 @@ class AppExtension extends AbstractExtension
         return $ret;
     }
 
-    public function verdictToBadge($verdict){
+    /**
+     * Return classes in percentage range
+     * @param $passRate - percentage
+     * @return string
+     */
+    public function passRateToColor($passRate): string
+    {
+        $ret = "";
+        if ($passRate >= 100) {
+            $ret = "text-success font-bold";
+        } elseif ($passRate >= 80) {
+            $ret = "text-success";
+        } elseif ($passRate >= 70) {
+            $ret = "text-primary font-bold";
+        } elseif ($passRate >= 60) {
+            $ret = "text-primary";
+        } elseif ($passRate >= 50) {
+            $ret = "text-muted font-bold";
+        } elseif ($passRate >= 40) {
+            $ret = "text-muted";
+        } elseif ($passRate >= 30) {
+            $ret = "text-warning font-bold";
+        } elseif ($passRate >= 20) {
+            $ret = "text-warning";
+        } elseif ($passRate < 10) {
+            $ret = "text-danger font-bold";
+        } else{
+            $ret = "text-danger";
+        }
+        return $ret;
+    }
+
+    public function verdictToBadge($verdict): string
+    {
         $ret = "";
         $tmp_verdict = strtolower($verdict);
-        switch ($tmp_verdict){
+        switch ($tmp_verdict) {
             case 'pass':
                 $ret = "badge-success";
                 break;
@@ -112,10 +167,20 @@ class AppExtension extends AbstractExtension
         return in_array($variable, $arr);
     }
 
-    public function pre_print_r($obj){
+    /**
+     * @param $obj
+     * @return string
+     */
+    public function pre_print_r($obj): string
+    {
         return '<pre>' . print_r($obj, true) . '</pre>';
     }
 
+    /**
+     * @param $stdClassObject
+     * @return array
+     * @throws ReflectionException
+     */
     public function cast_to_array($stdClassObject)
     {
         $array = array();
@@ -129,12 +194,10 @@ class AppExtension extends AbstractExtension
             }
         }
         catch (Exception  $ex){
-            print_r($ex);
+
         }
         return $array;
     }
-
-
 
 //
 //    public function __construct(Markdown $parser = null)
@@ -148,10 +211,11 @@ class AppExtension extends AbstractExtension
      * @param int $precision
      * @return float|int
      */
-    function getPercentage($valueOf, $valueFrom, $precision=2){
+    function getPercentage($valueOf, $valueFrom, $precision = 2)
+    {
         $ret = 0;
         try{
-            if($valueFrom>0) {
+            if ($valueFrom>0) {
                 $ret = ($valueOf*100)/$valueFrom;
             }
             $ret = round($ret,$precision);
@@ -166,12 +230,13 @@ class AppExtension extends AbstractExtension
      * @param $time
      * @return string
      */
-    function ExecutionTimeInHours($time){
+    function ExecutionTimeInHours($time): string
+    {
         $seconds  =   $time%60;
         $minutes  =   ($time/60)%60;
         $hours    =   number_format (floor($time/60/60));
         $min_print = sprintf('%02d', $minutes);
-        if($min_print == "00"){
+        if ($min_print == "00") {
             return ($hours . "h");
         }
         return ($hours . "h " . sprintf('%02d', $minutes) . "m");
@@ -181,17 +246,17 @@ class AppExtension extends AbstractExtension
      * @param $time
      * @return string
      */
-    function ExecutionTimeGeneric(int $time): string{
+    function ExecutionTimeGeneric(int $time): string
+    {
         $seconds  =   $time%60;
         $minutes  =   ($time/60)%60;
         $hours    =   number_format (floor($time/60/60));
         $hour_print = sprintf('%dh',$hours);
         $min_print = sprintf('%02dm',$minutes);
         $sec_print = sprintf('%02ds',$seconds);
-        if ($hours > 0){
+        if ($hours > 0) {
             $ret = sprintf("%s %s %s", $hour_print, $min_print, $sec_print);
-        }
-        else{
+        } else {
             $ret = sprintf("%s %s", $min_print, $sec_print);
         }
         return $ret;
@@ -201,7 +266,8 @@ class AppExtension extends AbstractExtension
      * @param $time
      * @return integer
      */
-    function TimeToHour($time){
+    function TimeToHour($time)
+    {
         $minutes  =   ($time/60)%60;
         $hours    =   floor($time/60/60);
 //        if($minutes > 30){
@@ -210,19 +276,13 @@ class AppExtension extends AbstractExtension
         return $time;
     }
 
-    public function markdownToHtml($content) {
-//        echo "<pre>";
-//        print_r($content);
-//        echo "</pre>";
-//        exit;
-        if($this->parser === null){
+    public function markdownToHtml($content)
+    {
+        if ($this->parser === null) {
             $this->parser = new Markdown();
         }
         return $this->parser->toHtml($content);
     }
-
-
-
 
     /**
      * Returns the name of the extension.
@@ -233,10 +293,5 @@ class AppExtension extends AbstractExtension
     {
         return 'twig_common';
         // TODO: Implement getName() method.
-    }
-
-    public function doSomething($value)
-    {
-        // ...
     }
 }

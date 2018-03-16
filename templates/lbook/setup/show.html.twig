@@ -17,7 +17,15 @@
                 <th>Short Name</th>
                 <td>{{ setup.nameShown }}</td>
             </tr>
-            {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown'] %}
+            <tr>
+                <th>Created </th>
+                <td>{{ setup.createdAt|date('d/m/Y H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Updated</th>
+                <td>{{ setup.updatedAt|date('d/m/Y H:i:s') }} = {{ setup.updatedAt|time_diff}}</td>
+            </tr>
+            {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt'] %}
             {% for key, value in setup|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>
@@ -65,7 +73,7 @@
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
-                <td><span title="Updated {{ cycle.updatedAt|time_diff }}">{{ cycle.updatedAt |date('m-d H:i:s') }}</span></td>
+                <td><span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">{{ cycle.updatedAt |date('d/m H:i:s') }}</span></td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     {% if is_granted('edit', setup) %}

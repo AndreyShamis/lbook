@@ -2,10 +2,14 @@
 {% block title %}LBOOK Setup list{% endblock %}
 {% block content %}
     <h1>Setup list</h1>
-
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    {% set pagePath = "setup_index" %}
+    {% include "lbook/paginator.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover">
         <thead>
         <tr>
+            <th></th>
             <th>Id</th>
             <th>Name</th>
             <th>Short Name</th>
@@ -13,14 +17,26 @@
             <th>Owner</th>
             <th>Check Uptime</th>
             <th>Cycles</th>
+            <th>Updated</th>
             <th>Disabled</th>
             <th>Options</th>
 
         </tr>
         </thead>
-        <tbody>
-        {% for setup in setups %}
+        <tbody class="searchable">
+        {% set break = false %}
+        {% set counter = 0 %}
+        {% for setup in iterator if not break %}
+        {% if counter == 10000 %}
+            {% set break = true %}
+        {% endif %}
+        {% set counter = counter+1 %}
             <tr>
+                <td>
+                    {%  if date(setup.updatedAt) > date('-60minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ setup.updatedAt|time_diff }}"></i>
+                    {% endif %}
+                </td>
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
                 <td>{{ setup.nameShown }}</td>
@@ -28,6 +44,7 @@
                 <td>{{ setup.owner }}</td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.cycles | length }}</td>
+                <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}"></span>{{ setup.updatedAt|time_diff}}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>
                 <td>
                     <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>

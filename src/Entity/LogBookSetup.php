@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Model\OsType;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\PreFlush;
+use Doctrine\ORM\Mapping\PrePersist;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -11,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\LogBookSetupRepository")
  * @ORM\Table(name="lbook_setups")
  * @UniqueEntity("name", message="Setup with this name already exist")
+ * @ORM\HasLifecycleCallbacks()
  */
 class LogBookSetup
 {
@@ -82,8 +86,27 @@ class LogBookSetup
      */
     protected $isPrivate = false;
 
+    /**
+     * @var DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
+     * //@Assert\DateTime()
+     */
+    protected $createdAt;
+
+    /**
+     * @var DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
+     * //@Assert\DateTime()
+     */
+    protected $updatedAt;
+
+
     public function __construct()
     {
+        $this->setUpdatedAt();
+        $this->setCreatedAt();
         $this->moderators = array();
     }
 
@@ -263,5 +286,38 @@ class LogBookSetup
     public function setCycles($cycles): void
     {
         $this->cycles = $cycles;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt() : DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @PrePersist
+     */
+    public function setCreatedAt(): void
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getUpdatedAt() : DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @PreFlush
+     * @PrePersist
+     */
+    public function setUpdatedAt(): void
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

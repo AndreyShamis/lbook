@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 /**
@@ -47,7 +47,7 @@ class LogBookCycleController extends Controller
     }
 
     /**
-     * Lists all setup entities.
+     * Lists all cycle entities.
      *
      * @Route("/page/{page}", name="cycle_index")
      * @Method("GET")

@@ -10,6 +10,10 @@
                 <td>{{ setup.id }}</td>
             </tr>
             <tr>
+                <th>OS</th>
+                <td><span class="label label-lg label-yellow">{{ setup.osStr }}</span></td>
+            </tr>
+            <tr>
                 <th>Name</th>
                 <td>{{ setup.name }}</td>
             </tr>
@@ -18,14 +22,47 @@
                 <td>{{ setup.nameShown }}</td>
             </tr>
             <tr>
+                <th>Disabled</th>
+                <td>
+                    {{ setup.disabled ? 'Yes':'False' }}
+                </td>
+            </tr>
+            <tr>
                 <th>Created </th>
-                <td>{{ setup.createdAt|date('d/m/Y H:i:s') }}</td>
+                <td>
+                    <i class="ace-icon fa fa-calendar"></i>
+                    {{ setup.createdAt|date('d/m/Y H:i:s') }}
+                </td>
             </tr>
             <tr>
                 <th>Updated</th>
-                <td>{{ setup.updatedAt|date('d/m/Y H:i:s') }} = {{ setup.updatedAt|time_diff}}</td>
+                <td>
+                    <i class="ace-icon fa fa-calendar"></i>
+                    {{ setup.updatedAt|date('d/m/Y H:i:s') }}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-info-circle"></i>
+                    {{ setup.updatedAt|time_diff}}
+                </td>
             </tr>
-            {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt'] %}
+            <tr>
+                <th>Owner/Moderators</th>
+                <td>
+                    <i class="ace-icon fa fa-key"></i>
+                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-users"></i>
+                    {% for moderator in setup.moderators %}
+                        <a href="{{ path('user_show', { 'id': moderator.id }) }}" target="_blank">
+                            {% if moderator.id == setup.owner.id %}
+                            <span class="label label-sm label-danger label-white arrowed arrowed-right" title="Setup owner">{{ moderator.username }}</span>
+                            {% else %}
+                            <span class="label label-sm label-primary label-white arrowed arrowed-right">{{ moderator.username }}</span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os'] %}
             {% for key, value in setup|cast_to_array %}
                 {% if key not in already_printed%}
                     <tr>

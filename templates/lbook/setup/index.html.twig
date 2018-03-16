@@ -15,6 +15,7 @@
             <th>Short Name</th>
             <th>OS</th>
             <th>Owner</th>
+            <th>Moderators</th>
             <th>Check Uptime</th>
             <th>Cycles</th>
             <th>Updated</th>
@@ -42,6 +43,7 @@
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.osStr }}</td>
                 <td>{{ setup.owner }}</td>
+                <td>{{ setup.moderators|length }}</td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.cycles | length }}</td>
                 <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}"></span>{{ setup.updatedAt|time_diff}}</td>

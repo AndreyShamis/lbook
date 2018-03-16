@@ -24,6 +24,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class LogBookSetupController extends Controller
 {
     protected $index_size = 50;
+    protected $show_cycle_size = 15;
     /**
      * Paginator Helper
      *
@@ -125,7 +126,78 @@ class LogBookSetupController extends Controller
     /**
      * Finds and displays a setup entity.
      *
-     * @Route("/{id}", name="setup_show")
+     * @Route("/{id}/page/{page}", name="setup_show")
+     * @Method("GET")
+     * @param LogBookSetup $setup
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFullAction(LogBookSetup $setup=null, $page=1)
+    {
+        try{
+            $em = $this->getDoctrine()->getManager();
+            $logs = $em->getRepository('App:LogBookCycle');
+            $qb = $logs->createQueryBuilder('t')
+                ->where('t.setup = :setup')
+                ->orderBy("t.updatedAt", "DESC")
+                ->setParameter('setup', $setup->getId());
+            $paginator = $this->paginate($qb, $page, $this->show_cycle_size);
+            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $iterator = $paginator->getIterator(); # ArrayIterator
+
+            $maxPages = ceil($totalPosts / $this->show_cycle_size);
+            $thisPage = $page;
+
+            $deleteForm = $this->createDeleteForm($setup);
+
+            return $this->render('lbook/setup/show.full.html.twig', array(
+                'setup'          => $setup,
+                'size'          => $totalPosts,
+                'maxPages'      => $maxPages,
+                'thisPage'      => $thisPage,
+                'iterator'      => $iterator,
+                'paginator'     => $paginator,
+                'delete_form'   => $deleteForm->createView(),
+            ));
+        }
+        catch (\Throwable $ex){
+            return $this->setupNotFound($setup, $ex);
+        }
+    }
+
+    /**
+     * @param LogBookSetup|null $setup
+     * @param \Throwable $ex
+     * @return Response
+     */
+    protected function setupNotFound(LogBookSetup $setup=null, \Throwable $ex){
+        global $request;
+        $possibleId = 0;
+        try{
+            $possibleId = $request->attributes->get('id');
+        }
+        catch (\Exception $ex){
+
+        }
+        if($setup === null){
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => sprintf('Setup with provided ID:[%s] not found', $possibleId),
+                'message' =>  $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
+        else{
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => 'Unknown error',
+                'message' => $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
+    }
+    /**
+     * Finds and displays a setup entity.
+     *
+     * @Route("/{id}", name="setup_show_full")
      * @Method("GET")
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\Response

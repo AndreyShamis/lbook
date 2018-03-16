@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
-    <h1>Setup [{{ setup.id }}] : {{ setup.name }}</h1>
+    <h3>Setup [{{ setup.id }}] : {{ setup.name }}</h3>
     <table class="records_list table table-striped table-condensed">
         <tbody>
         {#<tr>#}
@@ -18,33 +18,47 @@
         {#</tr>#}
         <tr>
             <th>Short Name</th>
-            <td>{{ setup.nameShown }}</td>
-        </tr>
-        <tr>
-            <th>Disabled</th>
             <td>
-                {{ setup.disabled ? 'Yes':'False' }}
+                <i class="ace-icon fa fa-bookmark"></i>
+                {{ setup.nameShown }}
             </td>
         </tr>
         <tr>
-            <th>Created </th>
+            <th>Disabled / Visibility / Check Yptime</th>
             <td>
-                <i class="ace-icon fa fa-calendar"></i>
-                {{ setup.createdAt|date('d/m/Y H:i:s') }}
+                {{ setup.disabled ? '<i class="ace-icon fa fa-lock"></i> Yes':'<i class="ace-icon fa fa-unlock"></i> False' }}
+                /
+                {{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}
+                /
+                {{ setup.checkUpTime ? 'Yes':'No' }}
             </td>
         </tr>
         <tr>
-            <th>Updated</th>
+            <th>Created / Updated</th>
             <td>
                 <i class="ace-icon fa fa-calendar"></i>
+                <span class="blue">
+                    {{ setup.createdAt|date('d/m/Y H:i:s') }}
+                </span>
+                /
+                <i class="ace-icon fa fa-calendar"></i>
+                <span class="blue">
                 {{ setup.updatedAt|date('d/m/Y H:i:s') }}
+                </span>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <i class="ace-icon fa fa-info-circle"></i>
+                {%  if date(setup.updatedAt) > date('-20minutes') %}
+                    {% set updatedClass="red" %}
+                {% else %}
+                    {% set updatedClass="blue" %}
+                {% endif %}
+                <span class="{{ updatedClass }}">
                 {{ setup.updatedAt|time_diff}}
+                </span>
             </td>
         </tr>
         <tr>
-            <th>Owner/Moderators</th>
+            <th>Owner / Moderators</th>
             <td>
                 <i class="ace-icon fa fa-key"></i>
                 <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
@@ -61,7 +75,7 @@
                 {% endfor %}
             </td>
         </tr>
-        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os'] %}
+        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime'] %}
         {% for key, value in setup|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>
@@ -76,7 +90,6 @@
     {% set pagePath = "setup_show" %}
     {% set objId = setup.id %}
     {% include "lbook/double.paginator.html.twig" %}
-
     {%  set cycles = setup.cycles %}
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
@@ -109,7 +122,7 @@
         {% set counter = counter+1 %}
             <tr>
                 <td>
-                    {%  if date(cycle.updatedAt) > date('-60minutes') %}
+                    {% if date(cycle.updatedAt) > date('-60minutes') %}
                         <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>

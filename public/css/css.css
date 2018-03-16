@@ -27,3 +27,10 @@
     border-color: #6a858e;
 }
 .log-debug hr{border-top-color:#a6e1ec;}
+.pagination{
+    margin: 0 !important;
+    margin-bottom: 5px !important;
+}
+table{
+    margin-bottom: 10px !important;
+}

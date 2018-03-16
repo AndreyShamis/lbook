@@ -53,8 +53,8 @@
                 <div>Count : {{ size }}</div>
                 {% include "lbook/search.html.twig" %}
                 {% set pagePath = "test_show_full" %}
-                {% set testId = test.id %}
-                {% include "lbook/test/log.paginator.html.twig" %}
+                {% set objId = test.id %}
+                {% include "lbook/double.paginator.html.twig" %}
             </h4>
 
             <div class="widget-toolbar">

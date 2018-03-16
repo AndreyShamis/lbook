@@ -74,8 +74,8 @@
     </table>
 
     {% set pagePath = "setup_show" %}
-    {% set setupId = setup.id %}
-    {% include "lbook/setup/cycle.paginator.html.twig" %}
+    {% set objId = setup.id %}
+    {% include "lbook/double.paginator.html.twig" %}
 
     {%  set cycles = setup.cycles %}
     <div>Count : {{ size }}</div>

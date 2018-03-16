@@ -3,7 +3,6 @@
 namespace App\Twig;
 
 use App\Entity\LogBookMessageType;
-use ArrayObject;
 use ReflectionClass;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Twig\Extension\AbstractExtension;
@@ -17,6 +16,7 @@ class AppExtension extends AbstractExtension
 
     public function getFilters()
     {
+
         return array(
             new \Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
             new \Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),

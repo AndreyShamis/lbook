@@ -1,0 +1,158 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
+{% block content %}
+    <h1>Cycle [{{ cycle.id }}] : {{ cycle.name }}</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <tbody>
+        <tr>
+            <th>
+                <span title="Time in seconds between min tests time to max tests time">Period</span>
+                /
+                <span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>
+            </th>
+            <td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}} </td>
+            <th>Pass Rate</th>
+            <td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>
+            <th>Name</th>
+            <td><span class="label label-info label-white">{{ cycle.name }}</span></td>
+            <th>Id</th>
+            <td>{{ cycle.id }}</td>
+
+        </tr>
+        <tr>
+            <th>Controller</th>
+            <td><span class="label label-success label-white middle">{{ cycle.controller }}</span></td>
+            <th>DUT</th>
+            <td><span class="label label-success label-white middle">{{ cycle.dut }}</span></td>
+            <th>Uploader</th>
+            <td><span class="label label-success label-white middle">{{ cycle.targetUploader }}</span></td>
+            <th>Build</th>
+            <td><span class="label label-success label-white middle">{{ cycle.build }}</span></td>
+        </tr>
+        <tr>
+            <th>Start Time</th>
+            <td>{{ cycle.timeStart|date('Y-m-d H:i:s') }}</td>
+            <th>End Time</th>
+            <td>{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</td>
+            <th>Updated</th>
+            <td>{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</td>
+            <th>Created</th>
+            <td>{{ cycle.createdAt|date('Y-m-d H:i:s') }}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <td></td>
+            <th></th>
+            <td></td>
+            <th>Token</th>
+            <td>{{ cycle.uploadToken }}</td>
+            <th>Token EXP</th>
+            <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
+        </tr>
+        <tr>
+            <th>Tests count</th>
+            <td>{{ cycle.tests|length }}</td>
+            <th>Setup</th>
+            <td colspan="5">
+                <table class="records_list table table-striped table-condensed">
+                    <tr>
+                        <td><a target="_blank" href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><span class="label label-success label-white middle">{{ cycle.setup}}</span></a></td>
+                        <td>Short name <span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
+                        <td>OS :{{ cycle.setup.os }}</td>
+                        <td>Owner :{{ cycle.setup.owner }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>Pass</th>
+            <td>{{ cycle.testsPass }}</td>
+            <th>Fail</th>
+            <td>{{ cycle.testsFail }}</td>
+            <th>Error</th>
+            <td>{{ cycle.testsError }}</td>
+            <th>Count</th>
+            <td>{{ cycle.testsCount }}</td>
+        </tr>
+        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+        {% for key, value in cycle|cast_to_array %}
+            {% if key not in already_printed%}
+                <tr>
+                    <th>{{ key | capitalize}}</th>
+                    <td>{{ dump(value) }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+    {% set pagePath = "cycle_show" %}
+    {% set objId = cycle.id %}
+    {% include "lbook/double.paginator.html.twig" %}
+    {%  set tests = cycle.tests%}
+    {% include "lbook/search.html.twig" %}
+    <table class="records_list table table-striped table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Order</th>
+            <th>Name</th>
+            <th>Time start</th>
+            <th>Time end</th>
+            <th>Runtime</th>
+            <th>Uptime</th>
+            <th>Uptime</th>
+            <th>Verdict</th>
+            {#<th>Actions</th>#}
+        </tr>
+        </thead>
+        <tbody class="searchable">
+        {% set break = false %}
+        {% set counter = 0 %}
+        {% for test in iterator if not break %}
+
+            {% if counter == 10000 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
+            <tr>
+                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
+                <td>{{ test.id }}</td>
+                <td>{{ test.executionOrder }}</td>
+                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
+                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
+                <td>{{ test.dutUpTimeStart }}</td>
+                <td>{{ test.dutUpTimeEnd }}</td>
+                <td><span class="badge {{ verdictToBadge(test.verdict)}}">
+                        {{ test.verdict }}
+                    </span></td>
+                {#<td>#}
+                {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
+                {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                {#</td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('cycle_index') }}">Back to the list</a>
+        </li>
+        {% if is_granted('edit', cycle.setup) %}
+            <li>
+                <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a>
+            </li>
+        {% endif %}
+        {#{% if is_granted('delete', cycle.setup) %}#}
+        {#<li>#}
+        {#{{ form_start(delete_form) }}#}
+        {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+        {#{{ form_end(delete_form) }}#}
+        {#</li>#}
+        {#{% endif %}#}
+    </ul>
+{% endblock %}

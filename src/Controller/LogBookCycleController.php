@@ -20,6 +20,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  */
 class LogBookCycleController extends Controller
 {
+
+    protected $show_tests_size = 2000;
+    protected $index_size = 100;
     /**
      * Paginator Helper
      *
@@ -58,18 +61,17 @@ class LogBookCycleController extends Controller
     public function index($page = 1)
     {
         $em = $this->getDoctrine()->getManager();
-        $limit = 40;
         $cycleRepo = $em->getRepository('App:LogBookCycle');
         $query = $cycleRepo->createQueryBuilder('t')
             ->orderBy('t.id', "DESC");
-        $paginator = $this->paginate($query, $page, $limit);
+        $paginator = $this->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
         $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
         $iterator = $paginator->getIterator(); # ArrayIterator
 
-        $maxPages = ceil($totalPosts / $limit);
+        $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
             //'cycles' => $cycles,
@@ -117,9 +119,51 @@ class LogBookCycleController extends Controller
     }
 
     /**
+     * Finds and displays a cycle entity with paginator.
+     *
+     * @Route("/{id}/page/{page}", name="cycle_show")
+     * @Method("GET")
+     * @param LogBookCycle $cycle
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFullAction(LogBookCycle $cycle=null, $page=1)
+    {
+        try{
+            $em = $this->getDoctrine()->getManager();
+            $tests = $em->getRepository('App:LogBookTest');
+            $qb = $tests->createQueryBuilder('t')
+                ->where('t.cycle = :cycle')
+                ->orderBy("t.executionOrder", "ASC")
+                ->setParameter('cycle', $cycle->getId());
+            $paginator = $this->paginate($qb, $page, $this->show_tests_size);
+            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $iterator = $paginator->getIterator(); # ArrayIterator
+
+            $maxPages = ceil($totalPosts / $this->show_tests_size);
+            $thisPage = $page;
+
+            $deleteForm = $this->createDeleteForm($cycle);
+
+            return $this->render('lbook/cycle/show.full.html.twig', array(
+                'cycle'          => $cycle,
+                'size'          => $totalPosts,
+                'maxPages'      => $maxPages,
+                'thisPage'      => $thisPage,
+                'iterator'      => $iterator,
+                'paginator'     => $paginator,
+                'delete_form'   => $deleteForm->createView(),
+            ));
+        }
+        catch (\Throwable $ex){
+            return $this->cycleNotFound($cycle, $ex);
+        }
+    }
+
+    /**
      * Finds and displays a cycle entity.
      *
-     * @Route("/{id}", name="cycle_show")
+     * @Route("/{id}", name="cycle_show_full")
      * @Method("GET")
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\Response
@@ -132,6 +176,36 @@ class LogBookCycleController extends Controller
             'cycle' => $obj,
 //            'delete_form' => $deleteForm->createView(),
         ));
+    }
+
+    /**
+     * @param LogBookCycle|null $cycle
+     * @param \Throwable $ex
+     * @return Response
+     */
+    protected function cycleNotFound(LogBookCycle $cycle=null, \Throwable $ex){
+        global $request;
+        $possibleId = 0;
+        try{
+            $possibleId = $request->attributes->get('id');
+        }
+        catch (\Exception $ex){
+
+        }
+        if($cycle === null){
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => sprintf('Cycle with provided ID:[%s] not found', $possibleId),
+                'message' =>  $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
+        else{
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => 'Unknown error',
+                'message' => $ex->getMessage(),
+                'ex' => $ex,
+            ));
+        }
     }
 
     /**

@@ -66,15 +66,89 @@
             </td>
         </tr>
         <tr>
-            <th>Pass</th>
-            <td>{{ cycle.testsPass }}</td>
-            <th>Fail</th>
-            <td>{{ cycle.testsFail }}</td>
-            <th>Error</th>
-            <td>{{ cycle.testsError }}</td>
-            <th>Count</th>
-            <td>{{ cycle.testsCount }}</td>
+            {% set testsCount = cycle.tests|length %}
+            <td colspan="4">
+                <div class="infobox-container">
+
+                    <div class="infobox infobox-orange2">
+                        <div class="infobox-icon">
+                            <i class="ace-icon fa fa-flask"></i>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-data-number">{{ testsCount }}</span>
+                            <div class="infobox-content">Total tests</div>
+                        </div>
+                    </div>
+
+                    <div class="infobox infobox-green">
+                        <div class="infobox-progress">
+                            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#87B87F" style="height: 50px; width: 50px; line-height: 49px; color: rgb(135, 184, 127);">
+                                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 0) }}%</span>
+                            </div>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-text">Pass Rate</span>
+                            <div class="infobox-content">
+                                <span class="bigger-110">{{ cycle.testsPass }} tests</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infobox infobox-red">
+                        <div class="infobox-progress">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.testsFail | getPercentage (testsCount, 2) }}" style="height: 50px; width: 50px; line-height: 49px; ">
+                                <span class="percent">{{ cycle.testsFail | getPercentage (testsCount, 0) }}%</span>
+                            </div>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-text">Fail Rate</span>
+                            <div class="infobox-content">
+                                <span class="bigger-110">{{ cycle.testsFail }} tests</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infobox infobox-orange">
+                        <div class="infobox-progress">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.testsError |  getPercentage (testsCount, 2) }}" style="height: 50px; width: 50px; line-height: 49px; ">
+                                <span class="percent">{{ cycle.testsError |  getPercentage (testsCount, 0) }}%</span>
+                            </div>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-text">Error Rate</span>
+                            <div class="infobox-content">
+                                <span class="bigger-110">{{ cycle.testsError }} tests</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="infobox infobox-black">
+                        <div class="infobox-progress">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="0" style="height: 50px; width: 50px; line-height: 49px; ">
+                                <span class="percent">0%</span>
+                            </div>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-text">Warning Rate</span>
+                            <div class="infobox-content">
+                                <span class="bigger-110">WIP tests</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </td>
         </tr>
+        {#<tr>#}
+            {#<th>Pass</th>#}
+            {#<td>{{ cycle.testsPass }}</td>#}
+            {#<th>Fail</th>#}
+            {#<td>{{ cycle.testsFail }}</td>#}
+            {#<th>Error</th>#}
+            {#<td>{{ cycle.testsError }}</td>#}
+            {#<th>Count</th>#}
+            {#<td>{{ cycle.testsCount }}</td>#}
+        {#</tr>#}
         {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
         {% for key, value in cycle|cast_to_array %}
             {% if key not in already_printed%}
@@ -155,4 +229,28 @@
         {#</li>#}
         {#{% endif %}#}
     </ul>
+
+    <script>
+        function drawEasyPieChart(){
+            jQuery(function($) {
+                $('.easy-pie-chart.percentage').each(function(){
+                    $(this).easyPieChart({
+                        barColor: $(this).data('color'),
+                        trackColor: '#EEEEEE',
+                        scaleColor: false,
+                        lineCap: 'butt',
+                        lineWidth: 6,
+                        animate: ace.vars['old_ie'] ? false : 3000,
+                        size:55
+                    }).css('color', $(this).data('color'));
+                });
+            });
+        }
+
+        $(document).ready(
+            function() {
+                drawEasyPieChart();
+            }
+        );
+    </script>
 {% endblock %}

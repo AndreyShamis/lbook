@@ -24,7 +24,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class LogBookSetupController extends Controller
 {
     protected $index_size = 50;
-    protected $show_cycle_size = 15;
+    protected $show_cycle_size = 100;
     /**
      * Paginator Helper
      *

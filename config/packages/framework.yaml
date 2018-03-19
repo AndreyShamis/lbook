@@ -12,7 +12,7 @@ framework:
         # required for solve issue Notice: SessionHandler::gc(): ps_files_cleanup_dir: opendir
         handler_id:           session.handler.native_file
         save_path:            '%kernel.cache_dir%/sessions'
-        gc_divisor:           1000
+        gc_divisor:           1
         gc_probability:       1
     #esi: true
     #fragments: true

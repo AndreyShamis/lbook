@@ -67,6 +67,22 @@ Used **jenkins** server
 [Andrey Shamis](https://github.com/AndreyShamis) lolnik@gmail.com
 @AndreyShamis
 
+## Apache
+~~~
+<Directory /var/www/lbook/public >
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+                Allow from All
+        <IfModule mod_rewrite.c>
+            Options -MultiViews
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(.*)$ index.php [QSA,L]
+        </IfModule>
+        </Directory>
+~~~
 
 ## PSR-12
 https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md

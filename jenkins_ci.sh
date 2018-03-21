@@ -29,10 +29,10 @@ restore_proxy(){
 }
 
 # Requirements
-#sudo apt install php7.0-ldap
-#sudo apt install php7.0-zip
-#sudo apt install php7.0-xml
-#sudo apt install php7.0-mbstring
+#sudo apt install php7.2-ldap
+#sudo apt install php7.2-zip
+#sudo apt install php7.2-xml
+#sudo apt install php7.2-mbstring
 
 save_proxy
 

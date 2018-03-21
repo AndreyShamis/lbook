@@ -1,0 +1,11 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block title %}New LogBookBuild{% endblock %}
+
+{% block content %}
+    <h1>Create new LogBookBuild</h1>
+
+    {{ include('lbook/build/_form.html.twig') }}
+
+    <a href="{{ path('log_book_build_index') }}">back to list</a>
+{% endblock %}

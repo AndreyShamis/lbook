@@ -1,0 +1,13 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block title %}Edit LogBookBuild{% endblock %}
+
+{% block content %}
+    <h1>Edit LogBookBuild</h1>
+
+    {{ include('lbook/build/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('log_book_build_index') }}">back to list</a>
+
+    {{ include('lbook/build/_delete_form.html.twig') }}
+{% endblock %}

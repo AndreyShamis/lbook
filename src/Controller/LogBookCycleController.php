@@ -12,6 +12,8 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use App\Form\LogBookCycleType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Cycle controller.
@@ -23,6 +25,7 @@ class LogBookCycleController extends Controller
 
     protected $show_tests_size = 2000;
     protected $index_size = 100;
+
     /**
      * Paginator Helper
      *
@@ -40,7 +43,7 @@ class LogBookCycleController extends Controller
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function paginate($dql, $page = 1, $limit = 20)
+    public function paginate($dql, $page = 1, $limit = 20): Paginator
     {
         $paginator = new Paginator($dql);
         $paginator->getQuery()
@@ -57,13 +60,14 @@ class LogBookCycleController extends Controller
      * @Template(template="lbook/cycle/index.html.twig")
      * @param int $page
      * @return array
+     * @throws \LogicException
      */
-    public function index($page = 1)
+    public function index($page = 1): array
     {
         $em = $this->getDoctrine()->getManager();
         $cycleRepo = $em->getRepository('App:LogBookCycle');
         $query = $cycleRepo->createQueryBuilder('t')
-            ->orderBy('t.id', "DESC");
+            ->orderBy('t.id', 'DESC');
         $paginator = $this->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
@@ -74,20 +78,12 @@ class LogBookCycleController extends Controller
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
-            //'cycles' => $cycles,
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,
             'paginator' => $paginator,
         );
-//        $em = $this->getDoctrine()->getManager();
-//
-//        $cycles = $em->getRepository('App:LogBookCycle')->findAll();
-//
-//        return $this->render('lbook/cycle/index.html.twig', array(
-//            'cycles' => $cycles,
-//        ));
     }
 
     /**
@@ -97,11 +93,12 @@ class LogBookCycleController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function newAction(Request $request)
     {
         $obj = new LogBookCycle();
-        $form = $this->createForm('App\Form\LogBookCycleType', $obj);
+        $form = $this->createForm(LogBookCycleType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -127,14 +124,14 @@ class LogBookCycleController extends Controller
      * @param int $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookCycle $cycle=null, $page=1)
+    public function showFullAction(LogBookCycle $cycle, $page=1): ?Response
     {
-        try{
+        try {
             $em = $this->getDoctrine()->getManager();
             $tests = $em->getRepository('App:LogBookTest');
             $qb = $tests->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
-                ->orderBy("t.executionOrder", "ASC")
+                ->orderBy('t.executionOrder', 'ASC')
                 ->setParameter('cycle', $cycle->getId());
             $paginator = $this->paginate($qb, $page, $this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
@@ -154,8 +151,7 @@ class LogBookCycleController extends Controller
                 'paginator'     => $paginator,
                 'delete_form'   => $deleteForm->createView(),
             ));
-        }
-        catch (\Throwable $ex){
+        } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);
         }
     }
@@ -168,7 +164,7 @@ class LogBookCycleController extends Controller
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookCycle $obj)
+    public function showAction(LogBookCycle $obj): Response
     {
         //$deleteForm = $this->createDeleteForm($obj);
 
@@ -183,29 +179,28 @@ class LogBookCycleController extends Controller
      * @param \Throwable $ex
      * @return Response
      */
-    protected function cycleNotFound(LogBookCycle $cycle=null, \Throwable $ex){
+    protected function cycleNotFound(LogBookCycle $cycle=null, \Throwable $ex): ?Response
+    {
         global $request;
         $possibleId = 0;
-        try{
+        try {
             $possibleId = $request->attributes->get('id');
+        } catch (\Exception $ex) {
         }
-        catch (\Exception $ex){
 
-        }
-        if($cycle === null){
+        if ($cycle === null) {
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Cycle with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
             ));
         }
-        else{
-            return $this->render('lbook/404.html.twig', array(
-                'short_message' => 'Unknown error',
-                'message' => $ex->getMessage(),
-                'ex' => $ex,
-            ));
-        }
+
+        return $this->render('lbook/404.html.twig', array(
+            'short_message' => 'Unknown error',
+            'message' => $ex->getMessage(),
+            'ex' => $ex,
+        ));
     }
 
     /**
@@ -216,17 +211,19 @@ class LogBookCycleController extends Controller
      * @param Request $request
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \LogicException
      */
     public function editAction(Request $request, LogBookCycle $obj)
     {
         $this->denyAccessUnlessGranted('edit', $obj->getSetup());
         $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm('App\Form\LogBookCycleType', $obj);
+        $editForm = $this->createForm(LogBookCycleType::class, $obj);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-
             return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
         }
 
@@ -245,8 +242,11 @@ class LogBookCycleController extends Controller
      * @param Request $request
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \LogicException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookCycle $obj)
+    public function deleteAction(Request $request, LogBookCycle $obj): RedirectResponse
     {
         $this->denyAccessUnlessGranted('delete', $obj->getSetup());
         $form = $this->createDeleteForm($obj);

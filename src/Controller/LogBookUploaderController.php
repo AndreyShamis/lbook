@@ -13,7 +13,6 @@ use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -27,16 +26,15 @@ use App\Utils\RandomName;
 class LogBookUploaderController extends Controller
 {
     /** @var \Doctrine\Common\Persistence\ObjectManager  */
-    protected $em = null;
-    protected $testsRepo = null;
-    protected $cycleRepo = null;
-    protected $verdictRepo = null;
-    protected $msgTypeRepo = null;
-    protected $logsRepo = null;
-    protected $setupRepo = null;
-    protected $buildRepo = null;
-    protected $targetRepo = null;
-    protected $container;
+    protected $em;
+    protected $testsRepo;
+    protected $cycleRepo;
+    protected $verdictRepo;
+    protected $msgTypeRepo;
+    protected $logsRepo;
+    protected $setupRepo;
+    protected $buildRepo;
+    protected $targetRepo;
     protected $_MIN_LOG_STR_LEN = 10;
     protected $_MIN_CLEAN_LOG_STR_LEN = 1;
     protected $_SHORT_TIME_LEN = 8;             // 12:48:45
@@ -68,93 +66,116 @@ class LogBookUploaderController extends Controller
         return $this->render('lbook/upload/index.html.twig', array());
     }
 
-    protected function getTestNewExecutionOrder(LogBookCycle $cycle){
+    /**
+     * @param LogBookCycle $cycle
+     * @return int
+     */
+    protected function getTestNewExecutionOrder(LogBookCycle $cycle): int
+    {
         /**
          * Find proper execution order | The correct Way
          */
-        $latestTestInCycle = $this->testsRepo->findOneBy(array("cycle" => $cycle->getId()), array('executionOrder' => 'DESC'));
-        if($latestTestInCycle !== null){
+        $latestTestInCycle = $this->testsRepo->findOneBy(array('cycle' => $cycle->getId()), array('executionOrder' => 'DESC'));
+        if ($latestTestInCycle !== null) {
             $executionOrder = $latestTestInCycle->getExecutionOrder() + 1;
-        }
-        else{
+        } else {
             $executionOrder = 0;
         }
         /**
          * Find proper execution order | Incorrect Way
          */
-//        $cycleTestsCount = $this->testsRepo->count(array("cycle" => $cycle->getId()));
+//        $cycleTestsCount = $this->testsRepo->count(array('cycle' => $cycle->getId()));
 //        $executionOrderFound = false;
 //        $executionOrder = $cycleTestsCount;
-//        while (!$executionOrderFound){
+//        while (!$executionOrderFound) {
 //            $count = $this->testsRepo->count(array(
-//                "cycle" => $cycle->getId(),
-//                "executionOrder" => $executionOrder,
+//                'cycle' => $cycle->getId(),
+//                'executionOrder' => $executionOrder,
 //            ));
-//            if($count > 0){
+//            if ($count > 0) {
 //                $executionOrder++;
-//            }
-//            else{
+//            } else {
 //                $executionOrderFound = true;
 //            }
 //        }
         return $executionOrder;
     }
 
-    protected function generateCycleName() : string {
+    /**
+     * @return string
+     */
+    protected function generateCycleName(): string
+    {
         return RandomName::asClassName(RandomName::getRandomTerm());
     }
 
-    protected function generateSetupName() : string {
-        $setup_name = "";
+    /**
+     * @return string
+     */
+    protected function generateSetupName(): string
+    {
+        $setup_name = '';
         $setupNameFound = false;
         $counter = 0;
-        $post_fix = "";
-        while(!$setupNameFound){
+        $post_fix = '';
+        while (!$setupNameFound) {
             $setup_name = RandomName::asClassName(RandomName::getRandomTerm()) . $post_fix;
             $setup = $this->setupRepo->findByName($setup_name);
-            if($setup === null){
-                $setupNameFound = true;
+            if ($setup === null) {
                 break;
             }
             $counter++;
-            if($counter%100==0){
-                $post_fix = rand(1,9999);
+            if ($counter%100 === 0) {
+                try {
+                    $post_fix = random_int(1, 9999);
+                } catch (\Exception $e) {
+                }
             }
-            if($counter%1000==0){
-                $post_fix = $counter . rand(1,9999);
+            if ($counter%1000 === 0) {
+                try {
+                    $post_fix = $counter . random_int(1, 9999);
+                } catch (\Exception $e) {
+                }
             }
         }
         return $setup_name;
     }
 
-    final protected function bringSetup(LogBookUpload &$obj, string $setupName = "", int $setupId = -1) : LogBookSetup{
+    /**
+     * @param LogBookUpload $obj
+     * @param string $setupName
+     * @param int $setupId
+     * @return LogBookSetup
+     */
+    final protected function bringSetup(LogBookUpload $obj, string $setupName = '', int $setupId = -1): LogBookSetup
+    {
 
         /** @var LogBookSetup $setup */
         $setup = null;
-        if($setupId > 0){
-            $obj->addMessage("Searching setup by ID :" . $setupId);
+        if ($setupId > 0) {
+            $obj->addMessage('Searching setup by ID :' . $setupId);
             $setup = $this->setupRepo->findById($setupId);
-            if($setup !== null){
-                $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+            if ($setup !== null) {
+                $obj->addMessage(sprintf('Found setup [ID:%d], [NAME:%s] ', $setup->getId(), $setup->getName()));
             }
         }
 
-        if($setup === null && strlen($setupName) > 0){
-            $obj->addMessage("Searching setup by NAME :" . $setupName);
+        if ($setup === null && \strlen($setupName) > 0) {
+            $obj->addMessage('Searching setup by NAME :' . $setupName);
             $setup = $this->setupRepo->findByName($setupName);
-            if($setup !== null){
-                $obj->addMessage(sprintf("Found setup [ID:%d], [NAME:%s] ", $setup->getId(), $setup->getName()));
+            if ($setup !== null) {
+                $obj->addMessage(sprintf('Found setup [ID:%d], [NAME:%s] ', $setup->getId(), $setup->getName()));
             }
         }
 
-        if($setup === null){
-            if(strlen($setupName) < 3){
+        if ($setup === null) {
+            if (\strlen($setupName) < 3) {
                 $setupName = $this->generateSetupName();
-                $obj->addMessage("Generating new setup NAME :" . $setupName);
+                $obj->addMessage('Generating new setup NAME :' . $setupName);
             }
-            $obj->addMessage("Creating setup  :" . $setupName);
+            $obj->addMessage('Creating setup  :' . $setupName);
             $setup = $this->setupRepo->findOneOrCreate(array(
-                    "name" => $setupName,
+                    'name' => $setupName,
                 )
             );
         }
@@ -188,17 +209,16 @@ class LogBookUploaderController extends Controller
             $cycle_token = $request->request->get('token');
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
 
-
-            if($cycle_token !== null && $cycle_token != ""){
-                $obj->addMessage("INFO: Token provided use him : " . $cycle_token);
-                $cycle = $this->cycleRepo->findOneBy(array("uploadToken" => $cycle_token));
-                if($cycle === null){
-                    $obj->addMessage("ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup");
+            if ($cycle_token !== null && $cycle_token !== '') {
+                $obj->addMessage('INFO: Token provided use him : ' . $cycle_token);
+                $cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
+                if ($cycle === null) {
+                    $obj->addMessage('ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup');
                     /**
                      * TODO create new cycle? -> Need Parse Setup
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
-                    if(strlen($cycle_name) < 1){
+                    if ('' === $cycle_name) {
                         $cycle_name = $this->generateCycleName();
                     }
                     $cycle = $this->cycleRepo->findOneOrCreate(array(
@@ -207,63 +227,60 @@ class LogBookUploaderController extends Controller
                         'uploadToken' => $cycle_token,
                         //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
                     ));
-                    if($cycle === null){
-                        $obj->addMessage("CRITICAL: Failed to generate cycle");
+                    if ($cycle === null) {
+                        $obj->addMessage('CRITICAL: Failed to generate cycle');
                         // exit();
                     }
-                    $obj->addMessage("ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup");
-                }
-                else{
+                    $obj->addMessage('ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup');
+                } else {
                     /**
                      * TODO Check token exp date
                      */
                 }
-            }
-            else{
+            } else {
                 /**
                  * TODO Token not provided -> EXIT?
                  */
             }
 //
 //            if($cycle === null){
-//                $cycle = $this->cycleRepo->findOneBy(array("id" => $cycle_id));
+//                $cycle = $this->cycleRepo->findOneBy(array('id' => $cycle_id));
 //            }
 
-            if($cycle !== null){
-                $obj->addMessage("INFO: Cycle found, take SETUP from cycle");
+            if ($cycle !== null) {
+                $obj->addMessage('INFO: Cycle found, take SETUP from cycle');
                 $setup = $cycle->getSetup();
-            }
-            else{
-                $obj->addMessage("ERROR: Cycle not found, take setup from POST");
+            } else {
+                $obj->addMessage('ERROR: Cycle not found, take setup from POST');
                 $setup = $this->bringSetup($obj, $setup_name);
 
-                if($setup !== null){
-                    $obj->addMessage("ERROR: TODO Require to create new cycle ");
+                if ($setup !== null) {
+                    $obj->addMessage('ERROR: TODO Require to create new cycle ');
                     /** TODO Require to create new cycle */
-                }
-                else{
-                    $obj->addMessage("ERROR: TODO - cycle not found, setup not found, Create Setup and then Cycle");
+                } else {
+                    $obj->addMessage('ERROR: TODO - cycle not found, setup not found, Create Setup and then Cycle');
                     /** TODO - cycle not found, setup not found, Create Setup and then Cycle */
                 }
             }
-            $obj->addMessage("File name is :" . $fileName . ". \tFile ext :"  .$file->guessExtension());
+            $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
             /** @var UploadedFile $new_file */
-            $new_file = $file->move("../uploads/", $fileName);
-            $obj->addMessage("File copy info :"  . $new_file . " File size is " . $new_file->getSize());
+            $new_file = $file->move('../uploads/', $fileName);
+            $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
             $obj->setLogFile($fileName);
 
             $testName = $file->getClientOriginalName();
+            /** @var LogBookTest $test */
             $test = $this->testsRepo->findOneOrCreate(array(
-                "id" => 1,
-                "name" => $testName,
-                "cycle" => $cycle,
-                "logFile" => $new_file->getFilename(),
-                "logFileSize" => $new_file->getSize(),
-                "executionOrder" => $this->getTestNewExecutionOrder($cycle),
+                'id' => 1,
+                'name' => $testName,
+                'cycle' => $cycle,
+                'logFile' => $new_file->getFilename(),
+                'logFileSize' => $new_file->getSize(),
+                'executionOrder' => $this->getTestNewExecutionOrder($cycle),
             ));
             $obj->data = $this->parseFile($new_file, $test);
             $this->em->refresh($cycle);
-            $cycle->setBuild($this->buildRepo->findOneOrCreate(array("name" => 'Some Build')));
+            $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
             $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
@@ -273,7 +290,7 @@ class LogBookUploaderController extends Controller
             $cycle->setDut($dut);
             $setup->setUpdatedAt();
             $this->em->flush();
-            $obj->addMessage("TestID is " . $test->getId());
+            $obj->addMessage('TestID is ' . $test->getId());
         }
 
         return $this->render('lbook/upload/curl.html.twig', array(
@@ -310,37 +327,37 @@ class LogBookUploaderController extends Controller
             $post_cycle = $request->request->get($request_str)['cycle'];
             $setup_id = $request->request->get($request_str)['setup'];
 
-            $cycle = $this->cycleRepo->findOneBy(array("id" => $post_cycle));
-            if($cycle !== null){
-                $obj->addMessage("Cycle found, take SETUP from cycle");
+            $cycle = $this->cycleRepo->findOneBy(array('id' => $post_cycle));
+            if ($cycle !== null) {
+                $obj->addMessage('Cycle found, take SETUP from cycle');
                 $setup = $cycle->getSetup();
-            }
-            else{
-                $obj->addMessage("Cycle not found, take setup from POST");
-                $setup_name = "";//$request->query->get('build');//$this->clean_string("Test Setup");
+            } else {
+                $obj->addMessage('Cycle not found, take setup from POST');
+                $setup_name = '';   //$request->query->get('build');//$this->cleanString('Test Setup');
                 /** @var LogBookSetup $setup */
                 $setup = $this->bringSetup($obj,$setup_name , $setup_id);
             }
 
-            $obj->addMessage("New file name is :" . $fileName);
-            $obj->addMessage("File ext :"  .$file->guessExtension());
-            $new_file = $file->move("../uploads/", $fileName);
+            $obj->addMessage('New file name is :' . $fileName);
+            $obj->addMessage('File ext :' .$file->guessExtension());
+            $new_file = $file->move('../uploads/', $fileName);
             $obj->new_file_info = $new_file;
-            $obj->addMessage("File copy info :"  . $new_file);
+            $obj->addMessage('File copy info :' . $new_file);
             $obj->setLogFile($fileName);
 
             $testName = $file->getClientOriginalName();
+            /** @var LogBookTest $test */
             $test = $this->testsRepo->findOneOrCreate(array(
-                "id" => 1,
-                "name" => $testName,
-                "cycle" => $cycle,
-                "logFile" => $new_file->getFilename(),
-                "logFileSize" => $new_file->getSize(),
-                "executionOrder" => $this->getTestNewExecutionOrder($cycle),
+                'id' => 1,
+                'name' => $testName,
+                'cycle' => $cycle,
+                'logFile' => $new_file->getFilename(),
+                'logFileSize' => $new_file->getSize(),
+                'executionOrder' => $this->getTestNewExecutionOrder($cycle),
                 ));
             $obj->data = $this->parseFile($new_file, $test);
             $this->em->refresh($cycle);
-            $cycle->setBuild($this->buildRepo->findOneOrCreate(array("name" => 'Some Build')));
+            $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
             $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
@@ -349,7 +366,7 @@ class LogBookUploaderController extends Controller
             $cycle->setController($uploader);
             $cycle->setDut($dut);
             $this->em->flush();
-            $obj->addMessage("TestID is " . $test->getId());
+            $obj->addMessage('TestID is ' . $test->getId());
             return $this->showAction($obj);
         }
 
@@ -360,27 +377,30 @@ class LogBookUploaderController extends Controller
         ));
     }
 
-    final protected function prepareLogArray(array &$temp_arr){
+    /**
+     * @param array $temp_arr
+     * @return array
+     */
+    final protected function prepareLogArray(array &$temp_arr): array
+    {
         $newTempArr = array();
         $last_good_key = -1;
-        foreach ($temp_arr as $key => $value){
+        foreach ($temp_arr as $key => $value) {
 
-            if(strlen($value) < $this->_MIN_LOG_STR_LEN){
+            if (\strlen($value) < $this->_MIN_LOG_STR_LEN) {
                 $value = null;
                 continue;
             }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/', $value,$oneLine);
-            if (count($oneLine[2]) > 0){
+            if (\count($oneLine[2]) > 0) {
                 $last_good_key = $key;
-                $newTempArr[$key] = $this->clean_string($value);
-            }
-            else{
-                if($last_good_key > 0){
-                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->clean_string($value);
-                }
-                else{
+                $newTempArr[$key] = $this->cleanString($value);
+            } else {
+                if ($last_good_key > 0) {
+                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . '\n' . $this->cleanString($value);
+                } else {
                     // add first lines without time to array
-                    $this->log_first_lines[] = $this->clean_string($value);
+                    $this->log_first_lines[] = $this->cleanString($value);
                     // or
                     // Skip first lines
                 }
@@ -396,16 +416,17 @@ class LogBookUploaderController extends Controller
      * @param $newTempArr
      * @return int
      */
-    protected function recoverFirstLines(&$newTempArr) : int {
+    protected function recoverFirstLines(&$newTempArr): int
+    {
 
-        if(count($newTempArr) && count($this->log_first_lines)){
+        if (\count($newTempArr) && \count($this->log_first_lines)) {
             // TODO Put first lines into start of $newTempArr
             $reverted = new ArrayIterator(array_reverse($this->log_first_lines));
-            foreach($reverted as $tmp){
+            foreach ($reverted as $tmp) {
                 array_unshift($newTempArr, $tmp);
             }
         }
-        return count($this->log_first_lines);
+        return \count($this->log_first_lines);
     }
 
     /**
@@ -413,11 +434,11 @@ class LogBookUploaderController extends Controller
      * @param LogBookTest $test
      * @return array
      */
-    protected function parseFile($file, LogBookTest $test)
+    protected function parseFile($file, LogBookTest $test): array
     {
         $ret_data = array();
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
-        $tmp_log_arr = preg_split("/\\r\\n|\\r|\\n/", $file_data);
+        $tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data);
         $newTempArr = $this->prepareLogArray($tmp_log_arr);
 
         unset($file_data);
@@ -450,44 +471,45 @@ class LogBookUploaderController extends Controller
          * If in previous FOR used "&" and use same array
          * Dont remove & from  &$value -> will cause to additional duplicated line
          */
-        foreach ($newTempArr as $key => $value){
+        foreach ($newTempArr as $key => $value) {
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
-            if (count($oneLine[2]) > 0){
+            if (\count($oneLine[2]) > 0) {
                 $dLevel = null;
                 /** Clean double DEBUG OUTPUT **/
                 //Removing : base_job:0395 utils:0262 ssh_host:0116
                 preg_match('/([\w|\_]*\:\d+\s*)\|\s*(.*)/s', $oneLine[3][0], $messageWithDebug);
-                if(count($messageWithDebug) == 3){
+                if (\count($messageWithDebug) === 3) {
                     $oneLine[3][0] = $messageWithDebug[2];
                 }
                 /** **/
                 $msg_str = trim($oneLine[3][0]);
-                if(strlen($msg_str) < $this->_MIN_CLEAN_LOG_STR_LEN){
+                if (\strlen($msg_str) < $this->_MIN_CLEAN_LOG_STR_LEN) {
                     continue;
                 }
                 $msgType_str = $oneLine[2][0];
                 $logTime_str = $oneLine[1][0];
 
                 /** Test verdict section **/
-                if($msgType_str === "INFO"){
+                if ($msgType_str === 'INFO') {
                     preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
-                    if(count($possibleVerdict) == 2){
+                    if (\count($possibleVerdict) === 2) {
                         $testVerdict = $this->parseVerdict($possibleVerdict[1]);
-                        if($testVerdict !== null){
-                            if($testVerdict->getName() == 'ABORT' || $testVerdict->getName() == 'PASS' || $testVerdict->getName() == 'ERROR' || $testVerdict->getName() == 'FAIL' || $testVerdict->getName() == 'TEST_NA'){
+                        if ($testVerdict !== null) {
+                            $verName = $testVerdict->getName();
+                            if ($verName === 'ABORT' || $verName === 'PASS' || $verName === 'ERROR' || $verName === 'FAIL' || $verName === 'TEST_NA') {
                                 $msgType_str = $testVerdict->getName();
                             }
                         }
                     }
                     else{
                         preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/D', $msg_str, $possibleMessageType);
-                        if(count($possibleMessageType) == 3){
-                            if($possibleMessageType[1] == "GOOD"){
-                                $possibleMessageType[1] = "PASS";
+                        if (\count($possibleMessageType) === 3) {
+                            if ($possibleMessageType[1] === 'GOOD') {
+                                $possibleMessageType[1] = 'PASS';
                             }
-                            if($possibleMessageType[1] == "WARN"){
-                                $possibleMessageType[1] = "WARNING";
+                            if ($possibleMessageType[1] === 'WARN') {
+                                $possibleMessageType[1] = 'WARNING';
                             }
                             $msgType_str = $possibleMessageType[1];
                         }
@@ -504,6 +526,8 @@ class LogBookUploaderController extends Controller
                         'name'      => $this->prepareDebugLevel($msgType_str)
                     )),
                 );
+
+                /** @var LogBookMessage $log */
                 $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
@@ -516,30 +540,28 @@ class LogBookUploaderController extends Controller
 //                    $objectsToClear = array();
 //                }
                 /*** Test Name section **/
-                if(!$testNameFound && $log->getMsgType() == "INFO"){
+                if (!$testNameFound && $log->getMsgType() === 'INFO') {
                     $tmpName = null;
 
-                    if(!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint){
+                    if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
-                        if($tmpName !== null){
+                        if ($tmpName !== null) {
                             $tmpTestNameFlag_AutotestTestPrint = true;
                         }
-                    }
-                    else if(!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint){
+                    } else if(!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
-                        if($tmpName !== null){
+                        if ($tmpName !== null) {
                             $tmpTestNameFlag_TestPrint = true;
                         }
-                    }
-                    else if(!$tmpTestNameFlag_ControlTestPrint){
+                    } else if(!$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogControlPrint($log);
-                        if($tmpName !== null){
+                        if ($tmpName !== null) {
                             $tmpTestNameFlag_ControlTestPrint = true;
                             $testNameFound = true;
                         }
                     }
 
-                    if($tmpName !== null){
+                    if ($tmpName !== null) {
                         $testName = $tmpName;
                     }
                 }
@@ -549,31 +571,29 @@ class LogBookUploaderController extends Controller
                 $testEndTime = max($testEndTime, $log->getLogTime());
                 /** **/
                 $counter++;
-            }
-            else{
-                if($counter > 0){
-                    echo count($oneLine) .  " $value:<pre>";
+            } else {
+                if ($counter > 0) {
+                    echo \count($oneLine) . ' '.   $value . ':<pre>';
                     print_r($oneLine);
-                    echo "</pre><br/>";
+                    echo '</pre><br/>';
                 }
             }
         }
         /**
          * Test Verdict section
          */
-        if($testVerdict !== null){
+        if ($testVerdict !== null) {
             $test->setVerdict($testVerdict);
-        }
-        else{
-            $test->setVerdict($this->parseVerdict("ERROR"));
+        } else {
+            $test->setVerdict($this->parseVerdict('ERROR'));
         }
         $test->setTimeStart($testStartTime);
         $test->setTimeEnd($testEndTime);
-        if($testName !== null && strlen($testName) > 0) {
+        if ($testName !== null && \strlen($testName) > 0) {
             $test->setName($testName);
         }
         $this->em->flush();
-        foreach ($objectsToClear as $obj){
+        foreach ($objectsToClear as $obj) {
             $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         }
 
@@ -585,10 +605,11 @@ class LogBookUploaderController extends Controller
      * @param string $input
      * @return LogBookVerdict
      */
-    protected function parseVerdict(string $input) : LogBookVerdict{
+    protected function parseVerdict(string $input): LogBookVerdict
+    {
         $input = strtolower(trim($input));
         $criteria['name'] = strtoupper($input);
-        switch ($input){
+        switch ($input) {
             case 'pass':
                 $ret = $this->verdictRepo->findOneOrCreate($criteria);
                 break;
@@ -611,7 +632,7 @@ class LogBookUploaderController extends Controller
                 $ret = $this->verdictRepo->findOneOrCreate($criteria);
                 break;
             default:
-                $ret = $this->verdictRepo->findOneOrCreate($criteria);
+                //$ret = $this->verdictRepo->findOneOrCreate($criteria);
                 $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'UNKNOWN'));
                 break;
         }
@@ -624,18 +645,18 @@ class LogBookUploaderController extends Controller
      * @param bool $includeVersion
      * @return null|string
      */
-    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true){
+    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true): ?string
+    {
         $ret = null;
         preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)]*)\]\s*\(ver\.\s*(\d+\.?\d*)\,/', $log->getMessage(), $possibleName);
-        if(count($possibleName) == 3){
+        if (\count($possibleName) === 3) {
             $dirty = $possibleName[0];
             $testName = $possibleName[1];
             $testVersion = $possibleName[2];
-            if (strlen($dirty) > 0 && strlen($testName) > 0 && strlen($testVersion) > 0) {
-                if($includeVersion){
-                    $ret = $testName . " " . $testVersion;
-                }
-                else{
+            if (\strlen($dirty) > 0 && \strlen($testName) > 0 && \strlen($testVersion) > 0) {
+                if ($includeVersion) {
+                    $ret = $testName . ' ' . $testVersion;
+                } else {
                     $ret = $testName;
                 }
             }
@@ -650,18 +671,18 @@ class LogBookUploaderController extends Controller
      * @param bool $includeVersion
      * @return null|string
      */
-    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true){
+    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true): ?string
+    {
         $ret = null;
         preg_match('/\=+\s*Initialize\s*(.*)\s*test\s*\(ver\.\s*(\d+\.?\d*)\)/', $log->getMessage(), $possibleName);
-        if(count($possibleName) == 3){
+        if (\count($possibleName) === 3) {
             $dirty = $possibleName[0];
             $testName = $possibleName[1];
             $testVersion = $possibleName[2];
-            if (strlen($dirty) > 0 && strlen($testName) > 0 && strlen($testVersion) > 0) {
-                if($includeVersion){
-                    $ret = $testName . " " . $testVersion;
-                }
-                else{
+            if (\strlen($dirty) > 0 && \strlen($testName) > 0 && \strlen($testVersion) > 0) {
+                if ($includeVersion) {
+                    $ret = $testName . ' ' . $testVersion;
+                } else {
                     $ret = $testName;
                 }
             }
@@ -673,15 +694,16 @@ class LogBookUploaderController extends Controller
     /**
      * Used to parse Autotest print of test start, grup test name
      * @param LogBookMessage $log
-     * @return null
+     * @return null|string
      */
-    protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log){
+    protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log): ?string
+    {
         $ret = null;
         preg_match('/START\s*([\w\.\/]*)\s*/', $log->getMessage(), $possibleName);
-        if(count($possibleName) == 2){
+        if (\count($possibleName) === 2) {
             $dirty = $possibleName[0];
             $testName = $possibleName[1];
-            if (strlen($dirty) > 0 && strlen($testName) > 0 ) {
+            if (\strlen($dirty) > 0 && \strlen($testName) > 0 ) {
                 $ret = $testName;
             }
         }
@@ -691,38 +713,33 @@ class LogBookUploaderController extends Controller
     /**
      * Convert string time to object DateTime
      * @param string $input
-     * @param int $SHORT_TIME_LEN The length of string without Day and month
      * @return \DateTime
      */
-    protected function getLogTime(string $input) : \DateTime{
-        $tmp_time = $this->clean_string($input);
-        $len = strlen($tmp_time);
+    protected function getLogTime(string $input): \DateTime
+    {
+        $tmp_time = $this->cleanString($input);
+        $len = \strlen($tmp_time);
         $timeFormat = 'U.u';
         $ret = \DateTime::createFromFormat('U', time());
 
-        if($len == $this->_MEDIUM_TIME_LEN){
+        if ($len === $this->_MEDIUM_TIME_LEN) {
             $timeFormat = 'm/d H:i:s';
-        }
-        else if($len == $this->_SHORT_TIME_LEN) {
+        } else if ($len === $this->_SHORT_TIME_LEN) {
             $timeFormat = 'H:i:s';
-        }
-        else if($len == $this->_SHORT_MILISEC_TIME_LEN){
+        } else if ($len === $this->_SHORT_MILISEC_TIME_LEN) {
             $timeFormat = 'H:i:s.u';
-        }
-        else if($len == $this->_MEDIUM_MILISEC_TIME_LEN){
+        } else if ($len === $this->_MEDIUM_MILISEC_TIME_LEN) {
             $timeFormat = 'm/d H:i:s.u';
-        }
-        else{
+        } else {
             $try_format = new DateTime($tmp_time);
             $tmp_time = $try_format->format('U.u');
         }
 
         try{
             $ret = \DateTime::createFromFormat($timeFormat, $tmp_time);
-        }
-        catch (\Exception $ex){
-            print_r($ex);
-            exit();
+        } catch (\Exception $ex) {
+//            print_r($ex);
+//            exit();
         }
         return $ret;
     }
@@ -732,14 +749,14 @@ class LogBookUploaderController extends Controller
      * @param string $debugLevel
      * @return string
      */
-    protected function prepareDebugLevel(string $debugLevel) : string {
+    protected function prepareDebugLevel(string $debugLevel): string
+    {
         //Get debug level message, convert to upper case
-        $ret = strtoupper($this->clean_string($debugLevel));
-        if($ret == 'WARNI'){
-            $ret = "WARNING";
-        }
-        elseif($ret == 'CRITI'){
-            $ret = "CRITICAL";
+        $ret = strtoupper($this->cleanString($debugLevel));
+        if ($ret === 'WARNI') {
+            $ret = 'WARNING';
+        } else if($ret === 'CRITI') {
+            $ret = 'CRITICAL';
         }
         return $ret;
     }
@@ -749,9 +766,10 @@ class LogBookUploaderController extends Controller
      * @param $string
      * @return string
      */
-    protected function clean_string(string $string) : string {
+    protected function cleanString(string $string): string
+    {
         $s = trim($string);
-        //$s = iconv("UTF-8", "UTF-8//IGNORE", $s); // drop all non utf-8 characters
+        //$s = iconv('UTF-8', 'UTF-8//IGNORE', $s); // drop all non utf-8 characters
         // this is some bad utf-8 byte sequence that makes mysql complain - control and formatting i think
         $s = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/', ' ', $s);
         //$s = preg_replace('/\s+/', ' ', $s); // reduce all multiple whitespace to a single space
@@ -776,9 +794,9 @@ class LogBookUploaderController extends Controller
     /**
      * @return string
      */
-    private function generateUniqueFileName() : string
+    private function generateUniqueFileName(): string
     {
         // md5() reduces the similarity of the file names generated by uniqid(), which is based on timestamps
-        return md5(uniqid());
+        return md5(uniqid('', true));
     }
 }

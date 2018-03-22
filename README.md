@@ -7,12 +7,31 @@ For upload can be used curl with post log file.
 - max_upload_file_size
 - max_execution_time
 
+Add this to your /etc/apache/sites-avaliable/site.name.conf
+~~~ apacheconf
+<Directory /var/www/logbook/public >
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+                Allow from All
+        <IfModule mod_rewrite.c>
+            Options -MultiViews
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(.*)$ index.php [QSA,L]
+        </IfModule>
+        </Directory>
+~~~
+
 ## MySQL
 
+~~~ bash
 # A larger buffer pool requires less disk I/O to access the same table data more than once.
 # On a dedicated database server, you might set the buffer pool size to 80% of the machine's
 # physical memory size. Be aware of the following potential issues when configuring buffer pool size,
 # and be prepared to scale back the size of the buffer pool if necessary.
+~~~
 ~~~
 innodb_buffer_pool_size     = 16G
 
@@ -67,26 +86,10 @@ Used **jenkins** server
 [Andrey Shamis](https://github.com/AndreyShamis) lolnik@gmail.com
 @AndreyShamis
 
-## Apache
-~~~
-<Directory /var/www/lbook/public >
-                Options Indexes FollowSymLinks MultiViews
-                AllowOverride All
-                Order allow,deny
-                allow from all
-                Allow from All
-        <IfModule mod_rewrite.c>
-            Options -MultiViews
-            RewriteEngine On
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteRule ^(.*)$ index.php [QSA,L]
-        </IfModule>
-        </Directory>
-~~~
-
 ## PSR-12
 https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md
-~~~php
+
+~~~ php
 <?php
 
 declare(strict_types=1);

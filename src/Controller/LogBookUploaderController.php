@@ -13,11 +13,11 @@ use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use App\Utils\RandomName;
+use App\Form\LogBookUploadType;
 
 /**
  * Uploader controller.
@@ -82,23 +82,6 @@ class LogBookUploaderController extends Controller
         } else {
             $executionOrder = 0;
         }
-        /**
-         * Find proper execution order | Incorrect Way
-         */
-//        $cycleTestsCount = $this->testsRepo->count(array('cycle' => $cycle->getId()));
-//        $executionOrderFound = false;
-//        $executionOrder = $cycleTestsCount;
-//        while (!$executionOrderFound) {
-//            $count = $this->testsRepo->count(array(
-//                'cycle' => $cycle->getId(),
-//                'executionOrder' => $executionOrder,
-//            ));
-//            if ($count > 0) {
-//                $executionOrder++;
-//            } else {
-//                $executionOrderFound = true;
-//            }
-//        }
         return $executionOrder;
     }
 
@@ -312,13 +295,14 @@ class LogBookUploaderController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
     public function newAction(Request $request)
     {
         //curl --max-time 120 --form file=@autoserv.DEBUG --form executionID=2602161043 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
         $obj = new LogBookUpload();
-        $form = $this->createForm('App\Form\LogBookUploadType', $obj);
+        $form = $this->createForm(LogBookUploadType::class, $obj);
         $form->handleRequest($request);
         $setup = null;
         if ($form->isSubmitted() && $form->isValid()) {
@@ -414,7 +398,6 @@ class LogBookUploaderController extends Controller
             }
             unset($temp_arr[$key]);
         }
-        unset($temp_arr);
 
         return $newTempArr;
     }
@@ -482,7 +465,6 @@ class LogBookUploaderController extends Controller
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
             if (\count($oneLine[2]) > 0) {
-                $dLevel = null;
                 /** Clean double DEBUG OUTPUT **/
                 //Removing : base_job:0395 utils:0262 ssh_host:0116
                 preg_match('/([\w|\_]*\:\d+\s*)\|\s*(.*)/s', $oneLine[3][0], $messageWithDebug);

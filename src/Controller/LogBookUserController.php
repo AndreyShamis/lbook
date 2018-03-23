@@ -56,7 +56,9 @@ class LogBookUserController extends Controller
      * @param LogBookUser $obj
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -69,7 +71,6 @@ class LogBookUserController extends Controller
             'current_user' => $current_user,
             'can_change_permissions' => $can_change_permissions,
         ));
-        //$editForm = $this->createForm('App\Form\LogBookUserType', $obj);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

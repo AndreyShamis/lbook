@@ -6,15 +6,13 @@ use App\Entity\LogBookSetup;
 use App\Entity\LogBookUser;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
 class LogBookSetupVoter extends Voter
 {
-    // these strings are just invented: you can use anything
-    const VIEW = 'view';
-    const EDIT = 'edit';
-    const DELETE = 'delete';
+    protected const VIEW = 'view';
+    protected const EDIT = 'edit';
+    protected const DELETE = 'delete';
 
     private $decisionManager;
 
@@ -32,10 +30,10 @@ class LogBookSetupVoter extends Voter
      * @param mixed $subject
      * @return bool
      */
-    protected function supports($attribute, $subject)
+    protected function supports($attribute, $subject): bool
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE))) {
+        if (!\in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE), true)) {
             return false;
         }
 
@@ -45,7 +43,6 @@ class LogBookSetupVoter extends Voter
         }
 
         return true;
-
     }
 
     /**
@@ -53,8 +50,9 @@ class LogBookSetupVoter extends Voter
      * @param mixed $subject
      * @param TokenInterface $token
      * @return bool
+     * @throws \LogicException
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
@@ -90,13 +88,14 @@ class LogBookSetupVoter extends Voter
      * @param LogBookUser $user
      * @return bool
      */
-    private function canView(LogBookSetup $setup, LogBookUser $user)
+    private function canView(LogBookSetup $setup, LogBookUser $user): bool
     {
         if(!$setup->isPrivate()){
             return true;
         }
+
         // if they can edit, they can view
-        else if ($this->canEdit($setup, $user)) {
+        if ($this->canEdit($setup, $user)) {
             return true;
         }
         return false;
@@ -107,7 +106,7 @@ class LogBookSetupVoter extends Voter
      * @param LogBookUser $user
      * @return bool
      */
-    private function canEdit(LogBookSetup $setup, LogBookUser $user)
+    private function canEdit(LogBookSetup $setup, LogBookUser $user): bool
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
@@ -119,11 +118,10 @@ class LogBookSetupVoter extends Voter
      * @param LogBookUser $user
      * @return bool
      */
-    private function canDelete(LogBookSetup $setup, LogBookUser $user)
+    private function canDelete(LogBookSetup $setup, LogBookUser $user): bool
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
         return $user === $setup->getOwner();
-        //return $this->canEdit($setup, $user);
     }
 }

@@ -21,7 +21,6 @@ final class RandomString
      * @param int $length
      * @param bool $useSpecial
      * @return String
-     * @throws \Exception
      */
     public static function generateRandomString($length = 20, $useSpecial = false): string
     {
@@ -37,7 +36,11 @@ final class RandomString
         $charsSize = \strlen($chars);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $chars[random_int(0, $charsSize - 1)];
+            try {
+                $randomString .= $chars[random_int(0, $charsSize - 1)];
+            } catch (\Exception $e) {
+                $randomString .= $i;
+            }
         }
         return $randomString;
     }
@@ -60,7 +63,6 @@ final class RandomString
     /**
      * @param int $length
      * @return String
-     * @throws \Exception
      */
     public static function generateRandomStringRange($length = 20): string
     {
@@ -68,7 +70,11 @@ final class RandomString
         $key = '';
         $charsSize = \count($keys);
         for ($i=0; $i < $length; $i++) {
-            $key .= $keys[random_int(0, $charsSize - 1)];
+            try {
+                $key .= $keys[random_int(0, $charsSize - 1)];
+            } catch (\Exception $e) {
+                $key .= $i;
+            }
         }
         return $key;
     }

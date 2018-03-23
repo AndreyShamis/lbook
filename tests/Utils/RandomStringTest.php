@@ -11,8 +11,8 @@ class RandomStringTest extends TestCase
     {
         $chars = str_split(RandomString::$special);
         $specialFound = false;
-        foreach ($chars as $char){
-            if(strpos($value, $char) !== false){
+        foreach ($chars as $char) {
+            if (strpos($value, $char) !== false) {
                 $specialFound = true;
                 break;
             }
@@ -20,92 +20,92 @@ class RandomStringTest extends TestCase
         return $specialFound;
     }
 
-    public function testGenerateRandomString()
+    public function testGenerateRandomString(): void
     {
         $length = 1200;
         $value1 = RandomString::generateRandomString($length);
-        $this->assertEquals($length, strlen($value1));
-        $this->assertTrue($this->findSpecial($value1) === false);
+        $this->assertEquals($length, \strlen($value1));
+        $this->assertFalse($this->findSpecial($value1));
 
         $value2 = RandomString::generateRandomString($length);
-        $this->assertEquals($length, strlen($value2));
-        $this->assertTrue($this->findSpecial($value2) === false);
+        $this->assertEquals($length, \strlen($value2));
+        $this->assertFalse($this->findSpecial($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringWithSpecial()
+    public function testGenerateRandomStringWithSpecial(): void
     {
         $length = 1200;
         $value1 = RandomString::generateRandomString($length, true);
-        $this->assertEquals($length, strlen($value1));
+        $this->assertEquals($length, \strlen($value1));
         $this->assertTrue($this->findSpecial($value1));
 
         $value2 = RandomString::generateRandomString($length, true);
-        $this->assertEquals($length, strlen($value2));
+        $this->assertEquals($length, \strlen($value2));
         $this->assertTrue($this->findSpecial($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringShuffle()
+    public function testGenerateRandomStringShuffle(): void
     {
         $length = 1200;
         $value1 = RandomString::generateRandomStringShuffle($length);
-        $this->assertEquals($length, strlen($value1));
-        $this->assertTrue($this->findSpecial($value1) === false);
+        $this->assertEquals($length, \strlen($value1));
+        $this->assertFalse($this->findSpecial($value1));
 
         $value2 = RandomString::generateRandomStringShuffle($length);
-        $this->assertEquals($length, strlen($value2));
-        $this->assertTrue($this->findSpecial($value2) === false);
+        $this->assertEquals($length, \strlen($value2));
+        $this->assertFalse($this->findSpecial($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringShuffleWithSpecial()
+    public function testGenerateRandomStringShuffleWithSpecial(): void
     {
         $length = 1200;
         $value1 = RandomString::generateRandomStringShuffle($length, true);
-        $this->assertEquals($length, strlen($value1));
+        $this->assertEquals($length, \strlen($value1));
         $this->assertTrue($this->findSpecial($value1));
 
         $value2 = RandomString::generateRandomStringShuffle($length, true);
-        $this->assertEquals($length, strlen($value2));
+        $this->assertEquals($length, \strlen($value2));
         $this->assertTrue($this->findSpecial($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringRange()
+    public function testGenerateRandomStringRange(): void
     {
         $length = 120;
         $value1 = RandomString::generateRandomStringRange($length);
         $value2 = RandomString::generateRandomStringRange($length);
-        $this->assertEquals($length, strlen($value1));
-        $this->assertEquals($length, strlen($value2));
+        $this->assertEquals($length, \strlen($value1));
+        $this->assertEquals($length, \strlen($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringSha1()
+    public function testGenerateRandomStringSha1(): void
     {
         $length = 120;
         $value1 = RandomString::generateRandomStringSha1($length);
         $value2 = RandomString::generateRandomStringSha1($length);
-        $this->assertEquals($length, strlen($value1));
-        $this->assertEquals($length, strlen($value2));
+        $this->assertEquals($length, \strlen($value1));
+        $this->assertEquals($length, \strlen($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 
-    public function testGenerateRandomStringMd5()
+    public function testGenerateRandomStringMd5(): void
     {
         $length = 120;
         $value1 = RandomString::generateRandomStringMd5($length);
         $value2 = RandomString::generateRandomStringMd5($length);
-        $this->assertEquals($length, strlen($value1));
-        $this->assertEquals($length, strlen($value2));
+        $this->assertEquals($length, \strlen($value1));
+        $this->assertEquals($length, \strlen($value2));
 
-        $this->assertTrue($value1 != $value2);
+        $this->assertNotEquals($value1, $value2);
     }
 }

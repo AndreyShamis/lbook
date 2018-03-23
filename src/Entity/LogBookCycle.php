@@ -27,7 +27,7 @@ class LogBookCycle
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="cycle", cascade={"all"}, fetch="EXTRA_LAZY")
@@ -124,7 +124,7 @@ class LogBookCycle
      *
      * @ORM\Column(name="upload_token", type="string", length=255, options={"default"=""})
      */
-    protected $uploadToken = "";
+    protected $uploadToken = '';
 
     /**
      * @var DateTime Time till token can be used
@@ -173,7 +173,10 @@ class LogBookCycle
         $this->setUpdatedAt();
         $this->setCreatedAt();
         $this->setTokenExpiration(new \DateTime('+7 days'));
-        $this->setUploadToken(RandomString::generateRandomString(50));
+        try {
+            $this->setUploadToken(RandomString::generateRandomString(50));
+        } catch (\Exception $e) {
+        }
     }
 
     /**
@@ -276,7 +279,7 @@ class LogBookCycle
     /**
      * @PreFlush
      */
-    public function unsetDirty()
+    public function unsetDirty(): void
     {
         $this->setDirty(false);
     }

@@ -31,14 +31,14 @@ class LogBookSetup
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank(message="Test Verdict name cannot ne empty")
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="name_shown", type="string", length=50, nullable=true)
      */
-    protected $nameShown = "";
+    protected $nameShown = '';
 
     /**
      * @var bool
@@ -201,11 +201,11 @@ class LogBookSetup
      */
     public function getNameShown(): ?string
     {
-        if (strlen($this->nameShown)>0) {
+        if (\strlen($this->nameShown)>0) {
             return $this->nameShown;
-        } else {
-            return $this->getName();
         }
+
+        return $this->getName();
     }
 
     /**
@@ -233,7 +233,7 @@ class LogBookSetup
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getOs()
     {
@@ -243,7 +243,7 @@ class LogBookSetup
     /**
      * @return string
      */
-    public function getOsStr()
+    public function getOsStr(): string
     {
         return OsType::getTypeName($this->getOs());
     }

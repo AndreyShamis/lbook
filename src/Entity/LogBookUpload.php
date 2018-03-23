@@ -17,7 +17,7 @@ class LogBookUpload
      */
     private $id;
 
-    protected $message="";
+    protected $message='';
     /**
      *
      * @Assert\NotBlank(message="Please, upload the log file as a DEBUG or INFO format file.")
@@ -39,14 +39,14 @@ class LogBookUpload
     /**
      * @param string $message
      */
-    public function addMessage(string $message)
+    public function addMessage(string $message): void
     {
         $this->message = $this->message . "\n" . $message;
     }
     /**
      * @param string $message
      */
-    public function setMessage(string $message)
+    public function setMessage(string $message): void
     {
         $this->message = $message;
     }

@@ -1,7 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
  * User: Andrey Shamis
+ * email: lolnik@gmail.com
  * Date: 17/02/18
  * Time: 08:28
  */
@@ -11,7 +11,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class LogBookDefaultController extends Controller
 {
@@ -22,15 +22,13 @@ class LogBookDefaultController extends Controller
      * @Route("/", name="home_index")
      * @Method("GET")
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
-    public function index()
+    public function index(): Response
     {
         $em = $this->getDoctrine()->getManager();
-
-        //$cycles = $em->getRepository('App:LogBookCycle')->findAll();
         $setups = $em->getRepository('App:LogBookSetup')->findAll();
         return $this->render('lbook/default/index.html.twig', array(
-//            'cycles' => $cycles,
             'setups' => $setups,
         ));
     }
@@ -40,7 +38,8 @@ class LogBookDefaultController extends Controller
      * @param \Swift_Mailer $mailer
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function emailExample(\Swift_Mailer $mailer){
+    public function emailExample(\Swift_Mailer $mailer): Response
+    {
 
         $message = (new \Swift_Message('Hello Email'))
             ->setFrom('hicam.golda@gmail.com')
@@ -49,7 +48,7 @@ class LogBookDefaultController extends Controller
                 $this->renderView(
                 // templates/emails/registration.html.twig
                     'lbook/email/test.html.twig',
-                    array('name' => "Test Name")
+                    array('name' => 'Test Name')
                 ),
                 'text/html'
             )

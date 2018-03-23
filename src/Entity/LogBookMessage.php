@@ -26,7 +26,7 @@ class LogBookMessage
      * @ORM\Column(name="message", type="string", length=4294967295)
      * @Assert\NotBlank(message="test log cannot be blank, please provide message")
      */
-    protected $message = "";
+    protected $message = '';
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookMessageType", cascade={"persist"})

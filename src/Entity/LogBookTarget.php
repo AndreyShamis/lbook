@@ -24,7 +24,7 @@ class LogBookTarget
      *
      * @ORM\Column(name="name", type="string", length=50, options={"default"=""})
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @var boolean

@@ -3,16 +3,17 @@
 namespace App\Repository;
 
 use App\Entity\LogBookUser;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class LogBookUserRepository extends EntityRepository implements UserLoaderInterface
+class LogBookUserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
-//    public function __construct(RegistryInterface $registry)
-//    {
-//        parent::__construct($registry, LogBookUser::class);
-//    }
+    public function __construct(RegistryInterface $registry)
+    {
+        parent::__construct($registry, LogBookUser::class);
+    }
 
     /**
      * Loads the user for the given username.
@@ -38,11 +39,11 @@ class LogBookUserRepository extends EntityRepository implements UserLoaderInterf
      * @param array $criteria
      * @return LogBookUser
      */
-    public function create(array $criteria)
+    public function create(array $criteria): LogBookUser
     {
         $criteria['username'] = strtolower($criteria['username']);
 
-        $entity = $this->findOneBy(array("username" => $criteria['username']));
+        $entity = $this->findOneBy(array('username' => $criteria['username']));
 
         if (null === $entity) {
             $entity = new LogBookUser();

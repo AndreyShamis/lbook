@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
+use App\Repository\LogBookUserRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,19 +21,13 @@ class LogBookUserController extends Controller
 {
     /**
      * @Route("/", name="user_index")
-     * @throws \LogicException
+     * @param LogBookUserRepository $logBookUserRepository
+     * @return Response
      */
-    public function index()
+    public function index(LogBookUserRepository $logBookUserRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $users = $em->getRepository('App:LogBookUser')->findAll();
-
-        return $this->render('lbook/user/index.html.twig', array(
-            'users' => $users,
-        ));
+        return $this->render('lbook/user/index.html.twig', ['users' => $logBookUserRepository->findAll()]);
     }
-
 
     /**
      * Finds and displays a Users  entity.
@@ -61,8 +56,7 @@ class LogBookUserController extends Controller
      * @param LogBookUser $obj
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
     {

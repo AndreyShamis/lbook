@@ -25,7 +25,7 @@ class LogBookBuild
      *
      * @ORM\Column(name="name", type="string", length=255, options={"default"=""})
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @return mixed

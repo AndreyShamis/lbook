@@ -36,6 +36,8 @@ class PagePaginator
         $paginator = new Paginator($dql);
         $paginator->getQuery()
             ->setFirstResult($limit * ($page - 1)) // Offset
+            //->useQueryCache(true) // Defines whether the query should make use of a query cache, if available.
+            //->useResultCache(true) // Set whether or not to cache the results of this query and if so, for how long and which ID to use for the cache entry.
             ->setMaxResults($limit); // Limit
         return $paginator;
     }

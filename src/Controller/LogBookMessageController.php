@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\LogBookMessageType;
+use App\Form\LogBookMessageType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\LogBookMessage;
+use App\Repository\LogBookMessageRepository;
+use App\Service\PagePaginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
 
 /**
  * Log controller.
@@ -21,60 +21,28 @@ use Doctrine\ORM\Query;
  */
 class LogBookMessageController extends Controller
 {
-    /**
-     * Paginator Helper
-     *
-     * Pass through a query object, current page & limit
-     * the offset is calculated from the page and limit
-     * returns an `Paginator` instance, which you can call the following on:
-     *
-     *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
-     *     $paginator->count() # Count of ALL posts (ie: `20` posts)
-     *     $paginator->getIterator() # ArrayIterator
-     *
-     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
-     * @param integer            $page  Current page (defaults to 1)
-     * @param integer            $limit The total number per page (defaults to 5)
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function paginate($dql, $page = 1, $limit = 20)
-    {
-        $paginator = new Paginator($dql);
-        $paginator->getQuery()
-            ->setFirstResult($limit * ($page - 1)) // Offset
-            ->setMaxResults($limit); // Limit
-        return $paginator;
-    }
+    protected $index_size = 2000;
 
     /**
      * @Route("/page/{page}", name="log_index")
      * @Method("GET")
      * @Template(template="lbook/log/index.html.twig")
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookMessageRepository $logRepo
      * @return Response
      */
-    public function index($page = 1)
+    public function index($page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $limit = 1000;
-        $logs = $em->getRepository('App:LogBookMessage');
-        $paginator = $this->paginate($logs->createQueryBuilder('t'), $page, $limit);
-        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
+        set_time_limit(30);
 
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
-        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
-
-        $maxPages = ceil($totalPosts / $limit);
-        $thisPage = $page;
+        $paginator = $pagePaginator->paginate($logRepo->createQueryBuilder('t'), $page, $this->index_size);
+        $totalPosts = $paginator->count();
         return $this->render('lbook/log/index.html.twig', array(
-            //'logs'     => $logs,
             'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
+            'maxPages'  => ceil($totalPosts / $this->index_size),
+            'thisPage'  => $page,
+            'iterator'  => $paginator->getIterator(),
             'paginator' => $paginator,
         ));
     }
@@ -86,11 +54,12 @@ class LogBookMessageController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function newAction(Request $request)
     {
         $obj = new LogBookMessage();
-        $form = $this->createForm('App\Form\LogBookMessageType', $obj);
+        $form = $this->createForm(LogBookMessageType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -115,10 +84,9 @@ class LogBookMessageController extends Controller
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookMessage $obj)
+    public function show(LogBookMessage $obj): Response
     {
         $deleteForm = $this->createDeleteForm($obj);
-
         return $this->render('lbook/log/show.html.twig', array(
             'log' => $obj,
             'delete_form' => $deleteForm->createView(),
@@ -133,11 +101,12 @@ class LogBookMessageController extends Controller
      * @param Request $request
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
-    public function editAction(Request $request, LogBookMessage $obj)
+    public function edit(Request $request, LogBookMessage $obj)
     {
         $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm('App\Form\LogBookMessageType', $obj);
+        $editForm = $this->createForm(LogBookMessageType::class, $obj);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -161,8 +130,9 @@ class LogBookMessageController extends Controller
      * @param Request $request
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \LogicException
      */
-    public function deleteAction(Request $request, LogBookMessage $obj)
+    public function delete(Request $request, LogBookMessage $obj): RedirectResponse
     {
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
@@ -188,7 +158,6 @@ class LogBookMessageController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('log_delete', array('id' => $obj->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-            ;
+            ->getForm();
     }
 }

@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\LogBookVerdict;
+use App\Form\LogBookVerdictType;
+use App\Repository\LogBookVerdictRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\LogBookVerdictType;
 
 /**
  * Verdict controller.
@@ -18,23 +19,16 @@ use App\Form\LogBookVerdictType;
  */
 class LogBookVerdictController extends Controller
 {
-
     /**
      * Lists all verdict entities.
      *
      * @Route("/", name="verdict_index")
-     * @Method("GET")
-     * @throws \LogicException
+     * @param LogBookVerdictRepository $logBookVerdictRepository
+     * @return Response
      */
-    public function index()
+    public function index(LogBookVerdictRepository $logBookVerdictRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $verdicts = $em->getRepository('App:LogBookVerdict')->findAll();
-
-        return $this->render('lbook/verdict/index.html.twig', array(
-            'verdicts' => $verdicts,
-        ));
+        return $this->render('lbook/verdict/index.html.twig', ['verdicts' => $logBookVerdictRepository->findAll()]);
     }
 
     /**

@@ -7,7 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use App\Form\LogBookVerdictType;
 
 /**
  * Verdict controller.
@@ -22,6 +24,7 @@ class LogBookVerdictController extends Controller
      *
      * @Route("/", name="verdict_index")
      * @Method("GET")
+     * @throws \LogicException
      */
     public function index()
     {
@@ -41,11 +44,12 @@ class LogBookVerdictController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
     public function newAction(Request $request)
     {
         $obj = new LogBookVerdict();
-        $form = $this->createForm('App\Form\LogBookVerdictType', $obj);
+        $form = $this->createForm(LogBookVerdictType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -70,7 +74,7 @@ class LogBookVerdictController extends Controller
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookVerdict $obj)
+    public function showAction(LogBookVerdict $obj): Response
     {
         $deleteForm = $this->createDeleteForm($obj);
 
@@ -88,11 +92,12 @@ class LogBookVerdictController extends Controller
      * @param Request $request
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
     public function editAction(Request $request, LogBookVerdict $obj)
     {
         $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm('App\Form\LogBookVerdictType', $obj);
+        $editForm = $this->createForm(LogBookVerdictType::class, $obj);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -116,8 +121,9 @@ class LogBookVerdictController extends Controller
      * @param Request $request
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
-    public function deleteAction(Request $request, LogBookVerdict $obj)
+    public function deleteAction(Request $request, LogBookVerdict $obj): RedirectResponse
     {
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);

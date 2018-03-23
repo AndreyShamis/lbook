@@ -26,7 +26,7 @@ class LogBookVerdict
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank(message="Test Verdict name cannot ne empty")
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @return mixed

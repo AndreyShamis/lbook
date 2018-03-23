@@ -7,14 +7,13 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class LogBookUserVoter extends Voter
 {
     // these strings are just invented: you can use anything
-    const VIEW = 'view';
-    const EDIT = 'edit';
-    const DELETE = 'delete';
+    protected const VIEW = 'view';
+    protected const EDIT = 'edit';
+    protected const DELETE = 'delete';
 
     private $decisionManager;
 
@@ -32,10 +31,10 @@ class LogBookUserVoter extends Voter
      * @param mixed $subject
      * @return bool
      */
-    protected function supports($attribute, $subject)
+    protected function supports($attribute, $subject): bool
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE))) {
+        if (!\in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE), true)) {
             return false;
         }
 
@@ -45,7 +44,6 @@ class LogBookUserVoter extends Voter
         }
 
         return true;
-
     }
 
     /**
@@ -53,8 +51,9 @@ class LogBookUserVoter extends Voter
      * @param mixed $subject
      * @param TokenInterface $token
      * @return bool
+     * @throws \LogicException
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $logedin_user = $token->getUser();
 
@@ -71,7 +70,6 @@ class LogBookUserVoter extends Voter
         if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN'))) {
             return true;
         }
-
 
         switch ($attribute) {
             case self::VIEW:
@@ -90,7 +88,7 @@ class LogBookUserVoter extends Voter
      * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canView(LogBookUser $edited_user, LogBookUser $logedin_user)
+    private function canView(LogBookUser $edited_user, LogBookUser $logedin_user): bool
     {
 //        if (!$edited_user->isPrivate()) {
 //            return true;
@@ -106,15 +104,15 @@ class LogBookUserVoter extends Voter
      * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canEdit(LogBookUser $edited_user, LogBookUser $logedin_user)
+    private function canEdit(LogBookUser $edited_user, LogBookUser $logedin_user): bool
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
         /** @var PersistentCollection $logedin_user_roles */
         $logedin_user_roles = $logedin_user->getRoles();
         return $logedin_user->getId() === $edited_user->getId()
-            || in_array('ROLE_ADMIN', $logedin_user_roles)
-            || in_array('ROLE_SUPER_ADMIN', $logedin_user_roles);
+            || \in_array('ROLE_ADMIN', (array)$logedin_user_roles, true)
+            || \in_array('ROLE_SUPER_ADMIN', (array)$logedin_user_roles, true);
     }
 
     /**
@@ -122,12 +120,12 @@ class LogBookUserVoter extends Voter
      * @param LogBookUser $logedin_user
      * @return bool
      */
-    private function canDelete(LogBookUser $edited_user, LogBookUser $logedin_user)
+    private function canDelete(LogBookUser $edited_user, LogBookUser $logedin_user): bool
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
         /** @var PersistentCollection $logedin_user_roles */
         $logedin_user_roles = $logedin_user->getRoles();
-        return in_array('ROLE_SUPER_ADMIN', $logedin_user_roles) && !$edited_user->isLdapUser();
+        return \in_array('ROLE_SUPER_ADMIN', (array)$logedin_user_roles, true) && !$edited_user->isLdapUser();
     }
 }

@@ -5,7 +5,6 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -28,7 +27,7 @@ class LogBookTest
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
-    protected $name = "";
+    protected $name = '';
 
     /**
      * @var DateTime
@@ -101,7 +100,7 @@ class LogBookTest
      * //@//Assert\NotBlank(message="Please, provide log file as a DEBUG or INFO format file.")
      * @Assert\File(mimeTypes={"text/plain", "application/octet-stream"}, groups = {"create"})
      */
-    private $logFile = "";
+    private $logFile = '';
     /**
      * @var integer
      * @ORM\Column(name="log_file_size", type="integer", length=11, options={"unsigned"=true})
@@ -136,7 +135,7 @@ class LogBookTest
      * @param string $logFile
      * @return $this
      */
-    public function setLogFile(string $logFile)
+    public function setLogFile(string $logFile): self
     {
         $this->logFile = $logFile;
 
@@ -147,7 +146,7 @@ class LogBookTest
      * @param UploadedFile $file
      * @return $this
      */
-    public function setUploadedFile(UploadedFile $file)
+    public function setUploadedFile(UploadedFile $file): self
     {
         $this->setLogFile($file->getPath());
 
@@ -173,7 +172,7 @@ class LogBookTest
     /**
      * @PreFlush
      */
-    public function calculateRunTime()
+    public function calculateRunTime(): void
     {
         $run_time = abs($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
         $this->setTimeRun($run_time);

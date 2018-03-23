@@ -34,14 +34,13 @@ use App\Entity\LogBookTest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
+use App\Form\LogBookTestType;
 
 /**
  * Test controller.
@@ -50,7 +49,6 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
  */
 class LogBookTestController extends Controller
 {
-
     /**
      * Paginator Helper
      *
@@ -68,7 +66,7 @@ class LogBookTestController extends Controller
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function paginate($dql, $page = 1, $limit = 20)
+    public function paginate($dql, $page = 1, $limit = 20): Paginator
     {
         $paginator = new Paginator($dql);
         $paginator->getQuery()
@@ -85,15 +83,16 @@ class LogBookTestController extends Controller
      * @Template(template="lbook/test/list.html.twig")
      * @param int $page
      * @return array
+     * @throws \LogicException
      */
-    public function listAction($page = 1)
+    public function listAction($page = 1): array
     {
         set_time_limit(10);
         $em = $this->getDoctrine()->getManager();
         $limit = 100;
         $testRepo = $em->getRepository('App:LogBookTest');
         $query = $testRepo->createQueryBuilder('t')
-            ->orderBy('t.id', "DESC");
+            ->orderBy('t.id', 'DESC');
         $paginator = $this->paginate($query, $page, $limit);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
@@ -104,7 +103,6 @@ class LogBookTestController extends Controller
         $maxPages = ceil($totalPosts / $limit);
         $thisPage = $page;
         return array(
-//            'tests'     => $testRepo,
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
@@ -118,6 +116,7 @@ class LogBookTestController extends Controller
      *
      * @Route("/", name="_test_index")
      * @Method("GET")
+     * @throws \LogicException
      */
     public function index()
     {
@@ -126,7 +125,7 @@ class LogBookTestController extends Controller
         $testRepo = $em->getRepository('App:LogBookTest');
         //$query  = $logs->createQueryBuilder('a');
         $query = $testRepo->createQueryBuilder('t')
-            ->orderBy('t.id', "DESC")
+            ->orderBy('t.id', 'DESC')
             ->setMaxResults(300);
         $tests = $query->getQuery()->execute();
         return $this->render('lbook/test/index.html.twig', array(
@@ -142,11 +141,12 @@ class LogBookTestController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function newAction(Request $request)
     {
         $test = new LogBookTest();
-        $form = $this->createForm('App\Form\LogBookTestType', $test);
+        $form = $this->createForm(LogBookTestType::class, $test);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -171,9 +171,9 @@ class LogBookTestController extends Controller
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookTest $test=null)
+    public function showAction(LogBookTest $test = null): ?Response
     {
-        try{
+        try {
 
             $deleteForm = $this->createDeleteForm($test);
 
@@ -182,7 +182,7 @@ class LogBookTestController extends Controller
                 'delete_form' => $deleteForm->createView(),
             ));
         }
-        catch (\Throwable $ex){
+        catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
     }
@@ -193,11 +193,12 @@ class LogBookTestController extends Controller
      * @Route("/{id}/page/{page}", name="test_show")
      * @Method("GET")
      * @param LogBookTest $test
+     * @param int $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookTest $test=null, $page=1)
+    public function showFullAction(LogBookTest $test = null, $page = 1): ?Response
     {
-        try{
+        try {
 
             $em = $this->getDoctrine()->getManager();
             $limit = 500;
@@ -224,7 +225,7 @@ class LogBookTestController extends Controller
                 'delete_form'   => $deleteForm->createView(),
             ));
         }
-        catch (\Throwable $ex){
+        catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
     }
@@ -234,29 +235,27 @@ class LogBookTestController extends Controller
      * @param \Throwable $ex
      * @return Response
      */
-    protected function testNotFound(LogBookTest $test=null, \Throwable $ex){
+    protected function testNotFound(LogBookTest $test=null, \Throwable $ex): Response
+    {
         global $request;
         $possibleId = 0;
-        try{
+        try {
             $possibleId = $request->attributes->get('id');
+        } catch (\Exception $ex) {
         }
-        catch (\Exception $ex){
-
-        }
-        if($test === null){
+        if ($test === null) {
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Test with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
             ));
         }
-        else{
-            return $this->render('lbook/404.html.twig', array(
-                'short_message' => 'Unknown error',
-                'message' => $ex->getMessage(),
-                'ex' => $ex,
-            ));
-        }
+
+        return $this->render('lbook/404.html.twig', array(
+            'short_message' => 'Unknown error',
+            'message' => $ex->getMessage(),
+            'ex' => $ex,
+        ));
     }
 
     /**
@@ -267,12 +266,13 @@ class LogBookTestController extends Controller
      * @param Request $request
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
     public function editAction(Request $request, LogBookTest $test)
     {
         $this->denyAccessUnlessGranted('edit', $test->getCycle()->getSetup());
         $deleteForm = $this->createDeleteForm($test);
-        $editForm = $this->createForm('App\Form\LogBookTestType', $test);
+        $editForm = $this->createForm(LogBookTestType::class, $test);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -298,11 +298,12 @@ class LogBookTestController extends Controller
      * @param Request $request
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function deleteAction(Request $request, LogBookTest $test)
     {
-        $this->denyAccessUnlessGranted('delete', $test->getCycle()->getSetup());
-        try{
+        try {
+            $this->denyAccessUnlessGranted('delete', $test->getCycle()->getSetup());
             $form = $this->createDeleteForm($test);
             $form->handleRequest($request);
 
@@ -315,8 +316,7 @@ class LogBookTestController extends Controller
                 $em->flush();
             }
             return $this->redirectToRoute('test_index');
-        }
-        catch (\Throwable $ex){
+        } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
     }
@@ -330,15 +330,13 @@ class LogBookTestController extends Controller
      */
     private function createDeleteForm(LogBookTest $test)
     {
-        try{
+        try {
             return $this->createFormBuilder()
                 ->setAction($this->generateUrl('test_delete', array('id' => $test->getId())))
                 ->setMethod('DELETE')
                 ->getForm();
-        }
-        catch (\Throwable $ex){
+        } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
-
     }
 }

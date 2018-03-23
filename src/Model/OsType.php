@@ -1,21 +1,20 @@
 <?php
 /**
  * User: Andrey Shamis
+ * email: lolnik@gmail.com
  * Date: 18/02/18
  * Time: 08:15
  */
 
 namespace App\Model;
 
-use Doctrine\ORM\Mapping as ORM;
-
 abstract class OsType
 {
-    const OS_UNKNOWN = 0;
-    const OS_LINUX = 1;
-    const OS_WINDOWS = 2;
-    const OS_ANDROID = 3;
-    const OS_FREEBSD = 4;
+    public const OS_UNKNOWN = 0;
+    public const OS_LINUX = 1;
+    public const OS_WINDOWS = 2;
+    public const OS_ANDROID = 3;
+    public const OS_FREEBSD = 4;
 
     /** @var array user friendly named type */
     protected static $typeName = [

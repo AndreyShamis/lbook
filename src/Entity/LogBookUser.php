@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * @property string salt
  * @ORM\Entity(repositoryClass="App\Repository\LogBookUserRepository")
  * @ORM\Table(name="lbook_users", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_name", columns={"username"})})
  * @UniqueEntity("username", message="This User Name already exist")
@@ -27,42 +28,42 @@ class LogBookUser implements UserInterface, \Serializable
      * @ORM\Column(name="username", type="string", length=255, unique=true)
      * @Assert\NotBlank(message="User Name cannot ne empty")
      */
-    protected $username = "";
+    protected $username = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
      */
-    protected $firstName = "";
+    protected $firstName = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      */
-    protected $lastName = "";
+    protected $lastName = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="another_id", type="string", length=255, nullable=true)
      */
-    protected $anotherId = "";
+    protected $anotherId = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="full_name", type="string", length=255, nullable=true)
      */
-    protected $fullName = "";
+    protected $fullName = '';
 
     /**
      * @var string
      *
      * @ORM\Column(name="mobile", type="string", length=255, nullable=true)
      */
-    protected $mobile = "";
+    protected $mobile = '';
 
     /**
      * @ORM\Column(type="string", length=64)
@@ -81,7 +82,7 @@ class LogBookUser implements UserInterface, \Serializable
      * @ORM\Column(name="email", type="string", length=255)
      * @Assert\Email()
      */
-    protected $email = "";
+    protected $email = '';
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
@@ -129,7 +130,7 @@ class LogBookUser implements UserInterface, \Serializable
     /**
      * @param string $username
      */
-    public function setUsername(string $username="")
+    public function setUsername(string $username='')
     {
         $this->username = $username;
     }
@@ -139,7 +140,7 @@ class LogBookUser implements UserInterface, \Serializable
      *
      * @return string The username
      */
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -243,19 +244,19 @@ class LogBookUser implements UserInterface, \Serializable
     /**
      * @return string
      */
-    public function getPlainPassword() : string
+    public function getPlainPassword(): string
     {
-        if (is_string($this->plainPassword)) {
+        if (\is_string($this->plainPassword)) {
             return $this->plainPassword;
-        } else {
-            return "";
         }
+
+        return '';
     }
 
     /**
      * @param string $password
      */
-    public function setPlainPassword($password = "")
+    public function setPlainPassword($password = '')
     {
         $this->plainPassword = $password;
     }
@@ -263,9 +264,9 @@ class LogBookUser implements UserInterface, \Serializable
     /**
      * @return bool
      */
-    public function getIsActive() : bool
+    public function getIsActive(): bool
     {
-        if (is_bool($this->isActive)) {
+        if (\is_bool($this->isActive)) {
             return $this->isActive;
         }
         return false;
@@ -315,10 +316,10 @@ class LogBookUser implements UserInterface, \Serializable
     {
         $roles = $this->roles;
         // give everyone ROLE_USER!
-        if (!is_array($roles)) {
+        if (!\is_array($roles)) {
             $roles = array();
         }
-        if (!in_array('ROLE_USER', $roles)) {
+        if (!\in_array('ROLE_USER', $roles, true)) {
             $roles[] = 'ROLE_USER';
         }
         return $roles;
@@ -342,11 +343,11 @@ class LogBookUser implements UserInterface, \Serializable
      */
     public function getPassword() : string
     {
-        if (is_string($this->password)) {
+        if (\is_string($this->password)) {
             return $this->password;
-        } else {
-            return "";
         }
+
+        return '';
     }
 
     /**
@@ -362,11 +363,11 @@ class LogBookUser implements UserInterface, \Serializable
      *
      * This can return null if the password was not encoded using a salt.
      *
-     * @return string|null The salt
      */
-    public function getSalt()
+    public function getSalt(): void
     {
         $this->salt = md5( uniqid('', true));
+        //return $this->salt;
     }
 
     /**
@@ -375,9 +376,9 @@ class LogBookUser implements UserInterface, \Serializable
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
-        // TODO: Implement eraseCredentials() method.
+
     }
 
     /**
@@ -386,7 +387,7 @@ class LogBookUser implements UserInterface, \Serializable
      * @return string the string representation of the object or null
      * @since 5.1.0
      * @see \Serializable::serialize() */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize(array(
             $this->id,
@@ -404,19 +405,19 @@ class LogBookUser implements UserInterface, \Serializable
      * @param string $serialized <p>
      * The string representation of the object.
      * </p>
-     * @return void
+     * @return array
      * @since 5.1.0
      * @see \Serializable::unserialize() */
-    public function unserialize($serialized)
+    public function unserialize($serialized): array
     {
-        list (
+        return list (
             $this->id,
             $this->username,
             $this->password,
             $this->isActive,
             // see section on salt below
             // $this->salt
-            ) = unserialize($serialized);
+            ) = unserialize($serialized, ['allowed_classes' => false]);
     }
 
     /**
@@ -429,7 +430,7 @@ class LogBookUser implements UserInterface, \Serializable
      *
      * @see DisabledException
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isActive;
     }

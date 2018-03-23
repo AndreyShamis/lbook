@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-
 /**
  * LogType controller.
  *
@@ -21,6 +20,7 @@ class LogBookUserController extends Controller
 {
     /**
      * @Route("/", name="user_index")
+     * @throws \LogicException
      */
     public function index()
     {
@@ -41,8 +41,9 @@ class LogBookUserController extends Controller
      * @Method("GET")
      * @param LogBookUser $obj
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function showAction(LogBookUser $obj)
+    public function showAction(LogBookUser $obj): Response
     {
         // check for "edit" access: calls all voters
         $this->denyAccessUnlessGranted('view', $obj);
@@ -60,6 +61,8 @@ class LogBookUserController extends Controller
      * @param LogBookUser $obj
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -67,7 +70,7 @@ class LogBookUserController extends Controller
         $this->denyAccessUnlessGranted('edit', $obj);
         $current_user= $this->get('security.token_storage')->getToken()->getUser();
         $can_change_permissions = $this->isGranted('ROLE_ADMIN');
-        $editForm = $this->get('form.factory')->create('App\Form\LogBookUserType', $obj, array(
+        $editForm = $this->get('form.factory')->create(LogBookUserType::class, $obj, array(
             'edit_enabled' => true,
             'current_user' => $current_user,
             'can_change_permissions' => $can_change_permissions,
@@ -78,14 +81,9 @@ class LogBookUserController extends Controller
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             /** @var LogBookUser $edited_user */
             $edited_user = $editForm->getData();
-            if($edited_user->isLdapUser() === false){
-//                if($current_user == $edited_user){
-                    // 3) Encode the password (you could also do this via Doctrine listener)
-                    if($edited_user->getPlainPassword() !== null && strlen($edited_user->getPlainPassword()) > 2){
-                        $password = $passwordEncoder->encodePassword($edited_user, $edited_user->getPlainPassword());
-                        $edited_user->setPassword($password);
-                    }
-//                }
+            if ($edited_user->isLdapUser() === false && $edited_user->getPlainPassword() !== null && \strlen($edited_user->getPlainPassword()) > 2) {
+                $password = $passwordEncoder->encodePassword($edited_user, $edited_user->getPlainPassword());
+                $edited_user->setPassword($password);
             }
             $this->getDoctrine()->getManager()->flush();
 
@@ -97,6 +95,7 @@ class LogBookUserController extends Controller
             'edit_form' => $editForm->createView(),
         ));
     }
+
 //    /**
 //     * @Route("/register", name="user_registration")
 //     * @param Request $request

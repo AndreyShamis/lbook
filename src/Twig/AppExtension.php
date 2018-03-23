@@ -20,7 +20,7 @@ class AppExtension extends AbstractExtension
      * Define twig filters
      * @return array|\Twig_Filter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return array(
             new Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
@@ -57,47 +57,50 @@ class AppExtension extends AbstractExtension
      * @param string $postFix
      * @return string
      */
-    public function shortString(string $input, int $len = 20, string $postFix = "..."): string
+    public function shortString(string $input, int $len = 20, string $postFix = '...'): string
     {
-        if (strlen($input) > $len) {
+        if (\strlen($input) > $len) {
             return substr($input, 0, $len) . $postFix;
         }
         return $input;
     }
 
-    public function logTypeToTableColor(LogBookMessageType $msgType)
+    /**
+     * @param LogBookMessageType $msgType
+     * @return string
+     */
+    public function logTypeToTableColor(LogBookMessageType $msgType): string
     {
-        $ret = "";
+        $ret = '';
         $tmp = strtolower($msgType->getName());
-        switch ($tmp){
+        switch ($tmp) {
             case 'pass':
-                $ret = "log-success";
+                $ret = 'log-success';
                 break;
             case 'fail':
-                $ret = "log-fail";
+                $ret = 'log-fail';
                 break;
             case 'error':
-                $ret = "log-error";
+                $ret = 'log-error';
                 break;
             case 'info':
-                $ret = "log-info";
+                $ret = 'log-info';
                 break;
             case 'warning':
-                $ret = "log-warning";
+                $ret = 'log-warning';
                 break;
             case 'debug':
-                $ret = "log-debug";
+                $ret = 'log-debug';
                 break;
             case 'critical':
-                $ret = "log-critical";
+                $ret = 'log-critical';
                 break;
             case 'test_na':
-                $ret = "log-na";
+                $ret = 'log-na';
                 break;
             default:
                 break;
         }
-        //"alert alert-block " .
         return $ret;
     }
 
@@ -108,47 +111,50 @@ class AppExtension extends AbstractExtension
      */
     public function passRateToColor($passRate): string
     {
-        $ret = "";
         if ($passRate >= 100) {
-            $ret = "text-success font-bold";
+            $ret = 'text-success font-bold';
         } elseif ($passRate >= 80) {
-            $ret = "text-success";
+            $ret = 'text-success';
         } elseif ($passRate >= 70) {
-            $ret = "text-primary font-bold";
+            $ret = 'text-primary font-bold';
         } elseif ($passRate >= 60) {
-            $ret = "text-primary";
+            $ret = 'text-primary';
         } elseif ($passRate >= 50) {
-            $ret = "text-muted font-bold";
+            $ret = 'text-muted font-bold';
         } elseif ($passRate >= 40) {
-            $ret = "text-muted";
+            $ret = 'text-muted';
         } elseif ($passRate >= 30) {
-            $ret = "text-warning font-bold";
+            $ret = 'text-warning font-bold';
         } elseif ($passRate >= 20) {
-            $ret = "text-warning";
+            $ret = 'text-warning';
         } elseif ($passRate < 10) {
-            $ret = "text-danger font-bold";
+            $ret = 'text-danger font-bold';
         } else{
-            $ret = "text-danger";
+            $ret = 'text-danger';
         }
         return $ret;
     }
 
+    /**
+     * @param $verdict
+     * @return string
+     */
     public function verdictToBadge($verdict): string
     {
-        $ret = "";
+        $ret = '';
         $tmp_verdict = strtolower($verdict);
         switch ($tmp_verdict) {
             case 'pass':
-                $ret = "badge-success";
+                $ret = 'badge-success';
                 break;
             case 'fail':
-                $ret = "badge-danger";
+                $ret = 'badge-danger';
                 break;
             case 'error':
-                $ret = "badge-warning";
+                $ret = 'badge-warning';
                 break;
             case 'test_na':
-                $ret = "badge-info";
+                $ret = 'badge-info';
                 break;
             default:
                 break;
@@ -164,7 +170,7 @@ class AppExtension extends AbstractExtension
      */
     public function inArray($variable, $arr): bool
     {
-        return in_array($variable, $arr);
+        return \in_array($variable, $arr, true);
     }
 
     /**
@@ -181,20 +187,18 @@ class AppExtension extends AbstractExtension
      * @return array
      * @throws ReflectionException
      */
-    public function cast_to_array($stdClassObject)
+    public function cast_to_array($stdClassObject): array
     {
         $array = array();
-        try{
-            $reflectionClass = new ReflectionClass(get_class($stdClassObject));
+        try {
+            $reflectionClass = new ReflectionClass(\get_class($stdClassObject));
 
             foreach ($reflectionClass->getProperties() as $property) {
                 $property->setAccessible(true);
                 $array[$property->getName()] = $property->getValue($stdClassObject);
                 $property->setAccessible(false);
             }
-        }
-        catch (Exception  $ex){
-
+        } catch (Exception  $ex) {
         }
         return $array;
     }
@@ -211,42 +215,41 @@ class AppExtension extends AbstractExtension
      * @param int $precision
      * @return float|int
      */
-    function getPercentage($valueOf, $valueFrom, $precision = 2)
+    public function getPercentage($valueOf, $valueFrom, $precision = 2)
     {
         $ret = 0;
-        try{
+        try {
             if ($valueFrom>0) {
                 $ret = ($valueOf*100)/$valueFrom;
             }
             $ret = round($ret,$precision);
         }
-        catch (Exception $ex){
-
+        catch (Exception $ex) {
         }
-        return($ret);
+        return $ret;
     }
 
     /**
      * @param $time
      * @return string
      */
-    function ExecutionTimeInHours($time): string
+    public function ExecutionTimeInHours($time): string
     {
         $seconds  =   $time%60;
         $minutes  =   ($time/60)%60;
         $hours    =   number_format (floor($time/60/60));
         $min_print = sprintf('%02d', $minutes);
-        if ($min_print == "00") {
-            return ($hours . "h");
+        if ($min_print === '00') {
+            return ($hours . 'h');
         }
-        return ($hours . "h " . sprintf('%02d', $minutes) . "m");
+        return ($hours . 'h ' . sprintf('%02d', $minutes) . 'm');
     }
 
     /**
      * @param $time
      * @return string
      */
-    function ExecutionTimeGeneric(int $time): string
+    public function ExecutionTimeGeneric(int $time): string
     {
         $seconds  =   $time%60;
         $minutes  =   ($time/60)%60;
@@ -255,9 +258,9 @@ class AppExtension extends AbstractExtension
         $min_print = sprintf('%02dm',$minutes);
         $sec_print = sprintf('%02ds',$seconds);
         if ($hours > 0) {
-            $ret = sprintf("%s %s %s", $hour_print, $min_print, $sec_print);
+            $ret = sprintf('%s %s %s', $hour_print, $min_print, $sec_print);
         } else {
-            $ret = sprintf("%s %s", $min_print, $sec_print);
+            $ret = sprintf('%s %s', $min_print, $sec_print);
         }
         return $ret;
     }
@@ -266,7 +269,7 @@ class AppExtension extends AbstractExtension
      * @param $time
      * @return integer
      */
-    function TimeToHour($time)
+    public function TimeToHour($time): int
     {
         $minutes  =   ($time/60)%60;
         $hours    =   floor($time/60/60);
@@ -289,9 +292,8 @@ class AppExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'twig_common';
-        // TODO: Implement getName() method.
     }
 }

@@ -14,15 +14,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LogBookUserType extends AbstractType
 {
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email', EmailType::class)
             ->add('username', TextType::class)
         ;
 
-        if(array_key_exists("edit_enabled", $options) && $options["edit_enabled"] === true && $options["can_change_permissions"] === true){
+        if (array_key_exists('edit_enabled', $options) && $options['edit_enabled'] === true && $options['can_change_permissions'] === true) {
             $builder
                 ->add('isActive')
                 ->add('roles', ChoiceType::class, [
@@ -41,7 +40,7 @@ class LogBookUserType extends AbstractType
 
         //if($options["data"] === $options['current_user']){
             /** @var LogBookUser $edited_user */
-            $edited_user = $options["data"];
+            $edited_user = $options['data'];
             if(!$edited_user->isLdapUser()){
                 $builder->add('plainPassword', RepeatedType::class, array(
                     'required' => false,
@@ -53,7 +52,11 @@ class LogBookUserType extends AbstractType
        // }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * @param OptionsResolver $resolver
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(array(
             'edit_enabled'

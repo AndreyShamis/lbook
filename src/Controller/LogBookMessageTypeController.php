@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
-use App\Form\LogBookMessageTypeType;
 use App\Entity\LogBookMessageType;
+use App\Form\LogBookMessageTypeType;
+use App\Repository\LogBookMessageTypeRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * LogType controller.
@@ -19,19 +21,12 @@ class LogBookMessageTypeController extends Controller
 {
     /**
      * @Route("/", name="msg_type_index")
-     * @Method("GET")
+     * @param LogBookMessageTypeRepository $logBookMessageTypeRepository
+     * @return Response
      */
-    public function index()
+    public function index(LogBookMessageTypeRepository $logBookMessageTypeRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $msg_types = $em->getRepository('App:LogBookMessageType')->findAll();
-
-        return $this->render('lbook/msg_type/index.html.twig', array(
-            'msg_types' => $msg_types,
-        ));
-        // replace this line with your own code!
-        //return $this->render('@Maker/demoPage.html.twig', [ 'path' => str_replace($this->getParameter('kernel.project_dir').'/', '', __FILE__) ]);
+        return $this->render('lbook/msg_type/index.html.twig', ['msg_types' => $logBookMessageTypeRepository->findAll()]);
     }
 
     /**
@@ -41,11 +36,12 @@ class LogBookMessageTypeController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function newAction(Request $request)
     {
         $obj = new LogBookMessageType();
-        $form = $this->createForm('App\Form\LogBookMessageTypeType', $obj);
+        $form = $this->createForm(LogBookMessageTypeType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -70,7 +66,7 @@ class LogBookMessageTypeController extends Controller
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookMessageType $obj)
+    public function showAction(LogBookMessageType $obj): Response
     {
         $deleteForm = $this->createDeleteForm($obj);
 
@@ -88,11 +84,12 @@ class LogBookMessageTypeController extends Controller
      * @param Request $request
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function editAction(Request $request, LogBookMessageType $obj)
     {
         $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm('App\Form\LogBookMessageTypeType', $obj);
+        $editForm = $this->createForm(LogBookMessageTypeType::class, $obj);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -116,8 +113,9 @@ class LogBookMessageTypeController extends Controller
      * @param Request $request
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \LogicException
      */
-    public function deleteAction(Request $request, LogBookMessageType $obj)
+    public function deleteAction(Request $request, LogBookMessageType $obj): RedirectResponse
     {
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);

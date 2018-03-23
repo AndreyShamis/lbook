@@ -24,7 +24,7 @@ class LogBookTestRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookTest
      */
-    public function findOneOrCreate(array $criteria, $flush = false)
+    public function findOneOrCreate(array $criteria, $flush = false): LogBookTest
     {
         $add_hash = true;
         if (isset(self::$hashedData[$criteria['id']])) {
@@ -44,10 +44,9 @@ class LogBookTestRepository extends ServiceEntityRepository
             $entity->setExecutionOrder($criteria['executionOrder']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-            if($flush == true) {
+            if ($flush === true) {
                 $this->_em->flush();
             }
-
         }
         if ($add_hash) {
             self::$hashedData[$criteria['id']] = $entity;
@@ -56,7 +55,10 @@ class LogBookTestRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    public function deleteByCycle(LogBookCycle &$cycle)
+    /**
+     * @param LogBookCycle $cycle
+     */
+    public function deleteByCycle(LogBookCycle $cycle): void
     {
         $msgRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
         foreach ($cycle->getTests() as $test){
@@ -77,21 +79,12 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     }
 
-    public function delete(LogBookTest &$test)
+    /**
+     * @param LogBookTest $test
+     */
+    public function delete(LogBookTest $test): void
     {
         $this->_em->remove($test);
         $this->_em->flush($test);
     }
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('l')
-            ->where('l.something = :value')->setParameter('value', $value)
-            ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 }

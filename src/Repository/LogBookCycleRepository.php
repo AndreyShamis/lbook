@@ -18,7 +18,7 @@ class LogBookCycleRepository extends ServiceEntityRepository
      * @param array $criteria
      * @return LogBookCycle
      */
-    public function findOneOrCreate(array $criteria)
+    public function findOneOrCreate(array $criteria): LogBookCycle
     {
         $entity = $this->findOneBy($criteria);
 
@@ -33,25 +33,14 @@ class LogBookCycleRepository extends ServiceEntityRepository
         return $entity;
     }
 
-
-    public function delete(LogBookCycle &$cycle)
+    /**
+     * @param LogBookCycle $cycle
+     */
+    public function delete(LogBookCycle $cycle): void
     {
         $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
         $testRepo->deleteByCycle($cycle);
         $this->_em->remove($cycle);
         $this->_em->flush();
-
     }
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('l')
-            ->where('l.something = :value')->setParameter('value', $value)
-            ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 }

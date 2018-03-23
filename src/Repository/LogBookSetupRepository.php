@@ -24,13 +24,13 @@ class LogBookSetupRepository extends ServiceEntityRepository
      * @param string $setupName
      * @return LogBookSetup|null
      */
-    public function findByName(string $setupName)
+    public function findByName(string $setupName): ?LogBookSetup
     {
         if (isset(self::$hashedData[$setupName])) {
             $entity = self::$hashedData[$setupName];
         } else {
             /** @var LogBookSetup $entity */
-            $entity = $this->findOneBy(array("name" => $setupName));
+            $entity = $this->findOneBy(array('name' => $setupName));
             if($entity !== null){
                 self::$hashedData[$setupName] = $entity;
                 self::$hashedData[$entity->getId()] = $entity;
@@ -44,13 +44,13 @@ class LogBookSetupRepository extends ServiceEntityRepository
      * @param int $setupId
      * @return LogBookSetup|null
      */
-    public function findById(int $setupId)
+    public function findById(int $setupId): ?LogBookSetup
     {
         if (isset(self::$hashedData[$setupId])) {
             $entity = self::$hashedData[$setupId];
         } else {
             /** @var LogBookSetup $entity */
-            $entity = $this->findOneBy(array("id" => $setupId));
+            $entity = $this->findOneBy(array('id' => $setupId));
             if ($entity !== null) {
                 self::$hashedData[$setupId] = $entity;
                 self::$hashedData[$entity->getName()] = $entity;
@@ -65,7 +65,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookSetup
      */
-    public function findOneOrCreate(array $criteria, $flush = false)
+    public function findOneOrCreate(array $criteria, $flush = false): LogBookSetup
     {
         $add_hash = true;
         if (isset(self::$hashedData[$criteria['name']])) {
@@ -84,7 +84,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
             $entity->setOs(OsType::OS_UNKNOWN);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-            if($flush == true) {
+            if ($flush === true) {
                 $this->_em->flush();
             }
 
@@ -96,7 +96,10 @@ class LogBookSetupRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    public function delete(LogBookSetup &$setup)
+    /**
+     * @param LogBookSetup $setup
+     */
+    public function delete(LogBookSetup $setup): void
     {
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
@@ -107,17 +110,4 @@ class LogBookSetupRepository extends ServiceEntityRepository
         $this->_em->remove($setup);
         $this->_em->flush($setup);
     }
-
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('l')
-            ->where('l.something = :value')->setParameter('value', $value)
-            ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 }

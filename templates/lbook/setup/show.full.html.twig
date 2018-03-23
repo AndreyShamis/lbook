@@ -134,7 +134,7 @@
                 </td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
-                <td>{{ cycle.tests | length }}</td>
+                <td>{{ cycle.testsCount }}</td>
                 <td>{{ shortString(cycle.build, 25) }}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>

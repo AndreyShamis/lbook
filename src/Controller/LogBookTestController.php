@@ -1,45 +1,18 @@
 <?php
-//
-//namespace App\Controller;
-//
-//use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-//use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-//use Symfony\Component\HttpFoundation\Response;
-//use App\Entity\LogBookTest;
-//
-//class LogBookTestController extends Controller
-//{
-//    /**
-//     * @Route("/log/book", name="log_book")
-//     */
-//    public function index()
-//    {
-//        $em = $this->getDoctrine()->getManager();
-//
-//        $logbook_tests = $em->getRepository('App:LogBookTest')->findAll();
-//
-//        return $this->render('lbook/test/index.html.twig', array(
-//            'logbook_tests' => $logbook_tests,
-//        ));
-//
-//        // replace this line with your own code!
-//        return $this->render('@Maker/demoPage.html.twig', [ 'path' => str_replace($this->getParameter('kernel.project_dir').'/', '', __FILE__) ]);
-//    }
-//}
 
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Repository\LogBookMessageRepository;
+use App\Repository\LogBookTestRepository;
+use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
 use App\Form\LogBookTestType;
 
 /**
@@ -49,32 +22,7 @@ use App\Form\LogBookTestType;
  */
 class LogBookTestController extends Controller
 {
-    /**
-     * Paginator Helper
-     *
-     * Pass through a query object, current page & limit
-     * the offset is calculated from the page and limit
-     * returns an `Paginator` instance, which you can call the following on:
-     *
-     *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
-     *     $paginator->count() # Count of ALL posts (ie: `20` posts)
-     *     $paginator->getIterator() # ArrayIterator
-     *
-     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
-     * @param integer            $page  Current page (defaults to 1)
-     * @param integer            $limit The total number per page (defaults to 5)
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function paginate($dql, $page = 1, $limit = 20): Paginator
-    {
-        $paginator = new Paginator($dql);
-        $paginator->getQuery()
-            ->setFirstResult($limit * ($page - 1)) // Offset
-            ->setMaxResults($limit); // Limit
-        return $paginator;
-    }
-
+    protected $index_size = 100;
     /**
      * Lists all Tests entities.
      *
@@ -82,25 +30,23 @@ class LogBookTestController extends Controller
      * @Method("GET")
      * @Template(template="lbook/test/list.html.twig")
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
      * @return array
-     * @throws \LogicException
      */
-    public function listAction($page = 1): array
+    public function index($page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): array
     {
         set_time_limit(10);
-        $em = $this->getDoctrine()->getManager();
-        $limit = 100;
-        $testRepo = $em->getRepository('App:LogBookTest');
         $query = $testRepo->createQueryBuilder('t')
             ->orderBy('t.id', 'DESC');
-        $paginator = $this->paginate($query, $page, $limit);
+        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
         $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
         $iterator = $paginator->getIterator(); # ArrayIterator
 
-        $maxPages = ceil($totalPosts / $limit);
+        $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
             'size'      => $totalPosts,
@@ -109,29 +55,6 @@ class LogBookTestController extends Controller
             'iterator'  => $iterator,
             'paginator' => $paginator,
         );
-    }
-
-    /**
-     * Lists all test entities.
-     *
-     * @Route("/", name="_test_index")
-     * @Method("GET")
-     * @throws \LogicException
-     */
-    public function index()
-    {
-        set_time_limit(180);
-        $em = $this->getDoctrine()->getManager();
-        $testRepo = $em->getRepository('App:LogBookTest');
-        //$query  = $logs->createQueryBuilder('a');
-        $query = $testRepo->createQueryBuilder('t')
-            ->orderBy('t.id', 'DESC')
-            ->setMaxResults(300);
-        $tests = $query->getQuery()->execute();
-        return $this->render('lbook/test/index.html.twig', array(
-            'tests' => $tests,
-        ));
-
     }
 
     /**
@@ -174,9 +97,7 @@ class LogBookTestController extends Controller
     public function showAction(LogBookTest $test = null): ?Response
     {
         try {
-
             $deleteForm = $this->createDeleteForm($test);
-
             return $this->render('lbook/test/show.html.twig', array(
                 'test' => $test,
                 'delete_form' => $deleteForm->createView(),
@@ -194,19 +115,18 @@ class LogBookTestController extends Controller
      * @Method("GET")
      * @param LogBookTest $test
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookMessageRepository $logRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookTest $test = null, $page = 1): ?Response
+    public function showFullAction(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): ?Response
     {
         try {
-
-            $em = $this->getDoctrine()->getManager();
             $limit = 500;
-            $logs = $em->getRepository('App:LogBookMessage');
-            $qb = $logs->createQueryBuilder('t')
+            $qb = $logRepo->createQueryBuilder('t')
                 ->where('t.test = :test')
                 ->setParameter('test', $test->getId());
-            $paginator = $this->paginate($qb, $page, $limit);
+            $paginator = $pagePaginator->paginate($qb, $page, $limit);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
@@ -235,7 +155,7 @@ class LogBookTestController extends Controller
      * @param \Throwable $ex
      * @return Response
      */
-    protected function testNotFound(LogBookTest $test=null, \Throwable $ex): Response
+    protected function testNotFound(LogBookTest $test = null, \Throwable $ex): Response
     {
         global $request;
         $possibleId = 0;

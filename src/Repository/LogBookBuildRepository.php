@@ -22,7 +22,7 @@ class LogBookBuildRepository extends ServiceEntityRepository
      * @param array $criteria
      * @return LogBookBuild
      */
-    public function findOneOrCreate(array $criteria)
+    public function findOneOrCreate(array $criteria): LogBookBuild
     {
         $add_hash = true;
         if (isset(self::$hashedData[$criteria['name']])) {

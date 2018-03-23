@@ -25,7 +25,7 @@ class LogBookUserRepository extends ServiceEntityRepository implements UserLoade
      * @return UserInterface|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): ?UserInterface
     {
         return $this->createQueryBuilder('u')
             ->where('u.username = :username OR u.email = :email')

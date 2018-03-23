@@ -22,7 +22,7 @@ class LogBookVerdictRepository extends ServiceEntityRepository
      * @param array $criteria
      * @return LogBookVerdict
      */
-    public function findOneOrCreate(array $criteria)
+    public function findOneOrCreate(array $criteria): LogBookVerdict
     {
         $criteria['name'] = strtoupper($criteria['name']);
         $add_hash = true;

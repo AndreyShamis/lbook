@@ -24,7 +24,7 @@ class LogBookMessageRepository extends ServiceEntityRepository
      * @param bool $flush
      * @return LogBookMessage
      */
-    public function Create(array $criteria, $flush = true)
+    public function Create(array $criteria, $flush = true): LogBookMessage
     {
 
 
@@ -44,7 +44,7 @@ class LogBookMessageRepository extends ServiceEntityRepository
         return $entity;
     }
 
-    public function deleteByTest(LogBookTest $test)
+    public function deleteByTest(LogBookTest $test): void
     {
         $qd = $this->createQueryBuilder('t')
             ->delete()
@@ -54,7 +54,7 @@ class LogBookMessageRepository extends ServiceEntityRepository
         $query->execute();
     }
 
-    public function deleteByTestId($testId)
+    public function deleteByTestId($testId): void
     {
         $qd = $this->createQueryBuilder('t')
             ->delete()

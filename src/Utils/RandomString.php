@@ -1,6 +1,7 @@
 <?php
 /**
  * User: Andrey Shamis
+ * email: lolnik@gmail.com
  * Date: 09/03/18
  * Time: 08:09
  */
@@ -9,8 +10,6 @@ namespace App\Utils;
 
 /**
  * Class RandomString
- * Is some place used rand : according to http://php.net/manual/en/function.rand.php
- *           "7.1.0 rand() has been made an alias of mt_rand()."
  * @package App\Utils
  */
 final class RandomString
@@ -22,6 +21,7 @@ final class RandomString
      * @param int $length
      * @param bool $useSpecial
      * @return String
+     * @throws \Exception
      */
     public static function generateRandomString($length = 20, $useSpecial = false): string
     {
@@ -29,15 +29,15 @@ final class RandomString
             $length = 1;
         }
         if ($useSpecial) {
-            $chars = RandomString::$chars . RandomString::$special;
+            $chars = self::$chars . self::$special;
         } else {
-            $chars = RandomString::$chars;
+            $chars = self::$chars;
         }
 
-        $charsSize = strlen($chars);
+        $charsSize = \strlen($chars);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $chars[rand(0, $charsSize - 1)];
+            $randomString .= $chars[random_int(0, $charsSize - 1)];
         }
         return $randomString;
     }
@@ -50,24 +50,25 @@ final class RandomString
     public static function generateRandomStringShuffle($length = 20, $useSpecial = false): string
     {
         if ($useSpecial) {
-            $chars = RandomString::$chars . RandomString::$special;
+            $chars = self::$chars . self::$special;
         } else {
-            $chars = RandomString::$chars;
+            $chars = self::$chars;
         }
-        return substr(str_shuffle(str_repeat($x=$chars, ceil($length/strlen($x)) )),1, $length);
+        return substr(str_shuffle(str_repeat($x=$chars, ceil($length/\strlen($x)) )),1, $length);
     }
 
     /**
      * @param int $length
      * @return String
+     * @throws \Exception
      */
     public static function generateRandomStringRange($length = 20): string
     {
         $keys = array_merge(range(0,9), range('a', 'z'));
-        $key = "";
-        $charsSize = count($keys);
-        for($i=0; $i < $length; $i++) {
-            $key .= $keys[rand(0, $charsSize - 1)];
+        $key = '';
+        $charsSize = \count($keys);
+        for ($i=0; $i < $length; $i++) {
+            $key .= $keys[random_int(0, $charsSize - 1)];
         }
         return $key;
     }
@@ -78,9 +79,9 @@ final class RandomString
      */
     public static function generateRandomStringSha1($length = 20): string
     {
-        $tmp_ret = "";
-        while(strlen($tmp_ret) < $length){
-            $tmp_ret .= sha1(rand());
+        $tmp_ret = '';
+        while (\strlen($tmp_ret) < $length) {
+            $tmp_ret .= sha1(mt_rand());
         }
 
         return substr($tmp_ret, 0, $length);
@@ -92,9 +93,9 @@ final class RandomString
      */
     public static function generateRandomStringMd5($length = 20): string
     {
-        $tmp_ret = "";
-        while(strlen($tmp_ret) < $length){
-            $tmp_ret .= md5(rand() . time());
+        $tmp_ret = '';
+        while (\strlen($tmp_ret) < $length) {
+            $tmp_ret .= md5(mt_rand() . time());
         }
 
         return substr($tmp_ret, 0, $length);

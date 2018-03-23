@@ -2,12 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
-use App\Entity\LogBookTest;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookSetupRepository;
+use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -15,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use App\Form\LogBookSetupType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Setup controller.
@@ -25,31 +25,6 @@ class LogBookSetupController extends Controller
 {
     protected $index_size = 50;
     protected $show_cycle_size = 100;
-    /**
-     * Paginator Helper
-     *
-     * Pass through a query object, current page & limit
-     * the offset is calculated from the page and limit
-     * returns an `Paginator` instance, which you can call the following on:
-     *
-     *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
-     *     $paginator->count() # Count of ALL posts (ie: `20` posts)
-     *     $paginator->getIterator() # ArrayIterator
-     *
-     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
-     * @param integer            $page  Current page (defaults to 1)
-     * @param integer            $limit The total number per page (defaults to 5)
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function paginate($dql, $page = 1, $limit = 20)
-    {
-        $paginator = new Paginator($dql);
-        $paginator->getQuery()
-            ->setFirstResult($limit * ($page - 1)) // Offset
-            ->setMaxResults($limit); // Limit
-        return $paginator;
-    }
 
     /**
      * Lists all setup entities.
@@ -58,15 +33,16 @@ class LogBookSetupController extends Controller
      * @Method("GET")
      * @Template(template="lbook/setup/index.html.twig")
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookSetupRepository $setupRepo
      * @return array
      */
-    public function index(int $page=1)
+    public function index(int $page = 1, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
     {
-        $em = $this->getDoctrine()->getManager();
-        $cycleRepo = $em->getRepository('App:LogBookSetup');
-        $query = $cycleRepo->createQueryBuilder('t')
-            ->orderBy('t.id', "DESC");
-        $paginator = $this->paginate($query, $page, $this->index_size);
+        $query = $setupRepo->createQueryBuilder('t')
+            ->orderBy('t.id', 'DESC');
+
+        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
@@ -76,20 +52,12 @@ class LogBookSetupController extends Controller
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
-            //'setups' => $setups,
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,
             'paginator' => $paginator,
         );
-//        $em = $this->getDoctrine()->getManager();
-//
-//        $setups = $em->getRepository('App:LogBookSetup')->findAll();
-//
-//        return $this->render('lbook/setup/index.html.twig', array(
-//            'setups' => $setups,
-//        ));
     }
 
     /**
@@ -99,11 +67,12 @@ class LogBookSetupController extends Controller
      * @Method({"GET", "POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException|\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function newAction(Request $request)
     {
         $obj = new LogBookSetup();
-        $form = $this->get('form.factory')->create('App\Form\LogBookSetupType', $obj, array(
+        $form = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
             'user' => $this->get('security.token_storage')->getToken()->getUser(),
         ));
 
@@ -130,18 +99,18 @@ class LogBookSetupController extends Controller
      * @Method("GET")
      * @param LogBookSetup $setup
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookSetup $setup=null, $page=1)
+    public function showFullAction(LogBookSetup $setup, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
-        try{
-            $em = $this->getDoctrine()->getManager();
-            $logs = $em->getRepository('App:LogBookCycle');
-            $qb = $logs->createQueryBuilder('t')
+        try {
+            $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
-                ->orderBy("t.updatedAt", "DESC")
+                ->orderBy('t.updatedAt', 'DESC')
                 ->setParameter('setup', $setup->getId());
-            $paginator = $this->paginate($qb, $page, $this->show_cycle_size);
+            $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
@@ -159,8 +128,7 @@ class LogBookSetupController extends Controller
                 'paginator'     => $paginator,
                 'delete_form'   => $deleteForm->createView(),
             ));
-        }
-        catch (\Throwable $ex){
+        } catch (\Throwable $ex) {
             return $this->setupNotFound($setup, $ex);
         }
     }
@@ -170,29 +138,28 @@ class LogBookSetupController extends Controller
      * @param \Throwable $ex
      * @return Response
      */
-    protected function setupNotFound(LogBookSetup $setup=null, \Throwable $ex){
+    protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
+    {
         global $request;
         $possibleId = 0;
-        try{
+        try {
             $possibleId = $request->attributes->get('id');
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
-        if($setup === null){
+        if ($setup === null) {
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Setup with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
             ));
         }
-        else{
-            return $this->render('lbook/404.html.twig', array(
-                'short_message' => 'Unknown error',
-                'message' => $ex->getMessage(),
-                'ex' => $ex,
-            ));
-        }
+
+        return $this->render('lbook/404.html.twig', array(
+            'short_message' => 'Unknown error',
+            'message' => $ex->getMessage(),
+            'ex' => $ex,
+        ));
     }
     /**
      * Finds and displays a setup entity.
@@ -202,16 +169,15 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookSetup $obj)
+    public function showAction(LogBookSetup $obj): Response
     {
         $user= $this->get('security.token_storage')->getToken()->getUser();
         /** @var PersistentCollection $moderators */
         $moderators = $obj->getModerators();
         //if(in_array($user, $moderators)){
-        if($moderators->contains($user)){
+        if ($moderators->contains($user)) {
             $deleteForm = $this->createDeleteForm($obj)->createView();
-        }
-        else{
+        } else {
             $deleteForm = null;
         }
 
@@ -229,6 +195,9 @@ class LogBookSetupController extends Controller
      * @param Request $request
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function editAction(Request $request, LogBookSetup $obj)
     {
@@ -237,7 +206,7 @@ class LogBookSetupController extends Controller
         // check for "edit" access: calls all voters
         $this->denyAccessUnlessGranted('edit', $obj);
         /** @var PersistentCollection $moderators */
-        $moderators = $obj->getModerators();
+        //$moderators = $obj->getModerators();
         $deleteForm = $this->createDeleteForm($obj);
         //if(in_array($user, $moderators)){
 //        if($moderators->contains($user)){
@@ -248,7 +217,7 @@ class LogBookSetupController extends Controller
 //        }
 
 
-        $editForm = $this->get('form.factory')->create('App\Form\LogBookSetupType', $obj, array(
+        $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
             'user' => $user,
         ));
         $editForm->handleRequest($request);
@@ -274,8 +243,9 @@ class LogBookSetupController extends Controller
      * @param Request $request
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
-    public function deleteAction(Request $request, LogBookSetup $obj)
+    public function deleteAction(Request $request, LogBookSetup $obj): RedirectResponse
     {
         $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
@@ -306,7 +276,6 @@ class LogBookSetupController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('setup_delete', array('id' => $obj->getId())))
             ->setMethod('DELETE')
-            ->getForm()
-            ;
+            ->getForm();
     }
 }

@@ -3,17 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
+use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookTestRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookCycleType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Service\PagePaginator;
 
 /**
  * Cycle controller.
@@ -22,35 +22,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class LogBookCycleController extends Controller
 {
-
     protected $show_tests_size = 2000;
     protected $index_size = 100;
-
-    /**
-     * Paginator Helper
-     *
-     * Pass through a query object, current page & limit
-     * the offset is calculated from the page and limit
-     * returns an `Paginator` instance, which you can call the following on:
-     *
-     *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
-     *     $paginator->count() # Count of ALL posts (ie: `20` posts)
-     *     $paginator->getIterator() # ArrayIterator
-     *
-     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
-     * @param integer            $page  Current page (defaults to 1)
-     * @param integer            $limit The total number per page (defaults to 5)
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function paginate($dql, $page = 1, $limit = 20): Paginator
-    {
-        $paginator = new Paginator($dql);
-        $paginator->getQuery()
-            ->setFirstResult($limit * ($page - 1)) // Offset
-            ->setMaxResults($limit); // Limit
-        return $paginator;
-    }
 
     /**
      * Lists all cycle entities.
@@ -59,16 +32,17 @@ class LogBookCycleController extends Controller
      * @Method("GET")
      * @Template(template="lbook/cycle/index.html.twig")
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
      * @return array
-     * @throws \LogicException
      */
-    public function index($page = 1): array
+    public function index($page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): array
     {
-        $em = $this->getDoctrine()->getManager();
-        $cycleRepo = $em->getRepository('App:LogBookCycle');
+//        $em = $this->getDoctrine()->getManager();
+//        $cycleRepo = $em->getRepository('App:LogBookCycle');
         $query = $cycleRepo->createQueryBuilder('t')
             ->orderBy('t.id', 'DESC');
-        $paginator = $this->paginate($query, $page, $this->index_size);
+        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
@@ -122,18 +96,18 @@ class LogBookCycleController extends Controller
      * @Method("GET")
      * @param LogBookCycle $cycle
      * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookCycle $cycle, $page=1): ?Response
+    public function showFullAction(LogBookCycle $cycle, $page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
     {
         try {
-            $em = $this->getDoctrine()->getManager();
-            $tests = $em->getRepository('App:LogBookTest');
-            $qb = $tests->createQueryBuilder('t')
+            $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
                 ->orderBy('t.executionOrder', 'ASC')
                 ->setParameter('cycle', $cycle->getId());
-            $paginator = $this->paginate($qb, $page, $this->show_tests_size);
+            $paginator = $pagePaginator->paginate($qb, $page, $this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
@@ -166,11 +140,8 @@ class LogBookCycleController extends Controller
      */
     public function showAction(LogBookCycle $obj): Response
     {
-        //$deleteForm = $this->createDeleteForm($obj);
-
         return $this->render('lbook/cycle/show.html.twig', array(
             'cycle' => $obj,
-//            'delete_form' => $deleteForm->createView(),
         ));
     }
 

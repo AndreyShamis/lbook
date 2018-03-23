@@ -29,6 +29,7 @@ class LogBookBuildController extends Controller
      * @Route("/new", name="log_book_build_new", methods="GET|POST")
      * @param Request $request
      * @return Response
+     * @throws \LogicException
      */
     public function new(Request $request): Response
     {
@@ -65,6 +66,7 @@ class LogBookBuildController extends Controller
      * @param Request $request
      * @param LogBookBuild $logBookBuild
      * @return Response
+     * @throws \LogicException
      */
     public function edit(Request $request, LogBookBuild $logBookBuild): Response
     {
@@ -88,6 +90,7 @@ class LogBookBuildController extends Controller
      * @param Request $request
      * @param LogBookBuild $logBookBuild
      * @return Response
+     * @throws \LogicException
      */
     public function delete(Request $request, LogBookBuild $logBookBuild): Response
     {

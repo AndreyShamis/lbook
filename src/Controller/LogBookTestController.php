@@ -23,6 +23,9 @@ use App\Form\LogBookTestType;
 class LogBookTestController extends Controller
 {
     protected $index_size = 100;
+
+    protected $log_size = 500;
+
     /**
      * Lists all Tests entities.
      *
@@ -122,15 +125,18 @@ class LogBookTestController extends Controller
     public function showFullAction(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): ?Response
     {
         try {
-            $limit = 500;
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
+
             $qb = $logRepo->createQueryBuilder('t')
                 ->where('t.test = :test')
                 ->setParameter('test', $test->getId());
-            $paginator = $pagePaginator->paginate($qb, $page, $limit);
+            $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
-            $maxPages = ceil($totalPosts / $limit);
+            $maxPages = ceil($totalPosts / $this->log_size);
             $thisPage = $page;
 
             $deleteForm = $this->createDeleteForm($test);
@@ -157,10 +163,12 @@ class LogBookTestController extends Controller
      */
     protected function testNotFound(LogBookTest $test = null, \Throwable $ex): Response
     {
-        global $request;
+        /** @var Request $request */
+        $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
         try {
             $possibleId = $request->attributes->get('id');
+            $response = new Response('', Response::HTTP_NOT_FOUND);
         } catch (\Exception $ex) {
         }
         if ($test === null) {
@@ -168,7 +176,7 @@ class LogBookTestController extends Controller
                 'short_message' => sprintf('Test with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
-            ));
+            ), $response);
         }
 
         return $this->render('lbook/404.html.twig', array(

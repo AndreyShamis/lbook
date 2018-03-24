@@ -26,12 +26,8 @@ Add this to your /etc/apache/sites-avaliable/site.name.conf
 
 ## MySQL
 
-~~~ bash
-# A larger buffer pool requires less disk I/O to access the same table data more than once.
-# On a dedicated database server, you might set the buffer pool size to 80% of the machine's
-# physical memory size. Be aware of the following potential issues when configuring buffer pool size,
-# and be prepared to scale back the size of the buffer pool if necessary.
-~~~
+>A larger buffer pool requires less disk I/O to access the same table data more than once. On a dedicated database server, you might set the buffer pool size to 80% of the machine's physical memory size. Be aware of the following potential issues when configuring buffer pool size, and be prepared to scale back the size of the buffer pool if necessary.
+
 ~~~
 innodb_buffer_pool_size     = 16G
 

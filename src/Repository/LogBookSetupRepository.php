@@ -62,10 +62,9 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
     /**
      * @param array $criteria
-     * @param bool $flush
      * @return LogBookSetup
      */
-    public function findOneOrCreate(array $criteria, $flush = false): LogBookSetup
+    public function findOneOrCreate(array $criteria): LogBookSetup
     {
         $add_hash = true;
         if (isset(self::$hashedData[$criteria['name']])) {
@@ -84,10 +83,6 @@ class LogBookSetupRepository extends ServiceEntityRepository
             $entity->setOs(OsType::OS_UNKNOWN);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-            if ($flush === true) {
-                $this->_em->flush();
-            }
-
         }
         if ($add_hash) {
             self::$hashedData[$criteria['name']] = $entity;
@@ -103,7 +98,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
     {
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
-        $cycles = $setup->getCycles();
+        $cycles = (array) $setup->getCycles();
         foreach ($cycles as $cycle){
             $cycleRepo->delete($cycle);
         }

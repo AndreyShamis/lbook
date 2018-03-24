@@ -59,6 +59,7 @@ class LogBookUserController extends Controller
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \LogicException
      */
     public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
     {

@@ -9,6 +9,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class LogBookMessageType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -21,7 +25,10 @@ class LogBookMessageType extends AbstractType
             ))
         ;
     }
-
+    /**
+     * @param OptionsResolver $resolver
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

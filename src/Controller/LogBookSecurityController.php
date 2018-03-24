@@ -27,6 +27,15 @@ class LogBookSecurityController extends Controller
 
     }
 
+    /**
+     * @param $user
+     * @param $password
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return array
+     * @throws \Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @throws \Symfony\Component\Ldap\Exception\NotBoundException
+     * @throws \Symfony\Component\Ldap\Exception\LdapException
+     */
     protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder): array
     {
         $ret_arr = array();
@@ -84,6 +93,8 @@ class LogBookSecurityController extends Controller
      * @param AuthenticationUtils $authUtils
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return Response
+     * @throws \Symfony\Component\Ldap\Exception\NotBoundException
+     * @throws \Symfony\Component\Ldap\Exception\LdapException
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException

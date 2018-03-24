@@ -12,12 +12,13 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class LogBookRegistrationController extends Controller
 {
-
     /**
      * @Route("/register", name="user_registration")
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \LogicException
      */
     public function registerAction(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {

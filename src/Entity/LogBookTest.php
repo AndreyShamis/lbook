@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookTestRepository")
- * @ORM\Table(name="lbook_tests", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_cycle_execution_order", columns={"execution_order", "cycle"})})
+ * @ORM\Table(name="lbook_tests", uniqueConstraints={@ORM\UniqueConstraint(name="test_uniq_cycle_execution_order", columns={"execution_order", "cycle"})})
  * @ORM\HasLifecycleCallbacks()
  */
 class LogBookTest

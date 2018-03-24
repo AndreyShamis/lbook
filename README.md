@@ -60,10 +60,7 @@ sudo dpkg-reconfigure tzdata
 
 # Requirements
 ## PHP>=7.2
-* sudo apt install php7.2-ldap
-* sudo apt install php7.2-zip
-* sudo apt install php7.2-xml
-* sudo apt install php7.2-mbstring
+* sudo apt install php7.2-ldap php7.2-zip php7.2-xml php7.2-mbstring php7.2-sqlite3
 
 ## Template
 * http://ace.jeka.by

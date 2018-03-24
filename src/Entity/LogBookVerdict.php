@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookVerdictRepository")
- * @ORM\Table(name="lbook_verdicts", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_name", columns={"name"})})
+ * @ORM\Table(name="lbook_verdicts", uniqueConstraints={@ORM\UniqueConstraint(name="verdict_uniq_name", columns={"name"})})
  * @UniqueEntity("name", message="Test Verdict with this name already exist")
  */
 class LogBookVerdict

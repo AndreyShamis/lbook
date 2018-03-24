@@ -7,7 +7,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookBuildRepository")
- * @ORM\Table(name="lbook_build", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_name", columns={"name"})})
+ * @ORM\Table(name="lbook_build", uniqueConstraints={@ORM\UniqueConstraint(name="build_uniq_name", columns={"name"})})
  * @UniqueEntity("name", message="Build name already exist")
  */
 class LogBookBuild

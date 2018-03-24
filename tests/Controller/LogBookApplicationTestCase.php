@@ -38,6 +38,7 @@ class LogBookApplicationTestCase extends WebTestCase
     {
         return self::$client;
     }
+
     /**
      * @throws \Exception
      */
@@ -119,7 +120,19 @@ class LogBookApplicationTestCase extends WebTestCase
 //        self::$entityManager = null; // avoid memory leaks
 //    }
 
-
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public static function tearDownAfterClass()
+//    {
+//        self::runCommand('doctrine:database:drop --force');
+//
+//        parent::tearDownAfterClass();
+//
+//        self::$entityManager->close();
+//        self::$entityManager = null; // avoid memory leaks
+//        print("\n\ntearDownAfterClass\n");
+//    }
     /**
      * @return bool
      */

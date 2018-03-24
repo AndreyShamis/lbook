@@ -103,9 +103,12 @@ class LogBookSetupController extends Controller
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookSetup $setup, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
+    public function showFullAction(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
         try {
+            if (!$setup) {
+                throw new \Exception();
+            }
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
                 ->orderBy('t.updatedAt', 'DESC')
@@ -140,10 +143,12 @@ class LogBookSetupController extends Controller
      */
     protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
     {
-        global $request;
+        /** @var Request $request */
+        $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
         try {
             $possibleId = $request->attributes->get('id');
+            $response = new Response('', Response::HTTP_NOT_FOUND);
         } catch (\Exception $ex) {
 
         }
@@ -152,7 +157,7 @@ class LogBookSetupController extends Controller
                 'short_message' => sprintf('Setup with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
-            ));
+            ), $response);
         }
 
         return $this->render('lbook/404.html.twig', array(

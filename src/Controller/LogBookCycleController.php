@@ -100,9 +100,13 @@ class LogBookCycleController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookCycle $cycle, $page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
+    public function show(LogBookCycle $cycle = null, $page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
     {
         try {
+            if (!$cycle) {
+                throw new \Exception();
+            }
+
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
                 ->orderBy('t.executionOrder', 'ASC')
@@ -133,7 +137,7 @@ class LogBookCycleController extends Controller
     /**
      * Finds and displays a cycle entity.
      *
-     * @Route("/{id}", name="cycle_show_full")
+     * @Route("/{id}", name="cycle_show_default")
      * @Method("GET")
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\Response
@@ -150,21 +154,26 @@ class LogBookCycleController extends Controller
      * @param \Throwable $ex
      * @return Response
      */
-    protected function cycleNotFound(LogBookCycle $cycle=null, \Throwable $ex): ?Response
+    protected function cycleNotFound(LogBookCycle $cycle = null, \Throwable $ex): ?Response
     {
-        global $request;
+        /** @var Request $request */
+        $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
+        $response = null;
+
         try {
             $possibleId = $request->attributes->get('id');
+            $response = new Response('', Response::HTTP_NOT_FOUND);
         } catch (\Exception $ex) {
         }
 
         if ($cycle === null) {
+
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Cycle with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
                 'ex' => $ex,
-            ));
+            ), $response);
         }
 
         return $this->render('lbook/404.html.twig', array(

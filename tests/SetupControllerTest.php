@@ -2,12 +2,15 @@
 
 namespace App\Tests;
 
+use Doctrine\ORM\EntityManager;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-#use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class SetupControllerTest extends WebTestCase
@@ -15,8 +18,8 @@ class SetupControllerTest extends WebTestCase
     /** @var  Application $application */
     protected static $application;
 
-
-    private $client = null;
+    /** @var Client $client */
+    private $client;
 
     /** @var  ContainerInterface $container */
     protected $container;
@@ -24,32 +27,32 @@ class SetupControllerTest extends WebTestCase
     /** @var  EntityManager $entityManager */
     protected $entityManager;
 
-
-    public function setUp()
+    /**
+     * @throws \Exception
+     */
+    public function setUp(): void
     {
         self::runCommand('doctrine:database:drop --force');
         self::runCommand('doctrine:database:create');
 
         self::runCommand('doctrine:schema:create --dump-sql');
         self::runCommand('doctrine:schema:create -vvv');
-
         //self::runCommand('doctrine:fixtures:load --append --no-interaction');
-
         //exit();
         $this->client = static::createClient();
 
-
-/*        $this->client = static::createClient(array(), array(
-        'PHP_AUTH_USER' => 'username',
-        'PHP_AUTH_PW'   => 'pa$$word',
-    ));*/
         $this->container = $this->client->getContainer();
         $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
         parent::setUp();
 
     }
-    private function logIn()
+
+    /**
+     *
+     */
+    private function logIn(): void
     {
+        /** @var Session $session */
         $session = $this->client->getContainer()->get('session');
 
         // the firewall context defaults to the firewall name
@@ -63,6 +66,9 @@ class SetupControllerTest extends WebTestCase
         $this->client->getCookieJar()->set($cookie);
     }
 
+    /**
+     *
+     */
     public function testSomething(): void
     {
         $this->logIn();
@@ -72,14 +78,22 @@ class SetupControllerTest extends WebTestCase
         $this->assertSame(1, $crawler->filter('h1:contains("Setup list")')->count());
     }
 
-    protected static function runCommand($command)
+    /**
+     * @param $command
+     * @return int
+     * @throws \Exception
+     */
+    protected static function runCommand($command): int
     {
         $command = sprintf('%s --quiet', $command);
 
         return self::getApplication()->run(new StringInput($command));
     }
 
-    protected static function getApplication()
+    /**
+     * @return Application
+     */
+    protected static function getApplication(): Application
     {
         if (null === self::$application) {
             $client = static::createClient();

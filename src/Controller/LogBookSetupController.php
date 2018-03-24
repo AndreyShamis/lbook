@@ -107,7 +107,7 @@ class LogBookSetupController extends Controller
     {
         try {
             if (!$setup) {
-                throw new \Exception();
+                throw new \RuntimeException('');
             }
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')

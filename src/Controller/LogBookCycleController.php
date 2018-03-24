@@ -104,7 +104,7 @@ class LogBookCycleController extends Controller
     {
         try {
             if (!$cycle) {
-                throw new \Exception();
+                throw new \RuntimeException('');
             }
 
             $qb = $testRepo->createQueryBuilder('t')

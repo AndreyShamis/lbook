@@ -110,7 +110,7 @@ class LogBookSetup
         $this->setUpdatedAt();
         $this->setCreatedAt();
         $this->moderators = array();
-        $this->cycles = new ArrayCollection();
+        //$this->cycles = new ArrayCollection();
     }
 
     /**
@@ -280,6 +280,9 @@ class LogBookSetup
      */
     public function getCycles(): Collection
     {
+        if ($this->cycles === null) {
+            $this->cycles = new ArrayCollection();
+        }
         return $this->cycles;
     }
 

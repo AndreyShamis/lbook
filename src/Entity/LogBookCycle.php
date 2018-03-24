@@ -179,7 +179,7 @@ class LogBookCycle
             $this->setUploadToken(RandomString::generateRandomString(50));
         } catch (\Exception $e) {
         }
-        $this->tests = new ArrayCollection();
+        //$this->tests = new ArrayCollection();
     }
 
     /**
@@ -513,6 +513,9 @@ class LogBookCycle
      */
     public function getTests(): Collection
     {
+        if ($this->tests === null) {
+            $this->tests = new ArrayCollection();
+        }
         return $this->tests;
     }
 

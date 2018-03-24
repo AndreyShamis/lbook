@@ -33,6 +33,71 @@ class TestControllerTest extends LogBookApplicationTestCase
     }
 
     /**
+     *
+     * @throws \Exception
+     */
+    public function testTestNotExistAfterDelete(): void
+    {
+        $test = self::createTest();
+        $this->checkTestExist($test);
+
+        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+        $testId = $test->getId();
+        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
+
+        $testRepo->delete($test);
+        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+    }
+
+    /**
+     *
+     * @throws \Exception
+     */
+    public function testTestNotExistAfterCycleDelete(): void
+    {
+        $setup = SetupControllerTest::createSetup('SetupttestTestNotExistAfterCycleDelete');
+        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterCycleDelete', $setup);
+        $test = self::createTest('testTestNotExistAfterCycleDelete', $setup, $cycle);
+        $this->checkTestExist($test);
+
+        $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
+        $testId = $test->getId();
+        $cycle = $cycleRepo->find($cycle->getId());
+        self::$entityManager->refresh($cycle);
+        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
+        //echo "Cycle tests count " . $cycle->getTests()->count() ."\n";
+        $cycleRepo->delete($test->getCycle());
+        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+    }
+
+    /**
+     *
+     * @throws \Exception
+     */
+    public function testTestNotExistAfterSetupDelete(): void
+    {
+        ini_set('max_execution_time', 125);
+        $setup = SetupControllerTest::createSetup('SetuptestTestNotExistAfterSetupDelete');
+        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterSetupDelete', $setup);
+        $test = self::createTest('TEST_testTestNotExistAfterSetupDelete', $setup, $cycle);
+        $this->checkTestExist($test);
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+
+        $testId = $test->getId();
+        self::$entityManager->refresh($setup);
+        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
+        $setupRepo->delete($setup);
+
+        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+    }
+
+    /**
      * @return int
      */
     public static function getExecutionOrder(): int
@@ -54,7 +119,6 @@ class TestControllerTest extends LogBookApplicationTestCase
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Tests list")')->count());
     }
-
 
     public function testTestIndexPageDefault(): void
     {
@@ -101,27 +165,23 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public static function createTest(string $testName = '', LogBookSetup $setup = null, LogBookCycle $cycle = null): LogBookTest
     {
-        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+
         if ($cycle === null) {
             $cycle = CycleControllerTest::createCycle(RandomString::generateRandomString(100), $setup);
         }
-
         if ($testName === '') {
             $testName = RandomString::generateRandomString(50);
         }
+
+        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+
         $test = $testRepo->findOneOrCreate(array(
             'name' => $testName,
             'cycle' => $cycle,
             'logFile' =>  RandomString::generateRandomString(100),
-            'logFileSize' => 100,
+            'logFileSize' => 100 + self::getExecutionOrder(),
             'executionOrder' => self::getExecutionOrder(),
         ), true);
-        $cycle->setDirty(true);
-        self::$entityManager->flush();
-        if ($test === null) {
-            echo "Error";
-            exit();
-        }
         return $test;
 
     }
@@ -131,7 +191,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     protected function checkTestExist(LogBookTest $test): void
     {
-        ini_set('max_execution_time', 25);
+        ini_set('max_execution_time', 125);
         $crawler = $this->getClient()->request('GET', '/test/'. $test->getId() . '/page');
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
         $searchString = 'h3:contains("Test [' . $test->getId() . '] : ' . $test->getName() . '")';
@@ -145,79 +205,14 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestExist(): void
     {
-        $cycle = self::createTest();
+        $setup = SetupControllerTest::createSetup('1_SetuptestTestExist');
+        $cycle = CycleControllerTest::createCycle('1_CycletestTestExist', $setup);
+        $test = self::createTest('1_testtestTestExist', $setup, $cycle);
+        self::$entityManager->refresh($cycle);
 
-        $this->checkTestExist($cycle);
-
-    }
-
-    /**
-     *
-     * @throws \Exception
-     */
-    public function testTestNotExistAfterDelete(): void
-    {
-        $test = self::createTest();
         $this->checkTestExist($test);
 
-        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
-        $testId = $test->getId();
-        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
-
-        $testRepo->delete($test);
-        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
-        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 
-    /**
-     *
-     * @throws \Exception
-     */
-    public function testTestNotExistAfterCycleDelete(): void
-    {
-        $test = self::createTest();
-        $this->checkTestExist($test);
 
-        $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
-        $testId = $test->getId();
-        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
-
-        $cycleRepo->delete($test->getCycle());
-        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
-        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
-    }
-
-//    /**
-//     *
-//     * @throws \Exception
-//     */
-//    public function testTestNotExistAfterSetupDelete(): void
-//    {
-//        ini_set('max_execution_time', 125);
-//        $test = self::createTest();
-//        $this->checkTestExist($test);
-//
-//
-//        $testId = $test->getId();
-//        /** @var LogBookSetup $setup */
-//        self::$entityManager->refresh($test);
-//        $setup = $test->getCycle()->getSetup();
-//        $cycle = $test->getCycle();
-//
-//        self::$entityManager->refresh($setup);
-//        self::$entityManager->refresh($cycle);
-//        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
-//        echo "Cycle tests count " . $cycle->getTestsCount() ."\n";
-//        echo "Setup id is " . $setup->getId() . " Cycles count " . $setup->getCycles()->count() . "\n";
-//
-//        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
-//        $setupRepo->delete($setup);
-////        echo "Setup id is " . $test->getCycle()->getSetup()->getId() . "\n";
-////        echo "Setup id is " . $test->getCycle()->getId() . "\n";
-//        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-//        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
-//        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
-//    }
 }

@@ -37,6 +37,7 @@ class LogBookDefaultController extends Controller
      * @Route("/send_email", name="send_email_example")
      * @param \Swift_Mailer $mailer
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \LogicException
      */
     public function emailExample(\Swift_Mailer $mailer): Response
     {

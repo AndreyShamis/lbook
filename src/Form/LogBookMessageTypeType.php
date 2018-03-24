@@ -21,6 +21,7 @@ class LogBookMessageTypeType extends AbstractType
 
     /**
      * @param OptionsResolver $resolver
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

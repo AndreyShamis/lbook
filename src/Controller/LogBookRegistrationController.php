@@ -18,6 +18,7 @@ class LogBookRegistrationController extends Controller
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
      */
     public function registerAction(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {

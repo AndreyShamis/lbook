@@ -44,6 +44,11 @@ class LogBookUploaderController extends Controller
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
     protected $log_first_lines = array();
 
+    /**
+     * LogBookUploaderController constructor.
+     * @param Container $container
+     * @throws \LogicException
+     */
     public function __construct(Container $container)
     {
         $this->container = $container;

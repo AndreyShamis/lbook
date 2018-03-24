@@ -27,6 +27,14 @@ class LogBookSecurityController extends Controller
 
     }
 
+    /**
+     * @param $user
+     * @param $password
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return array
+     * @throws \Symfony\Component\Ldap\Exception\NotBoundException
+     * @throws \Symfony\Component\Ldap\Exception\LdapException
+     */
     protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder): array
     {
         $ret_arr = array();

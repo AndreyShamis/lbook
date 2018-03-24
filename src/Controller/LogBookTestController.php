@@ -166,6 +166,7 @@ class LogBookTestController extends Controller
         /** @var Request $request */
         $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
+        $response = null;
         try {
             $possibleId = $request->attributes->get('id');
             $response = new Response('', Response::HTTP_NOT_FOUND);

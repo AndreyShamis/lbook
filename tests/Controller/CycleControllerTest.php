@@ -70,7 +70,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
      * @param LogBookSetup|null $setup
      * @return LogBookCycle
      */
-    protected static function createCycle($cycleName = '', LogBookSetup $setup = null): LogBookCycle
+    public static function createCycle($cycleName = '', LogBookSetup $setup = null): LogBookCycle
     {
         if ($cycleName === '') {
             $cycleName = RandomString::generateRandomString(250);
@@ -108,6 +108,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
         $this->checkCycleExist($cycle);
 
     }
+
     /**
      * @param LogBookCycle $cycle
      */

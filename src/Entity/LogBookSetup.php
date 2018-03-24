@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Model\OsType;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
@@ -108,6 +110,7 @@ class LogBookSetup
         $this->setUpdatedAt();
         $this->setCreatedAt();
         $this->moderators = array();
+        $this->cycles = new ArrayCollection();
     }
 
     /**
@@ -275,7 +278,7 @@ class LogBookSetup
     /**
      * @return mixed
      */
-    public function getCycles()
+    public function getCycles(): Collection
     {
         return $this->cycles;
     }

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\PreFlush;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -106,6 +107,11 @@ class LogBookTest
      * @ORM\Column(name="log_file_size", type="integer", length=11, options={"unsigned"=true})
      */
     private $logFileSize = 0;
+
+    public function __construct()
+    {
+        $this->logs = new ArrayCollection();
+    }
 
     /**
      * @return int

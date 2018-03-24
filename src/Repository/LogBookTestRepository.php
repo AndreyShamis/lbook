@@ -9,10 +9,6 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookTestRepository extends ServiceEntityRepository
 {
-    /**
-     * @var array Keep hashed entity
-     */
-    protected static $hashedData = array();
 
     public function __construct(RegistryInterface $registry)
     {
@@ -26,14 +22,7 @@ class LogBookTestRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria, $flush = false): LogBookTest
     {
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['id']])) {
-            $entity = self::$hashedData[$criteria['id']];
-            $add_hash = false;
-        } else {
-            $entity = $this->findOneBy($criteria);
-        }
-
+        $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookTest();
             $entity->setName($criteria['name']);
@@ -48,10 +37,6 @@ class LogBookTestRepository extends ServiceEntityRepository
                 $this->_em->flush();
             }
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['id']] = $entity;
-        }
-
         return $entity;
     }
 
@@ -61,7 +46,7 @@ class LogBookTestRepository extends ServiceEntityRepository
     public function deleteByCycle(LogBookCycle $cycle): void
     {
         $msgRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
-        foreach ((array) $cycle->getTests() as $test){
+        foreach ($cycle->getTests() as $test){
             /** @var LogBookTest $test */
             $msgRepo->deleteByTestId($test->getId());
             $this->delete($test);

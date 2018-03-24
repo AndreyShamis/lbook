@@ -1,14 +1,14 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Test [{{ test.id }}:{{ test.name }}] {% endblock %}
 {% block content %}
-    <h1>Test</h1>
+    <h3>Test [{{ test.id }}] : {{ test.name }}</h3>
 
     <table class="records_list table table-striped table-condensed">
         <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ test.id }}</td>
-        </tr>
+        {#<tr>#}
+            {#<th>Id</th>#}
+            {#<td>{{ test.id }}</td>#}
+        {#</tr>#}
         <tr>
             <th>Order</th>
             <td>{{ test.executionOrder }}</td>
@@ -21,10 +21,10 @@
             <th>Cycle</th>
             <td>{{ test.cycle.id }} / {{ test.cycle.name }}</td>
         </tr>
-        <tr>
-            <th>Name</th>
-            <td>{{ test.name }}</td>
-        </tr>
+        {#<tr>#}
+            {#<th>Name</th>#}
+            {#<td>{{ test.name }}</td>#}
+        {#</tr>#}
         <tr>
             <th>Timestart</th>
             <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>

@@ -98,8 +98,11 @@ class LogBookSetupRepository extends ServiceEntityRepository
     {
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
-        $cycles = (array) $setup->getCycles();
-        foreach ($cycles as $cycle){
+        //$cycles = $setup->getCycles();
+        //echo "Cycles count :" . ($setup->getCycles()) . "\n";
+        //print "I'm here in Setup Repo\n";
+        foreach ($setup->getCycles() as $cycle){
+            //print "Here delete cycle \n";
             $cycleRepo->delete($cycle);
         }
         $this->_em->remove($setup);

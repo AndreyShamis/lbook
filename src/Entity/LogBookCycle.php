@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Utils\RandomString;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping as ORM;
@@ -177,6 +179,7 @@ class LogBookCycle
             $this->setUploadToken(RandomString::generateRandomString(50));
         } catch (\Exception $e) {
         }
+        $this->tests = new ArrayCollection();
     }
 
     /**
@@ -508,7 +511,7 @@ class LogBookCycle
     /**
      * @return mixed
      */
-    public function getTests()
+    public function getTests(): Collection
     {
         return $this->tests;
     }

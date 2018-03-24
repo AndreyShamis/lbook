@@ -68,7 +68,6 @@ class SetupControllerTest extends WebTestCase
         $this->logIn();
 
         $crawler = $this->client->request('GET', '/setup/page/1');
-        print($this->client->getResponse()->getContent());
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertSame(1, $crawler->filter('h1:contains("Setup list")')->count());
     }

@@ -110,7 +110,7 @@ class LogBookTest
 
     public function __construct()
     {
-        $this->logs = new ArrayCollection();
+        //$this->logs = new ArrayCollection();
     }
 
     /**

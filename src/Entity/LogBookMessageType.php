@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookMessageTypeRepository")
- * @ORM\Table(name="lbook_msg_types", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_name", columns={"name"})})
+ * @ORM\Table(name="lbook_msg_types", uniqueConstraints={@ORM\UniqueConstraint(name="log_type_uniq_name", columns={"name"})})
  * @UniqueEntity("name", message="Message Type with this name already exist")
  */
 class LogBookMessageType

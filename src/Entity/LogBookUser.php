@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @property string salt
  * @ORM\Entity(repositoryClass="App\Repository\LogBookUserRepository")
- * @ORM\Table(name="lbook_users", uniqueConstraints={@ORM\UniqueConstraint(name="uniq_name", columns={"username"})})
+ * @ORM\Table(name="lbook_users", uniqueConstraints={@ORM\UniqueConstraint(name="user_uniq_name", columns={"username"})})
  * @UniqueEntity("username", message="This User Name already exist")
  */
 class LogBookUser implements UserInterface, \Serializable

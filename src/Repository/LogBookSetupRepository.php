@@ -66,14 +66,14 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): LogBookSetup
     {
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['name']])) {
-            $entity = self::$hashedData[$criteria['name']];
-            $add_hash = false;
-        } else {
-            $entity = $this->findOneBy($criteria);
-        }
-
+//        $add_hash = true;
+//        if (isset(self::$hashedData[$criteria['name']])) {
+//            $entity = self::$hashedData[$criteria['name']];
+//            $add_hash = false;
+//        } else {
+//            $entity = $this->findOneBy($criteria);
+//        }
+        $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookSetup();
             $entity->setName($criteria['name']);
@@ -84,10 +84,9 @@ class LogBookSetupRepository extends ServiceEntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['name']] = $entity;
-        }
-
+//        if ($add_hash) {
+//            self::$hashedData[$criteria['name']] = $entity;
+//        }
         return $entity;
     }
 
@@ -100,9 +99,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
         /** @var LogBookCycle $cycle */
         //$cycles = $setup->getCycles();
         //echo "Cycles count :" . ($setup->getCycles()) . "\n";
-        //print "I'm here in Setup Repo\n";
         foreach ($setup->getCycles() as $cycle){
-            //print "Here delete cycle \n";
             $cycleRepo->delete($cycle);
         }
         $this->_em->remove($setup);

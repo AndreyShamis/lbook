@@ -262,9 +262,6 @@ class LogBookSetupController extends Controller
 
             $setupRepo = $em->getRepository('App:LogBookSetup');
             $setupRepo->delete($obj);
-            $em->refresh($obj);
-            $em->remove($obj);
-            $em->flush();
         }
 
         return $this->redirectToRoute('setup_index');

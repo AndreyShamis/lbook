@@ -53,12 +53,13 @@ class LogBookApplicationTestCase extends WebTestCase
             self::$client = static::createClient();
 
             self::$container = self::$client->getContainer();
-            self::$entityManager = self::$container->get('doctrine.orm.entity_manager');
             parent::setUp();
 
             self::logIn();
             self::setSetupPass(true);
         }
+        self::$entityManager = self::$container->get('doctrine.orm.entity_manager');
+
     }
 
     /**

@@ -1,6 +1,12 @@
 <?php
+/**
+ * User: Andrey Shamis
+ * email: lolnik@gmail.com
+ * Date: 24/03/18
+ * Time: 11:35
+ */
 
-namespace App\Tests;
+namespace App\Tests\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -9,51 +15,58 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class SetupControllerTest extends WebTestCase
+class LogBookApplicationTestCase extends WebTestCase
 {
     /** @var  Application $application */
     protected static $application;
 
     /** @var Client $client */
-    private $client;
+    protected static $client;
 
     /** @var  ContainerInterface $container */
-    protected $container;
+    protected static $container;
 
     /** @var  EntityManager $entityManager */
-    protected $entityManager;
+    protected static $entityManager;
 
+    protected static $setupPass = false;
+
+    public function getClient(): Client
+    {
+        return self::$client;
+    }
     /**
      * @throws \Exception
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
-        self::runCommand('doctrine:database:drop --force');
-        self::runCommand('doctrine:database:create');
+        if (self::isSetupPass() === false) {
+            self::runCommand('doctrine:database:drop --force');
+            self::runCommand('doctrine:database:create');
+            self::runCommand('doctrine:schema:create --dump-sql');
+            self::runCommand('doctrine:schema:create -vvv');
+            //self::runCommand('doctrine:fixtures:load --append --no-interaction');
+            self::$client = static::createClient();
 
-        self::runCommand('doctrine:schema:create --dump-sql');
-        self::runCommand('doctrine:schema:create -vvv');
-        //self::runCommand('doctrine:fixtures:load --append --no-interaction');
-        //exit();
-        $this->client = static::createClient();
+            self::$container = self::$client->getContainer();
+            self::$entityManager = self::$container->get('doctrine.orm.entity_manager');
+            parent::setUp();
 
-        $this->container = $this->client->getContainer();
-        $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
-        parent::setUp();
-
+            self::logIn();
+            self::setSetupPass(true);
+        }
     }
 
     /**
      *
      */
-    private function logIn(): void
+    protected static function logIn(): void
     {
         /** @var Session $session */
-        $session = $this->client->getContainer()->get('session');
+        $session = self::$client->getContainer()->get('session');
 
         // the firewall context defaults to the firewall name
         $firewallContext = 'main';
@@ -63,19 +76,7 @@ class SetupControllerTest extends WebTestCase
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
-    }
-
-    /**
-     *
-     */
-    public function testSomething(): void
-    {
-        $this->logIn();
-
-        $crawler = $this->client->request('GET', '/setup/page/1');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertSame(1, $crawler->filter('h1:contains("Setup list")')->count());
+        self::$client->getCookieJar()->set($cookie);
     }
 
     /**
@@ -105,17 +106,33 @@ class SetupControllerTest extends WebTestCase
         return self::$application;
     }
 
+//    /**
+//     * {@inheritDoc}
+//     */
+//    protected function tearDown()
+//    {
+//        self::runCommand('doctrine:database:drop --force');
+//
+//        parent::tearDown();
+//
+//        self::$entityManager->close();
+//        self::$entityManager = null; // avoid memory leaks
+//    }
+
+
     /**
-     * {@inheritDoc}
+     * @return bool
      */
-    protected function tearDown()
+    public static function isSetupPass(): bool
     {
-        self::runCommand('doctrine:database:drop --force');
-
-        parent::tearDown();
-
-        $this->entityManager->close();
-        $this->entityManager = null; // avoid memory leaks
+        return self::$setupPass;
     }
 
+    /**
+     * @param bool $setupPass
+     */
+    public static function setSetupPass(bool $setupPass): void
+    {
+        self::$setupPass = $setupPass;
+    }
 }

@@ -145,7 +145,7 @@ class LogBookUploaderController extends Controller
             $obj->addMessage('Searching setup by ID :' . $setupId);
             $setup = $this->setupRepo->findById($setupId);
             if ($setup !== null) {
-                $obj->addMessage(sprintf('Found setup [ID:%d], [NAME:%s] ', $setup->getId(), $setup->getName()));
+                $obj->addMessage(sprintf('Found setup [ID:%d], [NAME:%s].', $setup->getId(), $setup->getName()));
             }
         }
 
@@ -200,28 +200,34 @@ class LogBookUploaderController extends Controller
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
 
             if ($cycle_token !== null && $cycle_token !== '') {
-                $obj->addMessage('INFO: Token provided use him : ' . $cycle_token);
+                $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
                 $cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
                 if ($cycle === null) {
-                    $obj->addMessage('ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup');
+                    $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
                     /**
                      * TODO create new cycle? -> Need Parse Setup
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
                     if ($cycle_name === '' || $cycle_name === null) {
+                        $obj->addMessage('INFO: -1- Cycle name not prided. Generating it for you.');
                         $cycle_name = $this->generateCycleName();
+                        $obj->addMessage('INFO: -1- Generated cycle name [' . $cycle_name . '].');
+                    } else {
+                        $obj->addMessage('INFO: -1- Cycle name provided [' . $cycle_name . '].');
                     }
+                    $obj->addMessage('INFO: -1- Creating cycle.');
                     $cycle = $this->cycleRepo->findOneOrCreate(array(
                         'name' => $cycle_name,   // TODO provide cycle name
                         'setup' => $setup,
                         'uploadToken' => $cycle_token,
                         //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
                     ));
+                    $obj->addMessage('INFO: -1- Cycle created ID:' . $cycle->getId() . '.');
                     if ($cycle === null) {
-                        $obj->addMessage('CRITICAL: Failed to generate cycle');
+                        $obj->addMessage('CRITICAL -1- Failed to generate cycle');
                         // exit();
                     }
-                    $obj->addMessage('ERROR: Cycle not found by token ! TODO create new cycle? -> Need Parse Setup');
+                    $obj->addMessage('PASS: -1- The LogBOOK system performed all thinks for you. Continue to log parsing.');
                 } else {
                     /**
                      * TODO Check token exp date

@@ -29,10 +29,7 @@ restore_proxy(){
 }
 
 # Requirements
-#sudo apt install php7.2-ldap
-#sudo apt install php7.2-zip
-#sudo apt install php7.2-xml
-#sudo apt install php7.2-mbstring
+#sudo apt install php7.2-ldap php7.2-zip php7.2-xml php7.2-mbstring
 
 save_proxy
 
@@ -60,8 +57,7 @@ success "***************************** Composer validation finished ************
 ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
-#sudo apt-get install php7.0-zip
-#sudo apt-get install php7.0-xml
+
 composer  -vvv update
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
@@ -87,6 +83,5 @@ success "Finish Check YAML files"
 restore_proxy
 
 info "Start unittests"
-#sudo apt install php7.0-mbstring
 ./vendor/bin/simple-phpunit --verbose --debug --testdox --colors=always --strict-coverage --strict-global-state --testdox-text artifacts/phpunit.txt
 success "Finish unittests"

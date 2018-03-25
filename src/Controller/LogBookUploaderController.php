@@ -534,7 +534,7 @@ class LogBookUploaderController extends Controller
 //                    $objectsToClear = array();
 //                }
                 /*** Test Name section **/
-                if (!$testNameFound && $log->getMsgType() === 'INFO') {
+                if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
                     $tmpName = null;
 
                     if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {

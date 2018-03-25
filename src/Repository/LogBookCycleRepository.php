@@ -31,7 +31,6 @@ class LogBookCycleRepository extends ServiceEntityRepository
             $entity->setUploadToken($criteria['uploadToken']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-
         }
         return $entity;
     }

@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Utils\RandomString;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\PreFlush;
@@ -59,7 +58,7 @@ class LogBookCycle
     protected $passRate = 0;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
@@ -67,7 +66,7 @@ class LogBookCycle
     protected $createdAt;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
@@ -75,14 +74,14 @@ class LogBookCycle
     protected $updatedAt;
 
     /**
-     * @var DateTime Took MIN time from tests
+     * @var \DateTime Took MIN time from tests
      *
      * @ORM\Column(name="time_start", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $timeStart;
 
     /**
-     * @var DateTime Took MAX time from tests
+     * @var \DateTime Took MAX time from tests
      *
      * @ORM\Column(name="time_end", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
@@ -129,7 +128,7 @@ class LogBookCycle
     protected $uploadToken = '';
 
     /**
-     * @var DateTime Time till token can be used
+     * @var \DateTime Time till token can be used
      *
      * @ORM\Column(name="token_expiration", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
@@ -264,17 +263,17 @@ class LogBookCycle
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getTokenExpiration()
+    public function getTokenExpiration(): \DateTime
     {
         return $this->tokenExpiration;
     }
 
     /**
-     * @param DateTime $tokenExpiration
+     * @param \DateTime $tokenExpiration
      */
-    public function setTokenExpiration(DateTime $tokenExpiration): void
+    public function setTokenExpiration(\DateTime $tokenExpiration): void
     {
         $this->tokenExpiration = $tokenExpiration;
     }
@@ -296,7 +295,7 @@ class LogBookCycle
         $min_time = new \DateTime('+100 years');
         $max_time = new \DateTime('-100 years');
         $tests = $this->getTests();
-        if (\is_object($tests)) {
+        if (\is_object($tests) && $tests->count() > 0) {
             foreach ($tests as $test) {
                 /** @var LogBookTest $test */
                 $max_time = max($max_time, $test->getTimeEnd());
@@ -322,9 +321,8 @@ class LogBookCycle
         $failCount = 0;
         $errorCount = 0;
         $tests = $this->getTests();
-        $allCount = 0;
-        if (\is_object($tests)) {
-            $allCount = \count($tests);
+        $allCount = $tests->count();
+        if (\is_object($tests) && $allCount > 0) {
             foreach ($tests as $test) {
                 /** @var LogBookTest $test */
                 if (strcasecmp($test->getVerdict(), 'PASS') === 0) {
@@ -341,7 +339,7 @@ class LogBookCycle
         $this->setTestsError($errorCount);
         $this->setTestsCount($allCount);
         if ($allCount > 0) {
-            $this->setPassRate($this->getTestsPass()*100/$this->getTestsCount());
+            $this->setPassRate($this->getTestsPass()*100/$allCount);
         } else {
             $this->setPassRate(100);
         }
@@ -364,17 +362,17 @@ class LogBookCycle
     }
 
     /**
-     * @return mixed
+     * @return LogBookTarget
      */
-    public function getDut()
+    public function getDut(): ?LogBookTarget
     {
         return $this->dut;
     }
 
     /**
-     * @param mixed $dut
+     * @param LogBookTarget $dut
      */
-    public function setDut($dut): void
+    public function setDut(LogBookTarget $dut = null): void
     {
         $this->dut = $dut;
     }
@@ -382,15 +380,15 @@ class LogBookCycle
     /**
      * @return mixed
      */
-    public function getTargetUploader()
+    public function getTargetUploader(): ?LogBookTarget
     {
         return $this->targetUploader;
     }
 
     /**
-     * @param mixed $targetUploader
+     * @param LogBookTarget $targetUploader
      */
-    public function setTargetUploader($targetUploader): void
+    public function setTargetUploader(LogBookTarget $targetUploader = null): void
     {
         $this->targetUploader = $targetUploader;
     }
@@ -398,7 +396,7 @@ class LogBookCycle
     /**
      * @return mixed
      */
-    public function getController()
+    public function getController(): ?LogBookTarget
     {
         return $this->controller;
     }
@@ -414,7 +412,7 @@ class LogBookCycle
     /**
      * @return LogBookBuild
      */
-    public function getBuild()
+    public function getBuild(): ?LogBookBuild
     {
         return $this->build;
     }
@@ -444,33 +442,33 @@ class LogBookCycle
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getTimeStart()
+    public function getTimeStart(): \DateTime
     {
         return $this->timeStart;
     }
 
     /**
-     * @param DateTime $timeStart
+     * @param \DateTime $timeStart
      */
-    public function setTimeStart(DateTime $timeStart): void
+    public function setTimeStart(\DateTime $timeStart): void
     {
         $this->timeStart = $timeStart;
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getTimeEnd()
+    public function getTimeEnd(): \DateTime
     {
         return $this->timeEnd;
     }
 
     /**
-     * @param DateTime $timeEnd
+     * @param \DateTime $timeEnd
      */
-    public function setTimeEnd(DateTime $timeEnd): void
+    public function setTimeEnd(\DateTime $timeEnd): void
     {
         $this->timeEnd = $timeEnd;
     }
@@ -488,7 +486,11 @@ class LogBookCycle
      */
     public function setPeriod(int $period): void
     {
-        $this->period = $period;
+        if ($period < 0) {
+            $this->period = 0;
+        } else {
+            $this->period = $period;
+        }
     }
 
     /**
@@ -520,9 +522,9 @@ class LogBookCycle
     }
 
     /**
-     * @param mixed $tests
+     * @param ArrayCollection $tests
      */
-    public function setTests($tests): void
+    public function setTests(ArrayCollection $tests): void
     {
         $this->tests = $tests;
     }
@@ -530,15 +532,15 @@ class LogBookCycle
     /**
      * @return mixed
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @param mixed $id
+     * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -568,25 +570,25 @@ class LogBookCycle
     }
 
     /**
-     * @return mixed
+     * @return LogBookSetup|null
      */
-    public function getSetup()
+    public function getSetup(): ?LogBookSetup
     {
         return $this->setup;
     }
 
     /**
-     * @param mixed $setup
+     * @param LogBookSetup|null $setup
      */
-    public function setSetup( $setup): void
+    public function setSetup(LogBookSetup $setup = null): void
     {
         $this->setup = $setup;
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getCreatedAt() : DateTime
+    public function getCreatedAt() : \DateTime
     {
         return $this->createdAt;
     }
@@ -600,9 +602,9 @@ class LogBookCycle
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getUpdatedAt() : DateTime
+    public function getUpdatedAt() : \DateTime
     {
         return $this->updatedAt;
     }

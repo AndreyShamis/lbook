@@ -118,17 +118,17 @@ class LogBookMessage
     }
 
     /**
-     * @return mixed
+     * @return LogBookMessageType
      */
-    public function getMsgType()
+    public function getMsgType(): LogBookMessageType
     {
         return $this->msgType;
     }
 
     /**
-     * @param mixed $msgType
+     * @param LogBookMessageType $msgType
      */
-    public function setMsgType($msgType): void
+    public function setMsgType(LogBookMessageType $msgType): void
     {
         $this->msgType = $msgType;
     }

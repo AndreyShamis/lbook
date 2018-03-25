@@ -208,7 +208,7 @@ class LogBookUploaderController extends Controller
                      * TODO create new cycle? -> Need Parse Setup
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
-                    if ('' === $cycle_name) {
+                    if ($cycle_name === '' || $cycle_name === null) {
                         $cycle_name = $this->generateCycleName();
                     }
                     $cycle = $this->cycleRepo->findOneOrCreate(array(

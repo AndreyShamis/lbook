@@ -38,7 +38,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterDelete(): void
     {
-        $test = self::createTest();
+        $test = self::createTest('testTestNotExistAfterDelete');
         $this->checkTestExist($test);
 
         $testRepo = self::$entityManager->getRepository(LogBookTest::class);
@@ -64,10 +64,8 @@ class TestControllerTest extends LogBookApplicationTestCase
 
         $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
         $testId = $test->getId();
-        $cycle = $cycleRepo->find($cycle->getId());
-        self::$entityManager->refresh($cycle);
+        $this->assertNotEquals(1, $cycle->getTests()->count(). ' Check that cycle include one created test. count: ' . $cycle->getTests()->count());
         $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
-        //echo "Cycle tests count " . $cycle->getTests()->count() ."\n";
         $cycleRepo->delete($test->getCycle());
         $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
@@ -85,16 +83,61 @@ class TestControllerTest extends LogBookApplicationTestCase
         $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterSetupDelete', $setup);
         $test = self::createTest('TEST_testTestNotExistAfterSetupDelete', $setup, $cycle);
         $this->checkTestExist($test);
-        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
 
         $testId = $test->getId();
-        self::$entityManager->refresh($setup);
         $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
+
+        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
+        self::$entityManager->refresh($setup);
+        $this->assertNotEquals(1, $cycle->getTests()->count(). ' Check that cycle include one created test. count: ' . $cycle->getTests()->count());
+        $this->assertNotEquals(1, $setup->getCycles()->count(). ' Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
+
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
         $setupRepo->delete($setup);
 
         $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testCycleContainsXTests(): void
+    {
+        $size = 31;
+        $setup = SetupControllerTest::createSetup('testCycleContainsXTests_SetuptestTestNotExistAfterSetupDelete');
+        $cycle = CycleControllerTest::createCycle('testCycleContainsXTests_CycletestTestNotExistAfterSetupDelete', $setup);
+        for ( $x = 0; $x < $size; $x++) {
+            self::createTest('testCycleContainsXTests_TEST_testTestNotExistAfterSetupDelete', $setup, $cycle);
+        }
+        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
+        self::$entityManager->refresh($setup);
+        $this->assertNotEquals($size, $cycle->getTests()->count(). ' Check that cycle include one created test. count: ' . $cycle->getTests()->count());
+        $this->assertNotEquals(1, $setup->getCycles()->count(). ' Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
+
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        $setupRepo->delete($setup);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testSetupContainsXCycles(): void
+    {
+        $x_size = 11;
+        $setup = SetupControllerTest::createSetup('testSetupContainsXCycles_SetuptestTestNotExistAfterSetupDelete');
+
+        for ( $x = 0; $x < $x_size; $x++) {
+            CycleControllerTest::createCycle('testSetupContainsXCycles_CycletestTestNotExistAfterSetupDelete', $setup);
+        }
+
+        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
+        self::$entityManager->refresh($setup);
+        $this->assertNotEquals($x_size, $setup->getCycles()->count(). ' Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
+
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        $setupRepo->delete($setup);
     }
 
     /**
@@ -114,6 +157,9 @@ class TestControllerTest extends LogBookApplicationTestCase
         self::$executionOrder = $executionOrder;
     }
 
+    /**
+     * @param Crawler $crawler
+     */
     protected function checkIndex(Crawler $crawler): void
     {
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
@@ -191,7 +237,6 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     protected function checkTestExist(LogBookTest $test): void
     {
-        ini_set('max_execution_time', 125);
         $crawler = $this->getClient()->request('GET', '/test/'. $test->getId() . '/page');
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
         $searchString = 'h3:contains("Test [' . $test->getId() . '] : ' . $test->getName() . '")';
@@ -209,10 +254,6 @@ class TestControllerTest extends LogBookApplicationTestCase
         $cycle = CycleControllerTest::createCycle('1_CycletestTestExist', $setup);
         $test = self::createTest('1_testtestTestExist', $setup, $cycle);
         self::$entityManager->refresh($cycle);
-
         $this->checkTestExist($test);
-
     }
-
-
 }

@@ -197,7 +197,7 @@ class LogBookUploaderController extends Controller
             $cycle_name = $request->request->get('cycle');
             $setup_name = $request->request->get('setup');
             $cycle_token = $request->request->get('token');
-            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
+            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
             if ($cycle_token !== null && $cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
@@ -261,7 +261,7 @@ class LogBookUploaderController extends Controller
             $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
 
             /** @var UploadedFile $new_file */
-            $new_file = $file->move('../uploads/' . $setup->getId(), $fileName);
+            $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
 
             $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
             $obj->setLogFile($fileName);
@@ -322,7 +322,7 @@ class LogBookUploaderController extends Controller
             /** @var UploadedFile $file */
             $file = $obj->getLogFile();
 
-            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.'.$file->guessExtension();
+            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
             $post_cycle = $request->request->get($request_str)['cycle'];
             $setup_id = $request->request->get($request_str)['setup'];
@@ -341,7 +341,7 @@ class LogBookUploaderController extends Controller
             $obj->addMessage('New file name is :' . $fileName);
             $obj->addMessage('File ext :' .$file->guessExtension());
 
-            $new_file = $file->move('../uploads/' . $setup->getId(), $fileName);
+            $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
 
             $obj->new_file_info = $new_file;
             $obj->addMessage('File copy info :' . $new_file);

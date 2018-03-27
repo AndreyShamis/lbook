@@ -24,36 +24,14 @@ class LogBookTargetRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): LogBookTarget
     {
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['name']])) {
-            $entity = self::$hashedData[$criteria['name']];
-            $add_hash = false;
-        } else {
-            $entity = $this->findOneBy($criteria);
-        }
-
+        $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookTarget();
             $entity->setName($criteria['name']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['name']] = $entity;
-        }
-
         return $entity;
     }
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('l')
-            ->where('l.something = :value')->setParameter('value', $value)
-            ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+
 }

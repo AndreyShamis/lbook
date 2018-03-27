@@ -209,7 +209,7 @@ class LogBookUploaderController extends Controller
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
                     if ($cycle_name === '' || $cycle_name === null) {
-                        $obj->addMessage('INFO: -1- Cycle name not prided. Generating it for you.');
+                        $obj->addMessage('INFO: -1- Cycle name not provided. Generating it for you.');
                         $cycle_name = $this->generateCycleName();
                         $obj->addMessage('INFO: -1- Generated cycle name [' . $cycle_name . '].');
                     } else {
@@ -288,7 +288,7 @@ class LogBookUploaderController extends Controller
             $cycle->setDut($dut);
             $setup->setUpdatedAt();
             $this->em->flush();
-            $obj->addMessage('TestID is ' . $test->getId());
+            $obj->addMessage('TestID is ' . $test->getId() . '.');
         }
 
         return $this->render('lbook/upload/curl.html.twig', array(

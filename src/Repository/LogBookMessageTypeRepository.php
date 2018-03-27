@@ -26,13 +26,13 @@ class LogBookMessageTypeRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria, $flush = false): LogBookMessageType
     {
         $criteria['name'] = strtoupper($criteria['name']);
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['name']])) {
-            $entity = self::$hashedData[$criteria['name']];
-            $add_hash = false;
-        } else {
+//        $add_hash = true;
+//        if (isset(self::$hashedData[$criteria['name']])) {
+//            $entity = self::$hashedData[$criteria['name']];
+//            $add_hash = false;
+//        } else {
             $entity = $this->findOneBy($criteria);
-        }
+//        }
 
         if (null === $entity) {
             $entity = new LogBookMessageType();
@@ -46,9 +46,9 @@ class LogBookMessageTypeRepository extends ServiceEntityRepository
             }
 
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['name']] = $entity;
-        }
+//        if ($add_hash) {
+//            self::$hashedData[$criteria['name']] = $entity;
+//        }
 
         return $entity;
     }

@@ -24,13 +24,13 @@ class LogBookTargetRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): LogBookTarget
     {
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['name']])) {
-            $entity = self::$hashedData[$criteria['name']];
-            $add_hash = false;
-        } else {
+//        $add_hash = true;
+//        if (isset(self::$hashedData[$criteria['name']])) {
+//            $entity = self::$hashedData[$criteria['name']];
+//            $add_hash = false;
+//        } else {
             $entity = $this->findOneBy($criteria);
-        }
+//        }
 
         if (null === $entity) {
             $entity = new LogBookTarget();
@@ -38,9 +38,9 @@ class LogBookTargetRepository extends ServiceEntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['name']] = $entity;
-        }
+//        if ($add_hash) {
+//            self::$hashedData[$criteria['name']] = $entity;
+//        }
 
         return $entity;
     }

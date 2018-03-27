@@ -18,7 +18,7 @@ class LogBookMessageType extends AbstractType
         $builder
             ->add('msgType')
             ->add('chain')
-            ->add('test')
+            //->add('test')
             ->add('logTime')
             ->add('message',TextareaType::class, array(
                 'attr' => array('class' => 'form-control', 'rows' => '25'),

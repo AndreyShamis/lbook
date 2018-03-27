@@ -399,7 +399,7 @@ class LogBookUploaderController extends Controller
                 $newTempArr[$key] = $this->cleanString($value);
             } else {
                 if ($last_good_key > 0) {
-                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . '\n' . $this->cleanString($value);
+                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
                 } else {
                     // add first lines without time to array
                     $this->log_first_lines[] = $this->cleanString($value);

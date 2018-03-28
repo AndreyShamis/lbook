@@ -3,12 +3,16 @@
 namespace App\Repository;
 
 use App\Entity\LogBookCycle;
+use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookCycleRepository extends ServiceEntityRepository
 {
-
+    /**
+     * LogBookCycleRepository constructor.
+     * @param RegistryInterface $registry
+     */
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, LogBookCycle::class);
@@ -22,7 +26,7 @@ class LogBookCycleRepository extends ServiceEntityRepository
     {
         $entity = $this->findOneBy($criteria);
         if (! array_key_exists('uploadToken', $criteria) || $criteria['uploadToken'] === '') {
-            $criteria['uploadToken'] = '9999999999999999999999999999';
+            $criteria['uploadToken'] = RandomString::generateRandomString(20);
         }
         if (null === $entity) {
             $entity = new LogBookCycle();

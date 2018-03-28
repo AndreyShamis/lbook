@@ -11,6 +11,7 @@ namespace App\Tests\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Utils\RandomString;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -68,18 +69,25 @@ class CycleControllerTest extends LogBookApplicationTestCase
     /**
      * @param string $cycleName
      * @param LogBookSetup|null $setup
+     * @param EntityManager|null $em
      * @return LogBookCycle
      */
-    public static function createCycle($cycleName = '', LogBookSetup $setup = null): LogBookCycle
+    public static function createCycle($cycleName = '', LogBookSetup $setup = null, EntityManager $em = null): LogBookCycle
     {
+        if ($em === null) {
+            $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
+            $em = self::$entityManager;
+        } else {
+            $cycleRepo = $em->getRepository(LogBookCycle::class);
+        }
+
         if ($cycleName === '') {
             $cycleName = RandomString::generateRandomString(20);
         }
         if ($setup === null) {
-            $setup = SetupControllerTest::createSetup();
+            $setup = SetupControllerTest::createSetup('SetupForCycle_' . $cycleName, $em);
         }
 
-        $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
         return $cycleRepo->findOneOrCreate(array(
             'name' => $cycleName,
             'setup' => $setup,

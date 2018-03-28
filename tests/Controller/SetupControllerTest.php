@@ -9,6 +9,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\LogBookSetup;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Utils\RandomString;
@@ -71,9 +72,15 @@ class SetupControllerTest extends LogBookApplicationTestCase
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Setup with provided ID:[9999999999999] not found")')->count());
     }
 
-    public static function createSetup(string $setupName = ''): LogBookSetup
+    public static function createSetup(string $setupName = '', EntityManager $em = null): LogBookSetup
     {
-        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        if ($em === null) {
+            $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        }
+        else{
+            $setupRepo = $em->getRepository(LogBookSetup::class);
+        }
+
 //        $setup = new LogBookSetup();
 //        $setup->setName($setupName);
 //        $setup->setCheckUpTime(false);

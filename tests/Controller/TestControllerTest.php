@@ -12,6 +12,7 @@ use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Utils\RandomString;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -38,7 +39,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterDelete(): void
     {
-        $test = self::createTest('testTestNotExistAfterDelete');
+        $test = self::createTest('testTestNotExistAfterDelete', null, null, self::$entityManager);
         $this->checkTestExist($test);
 
         $testRepo = self::$entityManager->getRepository(LogBookTest::class);
@@ -57,9 +58,9 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterCycleDelete(): void
     {
-        $setup = SetupControllerTest::createSetup('SetupttestTestNotExistAfterCycleDelete');
-        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterCycleDelete', $setup);
-        $test = self::createTest('testTestNotExistAfterCycleDelete', $setup, $cycle);
+        $setup = SetupControllerTest::createSetup('SetupttestTestNotExistAfterCycleDelete', self::$entityManager);
+        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterCycleDelete', $setup, self::$entityManager);
+        $test = self::createTest('testTestNotExistAfterCycleDelete', $setup, $cycle, self::$entityManager);
         $this->checkTestExist($test);
 
         $cycleRepo = self::$entityManager->getRepository(LogBookCycle::class);
@@ -72,76 +73,70 @@ class TestControllerTest extends LogBookApplicationTestCase
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 
-//    /**
-//     *
-//     * @throws \Exception
-//     */
-//    public function testTestNotExistAfterSetupDelete(): void
-//    {
-//        ini_set('max_execution_time', 125);
-//        $setup = SetupControllerTest::createSetup('SetuptestTestNotExistAfterSetupDelete');
-//        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterSetupDelete', $setup);
-//        $test = self::createTest('TEST_testTestNotExistAfterSetupDelete', $setup, $cycle);
-//        $this->checkTestExist($test);
-//
-//        $testId = $test->getId();
-//        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
-//
-//        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
-//
-//        $this->assertEquals(1, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
-//        $this->assertEquals(1, $setup->getCycles()->count(),'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
-//        self::$entityManager->refresh($setup);
-//        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
-//        $setupRepo->delete($setup);
-//
-//        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-//        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), 'Check that test with ID=' . $testId . ' not exist any more.');
-//        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
-//    }
-//
-//    /**
-//     * @throws \Doctrine\ORM\ORMException
-//     */
-//    public function testCycleContainsXTests(): void
-//    {
-//        $size = 31;
-//        $setup = SetupControllerTest::createSetup('testCycleContainsXTests_SetuptestTestNotExistAfterSetupDelete');
-//        $cycle = CycleControllerTest::createCycle('testCycleContainsXTests_CycletestTestNotExistAfterSetupDelete', $setup);
-//        for ( $x = 0; $x < $size; $x++) {
-//            self::createTest('testCycleContainsXTests_TEST_testTestNotExistAfterSetupDelete', $setup, $cycle);
-//        }
-//        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
-//        //self::$entityManager->refresh($setup);
-//        self::setUp();
-//        self::$entityManager->refresh($setup);
-//        $this->assertEquals($size, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
-//        $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
-//
-//        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
-//        $setupRepo->delete($setup);
-//    }
-//
-//    /**
-//     * @throws \Doctrine\ORM\ORMException
-//     */
-//    public function testSetupContainsXCycles(): void
-//    {
-//        $x_size = 11;
-//        $setup = SetupControllerTest::createSetup('testSetupContainsXCycles_SetuptestTestNotExistAfterSetupDelete');
-//
-//        for ( $x = 0; $x < $x_size; $x++) {
-//            CycleControllerTest::createCycle('testSetupContainsXCycles_CycletestTestNotExistAfterSetupDelete', $setup);
-//        }
-//
-//        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
-//        self::setUp();
-//        self::$entityManager->refresh($setup);
-//        $this->assertEquals($x_size, $setup->getCycles()->count(), 'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
-//
-//        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
-//        $setupRepo->delete($setup);
-//    }
+    /**
+     *
+     * @throws \Exception
+     */
+    public function testTestNotExistAfterSetupDelete(): void
+    {
+        ini_set('max_execution_time', 125);
+        $setup = SetupControllerTest::createSetup('SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
+        $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterSetupDelete', $setup, self::$entityManager);
+        $test = self::createTest('TEST_testTestNotExistAfterSetupDelete', $setup, $cycle, self::$entityManager);
+        $this->checkTestExist($test);
+
+        $testId = $test->getId();
+        $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
+
+        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
+        self::$entityManager->refresh($setup);
+        self::$entityManager->refresh($cycle);
+        $this->assertEquals(1, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
+        $this->assertEquals(1, $setup->getCycles()->count(),'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
+
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        $setupRepo->delete($setup);
+
+        $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), 'Check that test with ID=' . $testId . ' not exist any more.');
+        $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testCycleContainsXTests(): void
+    {
+        $size = 31;
+        $setup = SetupControllerTest::createSetup('testCycleContainsXTests_SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
+        $cycle = CycleControllerTest::createCycle('testCycleContainsXTests_CycletestTestNotExistAfterSetupDelete', $setup, self::$entityManager);
+        for ( $x = 0; $x < $size; $x++) {
+            self::createTest('testCycleContainsXTests_TEST_testTestNotExistAfterSetupDelete', $setup, $cycle, self::$entityManager);
+        }
+        /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
+        self::$entityManager->refresh($setup);
+        self::$entityManager->refresh($cycle);
+        $this->assertEquals($size, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
+        $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
+
+        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+        $setupRepo->delete($setup);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testSetupContainsXCycles(): void
+    {
+        $x_size = 11;
+        $setup = SetupControllerTest::createSetup('testSetupContainsXCycles_SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
+
+        for ( $x = 0; $x < $x_size; $x++) {
+            CycleControllerTest::createCycle('testSetupContainsXCycles_CycletestTestNotExistAfterSetupDelete' . $x, $setup, self::$entityManager);
+        }
+        self::$entityManager->refresh($setup);
+        $this->assertEquals($x_size, $setup->getCycles()->count(), 'Check that Setup include created cycles. Actual: ' . $setup->getCycles()->count() . ', expected=' . $x_size);
+    }
 
     /**
      * @return int
@@ -210,19 +205,24 @@ class TestControllerTest extends LogBookApplicationTestCase
      * @param string $testName
      * @param LogBookSetup|null $setup
      * @param LogBookCycle|null $cycle
+     * @param EntityManager $em
      * @return LogBookTest
      */
-    public static function createTest(string $testName = '', LogBookSetup $setup = null, LogBookCycle $cycle = null): LogBookTest
+    public static function createTest(string $testName = '', LogBookSetup $setup = null, LogBookCycle $cycle = null, EntityManager $em = null): LogBookTest
     {
-
+        if ($em === null) {
+            $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+            $em = self::$entityManager;
+        } else {
+            $testRepo = $em->getRepository(LogBookTest::class);
+        }
         if ($cycle === null) {
-            $cycle = CycleControllerTest::createCycle(RandomString::generateRandomString(100), $setup);
+            $cycle = CycleControllerTest::createCycle(RandomString::generateRandomString(100), $setup, $em);
         }
         if ($testName === '') {
             $testName = RandomString::generateRandomString(50);
         }
 
-        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
 
         $test = $testRepo->findOneOrCreate(array(
             'name' => $testName,

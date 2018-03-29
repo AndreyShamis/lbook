@@ -100,13 +100,15 @@ class LogBookTestController extends Controller
     public function showAction(LogBookTest $test = null): ?Response
     {
         try {
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
             $deleteForm = $this->createDeleteForm($test);
             return $this->render('lbook/test/show.html.twig', array(
                 'test' => $test,
                 'delete_form' => $deleteForm->createView(),
             ));
-        }
-        catch (\Throwable $ex) {
+        } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
     }
@@ -150,8 +152,7 @@ class LogBookTestController extends Controller
                 'paginator'     => $paginator,
                 'delete_form'   => $deleteForm->createView(),
             ));
-        }
-        catch (\Throwable $ex) {
+        } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);
         }
     }
@@ -199,24 +200,31 @@ class LogBookTestController extends Controller
      */
     public function editAction(Request $request, LogBookTest $test)
     {
-        $this->denyAccessUnlessGranted('edit', $test->getCycle()->getSetup());
-        $deleteForm = $this->createDeleteForm($test);
-        $editForm = $this->createForm(LogBookTestType::class, $test);
-        $editForm->handleRequest($request);
+        try {
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
+            $this->denyAccessUnlessGranted('edit', $test->getCycle()->getSetup());
+            $deleteForm = $this->createDeleteForm($test);
+            $editForm = $this->createForm(LogBookTestType::class, $test);
+            $editForm->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            /** @var LogBookCycle $cycle */
-            $cycle = $test->getCycle();
-            $cycle->setDirty(true);
-            $this->getDoctrine()->getManager()->flush();
-            return $this->redirectToRoute('test_edit', array('id' => $test->getId()));
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                /** @var LogBookCycle $cycle */
+                $cycle = $test->getCycle();
+                $cycle->setDirty(true);
+                $this->getDoctrine()->getManager()->flush();
+                return $this->redirectToRoute('test_edit', array('id' => $test->getId()));
+            }
+
+            return $this->render('lbook/test/edit.html.twig', array(
+                'test' => $test,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        } catch (\Throwable $ex) {
+            return $this->testNotFound($test, $ex);
         }
-
-        return $this->render('lbook/test/edit.html.twig', array(
-            'test' => $test,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**

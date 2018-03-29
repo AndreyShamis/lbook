@@ -197,21 +197,28 @@ class LogBookCycleController extends Controller
      */
     public function editAction(Request $request, LogBookCycle $obj)
     {
-        $this->denyAccessUnlessGranted('edit', $obj->getSetup());
-        $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm(LogBookCycleType::class, $obj);
-        $editForm->handleRequest($request);
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $this->denyAccessUnlessGranted('edit', $obj->getSetup());
+            $deleteForm = $this->createDeleteForm($obj);
+            $editForm = $this->createForm(LogBookCycleType::class, $obj);
+            $editForm->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-            return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
+                return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
+            }
+
+            return $this->render('lbook/cycle/edit.html.twig', array(
+                'cycle' => $obj,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($obj, $ex);
         }
-
-        return $this->render('lbook/cycle/edit.html.twig', array(
-            'cycle' => $obj,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -221,25 +228,32 @@ class LogBookCycleController extends Controller
      * @Method("DELETE")
      * @param Request $request
      * @param LogBookCycle $obj
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse|Response
      * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \LogicException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookCycle $obj): RedirectResponse
+    public function deleteAction(Request $request, LogBookCycle $obj)
     {
-        $this->denyAccessUnlessGranted('delete', $obj->getSetup());
-        $form = $this->createDeleteForm($obj);
-        $form->handleRequest($request);
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $this->denyAccessUnlessGranted('delete', $obj->getSetup());
+            $form = $this->createDeleteForm($obj);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
 
-            $cycleRepo = $em->getRepository('App:LogBookCycle');
-            $cycleRepo->delete($obj);
+                $cycleRepo = $em->getRepository('App:LogBookCycle');
+                $cycleRepo->delete($obj);
+            }
+
+            return $this->redirectToRoute('cycle_index');
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($obj, $ex);
         }
-
-        return $this->redirectToRoute('cycle_index');
     }
 
     /**

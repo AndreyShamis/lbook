@@ -570,17 +570,17 @@ class LogBookCycle
     }
 
     /**
-     * @return LogBookSetup|null
+     * @return LogBookSetup
      */
-    public function getSetup(): ?LogBookSetup
+    public function getSetup(): LogBookSetup
     {
         return $this->setup;
     }
 
     /**
-     * @param LogBookSetup|null $setup
+     * @param LogBookSetup $setup
      */
-    public function setSetup(LogBookSetup $setup = null): void
+    public function setSetup(LogBookSetup $setup): void
     {
         $this->setup = $setup;
     }

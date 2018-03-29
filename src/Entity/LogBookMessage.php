@@ -56,7 +56,7 @@ class LogBookMessage
     /**
      * @return \DateTime
      */
-    public function getLogTime()
+    public function getLogTime(): \DateTime
     {
         return $this->logTime;
     }

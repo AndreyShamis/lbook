@@ -325,11 +325,12 @@ class LogBookCycle
         if (\is_object($tests) && $allCount > 0) {
             foreach ($tests as $test) {
                 /** @var LogBookTest $test */
-                if (strcasecmp($test->getVerdict(), 'PASS') === 0) {
+                $verdictStr = $test->getVerdict();
+                if (strcasecmp($verdictStr, 'PASS') === 0) {
                     $passCount++;
-                } else if (strcasecmp($test->getVerdict(), 'FAIL') === 0) {
+                } else if (strcasecmp($verdictStr, 'FAIL') === 0) {
                     $failCount++;
-                } else if(strcasecmp($test->getVerdict(), 'ERROR') === 0) {
+                } else if(strcasecmp($verdictStr, 'ERROR') === 0) {
                     $errorCount++;
                 }
             }

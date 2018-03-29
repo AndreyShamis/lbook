@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\PreFlush;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -187,7 +186,7 @@ class LogBookTest
     /**
      * @return LogBookCycle
      */
-    public function getCycle(): ?LogBookCycle
+    public function getCycle(): LogBookCycle
     {
         return $this->cycle;
     }
@@ -203,7 +202,7 @@ class LogBookTest
     /**
      * @return LogBookVerdict
      */
-    public function getVerdict(): ?LogBookVerdict
+    public function getVerdict(): LogBookVerdict
     {
 
         return $this->verdict;

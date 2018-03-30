@@ -45,6 +45,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('passRateToColor', [$this, 'passRateToColor']),
             new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
+            new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new Twig_SimpleFunction('inarray', array($this, 'inArray')),
         ];

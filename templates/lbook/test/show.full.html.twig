@@ -30,21 +30,26 @@
             {#<td>{{ test.name }}</td>#}
         {#</tr>#}
         <tr>
-            <th>Time start / Time end / Run time</th>
+            <th>Time start / Time end / Run time / % of cycle time</th>
             <td>
                 <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue">
+                <span class="blue" title="Start time">
                     {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
                 </span>
                 /
                 <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue">
+                <span class="blue" title="End time">
                     {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
                 </span>
-                /
+                / &nbsp;&nbsp;
                 <i class="ace-icon fa fa-info-circle"></i>
-                <span title="{{ test.timeRun }}">
+                <span title="{{ test.timeRun }} seconds">
                     {{ test.timeRun |  ExecutionTimeGeneric }}
+                </span>
+                / &nbsp;&nbsp;
+                <i class="ace-icon fa fa-info-circle"></i>
+                <span class="orange" title="Show percentage of time in whole cycle">
+                    {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
                 </span>
             </td>
         </tr>

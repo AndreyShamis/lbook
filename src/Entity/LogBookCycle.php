@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookCycleRepository")
@@ -214,7 +213,7 @@ class LogBookCycle
         /**
          * Other stuff
          */
-        //$this->tests = new ArrayCollection();
+        $this->tests = new ArrayCollection();
     }
 
     /**
@@ -626,20 +625,17 @@ class LogBookCycle
     }
 
     /**
-     * @return PersistentCollection
+     * @return Collection|LogBookTest[]
      */
     public function getTests(): Collection
     {
-        if ($this->tests === null) {
-            $this->tests = new ArrayCollection();
-        }
         return $this->tests;
     }
 
     /**
-     * @param PersistentCollection $tests
+     * @param Collection|LogBookTest[] $tests
      */
-    public function setTests(PersistentCollection $tests): void
+    public function setTests(Collection $tests): void
     {
         $this->tests = $tests;
     }

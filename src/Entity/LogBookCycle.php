@@ -396,12 +396,16 @@ class LogBookCycle
         $this->setTestsWarning($warningCount);
         $this->setTestsCount($allCount);
         if ($allCount > 0) {
-            $this->setPassRate($this->getTestsPass()*100/$allCount);
-            $this->setFailRate($this->getTestsFail()*100/$allCount);
-            $this->setErrorRate($this->getTestsError()*100/$allCount);
-            $this->setWarningRate($this->getTestsWarning()*100/$allCount);
+            $coefficient = 100 / $allCount;
+            $this->setPassRate($this->getTestsPass() * $coefficient);
+            $this->setFailRate($this->getTestsFail() * $coefficient);
+            $this->setErrorRate($this->getTestsError() * $coefficient);
+            $this->setWarningRate($this->getTestsWarning() * $coefficient);
         } else {
-            $this->setPassRate(100);
+            $this->setPassRate(0);
+            $this->setFailRate(0);
+            $this->setErrorRate(0);
+            $this->setWarningRate(0);
         }
     }
 

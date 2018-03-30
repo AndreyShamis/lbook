@@ -161,7 +161,7 @@ class LogBookSetupController extends Controller
             ), $response);
         }
 
-        return $this->render('lbook/404.html.twig', array(
+        return $this->render('lbook/500.html.twig', array(
             'short_message' => 'Unknown error',
             'message' => $ex->getMessage(),
             'ex' => $ex,

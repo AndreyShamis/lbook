@@ -54,9 +54,30 @@ class LogBookCycle
     /**
      * @var float
      *
-     * @ORM\Column(name="pass_rate", type="float", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="pass_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
      */
     protected $passRate = 0;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="fail_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
+     */
+    protected $failRate = 0;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="error_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
+     */
+    protected $errorRate = 0;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="warning_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
+     */
+    protected $warningRate = 0;
 
     /**
      * @var \DateTime
@@ -177,15 +198,22 @@ class LogBookCycle
      */
     protected $testsWarning = 0;
 
+    /**
+     * LogBookCycle constructor.
+     */
     public function __construct()
     {
+        /**
+         * For new creation usage
+         */
         $this->setUpdatedAt();
         $this->setCreatedAt();
         $this->setTokenExpiration(new \DateTime('+7 days'));
-        try {
-            $this->setUploadToken(RandomString::generateRandomString(50));
-        } catch (\Exception $e) {
-        }
+        $this->setUploadToken(RandomString::generateRandomString(50));
+
+        /**
+         * Other stuff
+         */
         //$this->tests = new ArrayCollection();
     }
 
@@ -369,6 +397,9 @@ class LogBookCycle
         $this->setTestsCount($allCount);
         if ($allCount > 0) {
             $this->setPassRate($this->getTestsPass()*100/$allCount);
+            $this->setFailRate($this->getTestsFail()*100/$allCount);
+            $this->setErrorRate($this->getTestsError()*100/$allCount);
+            $this->setWarningRate($this->getTestsWarning()*100/$allCount);
         } else {
             $this->setPassRate(100);
         }
@@ -540,6 +571,57 @@ class LogBookCycle
     }
 
     /**
+     * @return float
+     */
+    public function getFailRate(): float
+    {
+        return $this->failRate;
+    }
+
+    /**
+     * @param float $failRate
+     * @param int $precision
+     */
+    public function setFailRate(float $failRate, $precision=2): void
+    {
+        $this->failRate = round($failRate, $precision);
+    }
+
+    /**
+     * @return float
+     */
+    public function getErrorRate(): float
+    {
+        return $this->errorRate;
+    }
+
+    /**
+     * @param float $errorRate
+     * @param int $precision
+     */
+    public function setErrorRate(float $errorRate, $precision=2): void
+    {
+        $this->errorRate = round($errorRate, $precision);
+    }
+
+    /**
+     * @return float
+     */
+    public function getWarningRate(): float
+    {
+        return $this->warningRate;
+    }
+
+    /**
+     * @param float $warningRate
+     * @param int $precision
+     */
+    public function setWarningRate(float $warningRate, $precision=2): void
+    {
+        $this->warningRate = round($warningRate, $precision);
+    }
+
+    /**
      * @return PersistentCollection
      */
     public function getTests(): Collection
@@ -559,7 +641,7 @@ class LogBookCycle
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId(): int
     {

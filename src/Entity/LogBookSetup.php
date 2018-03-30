@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Model\OsType;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -89,7 +88,7 @@ class LogBookSetup
     protected $isPrivate = false;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
@@ -97,20 +96,22 @@ class LogBookSetup
     protected $createdAt;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
      * //@Assert\DateTime()
      */
     protected $updatedAt;
 
-
+    /**
+     * LogBookSetup constructor.
+     */
     public function __construct()
     {
         $this->setUpdatedAt();
         $this->setCreatedAt();
-        $this->moderators = array();
-        //$this->cycles = new ArrayCollection();
+        $this->moderators = new ArrayCollection();
+        $this->cycles = new ArrayCollection();
     }
 
     /**
@@ -146,21 +147,20 @@ class LogBookSetup
     }
 
     /**
-     * @return mixed
+     * @return Collection|LogBookUser[]
      */
-    public function getModerators()
+    public function getModerators(): Collection
     {
         return $this->moderators;
     }
 
     /**
-     * @param mixed $moderators
+     * @param Collection $moderators
      */
-    public function setModerators($moderators): void
+    public function setModerators(Collection $moderators): void
     {
         $this->moderators = $moderators;
     }
-
 
     /**
      * @return mixed
@@ -276,18 +276,15 @@ class LogBookSetup
     }
 
     /**
-     * @return mixed
+     * @return Collection|LogBookCycle[]
      */
     public function getCycles(): Collection
     {
-        if ($this->cycles === null) {
-            $this->cycles = new ArrayCollection();
-        }
         return $this->cycles;
     }
 
     /**
-     * @param mixed $cycles
+     * @param Collection $cycles
      */
     public function setCycles($cycles): void
     {
@@ -295,9 +292,9 @@ class LogBookSetup
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getCreatedAt() : DateTime
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
@@ -311,9 +308,9 @@ class LogBookSetup
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getUpdatedAt() : DateTime
+    public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
     }

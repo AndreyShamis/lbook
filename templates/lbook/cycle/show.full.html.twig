@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
 {% block content %}
-    <h3>Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+    <h3><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
 
     <table class="records_list table table-striped table-condensed">
         <tbody>
@@ -82,26 +82,43 @@
 
                     <div class="infobox infobox-green">
                         <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#87B87F" style="height: 50px; width: 50px; line-height: 49px; color: rgb(135, 184, 127);">
+                            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#82af6f"
+                                 style="height: 50px; width: 50px; line-height: 49px; color: rgb(135, 184, 127);">
                                 <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 0) }}%</span>
                             </div>
                         </div>
-                        <div class="infobox-data">
-                            <span class="infobox-text">Pass Rate</span>
+                        <div class="infobox-data" title="{{ cycle.passRate }}%">
+                            <span class="infobox-text" style="color: #82af6f">Pass Rate</span>
                             <div class="infobox-content">
                                 <span class="bigger-110">{{ cycle.testsPass }} tests</span>
                             </div>
                         </div>
                     </div>
 
+                    <div class="infobox infobox-black">
+                        <div class="infobox-progress">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.warningRate }}" data-color="#6FB3E0"
+                                 style="height: 50px; width: 50px; line-height: 49px;">
+                                <span class="percent">{{ cycle.testsWarning |  getPercentage (testsCount, 0) }}%</span>
+                            </div>
+                        </div>
+                        <div class="infobox-data" title="{{ cycle.warningRate }}%">
+                            <span class="infobox-text" style="color: #6FB3E0">Warning Rate</span>
+                            <div class="infobox-content">
+                                <span class="bigger-110">{{ cycle.testsWarning }} tests</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="infobox infobox-red">
                         <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.testsFail | getPercentage (testsCount, 2) }}" style="height: 50px; width: 50px; line-height: 49px; ">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.failRate }}" data-color="#d15b47"
+                                 style="height: 50px; width: 50px; line-height: 49px;">
                                 <span class="percent">{{ cycle.testsFail | getPercentage (testsCount, 0) }}%</span>
                             </div>
                         </div>
-                        <div class="infobox-data">
-                            <span class="infobox-text">Fail Rate</span>
+                        <div class="infobox-data" title="{{ cycle.failRate }}%">
+                            <span class="infobox-text" style="color: #d15b47">Fail Rate</span>
                             <div class="infobox-content">
                                 <span class="bigger-110">{{ cycle.testsFail }} tests</span>
                             </div>
@@ -110,28 +127,15 @@
 
                     <div class="infobox infobox-orange">
                         <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.testsError |  getPercentage (testsCount, 2) }}" style="height: 50px; width: 50px; line-height: 49px; ">
+                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.errorRate }}" data-color="#f89406"
+                                 style="height: 50px; width: 50px; line-height: 49px;">
                                 <span class="percent">{{ cycle.testsError |  getPercentage (testsCount, 0) }}%</span>
                             </div>
                         </div>
-                        <div class="infobox-data">
-                            <span class="infobox-text">Error Rate</span>
+                        <div class="infobox-data" title="{{ cycle.errorRate }}%">
+                            <span class="infobox-text" style="color: #f89406">Error Rate</span>
                             <div class="infobox-content">
                                 <span class="bigger-110">{{ cycle.testsError }} tests</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="infobox infobox-black">
-                        <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="0" style="height: 50px; width: 50px; line-height: 49px; ">
-                                <span class="percent">0%</span>
-                            </div>
-                        </div>
-                        <div class="infobox-data">
-                            <span class="infobox-text">Warning Rate</span>
-                            <div class="infobox-content">
-                                <span class="bigger-110">WIP tests</span>
                             </div>
                         </div>
                     </div>
@@ -149,7 +153,7 @@
             {#<th>Count</th>#}
             {#<td>{{ cycle.testsCount }}</td>#}
         {#</tr>#}
-        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
         {% for key, value in cycle|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>

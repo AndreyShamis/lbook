@@ -512,9 +512,9 @@ class LogBookCycle
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getTests(): Collection
+    public function getTests(): ArrayCollection
     {
         if ($this->tests === null) {
             $this->tests = new ArrayCollection();

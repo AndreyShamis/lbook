@@ -54,7 +54,7 @@ class LogBookCycle
     /**
      * @var float
      *
-     * @ORM\Column(name="pass_rate", type="float")
+     * @ORM\Column(name="pass_rate", type="float", options={"unsigned"=true, "default"="0"})
      */
     protected $passRate = 0;
 

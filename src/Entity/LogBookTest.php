@@ -83,13 +83,13 @@ class LogBookTest
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookCycle", inversedBy="tests", cascade={"persist"})
-     * @ORM\JoinColumn(name="cycle", fieldName="id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="cycle", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      * @ORM\OrderBy({"id" = "ASC"})
      */
     protected $cycle;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", cascade={"all"}, fetch="EXTRA_LAZY", )
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="logs", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"chain" = "ASC"})
      */

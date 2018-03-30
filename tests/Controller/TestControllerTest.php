@@ -108,19 +108,16 @@ class TestControllerTest extends LogBookApplicationTestCase
     public function testCycleContainsXTests(): void
     {
         $size = 31;
-        $setup = SetupControllerTest::createSetup('testCycleContainsXTests_SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
-        $cycle = CycleControllerTest::createCycle('testCycleContainsXTests_CycletestTestNotExistAfterSetupDelete', $setup, self::$entityManager);
+        $setup = SetupControllerTest::createSetup('SETUP_testCycleContainsXTests', self::$entityManager);
+        $cycle = CycleControllerTest::createCycle('CYCLE_testCycleContainsXTests', $setup, self::$entityManager);
         for ( $x = 0; $x < $size; $x++) {
-            self::createTest('testCycleContainsXTests_TEST_testTestNotExistAfterSetupDelete', $setup, $cycle, self::$entityManager);
+            self::createTest('TEST_testCycleContainsXTests_' . $x, $setup, $cycle, self::$entityManager);
         }
         /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
         self::$entityManager->refresh($setup);
         self::$entityManager->refresh($cycle);
         $this->assertEquals($size, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
-
-        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
-        $setupRepo->delete($setup);
     }
 
     /**

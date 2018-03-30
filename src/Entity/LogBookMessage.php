@@ -42,7 +42,7 @@ class LogBookMessage
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTest", inversedBy="logs", cascade={"persist"})
-     * @ORM\JoinColumn(name="test", fieldName="id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="test", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $test;
 

@@ -36,7 +36,7 @@ class UploaderTest extends LogBookApplicationTestCase
     public function testUploadCli():void
     {
         $token = RandomString::generateRandomString(20);
-        $setupName = 'Test Setup';
+        $setupName = 'Test Setup' . $token;
         $postParams = array(
             'token' => $token,
             'setup' => $setupName,
@@ -83,7 +83,7 @@ class UploaderTest extends LogBookApplicationTestCase
         /** @var LogBookSetup $setup */
         $setup = $cycle->getSetup();
         //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
-        $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName);
+        $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
         $this->assertSame(35, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());
         $this->assertEquals(2, $cycle->getTests()->count(), 'Check that cycle include 2 created test. count: ' . $cycle->getTests()->count());

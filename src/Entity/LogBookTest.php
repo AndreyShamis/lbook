@@ -89,8 +89,8 @@ class LogBookTest
     protected $cycle;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", cascade={"all"}, fetch="EXTRA_LAZY", )
-     * @ORM\JoinColumn(name="logs", fieldName="id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="logs", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      * @ORM\OrderBy({"chain" = "ASC"})
      */
     protected $logs;

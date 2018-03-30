@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Utils\RandomString;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping as ORM;
@@ -512,9 +511,9 @@ class LogBookCycle
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getTests(): Collection
+    public function getTests(): ArrayCollection
     {
         if ($this->tests === null) {
             $this->tests = new ArrayCollection();

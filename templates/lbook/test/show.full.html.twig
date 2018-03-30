@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Test [{{ test.id }}:{{ test.name }}] {% endblock %}
 {% block content %}
-    <h3>Test [{{ test.id }}] : {{ test.name }}</h3>
+    <h3><a href="{{ path('setup_show', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a> / <a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a> / Test [{{ test.id }}] : {{ test.name }}</h3>
 
     <table class="records_list table table-striped table-condensed">
         <tbody>
@@ -14,28 +14,39 @@
             <td>{{ test.executionOrder }}</td>
         </tr>
         <tr>
-            <th>Setup</th>
-            <td>{{ test.cycle.setup.id }} / {{ test.cycle.setup.name }}</td>
-        </tr>
-        <tr>
-            <th>Cycle</th>
-            <td>{{ test.cycle.id }} / {{ test.cycle.name }}</td>
+            <th>Setup / Cycle info</th>
+            <td>
+                <span class="blue">
+                    {{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}
+                </span>
+                /
+                <span class="blue">
+                    {{ test.cycle.id }} : {{ test.cycle.name }}
+                </span>
+            </td>
         </tr>
         {#<tr>#}
             {#<th>Name</th>#}
             {#<td>{{ test.name }}</td>#}
         {#</tr>#}
         <tr>
-            <th>Timestart</th>
-            <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Timeend</th>
-            <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Timerun</th>
-            <td>{{ test.timeRun }}</td>
+            <th>Time start / Time end / Run time</th>
+            <td>
+                <i class="ace-icon fa fa-calendar"></i>
+                <span class="blue">
+                    {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
+                </span>
+                /
+                <i class="ace-icon fa fa-calendar"></i>
+                <span class="blue">
+                    {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
+                </span>
+                /
+                <i class="ace-icon fa fa-info-circle"></i>
+                <span title="{{ test.timeRun }}">
+                    {{ test.timeRun |  ExecutionTimeGeneric }}
+                </span>
+            </td>
         </tr>
         <tr>
             <th>Verdict</th>

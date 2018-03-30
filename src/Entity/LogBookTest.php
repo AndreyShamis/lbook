@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,7 +31,7 @@ class LogBookTest
     protected $name = '';
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="time_start", type="datetime")
      * //@Assert\DateTime()
@@ -38,7 +39,7 @@ class LogBookTest
     protected $timeStart;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="time_end", type="datetime")
      * //@Assert\DateTime()
@@ -107,9 +108,14 @@ class LogBookTest
      */
     private $logFileSize = 0;
 
+    /**
+     * LogBookTest constructor.
+     */
     public function __construct()
     {
-        //$this->logs = new ArrayCollection();
+        $this->timeStart = new \DateTime();
+        $this->timeEnd = new \DateTime();
+        $this->logs = new ArrayCollection();
     }
 
     /**
@@ -159,17 +165,17 @@ class LogBookTest
     }
 
     /**
-     * @return mixed
+     * @return Collection|LogBookMessage[]
      */
-    public function getLogs()
+    public function getLogs(): Collection
     {
         return $this->logs;
     }
 
     /**
-     * @param mixed $logs
+     * @param Collection $logs
      */
-    public function setLogs($logs): void
+    public function setLogs(Collection $logs): void
     {
         $this->logs = $logs;
     }
@@ -204,7 +210,6 @@ class LogBookTest
      */
     public function getVerdict(): ?LogBookVerdict
     {
-
         return $this->verdict;
     }
 
@@ -265,39 +270,33 @@ class LogBookTest
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getTimeStart(): DateTime
+    public function getTimeStart(): \DateTime
     {
-        if ($this->timeStart === null) {
-            $this->timeStart = new DateTime();
-        }
         return $this->timeStart;
     }
 
     /**
-     * @param DateTime $timeStart
+     * @param \DateTime $timeStart
      */
-    public function setTimeStart(DateTime $timeStart): void
+    public function setTimeStart(\DateTime $timeStart): void
     {
         $this->timeStart = $timeStart;
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getTimeEnd(): DateTime
+    public function getTimeEnd(): \DateTime
     {
-        if ($this->timeEnd === null) {
-            $this->timeEnd = new DateTime();
-        }
         return $this->timeEnd;
     }
 
     /**
-     * @param DateTime $timeEnd
+     * @param \DateTime $timeEnd
      */
-    public function setTimeEnd(DateTime $timeEnd): void
+    public function setTimeEnd(\DateTime $timeEnd): void
     {
         $this->timeEnd = $timeEnd;
     }

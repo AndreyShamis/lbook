@@ -170,6 +170,13 @@ class LogBookCycle
      */
     protected $testsError = 0;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_warning", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsWarning = 0;
+
     public function __construct()
     {
         $this->setUpdatedAt();
@@ -230,6 +237,21 @@ class LogBookCycle
         $this->testsError = $testsError;
     }
 
+    /**
+     * @return int
+     */
+    public function getTestsWarning(): int
+    {
+        return $this->testsWarning;
+    }
+
+    /**
+     * @param int $testsWarning
+     */
+    public function setTestsWarning(int $testsWarning): void
+    {
+        $this->testsWarning = $testsWarning;
+    }
 
     /**
      * @return bool
@@ -309,11 +331,12 @@ class LogBookCycle
         }
         $this->setTimeStart($min_time);
         $this->setTimeEnd($max_time);
-        $this->setPeriod($this->getTimeEnd()->getTimestamp() -$this->getTimeStart()->getTimestamp());
+        $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
         $this->setTestsTimeSum($testsTimeSum);
     }
 
     /**
+     * Update Pass/Fail/Error/Warning and Rates
      * @PreFlush
      */
     public function updatePassRate(): void
@@ -321,6 +344,7 @@ class LogBookCycle
         $passCount = 0;
         $failCount = 0;
         $errorCount = 0;
+        $warningCount = 0;
         $tests = $this->getTests();
         $allCount = $tests->count();
         if (\is_object($tests) && $allCount > 0) {
@@ -333,12 +357,15 @@ class LogBookCycle
                     $failCount++;
                 } else if(strcasecmp($verdictStr, 'ERROR') === 0) {
                     $errorCount++;
+                } else if(strcasecmp($verdictStr, 'WARNING') === 0) {
+                    $warningCount++;
                 }
             }
         }
         $this->setTestsPass($passCount);
         $this->setTestsFail($failCount);
         $this->setTestsError($errorCount);
+        $this->setTestsWarning($warningCount);
         $this->setTestsCount($allCount);
         if ($allCount > 0) {
             $this->setPassRate($this->getTestsPass()*100/$allCount);

@@ -111,16 +111,25 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertEquals(3, $cycle->getTests()->count(), 'Check that cycle include 2 created test. count: ' . $cycle->getTests()->count());
         $this->assertEquals(33.33, $cycle->getPassRate(), 'Check that cycle pass rate is 33.33%: Actual = ' . $cycle->getPassRate());
 
-        /** Check Test Pass/Fail/Error counters */
+        /** Check Test Pass/Fail/Error/Warning counters */
         $this->assertEquals(1, $cycle->getTestsPass(), 'Check that cycle Pass Count is 1: Actual = ' . $cycle->getTestsPass());
         $this->assertEquals(1, $cycle->getTestsFail(), 'Check that cycle Fail Count is 1: Actual = ' . $cycle->getTestsFail());
         $this->assertEquals(1, $cycle->getTestsError(), 'Check that cycle Error Count is 1: Actual = ' . $cycle->getTestsError());
+        $this->assertEquals(0, $cycle->getTestsWarning(), 'Check that cycle Warning Count is 0: Actual = ' . $cycle->getTestsWarning());
 
         /** Check Test Run times */
         $period = 1437;
         $testTimeSum = 572;
         $this->assertEquals($period, $cycle->getPeriod(), 'Check that cycle Tests Period is '.$period.': Actual = ' . $cycle->getPeriod());
         $this->assertEquals($testTimeSum, $cycle->getTestsTimeSum(), 'Check that cycle Tests [Run Time(tests_time_sum)] is '.$testTimeSum.': Actual = ' . $cycle->getTestsTimeSum());
+
+        $coefficient = 100/$cycle->getTestsCount();
+
+        /** Validate that  Pass/Fail/Error/Warning Rates similar to  Pass/Fail/Error/Warning counters */
+        $this->assertEquals(round($cycle->getTestsPass()*$coefficient, 2), $cycle->getPassRate());
+        $this->assertEquals(round($cycle->getTestsFail()*$coefficient, 2), $cycle->getFailRate());
+        $this->assertEquals(round($cycle->getTestsError()*$coefficient, 2), $cycle->getErrorRate());
+        $this->assertEquals(round($cycle->getTestsWarning()*$coefficient, 2), $cycle->getWarningRate());
 
         /**   */
     }

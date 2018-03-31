@@ -102,11 +102,24 @@ class LogBookTest
      * @Assert\File(mimeTypes={"text/plain", "application/octet-stream"}, groups = {"create"})
      */
     private $logFile = '';
+
     /**
      * @var integer
      * @ORM\Column(name="log_file_size", type="integer", length=11, options={"unsigned"=true})
      */
     private $logFileSize = 0;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="disabled", type="boolean")
+     */
+    protected $disabled = false;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="for_delete", type="boolean")
+     */
+    protected $forDelete = false;
 
     /**
      * LogBookTest constructor.
@@ -355,5 +368,45 @@ class LogBookTest
     public function setDutUpTimeEnd(int $dutUpTimeEnd): void
     {
         $this->dutUpTimeEnd = $dutUpTimeEnd;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled(bool $disabled): void
+    {
+        if ($this->disabled !== $disabled) {
+            $this->disabled = $disabled;
+            $this->getCycle()->setDirty(true);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForDelete(): bool
+    {
+        return $this->forDelete;
+    }
+
+    /**
+     * @param bool $forDelete
+     */
+    public function setForDelete(bool $forDelete): void
+    {
+        $this->forDelete = $forDelete;
+        if ($this->forDelete === true) {
+            $this->setDisabled(true);
+        } else {
+            $this->setDisabled(false);
+        }
     }
 }

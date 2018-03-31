@@ -24,6 +24,7 @@ class LogBookTestType extends AbstractType
             ->add('verdict')
             ->add('executionOrder')
             ->add('cycle')
+            ->add('disabled')
         ;
     }
 

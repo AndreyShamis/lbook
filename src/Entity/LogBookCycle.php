@@ -240,6 +240,9 @@ class LogBookCycle
      */
     public function updateTimes(): void
     {
+        if ($this->isForDelete() === true) {
+            return;
+        }
         $testsTimeSum = 0;
         $min_time = new \DateTime('+100 years');
         $max_time = new \DateTime('-100 years');
@@ -269,6 +272,9 @@ class LogBookCycle
      */
     public function updatePassRate(): void
     {
+        if ($this->isForDelete() === true) {
+            return;
+        }
         $passCount = $failCount = $errorCount = $warningCount = $disabledCount = $forDeleteCount = 0;
         $tests = $this->getTests();
         $allCount = $tests->count();

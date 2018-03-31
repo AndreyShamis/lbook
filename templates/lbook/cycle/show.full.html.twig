@@ -66,7 +66,7 @@
             </td>
         </tr>
         <tr>
-            {% set testsCount = cycle.tests|length %}
+            {% set testsCount = cycle.testsCount %}
             <td colspan="4">
                 <div class="infobox-container">
 
@@ -153,7 +153,12 @@
             {#<th>Count</th>#}
             {#<td>{{ cycle.testsCount }}</td>#}
         {#</tr>#}
-        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount',
+            'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',
+            'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',
+            'updatedAt', 'createdAt', 'testsTimeSum',
+            'controller', 'targetUploader', 'dut',
+            'build', 'disabled', 'forDelete'] %}
         {% for key, value in cycle|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>

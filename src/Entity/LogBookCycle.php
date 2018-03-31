@@ -172,6 +172,13 @@ class LogBookCycle
     /**
      * @var integer
      *
+     * @ORM\Column(name="tests_disabled", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsDisabled = 0;
+
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="tests_pass", type="smallint", options={"unsigned"=true, "default"="0"})
      */
     protected $testsPass = 0;
@@ -198,6 +205,18 @@ class LogBookCycle
     protected $testsWarning = 0;
 
     /**
+     * @var boolean
+     * @ORM\Column(name="disabled", type="boolean")
+     */
+    protected $disabled = false;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="for_delete", type="boolean")
+     */
+    protected $forDelete = false;
+
+    /**
      * LogBookCycle constructor.
      */
     public function __construct()
@@ -214,6 +233,86 @@ class LogBookCycle
          * Other stuff
          */
         $this->tests = new ArrayCollection();
+    }
+
+    /**
+     * @PreFlush
+     */
+    public function updateTimes(): void
+    {
+        $testsTimeSum = 0;
+        $min_time = new \DateTime('+100 years');
+        $max_time = new \DateTime('-100 years');
+        $tests = $this->getTests();
+        if (\is_object($tests) && $tests->count() > 0) {
+            foreach ($tests as $test) {
+                if ($test->isDisabled() !== true) {
+                    /** @var LogBookTest $test */
+                    $max_time = max($max_time, $test->getTimeEnd());
+                    $min_time = min($min_time, $test->getTimeStart());
+                    $testsTimeSum += $test->getTimeRun();
+                }
+            }
+        } else {
+            $min_time = new \DateTime();
+            $max_time = new \DateTime();
+        }
+        $this->setTimeStart($min_time);
+        $this->setTimeEnd($max_time);
+        $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
+        $this->setTestsTimeSum($testsTimeSum);
+    }
+
+    /**
+     * Update Pass/Fail/Error/Warning and Rates
+     * @PreFlush
+     */
+    public function updatePassRate(): void
+    {
+        $passCount = $failCount = $errorCount = $warningCount = $disabledCount = 0;
+        $tests = $this->getTests();
+        $allCount = $tests->count();
+        if (\is_object($tests) && $allCount > 0) {
+            foreach ($tests as $test) {
+                /** @var LogBookTest $test */
+                if ($test->isDisabled() !== true) {
+                    $verdictStr = $test->getVerdict();
+                    if (strcasecmp($verdictStr, 'PASS') === 0) {
+                        $passCount++;
+                    } else if (strcasecmp($verdictStr, 'FAIL') === 0) {
+                        $failCount++;
+                    } else if(strcasecmp($verdictStr, 'ERROR') === 0) {
+                        $errorCount++;
+                    } else if(strcasecmp($verdictStr, 'WARNING') === 0) {
+                        $warningCount++;
+                    }
+                } else {
+                    $disabledCount++;
+                }
+
+            }
+        }
+        $this->setTestsPass($passCount);
+        $this->setTestsFail($failCount);
+        $this->setTestsError($errorCount);
+        $this->setTestsWarning($warningCount);
+
+        $allCount -= $disabledCount;
+        $this->setTestsCount($allCount);
+        $this->setTestsDisabled($disabledCount);
+
+        if ($allCount > 0) {
+            $coefficient = 100 / $allCount;
+            $this->setPassRate($this->getTestsPass() * $coefficient);
+            $this->setFailRate($this->getTestsFail() * $coefficient);
+            $this->setErrorRate($this->getTestsError() * $coefficient);
+            $this->setWarningRate($this->getTestsWarning() * $coefficient);
+        } else {
+            $this->setPassRate(0);
+            $this->setFailRate(0);
+            $this->setErrorRate(0);
+            $this->setWarningRate(0);
+        }
     }
 
     /**
@@ -313,6 +412,22 @@ class LogBookCycle
     }
 
     /**
+     * @return int
+     */
+    public function getTestsDisabled(): int
+    {
+        return $this->testsDisabled;
+    }
+
+    /**
+     * @param int $testsDisabled
+     */
+    public function setTestsDisabled(int $testsDisabled): void
+    {
+        $this->testsDisabled = $testsDisabled;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getTokenExpiration(): \DateTime
@@ -334,78 +449,6 @@ class LogBookCycle
     public function unsetDirty(): void
     {
         $this->setDirty(false);
-    }
-
-    /**
-     * @PreFlush
-     */
-    public function updateTimes(): void
-    {
-        $testsTimeSum = 0;
-        $min_time = new \DateTime('+100 years');
-        $max_time = new \DateTime('-100 years');
-        $tests = $this->getTests();
-        if (\is_object($tests) && $tests->count() > 0) {
-            foreach ($tests as $test) {
-                /** @var LogBookTest $test */
-                $max_time = max($max_time, $test->getTimeEnd());
-                $min_time = min($min_time, $test->getTimeStart());
-                $testsTimeSum += $test->getTimeRun();
-            }
-        } else {
-            $min_time = new \DateTime();
-            $max_time = new \DateTime();
-        }
-        $this->setTimeStart($min_time);
-        $this->setTimeEnd($max_time);
-        $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
-        $this->setTestsTimeSum($testsTimeSum);
-    }
-
-    /**
-     * Update Pass/Fail/Error/Warning and Rates
-     * @PreFlush
-     */
-    public function updatePassRate(): void
-    {
-        $passCount = 0;
-        $failCount = 0;
-        $errorCount = 0;
-        $warningCount = 0;
-        $tests = $this->getTests();
-        $allCount = $tests->count();
-        if (\is_object($tests) && $allCount > 0) {
-            foreach ($tests as $test) {
-                /** @var LogBookTest $test */
-                $verdictStr = $test->getVerdict();
-                if (strcasecmp($verdictStr, 'PASS') === 0) {
-                    $passCount++;
-                } else if (strcasecmp($verdictStr, 'FAIL') === 0) {
-                    $failCount++;
-                } else if(strcasecmp($verdictStr, 'ERROR') === 0) {
-                    $errorCount++;
-                } else if(strcasecmp($verdictStr, 'WARNING') === 0) {
-                    $warningCount++;
-                }
-            }
-        }
-        $this->setTestsPass($passCount);
-        $this->setTestsFail($failCount);
-        $this->setTestsError($errorCount);
-        $this->setTestsWarning($warningCount);
-        $this->setTestsCount($allCount);
-        if ($allCount > 0) {
-            $coefficient = 100 / $allCount;
-            $this->setPassRate($this->getTestsPass() * $coefficient);
-            $this->setFailRate($this->getTestsFail() * $coefficient);
-            $this->setErrorRate($this->getTestsError() * $coefficient);
-            $this->setWarningRate($this->getTestsWarning() * $coefficient);
-        } else {
-            $this->setPassRate(0);
-            $this->setFailRate(0);
-            $this->setErrorRate(0);
-            $this->setWarningRate(0);
-        }
     }
 
     /**
@@ -727,5 +770,42 @@ class LogBookCycle
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled(bool $disabled): void
+    {
+        $this->disabled = $disabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForDelete(): bool
+    {
+        return $this->forDelete;
+    }
+
+    /**
+     * @param bool $forDelete
+     */
+    public function setForDelete(bool $forDelete): void
+    {
+        $this->forDelete = $forDelete;
+        if ($this->forDelete === true) {
+            $this->setDisabled(true);
+        } else {
+            $this->setDisabled(false);
+        }
     }
 }

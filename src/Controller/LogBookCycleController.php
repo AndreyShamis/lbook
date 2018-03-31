@@ -109,8 +109,10 @@ class LogBookCycleController extends Controller
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
+                //->andWhere('t.disabled = :disabled')
                 ->orderBy('t.executionOrder', 'ASC')
                 ->setParameter('cycle', $cycle->getId());
+                //->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
             $paginator = $pagePaginator->paginate($qb, $page, $this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator

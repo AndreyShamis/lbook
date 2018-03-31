@@ -1,8 +1,9 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
 {% block content %}
+    {% set testsCount = cycle.testsCount %}
+    {% set allTestsCount = cycle.tests|length  %}
     <h3><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
-
     <table class="records_list table table-striped table-condensed">
         <tbody>
         <tr>
@@ -51,8 +52,11 @@
             <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
         </tr>
         <tr>
-            <th>Tests count</th>
-            <td>{{ cycle.tests|length }}</td>
+            <th>All Tests count</th>
+            <td>
+                {{ allTestsCount}}
+                <i class="ace-icon fa fa-exclamation-circle" title="Disabled tests also included"></i>
+            </td>
             <th>Setup</th>
             <td colspan="5">
                 <table class="records_list table table-striped table-condensed">
@@ -66,7 +70,7 @@
             </td>
         </tr>
         <tr>
-            {% set testsCount = cycle.tests|length %}
+
             <td colspan="4">
                 <div class="infobox-container">
 
@@ -74,7 +78,7 @@
                         <div class="infobox-icon">
                             <i class="ace-icon fa fa-flask"></i>
                         </div>
-                        <div class="infobox-data">
+                        <div class="infobox-data" title="Also there is {{ cycle.testsDisabled }}({{ getPercentage (cycle.testsDisabled, allTestsCount, 2) }}%) disabled tests.">
                             <span class="infobox-data-number">{{ testsCount }}</span>
                             <div class="infobox-content">Total tests</div>
                         </div>
@@ -153,7 +157,12 @@
             {#<th>Count</th>#}
             {#<td>{{ cycle.testsCount }}</td>#}
         {#</tr>#}
-        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period', 'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd', 'updatedAt', 'createdAt', 'testsTimeSum', 'controller', 'targetUploader', 'dut', 'build'] %}
+        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',
+            'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',
+            'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',
+            'updatedAt', 'createdAt', 'testsTimeSum',
+            'controller', 'targetUploader', 'dut',
+            'build', 'disabled', 'forDelete'] %}
         {% for key, value in cycle|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>
@@ -193,7 +202,11 @@
                 {% set break = true %}
             {% endif %}
             {% set counter = counter+1 %}
-            <tr>
+            {% set test_disabled = '' %}
+            {% if test.isDisabled == 1 %}
+                {% set test_disabled = 'test-disabled' %}
+            {% endif %}
+            <tr class="{{ test_disabled }}">
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
                 <td>{{ test.id }}</td>
                 <td>{{ test.executionOrder }}</td>

@@ -2,12 +2,13 @@
 
 {% block content %}
     <h1>Tests list</h1>
-    <div>Count : {{ tests | length }} <a href="{{ path('_test_index') }}">View with paginator</a></div>
+    <div>Count : {{ tests | length }} <a href="{{ path('test_index') }}">View with paginator</a></div>
     {% include "lbook/search.html.twig" %}
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
             <th>Id</th>
+            <th>Test</th>
             <th>Order</th>
             <th>Name</th>
             <th>Logs</th> {# TODO Remove due performance #}
@@ -28,8 +29,9 @@
         {% if counter == 500 %}
             {% set break = true %}
         {% endif %}
-            <tr>
+            <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td><a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">{{ test.cycle.id }}</a></td>
                 <td>{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.logs | length }}</td> {# TODO Remove due performance #}
@@ -38,7 +40,7 @@
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 <td>{{ test.dutUpTimeStart }}</td>
                 <td>{{ test.dutUpTimeEnd }}</td>
-                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>
+                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
                 <td>
                     {% if is_granted('edit', test.cycle.setup) %}
                     <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>

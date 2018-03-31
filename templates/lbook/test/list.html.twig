@@ -11,6 +11,7 @@
         <thead>
         <tr>
             <th>Id</th>
+            <th>Test</th>
             <th>Order</th>
             <th>Name</th>
             <th>Time start</th>
@@ -30,8 +31,9 @@
                 {% set break = true %}
             {% endif %}
             {% set counter = counter+1 %}
-            <tr>
+            <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td><a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                 <td>{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
@@ -39,7 +41,9 @@
                 <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
                 <td>{{ test.dutUpTimeStart }}</td>
                 <td>{{ test.dutUpTimeEnd }}</td>
-                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>
+                <td>
+                    <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>
+                </td>
                 <td>
                     {% if is_granted('edit', test.cycle.setup) %}
                     <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>

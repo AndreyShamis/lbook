@@ -21,6 +21,14 @@
 }
 .log-critical{background-color:#ff7665;
 }
+
+.test-disabled{
+    /*color: #ada6a6;*/
+    background-color: #d8d8d8 !important;
+    border-color: #6a858e !important;
+    color: #728088 !important;
+}
+
 .log-debug{
     /*color: #ada6a6;*/
     background-color: #d8d8d8;

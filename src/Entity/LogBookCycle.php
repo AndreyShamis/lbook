@@ -269,7 +269,7 @@ class LogBookCycle
      */
     public function updatePassRate(): void
     {
-        $passCount = $failCount = $errorCount = $warningCount = $disabledCount = 0;
+        $passCount = $failCount = $errorCount = $warningCount = $disabledCount = $forDeleteCount = 0;
         $tests = $this->getTests();
         $allCount = $tests->count();
         if (\is_object($tests) && $allCount > 0) {
@@ -287,17 +287,21 @@ class LogBookCycle
                         $warningCount++;
                     }
                 } else {
-                    $disabledCount++;
+                    if (!$test->isForDelete()) {
+                        $disabledCount++;
+                    } else {
+                        $forDeleteCount++;
+                    }
                 }
-
             }
         }
+        
         $this->setTestsPass($passCount);
         $this->setTestsFail($failCount);
         $this->setTestsError($errorCount);
         $this->setTestsWarning($warningCount);
 
-        $allCount -= $disabledCount;
+        $allCount -= ($disabledCount + $forDeleteCount);
         $this->setTestsCount($allCount);
         $this->setTestsDisabled($disabledCount);
 

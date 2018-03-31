@@ -287,7 +287,7 @@ class LogBookCycle
                         $warningCount++;
                     }
                 } else {
-                    if (!$test->isForDelete()) {
+                    if ($test->isForDelete() === false) {
                         $disabledCount++;
                     } else {
                         $forDeleteCount++;
@@ -295,7 +295,7 @@ class LogBookCycle
                 }
             }
         }
-        
+
         $this->setTestsPass($passCount);
         $this->setTestsFail($failCount);
         $this->setTestsError($errorCount);

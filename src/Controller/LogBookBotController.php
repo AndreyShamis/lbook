@@ -38,7 +38,8 @@ class LogBookBotController extends Controller
         foreach ((array) $cycles as $cycle) {
             $cycleName = $cycle->getName();
             $cycleId = $cycle->getId();
-            $responseContent = sprintf('%sRemoving %s:[%d]%s',$responseContent,  $cycleName, $cycleId , "\n");
+            $testsFound = $cycle->getTests()->count();
+            $responseContent = sprintf('%sRemoving %s:[%d] - tests=%d %s',$responseContent,  $cycleName, $cycleId, $cycleId, "\n");
             $cycleRepo->delete($cycle);
         }
 

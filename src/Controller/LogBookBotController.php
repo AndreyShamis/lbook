@@ -39,7 +39,7 @@ class LogBookBotController extends Controller
             $cycleName = $cycle->getName();
             $cycleId = $cycle->getId();
             $testsFound = $cycle->getTests()->count();
-            $responseContent = sprintf('%sRemoving %s:[%d] - tests=%d %s',$responseContent,  $cycleName, $cycleId, $cycleId, "\n");
+            $responseContent = sprintf('%sRemoving %s:[%d] - tests=%d %s',$responseContent,  $cycleName, $cycleId, $testsFound, "\n");
             $cycleRepo->delete($cycle);
         }
 

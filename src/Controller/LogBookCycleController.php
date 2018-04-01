@@ -197,7 +197,7 @@ class LogBookCycleController extends Controller
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \LogicException
      */
-    public function editAction(Request $request, LogBookCycle $obj)
+    public function editAction(Request $request, LogBookCycle $obj = null)
     {
         try {
             if (!$obj) {
@@ -235,7 +235,7 @@ class LogBookCycleController extends Controller
      * @throws \LogicException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookCycle $obj)
+    public function deleteAction(Request $request, LogBookCycle $obj = null)
     {
         try {
             if (!$obj) {

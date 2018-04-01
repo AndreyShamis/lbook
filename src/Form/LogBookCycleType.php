@@ -23,6 +23,8 @@ class LogBookCycleType extends AbstractType
             ->add('period')
             ->add('testsTimeSum')
             ->add('build')
+            ->add('disabled')
+            ->add('forDelete')
         ;
     }
 

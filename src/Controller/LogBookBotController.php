@@ -7,6 +7,7 @@ use App\Repository\LogBookCycleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Class LogBookBotController
@@ -23,6 +24,8 @@ class LogBookBotController extends Controller
      */
     public function deleteCycle(LogBookCycleRepository $cycleRepo): Response
     {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('cycleDelete');
         $qd = $cycleRepo->createQueryBuilder('c')
             ->where('c.forDelete = :for_delete')
             ->setMaxResults(1)
@@ -35,13 +38,16 @@ class LogBookBotController extends Controller
         foreach ((array) $cycles as $cycle) {
             $cycleName = $cycle->getName();
             $cycleId = $cycle->getId();
-            $responseContent .= 'Removing ' . $cycleName  . ':[' .$cycleId. "]\n";
+            $responseContent = sprintf('%sRemoving %s:[%d]%s',$responseContent,  $cycleName, $cycleId , "\n");
             $cycleRepo->delete($cycle);
         }
 
         if ($responseContent === '') {
             $responseContent = "Nothing found for delete\n";
         }
+        $event = $stopwatch->stop('cycleDelete');
+        $time = new \DateTime();
+        $responseContent = sprintf('%s | Duration %d(milliseconds) %s%s', $time->format('Y/m/d H:i:s') , $event->getDuration(), '| ', $responseContent);
         return new Response($responseContent);
     }
 }

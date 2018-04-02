@@ -198,7 +198,7 @@ class LogBookTestController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
-    public function editAction(Request $request, LogBookTest $test)
+    public function editAction(Request $request, LogBookTest $test = null)
     {
         try {
             if (!$test) {
@@ -237,9 +237,12 @@ class LogBookTestController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookTest $test)
+    public function deleteAction(Request $request, LogBookTest $test = null)
     {
         try {
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
             $this->denyAccessUnlessGranted('delete', $test->getCycle()->getSetup());
             $form = $this->createDeleteForm($test);
             $form->handleRequest($request);

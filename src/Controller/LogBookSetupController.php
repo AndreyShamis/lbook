@@ -175,22 +175,29 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookSetup $obj): Response
+    public function showAction(LogBookSetup $obj = null): Response
     {
-        $user= $this->get('security.token_storage')->getToken()->getUser();
-        /** @var PersistentCollection $moderators */
-        $moderators = $obj->getModerators();
-        //if(in_array($user, $moderators)){
-        if ($moderators->contains($user)) {
-            $deleteForm = $this->createDeleteForm($obj)->createView();
-        } else {
-            $deleteForm = null;
-        }
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $user= $this->get('security.token_storage')->getToken()->getUser();
+            /** @var PersistentCollection $moderators */
+            $moderators = $obj->getModerators();
+            //if(in_array($user, $moderators)){
+            if ($moderators->contains($user)) {
+                $deleteForm = $this->createDeleteForm($obj)->createView();
+            } else {
+                $deleteForm = null;
+            }
 
-        return $this->render('lbook/setup/show.html.twig', array(
-            'setup' => $obj,
-            'delete_form' => $deleteForm,
-        ));
+            return $this->render('lbook/setup/show.html.twig', array(
+                'setup' => $obj,
+                'delete_form' => $deleteForm,
+            ));
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($obj, $ex);
+        }
     }
 
     /**
@@ -202,43 +209,47 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function editAction(Request $request, LogBookSetup $obj)
+    public function editAction(Request $request, LogBookSetup $obj = null)
     {
-        $user= $this->get('security.token_storage')->getToken()->getUser();
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $user= $this->get('security.token_storage')->getToken()->getUser();
 
-        // check for "edit" access: calls all voters
-        $this->denyAccessUnlessGranted('edit', $obj);
-        /** @var PersistentCollection $moderators */
-        //$moderators = $obj->getModerators();
-        $deleteForm = $this->createDeleteForm($obj);
-        //if(in_array($user, $moderators)){
-//        if($moderators->contains($user)){
-//            $deleteForm = $this->createDeleteForm($obj)->createView();
-//        }
-//        else{
-//            $deleteForm = null;
-//        }
+            // check for "edit" access: calls all voters
+            $this->denyAccessUnlessGranted('edit', $obj);
+            /** @var PersistentCollection $moderators */
+            //$moderators = $obj->getModerators();
+            $deleteForm = $this->createDeleteForm($obj);
+            //if (in_array($user, $moderators)) {
+    //        if ($moderators->contains($user)) {
+    //            $deleteForm = $this->createDeleteForm($obj)->createView();
+    //        } else {
+    //            $deleteForm = null;
+    //        }
 
+            $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
+                'user' => $user,
+            ));
+            $editForm->handleRequest($request);
 
-        $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
-            'user' => $user,
-        ));
-        $editForm->handleRequest($request);
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
+                return $this->redirectToRoute('setup_edit', array('id' => $obj->getId()));
+            }
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            return $this->render('lbook/setup/edit.html.twig', array(
+                'setup' => $obj,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
 
-            return $this->redirectToRoute('setup_edit', array('id' => $obj->getId()));
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($obj, $ex);
         }
-
-        return $this->render('lbook/setup/edit.html.twig', array(
-            'setup' => $obj,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -248,23 +259,30 @@ class LogBookSetupController extends Controller
      * @Method("DELETE")
      * @param Request $request
      * @param LogBookSetup $obj
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
+     * @return RedirectResponse|Response
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
-    public function deleteAction(Request $request, LogBookSetup $obj): RedirectResponse
+    public function deleteAction(Request $request, LogBookSetup $obj = null)
     {
-        $this->denyAccessUnlessGranted('delete', $obj);
-        $form = $this->createDeleteForm($obj);
-        $form->handleRequest($request);
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $this->denyAccessUnlessGranted('delete', $obj);
+            $form = $this->createDeleteForm($obj);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
 
-            $setupRepo = $em->getRepository('App:LogBookSetup');
-            $setupRepo->delete($obj);
+                $setupRepo = $em->getRepository('App:LogBookSetup');
+                $setupRepo->delete($obj);
+            }
+
+            return $this->redirectToRoute('setup_index');
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($obj, $ex);
         }
-
-        return $this->redirectToRoute('setup_index');
     }
 
     /**

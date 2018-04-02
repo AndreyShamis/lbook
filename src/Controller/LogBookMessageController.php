@@ -84,13 +84,21 @@ class LogBookMessageController extends Controller
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(LogBookMessage $obj): Response
+    public function show(LogBookMessage $obj = null): Response
     {
-        $deleteForm = $this->createDeleteForm($obj);
-        return $this->render('lbook/log/show.html.twig', array(
-            'log' => $obj,
-            'delete_form' => $deleteForm->createView(),
-        ));
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $deleteForm = $this->createDeleteForm($obj);
+            return $this->render('lbook/log/show.html.twig', array(
+                'log' => $obj,
+                'delete_form' => $deleteForm->createView(),
+            ));
+        } catch (\Throwable $ex) {
+            return $this->logNotFound($obj, $ex);
+        }
+
     }
 
     /**
@@ -103,23 +111,30 @@ class LogBookMessageController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function edit(Request $request, LogBookMessage $obj)
+    public function edit(Request $request, LogBookMessage $obj = null)
     {
-        $deleteForm = $this->createDeleteForm($obj);
-        $editForm = $this->createForm(LogBookMessageType::class, $obj);
-        $editForm->handleRequest($request);
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $deleteForm = $this->createDeleteForm($obj);
+            $editForm = $this->createForm(LogBookMessageType::class, $obj);
+            $editForm->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('log_edit', array('id' => $obj->getId()));
+                return $this->redirectToRoute('log_edit', array('id' => $obj->getId()));
+            }
+
+            return $this->render('lbook/log/edit.html.twig', array(
+                'log' => $obj,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        } catch (\Throwable $ex) {
+            return $this->logNotFound($obj, $ex);
         }
-
-        return $this->render('lbook/log/edit.html.twig', array(
-            'log' => $obj,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -132,18 +147,25 @@ class LogBookMessageController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @throws \LogicException
      */
-    public function delete(Request $request, LogBookMessage $obj): RedirectResponse
+    public function delete(Request $request, LogBookMessage $obj = null): RedirectResponse
     {
-        $form = $this->createDeleteForm($obj);
-        $form->handleRequest($request);
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $form = $this->createDeleteForm($obj);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($obj);
-            $em->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $em->remove($obj);
+                $em->flush();
+            }
+
+            return $this->redirectToRoute('log_index');
+        } catch (\Throwable $ex) {
+            return $this->logNotFound($obj, $ex);
         }
-
-        return $this->redirectToRoute('log_index');
     }
 
     /**
@@ -159,5 +181,34 @@ class LogBookMessageController extends Controller
             ->setAction($this->generateUrl('log_delete', array('id' => $obj->getId())))
             ->setMethod('DELETE')
             ->getForm();
+    }
+
+    private function logNotFound(LogBookMessage $log = null, \Throwable $ex)
+    {
+        /** @var Request $request */
+        $request= $this->get('request_stack')->getCurrentRequest();
+        $possibleId = 0;
+        $response = null;
+
+        try {
+            $possibleId = $request->attributes->get('id');
+            $response = new Response('', Response::HTTP_NOT_FOUND);
+        } catch (\Exception $ex) {
+        }
+
+        if ($log === null) {
+
+            return $this->render('lbook/404.html.twig', array(
+                'short_message' => sprintf('Log with provided ID:[%s] not found', $possibleId),
+                'message' =>  $ex->getMessage(),
+                'ex' => $ex,
+            ), $response);
+        }
+
+        return $this->render('lbook/500.html.twig', array(
+            'short_message' => 'Unknown error',
+            'message' => $ex->getMessage(),
+            'ex' => $ex,
+        ));
     }
 }

@@ -7,17 +7,23 @@
         {{ form_widget(edit_form) }}
         <input type="submit" value="Edit" />
     {{ form_end(edit_form) }}
-
-    <ul>
-        <li>
-            <a href="{{ path('cycle_index') }}">Back to the list</a>
-        </li>
-        {% if is_granted('delete', cycle.setup) %}
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
-            {{ form_end(delete_form) }}
-        </li>
-        {% endif %}
-    </ul>
+    <div class="well well-lg">
+        <h4 class="green smaller lighter">Options</h4>
+        <ul class="list-inline">
+            <li>
+                <i class="ace-icon fa fa-share green bigger-110"></i>
+                <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">Back to Cycle</a>
+            </li>
+            <li>
+                <a href="{{ path('cycle_index') }}">Back to the list</a>
+            </li>
+            {% if is_granted('delete', cycle.setup) %}
+            <li>
+                {{ form_start(delete_form) }}
+                    <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
+                {{ form_end(delete_form) }}
+            </li>
+            {% endif %}
+        </ul>
+    </div>
 {% endblock %}

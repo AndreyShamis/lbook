@@ -114,3 +114,9 @@ class Foo extends Bar implements FooInterface
     }
 }
 ~~~
+
+## Internal How To
+### Change permissions
+sudo chown -R www-data:www-data /var/www/lbook* ; sudo chmod -R g=u /var/www/lbook*
+###  Upload file
+curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=1.73 2.68' --form 'UPTIME_END=3.73 4.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4 --form testCaseName=sa --form testSetName=sa --form build=Build --form testCount=2  --form file=@results-03-network_WiFi_Perf.ht40/debug/autoserv.DEBUG --form setup='SUPER SETUP3' --form token=144224564212603434  http://127.0.0.1:8080/upload/new_cli

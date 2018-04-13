@@ -107,7 +107,7 @@
                                 {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
                                 <td title="{{ log.id }}">{{ log.chain }}</td>
                                 <td>{{ log.message | nl2br }}</td>
-                                <td>{{ log.msgType }}</td>
+                                <td class="logType">{{ log.msgType }}</td>
                             </tr>
                     {% endfor %}
                     </tbody>

@@ -10,18 +10,30 @@
 #update , #newRC{
     background-color: #FFCC33;
 }
+
+/** Used for Log type in test show */
+.logType{
+    font-size: 10px;
+}
 .log-success{background-color: #d8efdb;
 }
 .log-na{background-color: #a0fcff;}
 .log-fail{background-color: #ffb499;}
 .log-error{background-color: #f9ef90;}
-.log-warning{background-color: #f0f5dc;}
+.log-warning{
+    background-color: #f0f5dc;
+}
 .log-info{
     /*background-color:#00acd6*/
 }
 .log-critical{background-color:#ff7665;
 }
-
+.log-debug{
+    /*color: #ada6a6;*/
+    background-color: #eaedf1;
+    border-color: #6a858e;
+    font-size: 11px;
+}
 .test-disabled{
     /*color: #ada6a6;*/
     background-color: #d8d8d8 !important;
@@ -29,11 +41,7 @@
     color: #728088 !important;
 }
 
-.log-debug{
-    /*color: #ada6a6;*/
-    background-color: #d8d8d8;
-    border-color: #6a858e;
-}
+
 .log-debug hr{border-top-color:#a6e1ec;}
 .pagination{
     margin: 0 !important;

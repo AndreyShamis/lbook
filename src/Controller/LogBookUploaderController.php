@@ -511,6 +511,9 @@ class LogBookUploaderController extends Controller
                             if ($possibleMessageType[1] === 'WARN') {
                                 $possibleMessageType[1] = 'WARNING';
                             }
+                            if ($possibleMessageType[1] === 'NOTIC') {
+                                $possibleMessageType[1] = 'NOTICE';
+                            }
                             $msgType_str = $possibleMessageType[1];
                         }
                     }

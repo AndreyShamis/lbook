@@ -3,3 +3,5 @@ security:
         # replace 'main' by the name of your own firewall
         main:
             http_basic: ~
+parameters:
+    http_protocol: http

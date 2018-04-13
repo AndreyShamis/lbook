@@ -88,7 +88,7 @@ class LogBookSecurityController extends Controller
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route(name="login")
      * @param Request $request
      * @param AuthenticationUtils $authUtils
      * @param UserPasswordEncoderInterface $passwordEncoder

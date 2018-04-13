@@ -93,7 +93,7 @@ class LogBookUserController extends Controller
     }
 
 //    /**
-//     * @Route("/register", name="user_registration")
+//     * @Route("/register", name="register")
 //     * @param Request $request
 //     * @param UserPasswordEncoderInterface $passwordEncoder
 //     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response

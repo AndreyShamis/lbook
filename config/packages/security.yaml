@@ -69,7 +69,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%http_protocol%" }
-        - { path: ^/register$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register$, role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: "%http_protocol%"  }
         - { path: ^/upload(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/bot/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }

@@ -15,13 +15,14 @@
                     </span>
                         {{ short_message }}
                     </h1>
-
                     <hr>
                     <h3 class="lighter smaller">Something Went Wrong!</h3>
                     <h3 class="lighter smaller">
                         <i class="ace-icon fa fa-wrench icon-animated-wrench bigger-125"></i>
                         {{ message }}
                     </h3>
+                    File: {{ ex.file }} <br/>
+                    Line: {{ ex.line }} <br/>
                     <div>
 
                         <div class="space"></div>

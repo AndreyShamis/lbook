@@ -2,7 +2,14 @@ index:
     path: /
     controller: App\Controller\LogBookDefaultController::index
 
+login_index:
+    controller: App\Controller\LogBookSecurityController::login
+    path:   /login
+    schemes:  ['%http_protocol%']
+
 easy_admin_bundle:
     resource: "@EasyAdminBundle/Controller/AdminController.php"
     type:     annotation
     prefix:   /lbadmin
+
+

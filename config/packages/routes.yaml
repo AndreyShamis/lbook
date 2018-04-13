@@ -1,0 +1,7 @@
+controllers:
+    resource: ../src/Controller/
+    type: annotation
+#    resource: "@App/Controller/LogBookSecurityController"
+#    type:     annotation
+#    prefix:   /login
+#    schemes:  ['%httpProtocol%']

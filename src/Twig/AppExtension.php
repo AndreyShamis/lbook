@@ -25,6 +25,7 @@ class AppExtension extends AbstractExtension
         return array(
             new Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
             new Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
+            new Twig_SimpleFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
             new Twig_SimpleFilter('TimeToHour', array($this, 'TimeToHour')),
             new Twig_SimpleFilter('getPercentage', array($this, 'getPercentage')),
             new Twig_SimpleFilter('cast_to_array', array($this, 'cast_to_array')),
@@ -42,6 +43,9 @@ class AppExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
+            new TwigFunction('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
+            new TwigFunction('relativeTime', array($this, 'relativeTime')),
             new TwigFunction('passRateToColor', [$this, 'passRateToColor']),
             new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
@@ -244,6 +248,38 @@ class AppExtension extends AbstractExtension
             return ($hours . 'h');
         }
         return ($hours . 'h ' . sprintf('%02d', $minutes) . 'm');
+    }
+
+    /**
+     * Print time diff for two datetimes
+     * @param \DateTime $timeStart
+     * @param \DateTime $current
+     * @return string
+     */
+    public function relativeTime(\DateTime $timeStart, \DateTime $current): string
+    {
+        $diff = abs($timeStart->getTimestamp() - $current->getTimestamp());
+        return $this->executionTimeGenericShort($diff);
+    }
+
+    /**
+     * @param $time
+     * @return string
+     */
+    public function executionTimeGenericShort(int $time): string
+    {
+        $seconds  =   $time%60;
+        $minutes  =   ($time/60)%60;
+        $hours    =   number_format (floor($time/60/60));
+        $hour_print = sprintf('%d',$hours);
+        $min_print = sprintf('%02d',$minutes);
+        $sec_print = sprintf('%02d',$seconds);
+        if ($hours > 0) {
+            $ret = sprintf('%s:%s:%s', $hour_print, $min_print, $sec_print);
+        } else {
+            $ret = sprintf('%s:%s', $min_print, $sec_print);
+        }
+        return $ret;
     }
 
     /**

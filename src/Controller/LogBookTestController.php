@@ -24,7 +24,7 @@ class LogBookTestController extends Controller
 {
     protected $index_size = 100;
 
-    protected $log_size = 500;
+    protected $log_size = 3000;
 
     /**
      * Lists all Tests entities.

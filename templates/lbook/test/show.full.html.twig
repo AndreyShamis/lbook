@@ -86,6 +86,7 @@
                     <thead class="thin-border-bottom">
                     <tr>
                         <th><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
+                        <th><i class="ace-icon fa fa-caret-right blue"></i>Offset</th>
                         {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
                         <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>
                         <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
@@ -96,18 +97,18 @@
                     {% set break = false %}
                     {% set counter = 0 %}
                     {% for log in iterator if not break %}
-
-                    {% if counter == 10000 %}
-                        {% set break = true %}
-                    {% endif %}
-                    {% set counter = counter+1 %}
-                        <tr class="{{ logTypeToTableColor(log.msgType) }}">
-                            <td>{{ log.logTime | date('H:i:s') }}</td>
-                            {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
-                            <td title="{{ log.id }}">{{ log.chain }}</td>
-                            <td>{{ log.message | nl2br }}</td>
-                            <td>{{ log.msgType }}</td>
-                        </tr>
+                        {% if counter == 10000 %}
+                            {% set break = true %}
+                        {% endif %}
+                        {% set counter = counter+1 %}
+                            <tr class="{{ logTypeToTableColor(log.msgType) }}">
+                                <td>{{ log.logTime | date('H:i:s') }}</td>
+                                <td>{{ relativeTime(test.timeStart, log.logTime) }}</td>
+                                {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
+                                <td title="{{ log.id }}">{{ log.chain }}</td>
+                                <td>{{ log.message | nl2br }}</td>
+                                <td>{{ log.msgType }}</td>
+                            </tr>
                     {% endfor %}
                     </tbody>
                 </table>

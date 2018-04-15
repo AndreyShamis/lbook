@@ -157,20 +157,20 @@
             {#<th>Count</th>#}
             {#<td>{{ cycle.testsCount }}</td>#}
         {#</tr>#}
-        {% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',
-            'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',
-            'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',
-            'updatedAt', 'createdAt', 'testsTimeSum',
-            'controller', 'targetUploader', 'dut',
-            'build', 'disabled', 'forDelete'] %}
-        {% for key, value in cycle|cast_to_array %}
-            {% if key not in already_printed%}
-                <tr>
-                    <th>{{ key | capitalize}}</th>
-                    <td>{{ dump(value) }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
+        {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
+            {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
+            {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
+            {#'updatedAt', 'createdAt', 'testsTimeSum',#}
+            {#'controller', 'targetUploader', 'dut',#}
+            {#'build', 'disabled', 'forDelete'] %}#}
+        {#{% for key, value in cycle|cast_to_array %}#}
+            {#{% if key not in already_printed%}#}
+                {#<tr>#}
+                    {#<th>{{ key | capitalize}}</th>#}
+                    {#<td>{{ dump(value) }}</td>#}
+                {#</tr>#}
+            {#{% endif %}#}
+        {#{% endfor %}#}
         </tbody>
     </table>
     {% set pagePath = "cycle_show" %}

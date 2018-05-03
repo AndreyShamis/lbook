@@ -28,6 +28,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->setUp();
+        self::$entityManager->clear();
     }
 
     protected function checkIndex(Crawler $crawler): void
@@ -111,6 +112,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
      */
     public function testCycleExist(): void
     {
+        self::$entityManager->clear();
         $cycle = self::createCycle();
 
         $this->checkCycleExist($cycle);
@@ -136,6 +138,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
      */
     public function testCycleNotExistAfterDelete(): void
     {
+        self::$entityManager->clear();
         $cycle = self::createCycle();
         $this->checkCycleExist($cycle);
 
@@ -155,6 +158,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
      */
     public function testTenCycleCreationsDifferentSetups(): void
     {
+        self::$entityManager->clear();
         for ($x = 0; $x < 10; $x++) {
             $cycle = self::createCycle('__TEN__' . $x*$x);
             $this->checkCycleExist($cycle);
@@ -167,6 +171,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
      */
     public function testTenCycleCreationsSameSetups(): void
     {
+        self::$entityManager->clear();
         $setup = SetupControllerTest::createSetup();
         for ($x = 0; $x < 10; $x++) {
             $cycle = self::createCycle('__TEN__' . $x*$x, $setup);

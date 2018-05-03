@@ -31,6 +31,7 @@ class TestControllerTest extends LogBookApplicationTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->setUp();
+        self::$entityManager->clear();
     }
 
     /**
@@ -39,6 +40,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterDelete(): void
     {
+        self::$entityManager->clear();
         $test = self::createTest('testTestNotExistAfterDelete', null, null, self::$entityManager);
         $this->checkTestExist($test);
 
@@ -58,6 +60,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterCycleDelete(): void
     {
+        self::$entityManager->clear();
         $setup = SetupControllerTest::createSetup('SetupttestTestNotExistAfterCycleDelete', self::$entityManager);
         $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterCycleDelete', $setup, self::$entityManager);
         $test = self::createTest('testTestNotExistAfterCycleDelete', $setup, $cycle, self::$entityManager);
@@ -79,6 +82,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testTestNotExistAfterSetupDelete(): void
     {
+        self::$entityManager->clear();
         ini_set('max_execution_time', 125);
         $setup = SetupControllerTest::createSetup('SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
         $cycle = CycleControllerTest::createCycle('CycletestTestNotExistAfterSetupDelete', $setup, self::$entityManager);
@@ -104,19 +108,24 @@ class TestControllerTest extends LogBookApplicationTestCase
 
     /**
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     public function testCycleContainsXTests(): void
     {
         $size = 31;
-        $setup = SetupControllerTest::createSetup('SETUP_testCycleContainsXTests', self::$entityManager);
-        $cycle = CycleControllerTest::createCycle('CYCLE_testCycleContainsXTests', $setup, self::$entityManager);
+        $em = self::$entityManager;
+        $em->clear();
+        SetupControllerTest::createSetup('1', $em);
+        SetupControllerTest::createSetup('2', $em);
+        $setup = SetupControllerTest::createSetup('SETUP_testCycleContainsXTests', $em);
+        $cycle = CycleControllerTest::createCycle('CYCLE_testCycleContainsXTests', $setup, $em);
         for ( $x = 0; $x < $size; $x++) {
-            self::createTest('TEST_testCycleContainsXTests_' . $x, $setup, $cycle, self::$entityManager);
+            self::createTest('TEST_testCycleContainsXTests_' . $x, $setup, $cycle, $em);
         }
         /** Refresh required or cause to - Failed asserting that 200 is identical to 404 */
         self::$entityManager->refresh($setup);
         self::$entityManager->refresh($cycle);
-        $this->assertEquals($size, $cycle->getTests()->count(), 'Check that cycle include one created test. count: ' . $cycle->getTests()->count());
+        $this->assertEquals($size, $cycle->getTests()->count(), 'Check that cycle '.$cycle->getId().':Setup' . $setup->getId() . ' include one created test. count: ' . $cycle->getTests()->count());
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include one created cycle. count: ' . $setup->getCycles()->count());
     }
 
@@ -125,6 +134,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     public function testSetupContainsXCycles(): void
     {
+        self::$entityManager->clear();
         $x_size = 11;
         $setup = SetupControllerTest::createSetup('testSetupContainsXCycles_SetuptestTestNotExistAfterSetupDelete', self::$entityManager);
 

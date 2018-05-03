@@ -8,11 +8,14 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Component\Form\Test\TypeTestCase;
 use App\Entity\LogBookSetup;
+use App\Form\LogBookSetupType;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Utils\RandomString;
+use Symfony\Component\DomCrawler\Form;
 
 class SetupControllerTest extends LogBookApplicationTestCase
 {
@@ -27,6 +30,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->setUp();
+        self::$entityManager->clear();
     }
 
     protected function checkIndex(Crawler $crawler): void
@@ -101,6 +105,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
      */
     public function testSetupExist(): void
     {
+        self::$entityManager->clear();
         $setup = self::createSetup();
 
         $this->checkSetupExist($setup, true);
@@ -109,9 +114,11 @@ class SetupControllerTest extends LogBookApplicationTestCase
     /**
      * @param LogBookSetup $setup
      * @param bool $checkSetupName
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     protected function checkSetupExist(LogBookSetup $setup, bool $checkSetupName = true): void
     {
+        self::$entityManager->clear();
         $crawler = $this->getClient()->request('GET', '/setup/'. $setup->getId() . '/page');
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         if ($checkSetupName === true) {
@@ -130,20 +137,28 @@ class SetupControllerTest extends LogBookApplicationTestCase
      */
     public function testSetupNotExistAfterDelete(): void
     {
-        $setup = self::createSetup();
+        self::$entityManager->clear();
+        $setup = self::createSetup("NOT_EXIST_ON_DELETE", self::$entityManager);
         $this->checkSetupExist($setup);
-        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+
         $setupId = $setup->getId();
+
         CycleControllerTest::createCycle('Cycle_1__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_2__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_3__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_4__SETUP_DELETE', $setup, self::$entityManager);
-        $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
+
         self::$entityManager->refresh($setup);
-        $setupRepo->delete($setup);
+
+        $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
+        //$setupRepo->delete($setup);
+        $crawler = $this->getClient()->request('DELETE', '/setup/'. $setupId . '');
+        $this->assertSame(Response::HTTP_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
+
         $crawler = $this->getClient()->request('GET', '/setup/'. $setupId . '/page');
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
+        self::$entityManager->detach($setup);
     }
 
     /**
@@ -152,6 +167,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
      */
     public function testTenSetupCreations(): void
     {
+        self::$entityManager->clear();
         for ($x = 0; $x < 10; $x++) {
             $setup = self::createSetup('__TEN__' . $x*$x);
             $this->checkSetupExist($setup, true);

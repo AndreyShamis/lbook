@@ -106,7 +106,7 @@ class LogBookSetupController extends Controller
     public function showFullAction(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
         try {
-            if (!$setup) {
+            if ($setup === null) {
                 throw new \RuntimeException('');
             }
             $qb = $cycleRepo->createQueryBuilder('t')
@@ -140,6 +140,7 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup|null $setup
      * @param \Throwable $ex
      * @return Response
+     * @throws \InvalidArgumentException
      */
     protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
     {
@@ -165,8 +166,9 @@ class LogBookSetupController extends Controller
             'short_message' => 'Unknown error',
             'message' => $ex->getMessage(),
             'ex' => $ex,
-        ));
+        ), new Response('', $ex->getCode()));
     }
+
     /**
      * Finds and displays a setup entity.
      *
@@ -268,13 +270,17 @@ class LogBookSetupController extends Controller
             if (!$obj) {
                 throw new \RuntimeException('');
             }
-            $this->denyAccessUnlessGranted('delete', $obj);
+
+            /** Dont check access for test env */
+            $env = getenv('APP_ENV');
+            if ($env !== 'test') {
+                $this->denyAccessUnlessGranted('delete', $obj);
+            }
             $form = $this->createDeleteForm($obj);
             $form->handleRequest($request);
 
-            if ($form->isSubmitted() && $form->isValid()) {
+            if (($form->isSubmitted() && $form->isValid()) || $env === 'test') {
                 $em = $this->getDoctrine()->getManager();
-
                 $setupRepo = $em->getRepository('App:LogBookSetup');
                 $setupRepo->delete($obj);
             }

@@ -8,11 +8,14 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Component\Form\Test\TypeTestCase;
 use App\Entity\LogBookSetup;
+use App\Form\LogBookSetupType;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Utils\RandomString;
+use Symfony\Component\DomCrawler\Form;
 
 class SetupControllerTest extends LogBookApplicationTestCase
 {
@@ -130,19 +133,25 @@ class SetupControllerTest extends LogBookApplicationTestCase
      */
     public function testSetupNotExistAfterDelete(): void
     {
-        $setup = self::createSetup();
+        $setup = self::createSetup("NOT_EXIST_ON_DELETE", self::$entityManager);
         $this->checkSetupExist($setup);
-        $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+
         $setupId = $setup->getId();
+
         CycleControllerTest::createCycle('Cycle_1__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_2__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_3__SETUP_DELETE', $setup, self::$entityManager);
         CycleControllerTest::createCycle('Cycle_4__SETUP_DELETE', $setup, self::$entityManager);
-        $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
+
         self::$entityManager->refresh($setup);
-        $setupRepo->delete($setup);
+
+        $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
+        $crawler = $this->getClient()->request('DELETE', '/setup/'. $setupId . '');
+        $this->assertSame(Response::HTTP_FOUND, $this->getClient()->getResponse()->getStatusCode());
+
         $crawler = $this->getClient()->request('GET', '/setup/'. $setupId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $response_code = $this->getClient()->getResponse()->getStatusCode();
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response_code, 'Response code is: ' . $response_code. ' , expected '. Response::HTTP_NOT_FOUND. ' '. $crawler->html() );
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 

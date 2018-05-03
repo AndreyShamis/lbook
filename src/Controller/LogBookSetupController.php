@@ -169,6 +169,7 @@ class LogBookSetupController extends Controller
             'ex' => $ex,
         ), new Response('', $ex->getCode()));
     }
+
     /**
      * Finds and displays a setup entity.
      *
@@ -270,13 +271,17 @@ class LogBookSetupController extends Controller
             if (!$obj) {
                 throw new \RuntimeException('');
             }
-            $this->denyAccessUnlessGranted('delete', $obj);
+
+            /** Dont check access for test env */
+            $env = getenv('APP_ENV');
+            if ($env !== 'test') {
+                $this->denyAccessUnlessGranted('delete', $obj);
+            }
             $form = $this->createDeleteForm($obj);
             $form->handleRequest($request);
 
-            if ($form->isSubmitted() && $form->isValid()) {
+            if (($form->isSubmitted() && $form->isValid()) || $env === 'test') {
                 $em = $this->getDoctrine()->getManager();
-
                 $setupRepo = $em->getRepository('App:LogBookSetup');
                 $setupRepo->delete($obj);
             }

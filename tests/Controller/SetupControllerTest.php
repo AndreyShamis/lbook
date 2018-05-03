@@ -132,11 +132,14 @@ class SetupControllerTest extends LogBookApplicationTestCase
     {
         $setup = self::createSetup();
         $this->checkSetupExist($setup);
-
         $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
         $setupId = $setup->getId();
+        CycleControllerTest::createCycle('Cycle_1__SETUP_DELETE', $setup, self::$entityManager);
+        CycleControllerTest::createCycle('Cycle_2__SETUP_DELETE', $setup, self::$entityManager);
+        CycleControllerTest::createCycle('Cycle_3__SETUP_DELETE', $setup, self::$entityManager);
+        CycleControllerTest::createCycle('Cycle_4__SETUP_DELETE', $setup, self::$entityManager);
         $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
-
+        self::$entityManager->refresh($setup);
         $setupRepo->delete($setup);
         $crawler = $this->getClient()->request('GET', '/setup/'. $setupId . '/page');
         $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
@@ -151,7 +154,6 @@ class SetupControllerTest extends LogBookApplicationTestCase
     {
         for ($x = 0; $x < 10; $x++) {
             $setup = self::createSetup('__TEN__' . $x*$x);
-
             $this->checkSetupExist($setup, true);
         }
     }

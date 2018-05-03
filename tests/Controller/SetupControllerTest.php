@@ -131,10 +131,20 @@ class SetupControllerTest extends LogBookApplicationTestCase
     public function testSetupNotExistAfterDelete(): void
     {
         $setup = self::createSetup();
+
+        CycleControllerTest::createCycle('Cycle_1__SETUP_DELETE', $setup, self::$entityManager);
+
         $this->checkSetupExist($setup);
 
+
+
         $setupRepo = self::$entityManager->getRepository(LogBookSetup::class);
+
         $setupId = $setup->getId();
+
+//        CycleControllerTest::createCycle('Cycle_2__SETUP_DELETE', $setup, self::$entityManager);
+//        CycleControllerTest::createCycle('Cycle_3__SETUP_DELETE', $setup, self::$entityManager);
+//        CycleControllerTest::createCycle('Cycle_4__SETUP_DELETE', $setup, self::$entityManager);
         $searchString = 'h1:contains("Setup with provided ID:[' . $setupId . '] not found")';
 
         $setupRepo->delete($setup);

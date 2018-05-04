@@ -27,10 +27,7 @@ class LogBookDefaultController extends Controller
     public function index(): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $setups = $em->getRepository('App:LogBookSetup')->findAll();
-        return $this->render('lbook/default/index.html.twig', array(
-            'setups' => $setups,
-        ));
+        return $this->render('lbook/default/index.html.twig', array());
     }
 
     /**

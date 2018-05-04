@@ -102,7 +102,6 @@ class LogBookSetupController extends Controller
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \InvalidArgumentException
      */
     public function showFullAction(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
@@ -120,7 +119,6 @@ class LogBookSetupController extends Controller
 
             $maxPages = ceil($totalPosts / $this->show_cycle_size);
             $thisPage = $page;
-
             $deleteForm = $this->createDeleteForm($setup);
 
             return $this->render('lbook/setup/show.full.html.twig', array(
@@ -141,17 +139,23 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup|null $setup
      * @param \Throwable $ex
      * @return Response
-     * @throws \InvalidArgumentException
      */
     protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
     {
         /** @var Request $request */
         $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
-        $response = null;
-        try {
+        $response = $otherResponse = null;
+        $short_msg = 'Unknown error';
+        try {;
             $possibleId = $request->attributes->get('id');
             $response = new Response('', Response::HTTP_NOT_FOUND);
+            if ( $ex->getCode() > 0 && Response::$statusTexts[$ex->getCode()] !== '') {
+                $otherResponse = new Response('', $ex->getCode());
+                $short_msg = Response::$statusTexts[$ex->getCode()];
+            } else {
+                $otherResponse = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         } catch (\Exception $ex) {
 
         }
@@ -164,10 +168,10 @@ class LogBookSetupController extends Controller
         }
 
         return $this->render('lbook/500.html.twig', array(
-            'short_message' => 'Unknown error',
+            'short_message' => $short_msg,
             'message' => $ex->getMessage(),
             'ex' => $ex,
-        ), new Response('', $ex->getCode()));
+        ), $otherResponse);
     }
     /**
      * Finds and displays a setup entity.

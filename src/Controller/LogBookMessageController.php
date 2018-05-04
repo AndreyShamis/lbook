@@ -188,16 +188,21 @@ class LogBookMessageController extends Controller
         /** @var Request $request */
         $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
-        $response = null;
-
+        $response = $otherResponse = null;
+        $short_msg = 'Unknown error';
         try {
             $possibleId = $request->attributes->get('id');
             $response = new Response('', Response::HTTP_NOT_FOUND);
+            if ( $ex->getCode() > 0 && Response::$statusTexts[$ex->getCode()] !== '') {
+                $otherResponse = new Response('', $ex->getCode());
+                $short_msg = Response::$statusTexts[$ex->getCode()];
+            } else {
+                $otherResponse = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         } catch (\Exception $ex) {
         }
 
         if ($log === null) {
-
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Log with provided ID:[%s] not found', $possibleId),
                 'message' =>  $ex->getMessage(),
@@ -206,9 +211,9 @@ class LogBookMessageController extends Controller
         }
 
         return $this->render('lbook/500.html.twig', array(
-            'short_message' => 'Unknown error',
+            'short_message' => $short_msg,
             'message' => $ex->getMessage(),
             'ex' => $ex,
-        ));
+        ), $otherResponse);
     }
 }

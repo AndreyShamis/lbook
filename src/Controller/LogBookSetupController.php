@@ -102,11 +102,12 @@ class LogBookSetupController extends Controller
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \InvalidArgumentException
      */
     public function showFullAction(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
         try {
-            if (!$setup) {
+            if ($setup === null) {
                 throw new \RuntimeException('');
             }
             $qb = $cycleRepo->createQueryBuilder('t')
@@ -140,6 +141,7 @@ class LogBookSetupController extends Controller
      * @param LogBookSetup|null $setup
      * @param \Throwable $ex
      * @return Response
+     * @throws \InvalidArgumentException
      */
     protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
     {
@@ -165,7 +167,7 @@ class LogBookSetupController extends Controller
             'short_message' => 'Unknown error',
             'message' => $ex->getMessage(),
             'ex' => $ex,
-        ));
+        ), new Response('', $ex->getCode()));
     }
     /**
      * Finds and displays a setup entity.

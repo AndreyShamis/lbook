@@ -48,7 +48,7 @@ class TestControllerTest extends LogBookApplicationTestCase
 
         $testRepo->delete($test);
         $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 
@@ -69,7 +69,7 @@ class TestControllerTest extends LogBookApplicationTestCase
         $searchString = 'h1:contains("Test with provided ID:[' . $testId . '] not found")';
         $cycleRepo->delete($test->getCycle());
         $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 
@@ -98,7 +98,7 @@ class TestControllerTest extends LogBookApplicationTestCase
         $setupRepo->delete($setup);
 
         $crawler = $this->getClient()->request('GET', '/test/'. $testId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), 'Check that test with ID=' . $testId . ' not exist any more.');
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), 'Check that test with ID=' . $testId . ' not exist any more.' . $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 
@@ -157,7 +157,7 @@ class TestControllerTest extends LogBookApplicationTestCase
      */
     protected function checkIndex(Crawler $crawler): void
     {
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Tests list")')->count());
     }
 
@@ -194,7 +194,7 @@ class TestControllerTest extends LogBookApplicationTestCase
     public function testTestNotExist(): void
     {
         $crawler = $this->getClient()->request('GET', '/test/9999999999999/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Test with provided ID:[9999999999999] not found")')->count());
     }
 
@@ -238,7 +238,7 @@ class TestControllerTest extends LogBookApplicationTestCase
     protected function checkTestExist(LogBookTest $test): void
     {
         $crawler = $this->getClient()->request('GET', '/test/'. $test->getId() . '/page');
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $searchString = 'h3:contains("Test [' . $test->getId() . '] : ' . $test->getName() . '")';
         $count = $crawler->filter($searchString)->count();
         $this->assertGreaterThan(0, $count, 'Search string is :[' . $searchString. '] Count : '. $count);

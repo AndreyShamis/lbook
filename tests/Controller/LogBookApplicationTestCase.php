@@ -11,6 +11,7 @@ namespace App\Tests\Controller;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
@@ -62,6 +63,24 @@ class LogBookApplicationTestCase extends WebTestCase
 
     }
 
+    protected function getErrorMessage(Crawler $crawler) :string
+    {
+        $error_message = '';
+        $error_file = '';
+        $error_line = '';
+        try {
+            $error_message = $crawler->filter('#errorMessage')->text();
+            $error_file = $crawler->filter('#errorFile')->text();
+            $error_line = $crawler->filter('#errorLineNumber')->text();
+        } catch (\Exception $ex) {}
+
+        $error_message = sprintf('Error Message: %s.%sError File %s.%sError line %s.',
+            $error_message, "\n",
+            $error_file, "\n",
+            $error_line);
+
+        return $error_message;
+    }
     /**
      *
      */

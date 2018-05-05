@@ -32,7 +32,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
 
     protected function checkIndex(Crawler $crawler): void
     {
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Cycle list")')->count());
     }
 
@@ -101,7 +101,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
     public function testCycleShowNotExist(): void
     {
         $crawler = $this->getClient()->request('GET', '/cycle/9999999999999/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Cycle with provided ID:[9999999999999] not found")')->count());
     }
 
@@ -124,16 +124,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
     {
         // self::$entityManager->refresh($cycle);
         $crawler = $this->getClient()->request('GET', '/cycle/'. $cycle->getId() . '/page');
-
-        $error_code = $this->getClient()->getResponse()->getStatusCode();
-        $error_message = '';
-        if ($error_code !== Response::HTTP_OK) {
-            $error_message = sprintf('Error Message: %s.%sError File %s.%sError line %s%s.',
-                $crawler->filter('#errorMessage')->text(), "\n",
-                $crawler->filter('#errorFile')->text(), "\n",
-                $crawler->filter('#errorLineNumber')->text(), "\n");
-        }
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $error_message);
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $searchString = 'h3:contains("Cycle [' . $cycle->getId() . '] : ' . $cycle->getName() . '")';
         $count = $crawler->filter($searchString)->count();
         $this->assertGreaterThan(0, $count, 'Search string is :[' . $searchString. '] Count : '. $count);
@@ -154,7 +145,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
 
         $cycleRepo->delete($cycle);
         $crawler = $this->getClient()->request('GET', '/cycle/'. $cycleId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 

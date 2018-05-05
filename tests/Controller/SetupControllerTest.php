@@ -31,7 +31,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
 
     protected function checkIndex(Crawler $crawler): void
     {
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Setup list")')->count());
     }
 
@@ -68,7 +68,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
     public function testSetupNotExist(): void
     {
         $crawler = $this->getClient()->request('GET', '/setup/9999999999999/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter('h1:contains("Setup with provided ID:[9999999999999] not found")')->count());
     }
 
@@ -113,7 +113,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
     protected function checkSetupExist(LogBookSetup $setup, bool $checkSetupName = true): void
     {
         $crawler = $this->getClient()->request('GET', '/setup/'. $setup->getId() . '/page');
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         if ($checkSetupName === true) {
             $searchString = 'h3:contains("Setup [' . $setup->getId() . '] : ' . $setup->getName() . '")';
 
@@ -142,7 +142,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
         self::$entityManager->refresh($setup);
         $setupRepo->delete($setup);
         $crawler = $this->getClient()->request('GET', '/setup/'. $setupId . '/page');
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $this->assertGreaterThan(0, $crawler->filter($searchString)->count(), $searchString);
     }
 

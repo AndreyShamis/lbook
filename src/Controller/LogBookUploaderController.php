@@ -200,7 +200,7 @@ class LogBookUploaderController extends Controller
             $build_name = $request->request->get('build');
 
             if ($build_name === null || $build_name === '') {
-                $build_name = 'Some Build';
+                $build_name = $cycle_name;
             }
 
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();

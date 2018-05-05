@@ -122,8 +122,18 @@ class CycleControllerTest extends LogBookApplicationTestCase
      */
     protected function checkCycleExist(LogBookCycle $cycle): void
     {
+        // self::$entityManager->refresh($cycle);
         $crawler = $this->getClient()->request('GET', '/cycle/'. $cycle->getId() . '/page');
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+
+        $error_code = $this->getClient()->getResponse()->getStatusCode();
+        $error_message = '';
+        if ($error_code !== Response::HTTP_OK) {
+            $error_message = sprintf('Error Message: %s.%sError File %s.%sError line %s%s.',
+                $crawler->filter('#errorMessage')->text(), "\n",
+                $crawler->filter('#errorFile')->text(), "\n",
+                $crawler->filter('#errorLineNumber')->text(), "\n");
+        }
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $error_message);
         $searchString = 'h3:contains("Cycle [' . $cycle->getId() . '] : ' . $cycle->getName() . '")';
         $count = $crawler->filter($searchString)->count();
         $this->assertGreaterThan(0, $count, 'Search string is :[' . $searchString. '] Count : '. $count);

@@ -199,10 +199,6 @@ class LogBookUploaderController extends Controller
             $cycle_token = $request->request->get('token');
             $build_name = $request->request->get('build');
 
-            if ($build_name === null || $build_name === '') {
-                $build_name = 'Some Build';
-            }
-
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
             if ($cycle_token !== null && $cycle_token !== '') {
@@ -284,6 +280,10 @@ class LogBookUploaderController extends Controller
             ));
             $obj->data = $this->parseFile($new_file, $test);
             $this->em->refresh($cycle);
+
+            if ($build_name === null || $build_name === '') {
+                $build_name = $cycle->getName();
+            }
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => $build_name)));
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));

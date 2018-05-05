@@ -18,10 +18,11 @@
                     <h3 class="lighter smaller">Something Went Wrong!</h3>
                     <h3 class="lighter smaller">
                         <i class="ace-icon fa fa-wrench icon-animated-wrench bigger-125"></i>
-                        {{ message }}
+                        <span id='errorMessage'>{{ message }}</span>
+
                     </h3>
-                    File: {{ ex.file }} <br/>
-                    Line: {{ ex.line }} <br/>
+                    <span id='errorFile'>File: {{ ex.file }}</span><br/>
+                    <span id='errorLineNumber'>Line: {{ ex.line }}</span><br/>
                     <div>
 
                         <div class="space"></div>

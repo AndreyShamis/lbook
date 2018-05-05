@@ -27,17 +27,23 @@
             </th>
             <td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
             <th>DUT</th>
-            <td><span class="label label-success label-white middle">{{ cycle.dut }}</span></td>
+            <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
             <th>Controller/Uploader</th>
             <td>
-                <span class="label label-success label-white middle">{{ cycle.controller }}</span>/
-                <span class="label label-success label-white middle">{{ cycle.targetUploader }}</span></td>
+                <span class="label label-purple label-white middle">{{ cycle.controller }}</span>/
+                <span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
             <th>Build</th>
-            <td><span class="label label-success label-white middle">{{ cycle.build }}</span></td>
+            <td>
+                {% if cycle.build  %}
+                    <a href="{{ path('log_book_build_show', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info">
+                        <span class="label label-white middle">{{ cycle.build }}</span>
+                    </a>
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <th>Start Time</th>
-            <td><span class="label label-success label-white middle">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
             <th>Token EXP</th>
             <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
             <th>Updated</th>
@@ -47,7 +53,7 @@
         </tr>
         <tr>
             <th>End Time</th>
-            <td><span class="label label-success label-white middle">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
             <th>Token</th>
             <td colspan="5"><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
         </tr>

@@ -144,10 +144,19 @@
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
                 <td><span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">{{ cycle.updatedAt |date('d/m H:i:s') }}</span></td>
                 <td>
-                    <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
-                    {% if is_granted('edit', setup) %}
-                        <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
-                    {% endif %}
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        <a class="blue" href="{{ path('cycle_show', { 'id': cycle.id }) }}" title="Show">
+                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                        </a>
+                        {% if is_granted('edit', setup) %}
+                            <a class="green" href="{{ path('cycle_edit', { 'id': cycle.id }) }}" title="Edit">
+                                <i class="ace-icon fa fa-pencil bigger-130"></i>
+                            </a>
+                        {% endif %}
+                        {#<a class="red" href="#" title="Delete">#}
+                        {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+                        {#</a>#}
+                    </div>
                 </td>
             </tr>
         {% endfor %}

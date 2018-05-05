@@ -3,9 +3,12 @@
 {% block title %}LogBookBuild index{% endblock %}
 
 {% block content %}
-    <h1>LogBookBuild index</h1>
-
-    <table class="table">
+    <h1>List of builds</h1>
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    {% set pagePath = "log_book_build_index" %}
+    {% include "lbook/paginator.html.twig" %}
+    <table class="records_list table table-striped table-condensed table-hover">
         <thead>
             <tr>
                 <th>Id</th>
@@ -13,13 +16,18 @@
                 <th>actions</th>
             </tr>
         </thead>
-        <tbody>
-        {% for log_book_build in log_book_builds %}
+        <tbody class="searchable">
+        {% set break = false %}
+        {% set counter = 0 %}
+        {% for log_book_build in iterator if not break %}
+        {% if counter == 10000 %}
+            {% set break = true %}
+        {% endif %}
+        {% set counter = counter+1 %}
             <tr>
-                <td>{{ log_book_build.id }}</td>
-                <td>{{ log_book_build.name }}</td>
+                <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
+                <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>
                 <td>
-                    <a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">show</a>
                     <a href="{{ path('log_book_build_edit', {'id': log_book_build.id}) }}">edit</a>
                 </td>
             </tr>

@@ -5,24 +5,49 @@ namespace App\Controller;
 use App\Entity\LogBookBuild;
 use App\Form\LogBookBuildType;
 use App\Repository\LogBookBuildRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\PagePaginator;
 
 /**
  * @Route("/build")
  */
 class LogBookBuildController extends Controller
 {
+    protected $index_size = 100;
+
     /**
      * @Route("/", name="log_book_build_index", methods="GET")
+     * @Template(template="lbook/build/index.html.twig")
+     * @param int $page
+     * @param PagePaginator $pagePaginator
      * @param LogBookBuildRepository $logBookBuildRepository
-     * @return Response
+     * @return array
      */
-    public function index(LogBookBuildRepository $logBookBuildRepository): Response
+    public function index($page = 1, PagePaginator $pagePaginator, LogBookBuildRepository $logBookBuildRepository): array
     {
-        return $this->render('lbook/build/index.html.twig', ['log_book_builds' => $logBookBuildRepository->findAll()]);
+        $query = $logBookBuildRepository->createQueryBuilder('log_book_build')
+            ->orderBy('log_book_build.id', 'DESC');
+        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
+        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
+        // You can also call the count methods (check PHPDoc for `paginate()`)
+        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
+        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
+        $iterator = $paginator->getIterator(); # ArrayIterator
+
+        $maxPages = ceil($totalPosts / $this->index_size);
+        $thisPage = $page;
+        return array(
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
+        );
+        // return $this->render('lbook/build/index.html.twig', ['log_book_builds' => $logBookBuildRepository->findAll()]);
     }
 
     /**

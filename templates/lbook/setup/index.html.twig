@@ -9,19 +9,18 @@
     <table class="records_list table table-striped table-condensed table-hover">
         <thead>
         <tr>
-            <th></th>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Short Name</th>
+            <th title="Updated image"> </th>
+            <th>ID</th>
+            <th title="Full setup name">Name</th>
+            <th title="Cycles found">Cycles</th>
+            <th title="Friendly short setup name">Short Name</th>
             <th>OS</th>
-            <th>Owner</th>
-            <th>Moderators</th>
-            <th>Check Uptime</th>
-            <th>Cycles</th>
+            <th title="Owner Name">Owner</th>
             <th>Updated</th>
-            <th>Disabled</th>
+            <th title="Check Uptime">UPT</th>
+            <th title="Moderators cound">Moderators</th>
+            <th title="Shows if the setup is disabled">Disabled</th>
             <th>Options</th>
-
         </tr>
         </thead>
         <tbody class="searchable">
@@ -40,19 +39,28 @@
                 </td>
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
                 <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
+                <td>{{ setup.cycles | length }}</td>
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.osStr }}</td>
                 <td>{{ setup.owner }}</td>
-                <td>{{ setup.moderators|length }}</td>
-                <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
-                <td>{{ setup.cycles | length }}</td>
                 <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}"></span>{{ setup.updatedAt|time_diff}}</td>
+                <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
+                <td>{{ setup.moderators|length }}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>
                 <td>
-                    <a href="{{ path('setup_show', { 'id': setup.id }) }}">show</a>
-                    {% if is_granted('edit', setup) %}
-                    <a href="{{ path('setup_edit', { 'id': setup.id }) }}">edit</a>
-                    {% endif %}
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">
+                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                        </a>
+                        {% if is_granted('edit', setup) %}
+                        <a class="green" href="{{ path('setup_edit', { 'id': setup.id }) }}" title="Edit">
+                            <i class="ace-icon fa fa-pencil bigger-130"></i>
+                        </a>
+                        {% endif %}
+                        {#<a class="red" href="#" title="Delete">#}
+                            {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+                        {#</a>#}
+                    </div>
                 </td>
             </tr>
         {% endfor %}

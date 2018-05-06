@@ -17,9 +17,12 @@ from threading import Thread
 
 TOKEN_LEN = 30
 MAX_TOKEN_LEN = 150
-LOGBOOK_URL = "http://127.0.0.1:8080/upload/new_cli"
+DEBUG_LOGBOOK_URL = "http://127.0.0.1:8080/upload/new_cli"
+LOGBOOK_URL = "http://logbook.anshamis.com/upload/new_cli"
 MIN_TOKEN_LEN = 20
 UPLOAD_TIMEOUT = 120
+WAIT_TH_COUNT = 1   # Max uploads in same time
+WAIT_TH_MAX_TIME = 20   # Time to wait for WAIT_TH_COUNT exit
 
 
 class MultipartFormDataEncoder(object):
@@ -90,6 +93,7 @@ class LogBookCycle(object):
         self.token = None
         self.cycle_name = None
         self.setup_name = None
+        self.build_name = None
         self.test_count = 0
 
     @staticmethod
@@ -139,7 +143,7 @@ class LogBookUploader(object):
     """
     Logbook Uploader object
     """
-    url = LOGBOOK_URL
+    url = LOGBOOK_URL   # DEBUG_LOGBOOK_URL
     __DEF_FILE = 'debug/autoserv.DEBUG'
 
     def __init__(self, setup_name=None, cycle_name='', token=None):
@@ -147,7 +151,9 @@ class LogBookUploader(object):
         self.__token = None
         self.__setup_name = None
         self.__cycle_name = None
+        self.__build_name = None
         self.progress = 0
+        self.__post_async_waits = 0
         self.test_count = 0
         self.set_token(token)
         self.set_cycle_name(cycle_name)
@@ -166,6 +172,7 @@ class LogBookUploader(object):
         cycle.cycle_name = self.get_cycle_name()
         cycle.setup_name = self.get_setup_name()
         cycle.test_count = self.test_count
+        cycle.build_name = self.get_build_name()
         return cycle.save()
 
     @classmethod
@@ -181,6 +188,7 @@ class LogBookUploader(object):
         # new_cls.set_token(cycle.token)
         # new_cls.set_cycle_name(cycle.cycle_name)
         # new_cls.set_setup_name(cycle.setup_name)
+        new_cls.set_build_name(cycle.build_name)
         new_cls.test_count = cycle.test_count
         return new_cls
 
@@ -206,6 +214,16 @@ class LogBookUploader(object):
     def get_token(self):
         return self.__token
 
+    def get_build_name(self):
+        if self.__build_name is None:
+            return self.get_setup_name()
+        return self.__build_name
+
+    def set_build_name(self, build_name):
+        if build_name is None or len(build_name) < 3:
+            build_name = self.get_setup_name()
+        self.__build_name = build_name
+
     def get_cycle_name(self):
         return self.__cycle_name
 
@@ -218,6 +236,7 @@ class LogBookUploader(object):
             ('token', self.get_token()),
             ('setup', self.get_setup_name()),
             ('tests_count', self.test_count),
+            ('build', self.get_build_name()),
             ('cycle', self.get_cycle_name())
         ]
         return fields
@@ -241,11 +260,16 @@ class LogBookUploader(object):
         files = [('file', os.path.basename(upload_file), upload_file)]
         content_type, body = MultipartFormDataEncoder().encode(self.__get_post_fields(), files)
         headers = {'Content-Type': content_type}
+        # For disable proxy
+        proxy_handler = urllib2.ProxyHandler({})
+        opener = urllib2.build_opener(proxy_handler)
+
         the_request = urllib2.Request(url=self.url, data=body, headers=headers)
         try:
             self.progress += 1
             self.test_count += 1
-            response = urllib2.urlopen(the_request, timeout=UPLOAD_TIMEOUT)
+            response = opener.open(the_request, timeout=UPLOAD_TIMEOUT)
+            # response = urllib2.urlopen(the_request, timeout=UPLOAD_TIMEOUT)
             if print_response:
                 LogBookUploader.__print_response(response, "File {}".format(self.test_count))
             logging.info("File {} uploaded.".format(upload_file))
@@ -270,9 +294,19 @@ class LogBookUploader(object):
         :return:
         """
         try:
+            self.__post_async_waits += 1
             logging.info("Uploading file {} in thread.".format(logs_path))
             async_thread = threading.Thread(target=self.post, args=(logs_path, print_response))
             async_thread.daemon = True
+
+            # wait loop while self.progress > 0
+            end_time = int(time.time() + WAIT_TH_MAX_TIME)
+            trash_hold = max(1, WAIT_TH_COUNT)
+            while self.progress >= trash_hold and time.time() <= end_time:
+                time.sleep(0.2)
+
+            if self.progress >= trash_hold and time.time() > end_time:
+                logging.info("BREAK FROM WAIT : Current progress {},  adding new one.".format(self.progress))
             async_thread.setName(str(self.test_count + 1))
             async_thread.start()
             self.__threads.append(async_thread)
@@ -282,6 +316,8 @@ class LogBookUploader(object):
         except Exception as ex:
             logging.exception(str(ex))
             return False
+        finally:
+            self.__post_async_waits -= 1
         return True
 
     def wait_for_close(self):
@@ -297,7 +333,7 @@ class LogBookUploader(object):
                 logging.error("Timeout on wait, in progress {} uploads.".format(self.progress))
                 res = False
         for th in self.__threads:
-            logging.info("Join thread: {}.".format(th.getName()))
+            logging.info("Join thread: {}".format(th.getName()))
             th.join(1)
         return res
 
@@ -335,19 +371,19 @@ class LogBookUploader(object):
 
 logging.basicConfig(format='%(asctime)s %(levelname)-5.5s| %(message)s', level=logging.DEBUG)
 
-logs = '/home/werd/lbook/_wifi-matfunc-chell'
-file_path = os.path.join(logs, 'results-01-network_WiFi_BluetoothStreamPerf.11b/')
+ws_path = '/home/werd/lbook/_wifi-matfunc-chell'
 logbook = LogBookUploader(setup_name="TestPython", cycle_name="CycleNameTest 3")
-logbook.post_async(file_path)
-logbook.post_async(os.path.join(logs, 'results-02-network_WiFi_BluetoothStreamPerf.11a/'))
+logbook.post_async(os.path.join(ws_path, 'results-01-network_WiFi_BluetoothStreamPerf.11b/'))
+logbook.post_async(os.path.join(ws_path, 'results-02-network_WiFi_BluetoothStreamPerf.11a/'))
 logbook.wait_for_close()
 
+logbook.set_build_name("Test Build Name")
 # Save LogBookUploader setting
 f_name = logbook.save()
 
 # Load  LogBookUploader setting
 logbook = LogBookUploader.load(f_name)
 
-logbook.post_async(os.path.join(logs, 'results-03-network_WiFi_Perf.ht40/', True))
-logbook.post_async(os.path.join(logs, 'results-04-network_WiFi_Perf.11b/'))
+logbook.post_async(os.path.join(ws_path, 'results-03-network_WiFi_Perf.ht40/'), True)
+logbook.post_async(os.path.join(ws_path, 'results-04-network_WiFi_Perf.11b/'))
 logbook.wait_for_close()

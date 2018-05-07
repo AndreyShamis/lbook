@@ -216,7 +216,7 @@ class LogBookUploader(object):
 
     def get_build_name(self):
         if self.__build_name is None:
-            return self.get_setup_name()
+            return self.get_cycle_name()
         return self.__build_name
 
     def set_build_name(self, build_name):

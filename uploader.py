@@ -12,13 +12,18 @@ import urllib2
 import uuid
 import threading
 import pickle
-from typing import List
+try:
+    from typing import List
+except:
+    pass
 from threading import Thread
 
 TOKEN_LEN = 30
 MAX_TOKEN_LEN = 150
 DEBUG_LOGBOOK_URL = "http://127.0.0.1:8080/upload/new_cli"
-LOGBOOK_URL = "http://logbook.anshamis.com/upload/new_cli"
+#LOGBOOK_URL = "http://logbook.anshamis.com/upload/new_cli"
+LOGBOOK_URL = "http://46.101.215.57/upload/new_cli"
+
 MIN_TOKEN_LEN = 20
 UPLOAD_TIMEOUT = 120
 WAIT_TH_COUNT = 1   # Max uploads in same time
@@ -386,4 +391,16 @@ logbook = LogBookUploader.load(f_name)
 
 logbook.post_async(os.path.join(ws_path, 'results-03-network_WiFi_Perf.ht40/'), True)
 logbook.post_async(os.path.join(ws_path, 'results-04-network_WiFi_Perf.11b/'))
+
+logbook.post_async(os.path.join(ws_path, 'results-05-network_WiFi_Perf.11a/'))
+logbook.post_async(os.path.join(ws_path, 'results-06-network_WiFi_Perf.11g/'))
+logbook.post_async(os.path.join(ws_path, 'results-07-network_WiFi_Perf.11a_tkip/'))
+logbook.post_async(os.path.join(ws_path, 'results-08-network_WiFi_Perf.ht20_aes/'))
+logbook.post_async(os.path.join(ws_path, 'results-09-network_WiFi_Perf.11g_tkip/'))
+
+logbook.post_async(os.path.join(ws_path, 'results-10-network_WiFi_Perf.11a_wep/'))
+logbook.post_async(os.path.join(ws_path, 'results-11-network_WiFi_Perf.ht40_aes/'))
+logbook.post_async(os.path.join(ws_path, 'results-12-network_WiFi_Perf.11b_wep/'))
+logbook.post_async(os.path.join(ws_path, 'results-13-network_WiFi_Perf.ht20/'))
+
 logbook.wait_for_close()

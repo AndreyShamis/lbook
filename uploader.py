@@ -22,7 +22,7 @@ TOKEN_LEN = 30
 MAX_TOKEN_LEN = 150
 DEBUG_LOGBOOK_URL = "http://127.0.0.1:8080/upload/new_cli"
 #LOGBOOK_URL = "http://logbook.anshamis.com/upload/new_cli"
-LOGBOOK_URL = "http://46.101.215.57/upload/new_cli"
+LOGBOOK_URL = "http://do.anshamis.com/upload/new_cli"
 
 MIN_TOKEN_LEN = 20
 UPLOAD_TIMEOUT = 120

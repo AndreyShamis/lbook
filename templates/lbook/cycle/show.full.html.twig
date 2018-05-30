@@ -103,7 +103,7 @@
                             </div>
                         </div>
                     </div>
-
+                    {% if cycle.testsWarning > 0 %}
                     <div class="infobox infobox-black">
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.warningRate }}" data-color="#6FB3E0"
@@ -118,7 +118,9 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
 
+                    {% if cycle.testsFail > 0 %}
                     <div class="infobox infobox-red">
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.failRate }}" data-color="#d15b47"
@@ -133,7 +135,9 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
 
+                    {% if cycle.testsError > 0 %}
                     <div class="infobox infobox-orange">
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.errorRate }}" data-color="#f89406"
@@ -148,7 +152,7 @@
                             </div>
                         </div>
                     </div>
-
+                    {% endif %}
                 </div>
             </td>
         </tr>

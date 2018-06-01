@@ -45,7 +45,7 @@ class LogBookApplicationTestCase extends WebTestCase
      */
     protected function setUp(): void
     {
-        if (self::isSetupPass() === false) {
+        if (self::$container === null || self::isSetupPass() === false) {
             self::runCommand('doctrine:database:drop --force');
             self::runCommand('doctrine:database:create');
             self::runCommand('doctrine:schema:create --dump-sql');

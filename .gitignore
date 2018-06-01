@@ -1,4 +1,5 @@
-
+# Ignore lbk files
+*.lbk
 ###> symfony/framework-bundle ###
 .env
 /public/bundles/

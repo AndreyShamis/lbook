@@ -57,9 +57,9 @@ class UploaderTest extends LogBookApplicationTestCase
 
         $this->resource_copy($currentPath . 'ForUpload/', $currentPath);
 
-        $file1 = new UploadedFile($filePath1, $passFileName, 'text/plain', filesize($filePath1));
-        $file2 = new UploadedFile($filePath2, $errorFileName, 'text/plain', filesize($filePath2));
-        $file3 = new UploadedFile($filePath3, $failFileName, 'text/plain', filesize($filePath3));
+        $file1 = new UploadedFile($filePath1, $passFileName, 'text/plain');
+        $file2 = new UploadedFile($filePath2, $errorFileName, 'text/plain');
+        $file3 = new UploadedFile($filePath3, $failFileName, 'text/plain');
         $client = $this->getClient();
 
         $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file1), $postHeader);

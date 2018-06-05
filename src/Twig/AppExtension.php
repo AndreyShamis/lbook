@@ -82,6 +82,9 @@ class AppExtension extends AbstractExtension
             case 'pass':
                 $ret = 'log-success';
                 break;
+            case 'step':
+                $ret = 'log-step';
+                break;
             case 'fail':
                 $ret = 'log-fail';
                 break;

@@ -15,19 +15,16 @@
 .logType{
     font-size: 10px;
 }
-.log-success{background-color: #d8efdb;
-}
+.log-success{background-color: #d8efdb;}
+.log-step{background-color: #eeffd3;}
 .log-na{background-color: #a0fcff;}
 .log-fail{background-color: #ffb499;}
 .log-error{background-color: #f9ef90;}
-.log-warning{
-    background-color: #f0f5dc;
-}
+.log-warning{background-color: #f0f5dc;}
 .log-info{
     /*background-color:#00acd6*/
 }
-.log-critical{background-color:#ff7665;
-}
+.log-critical{background-color:#ff7665;}
 .log-debug{
     /*color: #ada6a6;*/
     background-color: #eaedf1;

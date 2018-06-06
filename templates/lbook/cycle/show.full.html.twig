@@ -190,12 +190,13 @@
     <table class="records_list table table-striped table-condensed table-hover">
         <thead>
         <tr>
-            <th>id</th>
-            <th>Order</th>
-            <th>Name</th>
+            <th>ID</th>
+            <th title="Test order">Order</th>
+            <th title="Test Name">Name</th>
             <th>Time start</th>
             <th>Time end</th>
             <th>Runtime</th>
+            <th title="Shows percentage of time in whole cycle">% time</th>
             {% if disabled_uptime == false %}
                 <th title="Uptime on test start">Uptime</th>
                 <th title="Uptime on test end">Uptime</th>
@@ -226,13 +227,16 @@
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
+                <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
                 {% if disabled_uptime == false %}
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
                 {% endif %}
-                <td><span class="badge {{ verdictToBadge(test.verdict)}}">
+                <td>
+                    <span class="badge {{ verdictToBadge(test.verdict)}}">
                         {{ test.verdict }}
-                    </span></td>
+                    </span>
+                </td>
                 {#<td>#}
                 {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
                 {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}

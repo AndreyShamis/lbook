@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookTest;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -134,17 +135,33 @@ class LogBookCycleController extends Controller
 
             $maxPages = ceil($totalPosts / $this->show_tests_size);
             $thisPage = $page;
-
+            $disable_uptime = false;
             $deleteForm = $this->createDeleteForm($cycle);
+            if ($totalPosts > 0) {
+                $tmp_counter = (int)round(sqrt($totalPosts), 0);
+                $nul_found = 0;
+                for ($x = 0; $x < $tmp_counter; $x++) {
+                    /** @var LogBookTest $test */
+                    $test = $iterator->current();
+                    if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
+                        $nul_found++;
+                    }
+                    $iterator->next();
+                }
+                if ($nul_found === $tmp_counter) {
+                    $disable_uptime = true;
+                }
+            }
 
             return $this->render('lbook/cycle/show.full.html.twig', array(
-                'cycle'          => $cycle,
-                'size'          => $totalPosts,
-                'maxPages'      => $maxPages,
-                'thisPage'      => $thisPage,
-                'iterator'      => $iterator,
-                'paginator'     => $paginator,
-                'delete_form'   => $deleteForm->createView(),
+                'cycle'             => $cycle,
+                'size'              => $totalPosts,
+                'maxPages'          => $maxPages,
+                'thisPage'          => $thisPage,
+                'iterator'          => $iterator,
+                'paginator'         => $paginator,
+                'disabled_uptime'   => $disable_uptime,
+                'delete_form'       => $deleteForm->createView(),
             ));
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);

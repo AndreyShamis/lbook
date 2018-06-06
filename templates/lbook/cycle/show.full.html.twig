@@ -196,8 +196,10 @@
             <th>Time start</th>
             <th>Time end</th>
             <th>Runtime</th>
-            <th>Uptime</th>
-            <th>Uptime</th>
+            {% if disabled_uptime == false %}
+                <th title="Uptime on test start">Uptime</th>
+                <th title="Uptime on test end">Uptime</th>
+            {% endif %}
             <th>Verdict</th>
             {#<th>Actions</th>#}
         </tr>
@@ -224,8 +226,10 @@
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
-                <td>{{ test.dutUpTimeStart }}</td>
-                <td>{{ test.dutUpTimeEnd }}</td>
+                {% if disabled_uptime == false %}
+                    <td>{{ test.dutUpTimeStart }}</td>
+                    <td>{{ test.dutUpTimeEnd }}</td>
+                {% endif %}
                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">
                         {{ test.verdict }}
                     </span></td>

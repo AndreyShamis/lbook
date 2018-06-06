@@ -92,6 +92,21 @@ class LogBookCycleController extends Controller
     /**
      * Finds and displays a cycle entity with paginator.
      *
+     * @Route("/{id}", name="cycle_show_first")
+     * @Method("GET")
+     * @param LogBookCycle $cycle
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFirstPage(LogBookCycle $cycle = null, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
+    {
+        return $this->show($cycle, 1, $pagePaginator, $testRepo);
+    }
+
+    /**
+     * Finds and displays a cycle entity with paginator.
+     *
      * @Route("/{id}/page/{page}", name="cycle_show")
      * @Method("GET")
      * @param LogBookCycle $cycle

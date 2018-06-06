@@ -60,7 +60,7 @@
         {#</a>#}
         {#<b class="arrow"></b>#}
     {#</li>#}
-
+    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
     <li class="{% if route starts with 'upload_' %}active{% endif %}">
         <a href="{{asset(path('upload_new'))}}" >
             <i class="menu-icon fa fa-cloud-upload"></i>
@@ -68,6 +68,7 @@
         </a>
         <b class="arrow"></b>
     </li>
+    {% endif %}
 
     {#<li class="{% if route starts with 'log_' %}active{% endif %}">#}
         {#<a href="{{asset(path('log_index'))}}">#}
@@ -135,12 +136,15 @@
                 </a>
                 <b class="arrow"></b>
             </li>
+
+            {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
             <li class="{% if route starts with 'log_' %}active{% endif %}">
                 <a href="{{asset(path('log_index'))}}">
                     <i class="menu-icon fa fa-caret-right"></i>Logs
                 </a>
                 <b class="arrow"></b>
             </li>
+            {% endif %}
         </ul>
     </li>
 

@@ -133,9 +133,9 @@
                     {% endif %}
                 </td>
                 <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
-                <td>{{ shortString(cycle.build, 25) }}</td>
+                <td title="{{ cycle.build }}">{{ shortString(cycle.build, 30) }}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>

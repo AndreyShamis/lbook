@@ -132,8 +132,8 @@
                         <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>
-                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
+                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
                 <td>{{ shortString(cycle.build, 25) }}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>

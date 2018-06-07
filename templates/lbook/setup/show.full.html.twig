@@ -99,21 +99,23 @@
     {%  set cycles = setup.cycles %}
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover">
+    <table class="records_list table table-striped table-condensed table-hover"
+           data-pagination="true" data-search="true" data-toggle="table"
+           data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
-            <th></th>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Tests</th>
-            <th>Build</th>
-            <th>Pass Rate</th>
-            <th>Controller</th>
-            <th>DUT</th>
-            <th>Uploader</th>
-            <th>Period</th>
-            <th>Test time</th>
-            <th>Updated</th>
+            <th data-sortable="true"></th>
+            <th data-sorter="htmlSorter" data-sortable="true">Id</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Name</th>
+            <th data-sortable="true">Tests</th>
+            <th data-sortable="true">Build</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
+            <th data-sortable="true">Controller</th>
+            <th data-sortable="true">DUT</th>
+            <th data-sortable="true">Uploader</th>
+            <th data-sortable="true">Period</th>
+            <th data-sortable="true">Test time</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -121,11 +123,10 @@
         {% set break = false %}
         {% set counter = 0 %}
         {% for cycle in iterator if not break %}
-
-        {% if counter == 10000 %}
-            {% set break = true %}
-        {% endif %}
-        {% set counter = counter+1 %}
+            {% if counter == 10000 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
             <tr>
                 <td>
                     {% if date(cycle.updatedAt) > date('-60minutes') %}
@@ -142,7 +143,11 @@
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
-                <td><span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">{{ cycle.updatedAt |date('d/m H:i:s') }}</span></td>
+                <td>
+                    <span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">
+                        {{ cycle.updatedAt |date('d/m H:i:s') }}
+                    </span>
+                </td>
                 <td>
                     <div class="hidden-sm hidden-xs action-buttons">
                         <a class="blue" href="{{ path('cycle_show', { 'id': cycle.id }) }}" title="Show">

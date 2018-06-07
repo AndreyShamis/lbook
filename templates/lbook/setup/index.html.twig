@@ -6,20 +6,22 @@
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "setup_index" %}
     {% include "lbook/paginator.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover">
+    <table class="records_list table table-striped table-condensed table-hover"
+           data-pagination="true" data-toggle="table"
+           data-page-size="50" data-page-list="[5, 10, 20, 50]" data-sort-order="desc">
         <thead>
         <tr>
-            <th title="Updated image"> </th>
-            <th>ID</th>
-            <th title="Full setup name">Name</th>
-            <th title="Cycles found">Cycles</th>
-            <th title="Friendly short setup name">Short Name</th>
-            <th>OS</th>
-            <th title="Owner Name">Owner</th>
-            <th>Updated</th>
-            <th title="Check Uptime">UPT</th>
-            <th title="Moderators cound">Moderators</th>
-            <th title="Shows if the setup is disabled">Disabled</th>
+            <th data-sortable="true" title="Updated image"> </th>
+            <th data-sorter="htmlSorter" data-sortable="true">ID</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name">Name</th>
+            <th data-sortable="true" title="Cycles found">Cycles</th>
+            <th data-sortable="true" title="Friendly short setup name">Short Name</th>
+            <th data-sortable="true">OS</th>
+            <th data-sortable="true" title="Owner Name">Owner</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
+            <th data-sortable="true" title="Check Uptime">UPT</th>
+            <th data-sortable="true" title="Moderators cound">Moderators</th>
+            <th data-sortable="true" title="Shows if the setup is disabled">Disabled</th>
             <th>Options</th>
         </tr>
         </thead>
@@ -43,7 +45,7 @@
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.osStr }}</td>
                 <td>{{ setup.owner }}</td>
-                <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}"></span>{{ setup.updatedAt|time_diff}}</td>
+                <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.moderators|length }}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>

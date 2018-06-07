@@ -61,6 +61,22 @@ class LogBookTestController extends Controller
     }
 
     /**
+     * Lists all Tests entities.
+     *
+     * @Route("/", name="test_index_first")
+     * @Method("GET")
+     * @Template(template="lbook/test/list.html.twig")
+     * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @return array
+     */
+    public function indexFirst(PagePaginator $pagePaginator, LogBookTestRepository $testRepo): array
+    {
+        return $this->index(1, $pagePaginator, $testRepo);
+    }
+
+    /**
      * Creates a new test entity.
      *
      * @Route("/new", name="test_new")

@@ -187,7 +187,9 @@
     {% include "lbook/double.paginator.html.twig" %}
     {%  set tests = cycle.tests%}
     {% include "lbook/search.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover" data-pagination="true" data-search="true" data-toggle="table"
+    <table id="testTable" class="records_list table table-striped table-condensed table-hover" data-pagination="true"
+           data-search="true" data-toggle="table"
+           data-page-size="2000" data-page-list="[50, 100, 500, 1000, 2000, 'ALL']"
            {#data-toolbar="#toolbar"#}
            {#data-search="true"#}
            {#data-show-refresh="true"#}
@@ -200,8 +202,6 @@
            {#data-show-pagination-switch="true"#}
            {#data-pagination="true"#}
            {#data-id-field="id"#}
-           {#data-page-list="[10, 25, 50, 100, ALL]"#}
-           {#data-side-pagination="server"#}
            {#data-response-handler="responseHandler"#}
     >
         <thead>
@@ -300,6 +300,14 @@
         $(document).ready(
             function() {
                 drawEasyPieChart();
+
+                var testTable = $('#testTable');
+                console.log(testTable)
+                testTable.bootstrapTable({
+                    // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+                });
+
+
             }
         );
     </script>

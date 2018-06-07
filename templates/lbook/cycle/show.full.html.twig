@@ -190,6 +190,7 @@
     <table id="testTable" class="records_list table table-striped table-condensed table-hover" data-pagination="true"
            data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[50, 100, 500, 1000, 2000, 'ALL']"
+           data-sort-order="desc"
            {#data-toolbar="#toolbar"#}
            {#data-search="true"#}
            {#data-show-refresh="true"#}
@@ -208,7 +209,7 @@
         <tr>
             <th data-sortable="true" data-field="id">ID</th>
             <th data-sortable="true" data-field="order" title="Test order">Order</th>
-            <th data-sortable="true" data-field="name" title="Test Name">Name</th>
+            <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Name</th>
             <th data-sortable="true" data-field="time_start">Time start</th>
             <th data-sortable="true" data-field="time_end">Time end</th>
             <th data-sortable="true" data-field="time_run">Runtime</th>

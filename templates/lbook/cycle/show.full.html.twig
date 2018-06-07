@@ -187,7 +187,7 @@
     {% include "lbook/double.paginator.html.twig" %}
     {%  set tests = cycle.tests%}
     {% include "lbook/search.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover"
+    <table class="records_list table table-striped table-condensed table-hover fixed-table-container bootstrap-table"
            id="testTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
            {#data-toolbar="#toolbar"#}

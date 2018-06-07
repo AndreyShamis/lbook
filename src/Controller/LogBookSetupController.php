@@ -118,7 +118,7 @@ class LogBookSetupController extends Controller
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
+    public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
     {
         try {
             if ($setup === null) {
@@ -148,6 +148,21 @@ class LogBookSetupController extends Controller
         } catch (\Throwable $ex) {
             return $this->setupNotFound($setup, $ex);
         }
+    }
+
+    /**
+     * Finds and displays a setup entity.
+     *
+     * @Route("/{id}", name="setup_show_first")
+     * @Method("GET")
+     * @param LogBookSetup $setup
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
+    {
+        return $this->showFull($setup, 1, $pagePaginator, $cycleRepo);
     }
 
     /**
@@ -187,39 +202,6 @@ class LogBookSetupController extends Controller
             'message' => $ex->getMessage(),
             'ex' => $ex,
         ), $otherResponse);
-    }
-
-    /**
-     * Finds and displays a setup entity.
-     *
-     * @Route("/{id}", name="setup_show_full")
-     * @Method("GET")
-     * @param LogBookSetup $obj
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function showAction(LogBookSetup $obj = null): Response
-    {
-        try {
-            if (!$obj) {
-                throw new \RuntimeException('');
-            }
-            $user= $this->get('security.token_storage')->getToken()->getUser();
-            /** @var PersistentCollection $moderators */
-            $moderators = $obj->getModerators();
-            //if(in_array($user, $moderators)){
-            if ($moderators->contains($user)) {
-                $deleteForm = $this->createDeleteForm($obj)->createView();
-            } else {
-                $deleteForm = null;
-            }
-
-            return $this->render('lbook/setup/show.html.twig', array(
-                'setup' => $obj,
-                'delete_form' => $deleteForm,
-            ));
-        } catch (\Throwable $ex) {
-            return $this->setupNotFound($obj, $ex);
-        }
     }
 
     /**

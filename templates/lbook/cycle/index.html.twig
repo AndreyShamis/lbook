@@ -39,9 +39,9 @@
                     <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
                     {% endif %}
                 </td>
-                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td><a href="{{ path('cycle_show', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
-                <td><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>
+                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
+                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
+                <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
                 {#<td>{{ cycle.tests | length }}</td>#}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>

@@ -37,8 +37,8 @@
                         <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ setup.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>
-                <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
-                <td><a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
+                <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
+                <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.name }}</a></td>
                 <td>{{ setup.cycles | length }}</td>
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.osStr }}</td>

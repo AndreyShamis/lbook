@@ -61,6 +61,21 @@ class LogBookSetupController extends Controller
     }
 
     /**
+     * Lists all setup entities.
+     *
+     * @Route("/", name="setup_index_first")
+     * @Method("GET")
+     * @Template(template="lbook/setup/index.html.twig")
+     * @param PagePaginator $pagePaginator
+     * @param LogBookSetupRepository $setupRepo
+     * @return array
+     */
+    public function indexFirst(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
+    {
+        return $this->index(1, $pagePaginator, $setupRepo);
+    }
+
+    /**
      * Creates a new setup entity.
      *
      * @Route("/new", name="setup_new")

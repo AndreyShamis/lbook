@@ -66,7 +66,6 @@ class LogBookTestController extends Controller
      * @Route("/", name="test_index_first")
      * @Method("GET")
      * @Template(template="lbook/test/list.html.twig")
-     * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @return array

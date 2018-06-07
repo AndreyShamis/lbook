@@ -61,6 +61,21 @@ class LogBookCycleController extends Controller
         );
     }
 
+
+    /**
+     * Lists all cycle entities.
+     *
+     * @Route("/", name="cycle_index_first")
+     * @Method("GET")
+     * @Template(template="lbook/cycle/index.html.twig")
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return array
+     */
+    public function indexFirst(PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): array
+    {
+        return $this->index(1, $pagePaginator, $cycleRepo);
+    }
     /**
      * Creates a new cycle entity.
      *

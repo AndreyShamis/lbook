@@ -592,13 +592,10 @@ class LogBookUploaderController extends Controller
                         //$uploadObj->addMessage('HERE IS THE VALUES '. print_r($arr, true));
                         $test->setMetaData($arr);
                     }
-
-                    /** Parse KEY::JSON_VALUE */
-                    if ($this->isJson($log->getMessage())) {
-                        $uploadObj->addMessage('JSON FOUND '. $log->getMessage());
-                    }
-//                    else {
-//                        $uploadObj->addMessage('JSON NOT FOUND '. $log->getMessage());
+//
+//                    /** Parse KEY::JSON_VALUE */
+//                    if ($this->isJson($log->getMessage())) {
+//                        $uploadObj->addMessage('JSON FOUND '. $log->getMessage());
 //                    }
                 }
                 /** Test Time section **/

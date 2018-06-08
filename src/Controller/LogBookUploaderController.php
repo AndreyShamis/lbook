@@ -586,11 +586,17 @@ class LogBookUploaderController extends Controller
                 /** SYSTEM section */
                 if ($log->getMsgType()->getName() === 'SYSTEM') {
                     /** Parse KEY::STR_VALUE */
+                    if ($this->isVariableString($log->getMessage())) {
+                        //$uploadObj->addMessage('START WITH UPPER FOUND '. $log->getMessage());
+                        $arr = $this->extractTestVariables($log->getMessage());
+                        //$uploadObj->addMessage('HERE IS THE VALUES '. print_r($arr, true));
+                        $test->setMetaData($arr);
+                    }
 
                     /** Parse KEY::JSON_VALUE */
                     if ($this->isJson($log->getMessage())) {
                         $uploadObj->addMessage('JSON FOUND '. $log->getMessage());
-                    } 
+                    }
 //                    else {
 //                        $uploadObj->addMessage('JSON NOT FOUND '. $log->getMessage());
 //                    }
@@ -629,12 +635,46 @@ class LogBookUploaderController extends Controller
         return $ret_data;
     }
 
+    private function extractTestVariables($string): array
+    {
+        $ret = array();
+        $tmp_arr = explode(';;', $string);
+        foreach ($tmp_arr as $single) {
+            $tmp_pair = explode('::', $single);
+            $key = trim($tmp_pair[0]);
+            if ($this->startsWithUpper($key) && mb_strlen($key) >= 2 && mb_strlen($key) <= 100) {
+                $ret[$key] = trim($tmp_pair[1]);
+            }
+        }
+
+        return $ret;
+    }
+
+    private function isMultipleVariable($string): bool
+    {
+        if (substr_count($string, ';;') > 0) {
+            $tmp_arr = explode(';;', $string);
+            return $this->isVariableString($tmp_arr[0]) && $this->isVariableString($tmp_arr[1]);
+        }
+        return false;
+    }
+
+    private function isVariableString($string): bool
+    {
+        return $this->startsWithUpper($string) && strpos($string, '::') !== false;
+    }
+
     private function isJson($string): bool
     {
         json_decode($string);
         return (json_last_error() === JSON_ERROR_NONE);
     }
 
+    private function startsWithUpper($str): bool
+    {
+        $chr = mb_substr ($str, 0, 1, 'UTF-8');
+        return mb_strtolower($chr, 'UTF-8') !== $chr;
+    }
     /**
      * Parse from string Test Verdict
      * @param string $input

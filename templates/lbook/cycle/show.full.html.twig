@@ -213,11 +213,15 @@
             <th data-sortable="true" data-field="time_end">Time end</th>
             <th data-sortable="true" data-field="time_run">Runtime</th>
             <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+            {% for key, item in additional_cols %}
+                <th data-sortable="true" title="{{ key }}">{{ item|replace({'_SHOW': '' }) }}</th>
+            {% endfor %}
             {% if disabled_uptime == false %}
                 <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
                 <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
             {% endif %}
             <th data-sortable="true" data-field="verdict">Verdict</th>
+            {#<th data-field="options">Meta Data</th>#}
             {#<th>Actions</th>#}
         </tr>
         </thead>
@@ -244,6 +248,12 @@
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                {% for key, item in additional_cols %}
+                    <td title="{{ item }}">{{ test.metaData[item] }}</td>
+                {% endfor %}
+                {#<td>{{ test.metaData| keys | join(', ')   }}</td>#}
+                {#<td>{{ test.metaData["VARIABLE1"]  }}</td>#}
+                {#<td>{{ test.metaData|join(', ')  }}</td>#}
                 {% if disabled_uptime == false %}
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
@@ -253,6 +263,44 @@
                         {{ test.verdict }}
                     </span>
                 </td>
+                {#<td>#}
+                    {#<div class="col-xs-12 col-sm-6 widget-container-col ui-sortable" id="widget-container-col-1">#}
+
+                        {#<div class="widget-box collapsed">#}
+                            {#<div class="widget-header widget-header-small">#}
+                                {#<h6 class="widget-title">#}
+                                    {#<i class="ace-icon fa fa-sort"></i>#}
+                                    {#Options#}
+                                {#</h6>#}
+
+                                {#<div class="widget-toolbar">#}
+                                    {#<a href="#" data-action="settings">#}
+                                        {#<i class="ace-icon fa fa-cog"></i>#}
+                                    {#</a>#}
+                                    {#<a href="#" data-action="reload">#}
+                                        {#<i class="ace-icon fa fa-refresh"></i>#}
+                                    {#</a>#}
+                                    {#<a href="#" data-action="collapse">#}
+                                        {#<i class="ace-icon fa fa-plus small" data-icon-show="fa-plus" data-icon-hide="fa-minus"></i>#}
+                                    {#</a>#}
+                                    {#<a href="#" data-action="close">#}
+                                        {#<i class="ace-icon fa fa-times"></i>#}
+                                    {#</a>#}
+                                {#</div>#}
+                            {#</div>#}
+
+                            {#<div class="widget-body" style="display: none;">#}
+                                {#<div class="widget-main">#}
+                                    {#<ul>#}
+                                        {#{% for key, item in test.metaData %}#}
+                                            {#<li>{{ key }}:{{ item }}</li>#}
+                                        {#{% endfor %}#}
+                                    {#</ul>#}
+                                {#</div>#}
+                            {#</div>#}
+                        {#</div>#}
+                    {#</div>#}
+                {#</td>#}
                 {#<td>#}
                 {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
                 {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
@@ -307,8 +355,6 @@
                     classes: "table-no-bordered",
                     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
                 });
-
-
             }
         );
     </script>

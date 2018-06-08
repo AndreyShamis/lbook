@@ -142,6 +142,9 @@ class LogBookTest
      */
     public function getMetaData(): array
     {
+        if ($this->meta_data === null) {
+            $this->meta_data = array();
+        }
         return $this->meta_data;
     }
 

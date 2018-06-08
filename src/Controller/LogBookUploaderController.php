@@ -184,7 +184,9 @@ class LogBookUploaderController extends Controller
      */
     public function newCli(Request $request)
     {
-        //curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
+        //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
+        //curl --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
+
         $obj = new LogBookUpload();
         $p_data = $request->request;
         /** @var LogBookCycle $cycle */
@@ -278,7 +280,7 @@ class LogBookUploaderController extends Controller
                 'logFileSize' => $new_file->getSize(),
                 'executionOrder' => $this->getTestNewExecutionOrder($cycle),
             ));
-            $obj->data = $this->parseFile($new_file, $test);
+            $obj->data = $this->parseFile($new_file, $test, $obj);
             $this->em->refresh($cycle);
 
             if ($build_name === null || $build_name === '') {
@@ -317,7 +319,7 @@ class LogBookUploaderController extends Controller
      */
     public function newWeb(Request $request)
     {
-        //curl --max-time 120 --form file=@autoserv.DEBUG --form executionID=2602161043 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
+        //curl --max-time 120 --form file=@autoserv.DEBUG --form token=2602161043 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
         $obj = new LogBookUpload();
         $form = $this->createForm(LogBookUploadType::class, $obj);
         $form->handleRequest($request);
@@ -363,7 +365,12 @@ class LogBookUploaderController extends Controller
                 'logFileSize' => $new_file->getSize(),
                 'executionOrder' => $this->getTestNewExecutionOrder($cycle),
                 ));
-            $obj->data = $this->parseFile($new_file, $test);
+            /**
+             * Parse log in test
+             * @var array data
+             */
+            $obj->data = $this->parseFile($new_file, $test, $obj);
+
             $this->em->refresh($cycle);
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));
             $remote_ip = $request->getClientIp();
@@ -439,9 +446,10 @@ class LogBookUploaderController extends Controller
     /**
      * @param String $file
      * @param LogBookTest $test
+     * @param LogBookUpload $uploadObj
      * @return array
      */
-    protected function parseFile($file, LogBookTest $test): array
+    protected function parseFile($file, LogBookTest $test, LogBookUpload $uploadObj): array
     {
         $ret_data = array();
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
@@ -548,7 +556,7 @@ class LogBookUploaderController extends Controller
 //                    unset($objectsToClear);
 //                    $objectsToClear = array();
 //                }
-                /*** Test Name section **/
+                /** Test Name section */
                 if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
                     $tmpName = null;
 
@@ -575,6 +583,18 @@ class LogBookUploaderController extends Controller
                     }
                 }
 
+                /** SYSTEM section */
+                if ($log->getMsgType()->getName() === 'SYSTEM') {
+                    /** Parse KEY::STR_VALUE */
+
+                    /** Parse KEY::JSON_VALUE */
+                    if ($this->isJson($log->getMessage())) {
+                        $uploadObj->addMessage('JSON FOUND '. $log->getMessage());
+                    } 
+//                    else {
+//                        $uploadObj->addMessage('JSON NOT FOUND '. $log->getMessage());
+//                    }
+                }
                 /** Test Time section **/
                 $testStartTime = min($testStartTime, $log->getLogTime());
                 $testEndTime = max($testEndTime, $log->getLogTime());
@@ -602,11 +622,17 @@ class LogBookUploaderController extends Controller
             $test->setName($testName);
         }
         $this->em->flush();
-        foreach ($objectsToClear as $obj) {
-            $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+        foreach ($objectsToClear as $tmp_obj) {
+            $this->em->detach($tmp_obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
         }
 
         return $ret_data;
+    }
+
+    private function isJson($string): bool
+    {
+        json_decode($string);
+        return (json_last_error() === JSON_ERROR_NONE);
     }
 
     /**

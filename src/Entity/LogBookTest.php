@@ -122,6 +122,12 @@ class LogBookTest
     protected $forDelete = false;
 
     /**
+     * @var array
+     * @ORM\Column(type="array", nullable=true, columnDefinition="LONGTEXT DEFAULT NULL")
+     */
+    protected $meta_data = [];
+
+    /**
      * LogBookTest constructor.
      */
     public function __construct()
@@ -129,6 +135,34 @@ class LogBookTest
         $this->timeStart = new \DateTime();
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaData(): array
+    {
+        return $this->meta_data;
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function addMetaData(array $meta_data): void
+    {
+        $this->meta_data = array_merge($this->meta_data, $meta_data);
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function setMetaData(array $meta_data): void
+    {
+        if ($this->meta_data === null || \count($this->meta_data) === 0) {
+            $this->meta_data = $meta_data;
+        } else {
+            $this->addMetaData($meta_data);
+        }
     }
 
     /**

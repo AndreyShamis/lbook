@@ -152,20 +152,37 @@ class LogBookCycleController extends Controller
             $thisPage = $page;
             $disable_uptime = false;
             $deleteForm = $this->createDeleteForm($cycle);
+            $nul_found = 0;
+
+            $additional_cols = array();
+            $iterator->rewind();
             if ($totalPosts > 0) {
-                $tmp_counter = (int)round(sqrt($totalPosts), 0);
-                $nul_found = 0;
-                for ($x = 0; $x < $tmp_counter; $x++) {
+                for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $test = $iterator->current();
+
+                    /**
+                     * Search for metadata with _SHOW postfix, if exist that column will be shown
+                     * @var array $md
+                     */
+                    $md = $test->getMetaData();
+                    if (\count($md) > 0) {
+                        foreach ($md as $key => $value) {
+                            if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
+                                $additional_cols[] = $key;
+                            }
+                        }
+                    }
+                    /** Search for uptime if show or not */
                     if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
                         $nul_found++;
                     }
                     $iterator->next();
                 }
-                if ($nul_found === $tmp_counter) {
-                    $disable_uptime = true;
-                }
+            }
+
+            if ($nul_found === $totalPosts) {
+                $disable_uptime = true;
             }
 
             return $this->render('lbook/cycle/show.full.html.twig', array(
@@ -177,10 +194,18 @@ class LogBookCycleController extends Controller
                 'paginator'         => $paginator,
                 'disabled_uptime'   => $disable_uptime,
                 'delete_form'       => $deleteForm->createView(),
+                'additional_cols'   => $additional_cols
             ));
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);
         }
+    }
+
+    private function endsWith($haystack, $needle): bool
+    {
+        $length = mb_strlen($needle);
+
+        return $length === 0 || (substr($haystack, -$length) === $needle);
     }
 
     /**

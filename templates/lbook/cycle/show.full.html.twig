@@ -213,6 +213,9 @@
             <th data-sortable="true" data-field="time_end">Time end</th>
             <th data-sortable="true" data-field="time_run">Runtime</th>
             <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+            {% for key, item in additional_cols %}
+                <th data-sortable="true" title="{{ key }}">{{ shortString(item|replace({'_SHOW': '' }) , 20) }}</th>
+            {% endfor %}
             {% if disabled_uptime == false %}
                 <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
                 <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
@@ -244,6 +247,17 @@
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                {% for key, item in additional_cols %}
+                    <td title="{{ item }}">
+                    {% if isUrl(test.metaData[item]) %}
+                        <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                    {% else %}
+                        <span title="{{ test.metaData[item] }}">
+                            {{ shortString(test.metaData[item], 35) }}
+                        </span>
+                    {% endif %}
+                    </td>
+                {% endfor %}
                 {% if disabled_uptime == false %}
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
@@ -307,8 +321,6 @@
                     classes: "table-no-bordered",
                     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
                 });
-
-
             }
         );
     </script>

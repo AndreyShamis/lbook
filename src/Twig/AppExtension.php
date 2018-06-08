@@ -49,6 +49,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('passRateToColor', [$this, 'passRateToColor']),
             new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
+            new TwigFunction('isUrl', [$this, 'isUrl']),
             new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new Twig_SimpleFunction('inarray', array($this, 'inArray')),
@@ -68,6 +69,14 @@ class AppExtension extends AbstractExtension
             return substr($input, 0, $len) . $postFix;
         }
         return $input;
+    }
+
+    public function isUrl($string): bool
+    {
+        if (filter_var($string, FILTER_VALIDATE_URL)) {
+            return true;
+        }
+        return false;
     }
 
     /**

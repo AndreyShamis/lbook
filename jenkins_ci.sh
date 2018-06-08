@@ -57,8 +57,8 @@ success "***************************** Composer validation finished ************
 ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
-
-composer  -vvv update
+mkdir -p artifacts
+composer -vvv update &> artifacts/update.log.txt
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
 #composer validate --no-check-all --strict  # TODO

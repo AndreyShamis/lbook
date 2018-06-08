@@ -182,7 +182,7 @@ class LogBookUploaderController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function newCliAction(Request $request)
+    public function newCli(Request $request)
     {
         //curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
         $obj = new LogBookUpload();
@@ -241,7 +241,7 @@ class LogBookUploaderController extends Controller
                  */
             }
 //
-//            if($cycle === null){
+//            if ($cycle === null) {
 //                $cycle = $this->cycleRepo->findOneBy(array('id' => $cycle_id));
 //            }
 
@@ -315,7 +315,7 @@ class LogBookUploaderController extends Controller
      * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function newAction(Request $request)
+    public function newWeb(Request $request)
     {
         //curl --max-time 120 --form file=@autoserv.DEBUG --form executionID=2602161043 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
         $obj = new LogBookUpload();
@@ -461,7 +461,7 @@ class LogBookUploaderController extends Controller
 
         $testVerdict = null;
 
-//        if(count($this->log_first_lines)){
+//        if (count($this->log_first_lines)) {
 //            /**
 //             * TODO : Need First time in test
 //             */
@@ -540,9 +540,9 @@ class LogBookUploaderController extends Controller
                 $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
-//                if($counter%20000 == 0){
+//                if ($counter%20000 == 0) {
 //                    $this->em->flush();
-//                    foreach ($objectsToClear as $obj){
+//                    foreach ($objectsToClear as $obj) {
 //                        $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
 //                    }
 //                    unset($objectsToClear);
@@ -557,12 +557,12 @@ class LogBookUploaderController extends Controller
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_AutotestTestPrint = true;
                         }
-                    } else if(!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
+                    } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_TestPrint = true;
                         }
-                    } else if(!$tmpTestNameFlag_ControlTestPrint) {
+                    } else if (!$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogControlPrint($log);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_ControlTestPrint = true;
@@ -764,7 +764,7 @@ class LogBookUploaderController extends Controller
         $ret = strtoupper($this->cleanString($debugLevel));
         if ($ret === 'WARNI') {
             $ret = 'WARNING';
-        } else if($ret === 'CRITI') {
+        } elseif ($ret === 'CRITI') {
             $ret = 'CRITICAL';
         }
         return $ret;

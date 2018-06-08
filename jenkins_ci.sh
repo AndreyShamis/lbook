@@ -58,7 +58,7 @@ ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
 
-composer  -vvv update
+composer -vvv update &> artifacts/update.log.txt
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
 #composer validate --no-check-all --strict  # TODO

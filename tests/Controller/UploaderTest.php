@@ -132,6 +132,15 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertEquals(round($cycle->getTestsWarning()*$coefficient, 2), $cycle->getWarningRate());
 
         /**   */
+
+        /** Forth file upload */
+        $postParams['cycle'] = '4CycleNameShouldBeLike_This';
+        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file3), $postHeader);
+
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $thirdResponse = $this->getClient()->getResponse()->getContent();
+
+        $this->validateExistingTestResponse($thirdResponse, $setupName, $token, $failFileName, $postParams['cycle']);
     }
 
     /**
@@ -140,7 +149,7 @@ class UploaderTest extends LogBookApplicationTestCase
      * @param string $token
      * @param string $fileName
      */
-    protected function validateExistingTestResponse(string &$stringResponse, string &$setupName, string &$token, string &$fileName): void
+    protected function validateExistingTestResponse(string &$stringResponse, string &$setupName, string &$token, string &$fileName, $cycleName=null): void
     {
         $this->assertNotRegExp('/Failed to generate cycle/', $stringResponse);
         $this->assertRegExp('/Token provided \['.$token.'\]/', $stringResponse);
@@ -152,6 +161,9 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertNotRegExp('/Creating cycle/', $stringResponse);
         $this->assertNotRegExp('/Cycle created ID:\d+./', $stringResponse);
         $this->assertRegExp('/Cycle found, take SETUP from cycle/', $stringResponse);
+        if ($cycleName !== null) {
+            $this->assertRegExp('/WARNING: cycle name changed, updating to new one \['. $cycleName .'\]/', $stringResponse);
+        }
         $this->assertRegExp('/File name is :[\w\d]+'.$fileName.'/', $stringResponse);
         $this->assertRegExp('/TestID is \d+\.$/', $stringResponse);
     }

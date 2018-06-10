@@ -90,12 +90,13 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertEquals(50, $cycle->getPassRate(), 'Check that cycle pass rate is 50%: Actual = ' . $cycle->getPassRate());
 
         /** Third file upload */
+        $postParams['cycle'] = '3CycleNameShouldBeLike_This';
         $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file3), $postHeader);
 
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
         $thirdResponse = $this->getClient()->getResponse()->getContent();
 
-        $this->validateExistingTestResponse($thirdResponse, $setupName, $token, $failFileName);
+        $this->validateExistingTestResponse($thirdResponse, $setupName, $token, $failFileName, $postParams['cycle']);
 
         $testId = $this->findTestIdInTest($thirdResponse);
 
@@ -103,6 +104,8 @@ class UploaderTest extends LogBookApplicationTestCase
         self::$entityManager->refresh($cycle);
         self::$entityManager->refresh($setup);
         $test = $testRepo->find($testId);
+
+        $this->assertEquals($postParams['cycle'], $cycle->getName(), 'Check that cycle Name was changed in DB. Expect '.$postParams['cycle'].': Actual = ' . $cycle->getName());
 
         //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
         $this->assertSame($failTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $failTestName);
@@ -132,6 +135,17 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertEquals(round($cycle->getTestsWarning()*$coefficient, 2), $cycle->getWarningRate());
 
         /**   */
+
+//        /** Forth file upload */
+//        $postParams['cycle'] = '4CycleNameShouldBeLike_This';
+//        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file3), $postHeader);
+//
+//        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+//        $thirdResponse = $this->getClient()->getResponse()->getContent();
+//
+//        $this->validateExistingTestResponse($thirdResponse, $setupName, $token, $failFileName);
+//        self::$entityManager->refresh($cycle);
+//        $this->assertEquals($postParams['cycle'], $cycle->getName(), 'Check that cycle Name was changed in DB. Expect '.$postParams['cycle'].': Actual = ' . $cycle->getName());
     }
 
     /**
@@ -140,7 +154,7 @@ class UploaderTest extends LogBookApplicationTestCase
      * @param string $token
      * @param string $fileName
      */
-    protected function validateExistingTestResponse(string &$stringResponse, string &$setupName, string &$token, string &$fileName): void
+    protected function validateExistingTestResponse(string &$stringResponse, string &$setupName, string &$token, string &$fileName, $cycleName=null): void
     {
         $this->assertNotRegExp('/Failed to generate cycle/', $stringResponse);
         $this->assertRegExp('/Token provided \['.$token.'\]/', $stringResponse);
@@ -152,6 +166,9 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertNotRegExp('/Creating cycle/', $stringResponse);
         $this->assertNotRegExp('/Cycle created ID:\d+./', $stringResponse);
         $this->assertRegExp('/Cycle found, take SETUP from cycle/', $stringResponse);
+        if ($cycleName !== null) {
+            $this->assertRegExp('/WARNING: cycle name changed, updating to new one \['. $cycleName .'\]/', $stringResponse);
+        }
         $this->assertRegExp('/File name is :[\w\d]+'.$fileName.'/', $stringResponse);
         $this->assertRegExp('/TestID is \d+\.$/', $stringResponse);
     }

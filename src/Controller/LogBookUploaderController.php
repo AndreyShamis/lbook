@@ -237,19 +237,16 @@ class LogBookUploaderController extends Controller
                      * TODO Check token exp date
                      */
                 }
-            } else {
-                /**
-                 * TODO Token not provided -> EXIT?
-                 */
             }
-//
-//            if ($cycle === null) {
-//                $cycle = $this->cycleRepo->findOneBy(array('id' => $cycle_id));
-//            }
 
             if ($cycle !== null) {
                 $obj->addMessage('INFO: Cycle found, take SETUP from cycle');
                 $setup = $cycle->getSetup();
+                /** Update cycle name if changed */
+                if ($cycle_name !== '' && $cycle_name !== null && $cycle_name !== $cycle->getName()) {
+                    $obj->addMessage('WARNING: cycle name changed, updating to new one');
+                    $cycle->setName($cycle_name);
+                }
             } else {
                 $obj->addMessage('ERROR: Cycle not found, take setup from POST');
                 $setup = $this->bringSetup($obj, $setup_name);

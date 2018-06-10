@@ -106,7 +106,11 @@
                                 <td>{{ relativeTime(test.timeStart, log.logTime) }}</td>
                                 {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
                                 {#<td title="{{ log.id }}">{{ log.chain }}</td>#}
-                                <td>{{ log.message | nl2br }}</td>
+                                {% set link_class = '' %}
+                                {% if log.msgType.name in ["INFO", "SYSTEM"] %}
+                                    {% set link_class = 'autolink' %}
+                                {% endif %}
+                                <td class="well {{ link_class }}">{{ log.message | nl2br }}</td>
                                 <td class="logType">{{ log.msgType }}</td>
                             </tr>
                     {% endfor %}
@@ -133,4 +137,13 @@
         {#</li>#}
         {#{% endif %}#}
     </ul>
+    <script type="text/javascript">
+        $(document).ready(
+            function() {
+                $(".autolink").each(function(){
+                    $(this).html(linkify($(this).html()));
+                });
+            }
+        );
+    </script>
 {% endblock %}

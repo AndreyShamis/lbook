@@ -63,8 +63,11 @@ class AppExtension extends AbstractExtension
      * @param string $postFix
      * @return string
      */
-    public function shortString(string $input, int $len = 20, string $postFix = '...'): string
+    public function shortString(string $input = null, int $len = 20, string $postFix = '...'): string
     {
+        if ($input === null) {
+            return '';
+        }
         if (\strlen($input) > $len) {
             return substr($input, 0, $len) . $postFix;
         }

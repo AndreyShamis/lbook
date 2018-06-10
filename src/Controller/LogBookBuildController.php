@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookBuild;
 use App\Form\LogBookBuildType;
 use App\Repository\LogBookBuildRepository;
+use App\Repository\LogBookCycleRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,7 @@ use App\Service\PagePaginator;
 class LogBookBuildController extends Controller
 {
     protected $index_size = 100;
+    protected $show_cycle_size = 100;
 
     /**
      * @Route("/page/{page}", name="log_book_build_index", methods="GET")
@@ -77,13 +79,55 @@ class LogBookBuildController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="log_book_build_show", methods="GET")
+     * @Route("/detail/{id}", name="log_book_build_show", methods="GET")
      * @param LogBookBuild $logBookBuild
      * @return Response
      */
     public function show(LogBookBuild $logBookBuild): Response
     {
         return $this->render('lbook/build/show.html.twig', ['log_book_build' => $logBookBuild]);
+    }
+
+    /**
+     * @Route("/{id}", name="build_show_cycles_first", methods="GET")
+     * @param LogBookBuild $logBookBuild
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return Response
+     */
+    public function showCyclesFirst(LogBookBuild $logBookBuild, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): Response
+    {
+        return $this->showCycles($logBookBuild, 1 , $pagePaginator, $cycleRepo);
+    }
+
+    /**
+     * @Route("/{id}/page/{page}", name="build_show_cycles", methods="GET")
+     * @param LogBookBuild $logBookBuild
+     * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return Response
+     */
+    public function showCycles(LogBookBuild $logBookBuild, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): Response
+    {
+        $qb = $cycleRepo->createQueryBuilder('t')
+            ->where('t.build = :build')
+            ->orderBy('t.updatedAt', 'DESC')
+            ->setParameter('build', $logBookBuild->getId());
+        $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
+        $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+        $iterator = $paginator->getIterator(); # ArrayIterator
+
+        $maxPages = ceil($totalPosts / $this->show_cycle_size);
+        $thisPage = $page;
+        return $this->render('lbook/build/show.cycle.html.twig', array(
+            'build'         => $logBookBuild,
+            'size'          => $totalPosts,
+            'maxPages'      => $maxPages,
+            'thisPage'      => $thisPage,
+            'iterator'      => $iterator,
+            'paginator'     => $paginator,
+        ));
     }
 
     /**

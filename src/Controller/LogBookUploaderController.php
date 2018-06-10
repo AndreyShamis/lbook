@@ -829,7 +829,10 @@ class LogBookUploaderController extends Controller
             $ret = 'WARNING';
         } elseif ($ret === 'CRITI') {
             $ret = 'CRITICAL';
+        } elseif ($ret === 'SYSTE') {
+            $ret = 'SYSTEM';
         }
+
         return $ret;
     }
 

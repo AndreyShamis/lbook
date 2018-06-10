@@ -1,0 +1,88 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block title %}LogBookBuild{% endblock %}
+
+{% block content %}
+    <h3>Build [{{ build.id }}] : {{ build.name }}</h3>
+    {% set pagePath = "build_show_cycles" %}
+    {% set objId = build.id %}
+    {% include "lbook/double.paginator.html.twig" %}
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           data-pagination="true" data-toggle="table"
+           data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
+        <thead>
+        <tr>
+            <th data-sortable="true"></th>
+            <th data-sorter="htmlSorter" data-sortable="true">Id</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Setup</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Name</th>
+            <th data-sortable="true">Tests</th>
+            <th data-sortable="true">Build</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
+            <th data-sortable="true">Controller</th>
+            <th data-sortable="true">DUT</th>
+            <th data-sortable="true">Uploader</th>
+            <th data-sortable="true">Period</th>
+            <th data-sortable="true">Test time</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
+            <th>Options</th>
+        </tr>
+        </thead>
+        <tbody class="searchable">
+        {% set break = false %}
+        {% set counter = 0 %}
+        {% for cycle in iterator if not break %}
+            {% if counter == 10000 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
+            <tr>
+                <td>
+                    {% if date(cycle.updatedAt) > date('-60minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
+                    {% endif %}
+                </td>
+                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
+                <td title="{{ cycle.setup.name }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ shortString(cycle.setup.name, 35, "...") }}</a></td>
+                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                <td>{{ cycle.testsCount }}</td>
+                <td title="{{ cycle.build }}">{{ shortString(cycle.build, 30) }}</td>
+                <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
+                <td>{{ cycle.controller }}</td>
+                <td>{{ cycle.dut }}</td>
+                <td>{{ cycle.targetUploader }}</td>
+                <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
+                <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
+                <td>
+                    <span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">
+                        {{ cycle.updatedAt |date('d/m H:i:s') }}
+                    </span>
+                </td>
+                <td>
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        <a class="blue" href="{{ path('cycle_show', { 'id': cycle.id }) }}" title="Show">
+                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                        </a>
+                        {#{% if is_granted('edit', setup) %}#}
+                            {#<a class="green" href="{{ path('cycle_edit', { 'id': cycle.id }) }}" title="Edit">#}
+                                {#<i class="ace-icon fa fa-pencil bigger-130"></i>#}
+                            {#</a>#}
+                        {#{% endif %}#}
+                        {#<a class="red" href="#" title="Delete">#}
+                        {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+                        {#</a>#}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {#<a href="{{ path('log_book_build_index') }}">back to list</a>#}
+    {#&nbsp;&nbsp;&nbsp;#}
+    {#<a href="{{ path('log_book_build_edit', {'id': build.id}) }}">edit</a>#}
+    {#{% set log_book_build = build %}#}
+    {#{{ include('lbook/build/_delete_form.html.twig') }}#}
+{% endblock %}

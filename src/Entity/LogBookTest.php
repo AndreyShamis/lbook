@@ -312,7 +312,6 @@ class LogBookTest
         return $this->name;
     }
 
-
     public static function validateName($newName): string
     {
         if (mb_strlen($newName) > self::$MAX_NAME_LEN) {

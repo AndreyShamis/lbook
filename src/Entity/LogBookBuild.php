@@ -19,6 +19,7 @@ class LogBookBuild
      */
     protected $id;
 
+    public static $MAX_NAME_LEN = 250;
 
     /**
      * @var string
@@ -51,12 +52,20 @@ class LogBookBuild
         return $this->name;
     }
 
+    public static function validateName($newName): string
+    {
+        if (mb_strlen($newName) > self::$MAX_NAME_LEN) {
+            $newName = mb_substr($newName, 0, self::$MAX_NAME_LEN);
+        }
+        return $newName;
+    }
+
     /**
      * @param string $name
      */
     public function setName(string $name): void
     {
-        $this->name = $name;
+        $this->name = self::validateName($name);
     }
 
     /**

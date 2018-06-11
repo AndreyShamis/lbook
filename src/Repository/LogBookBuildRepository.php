@@ -23,8 +23,8 @@ class LogBookBuildRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): LogBookBuild
     {
+        $criteria['name'] = LogBookBuild::validateName($criteria['name']);
         $entity = $this->findOneBy($criteria);
-
         if (null === $entity) {
             $entity = new LogBookBuild();
             $entity->setName($criteria['name']);
@@ -33,5 +33,4 @@ class LogBookBuildRepository extends ServiceEntityRepository
         }
         return $entity;
     }
-
 }

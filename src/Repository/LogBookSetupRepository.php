@@ -73,6 +73,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
 //        } else {
 //            $entity = $this->findOneBy($criteria);
 //        }
+        $criteria['name'] = LogBookSetup::validateName($criteria['name']);
         $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookSetup();
@@ -99,7 +100,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
         /** @var LogBookCycle $cycle */
         //$cycles = $setup->getCycles();
         //echo "Cycles count :" . ($setup->getCycles()) . "\n";
-        foreach ($setup->getCycles() as $cycle){
+        foreach ($setup->getCycles() as $cycle) {
             $cycleRepo->delete($cycle);
         }
         $this->_em->remove($setup);

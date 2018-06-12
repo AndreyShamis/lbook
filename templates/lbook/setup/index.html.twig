@@ -35,7 +35,7 @@
         {% set counter = counter+1 %}
             <tr>
                 <td>
-                    {%  if date(setup.updatedAt) > date('-60minutes') %}
+                    {%  if date(setup.updatedAt) > date('-20minutes') %}
                         <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ setup.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>

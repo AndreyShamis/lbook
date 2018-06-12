@@ -17,3 +17,11 @@
     width:70px !important;
     text-align: center !important;
 }
+
+th.meta_data_column{
+    font-size: 10px !important;
+    font-weight: lighter !important;
+}
+.meta_data_column{
+    font-size: 12px;
+}

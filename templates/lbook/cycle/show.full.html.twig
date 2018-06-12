@@ -214,7 +214,7 @@
             <th data-sortable="true" data-field="time_run">Runtime</th>
             <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
             {% for key, item in additional_cols %}
-                <th data-sortable="true" title="{{ key }}">{{ shortString(item|replace({'_SHOW': '' }) , 20) }}</th>
+                <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
             {% endfor %}
             {% if disabled_uptime == false %}
                 <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>

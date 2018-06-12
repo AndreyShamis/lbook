@@ -11,7 +11,7 @@
            data-page-size="50" data-page-list="[5, 10, 20, 50]" data-sort-order="desc">
         <thead>
         <tr>
-            <th data-sortable="true" title="Updated image"> </th>
+            <th data-sortable="true" title="Updated image" class="time_diff_icon">&nbsp;</th>
             <th data-sorter="htmlSorter" data-sortable="true">ID</th>
             <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name">Name</th>
             <th data-sortable="true" title="Cycles found">Cycles</th>
@@ -36,7 +36,7 @@
             <tr>
                 <td>
                     {%  if date(setup.updatedAt) > date('-20minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ setup.updatedAt|time_diff }}"></i>
+                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ setup.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>
                 <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.id }}</a></td>

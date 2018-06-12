@@ -104,7 +104,7 @@
            data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
-            <th data-sortable="true"></th>
+            <th data-sortable="true" title="Updated image" class="time_diff_icon">&nbsp;</th>
             <th data-sorter="htmlSorter" data-sortable="true">Id</th>
             <th data-sorter="htmlSorter" data-sortable="true">Name</th>
             <th data-sortable="true">Tests</th>
@@ -130,7 +130,7 @@
             <tr>
                 <td>
                     {% if date(cycle.updatedAt) > date('-60minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
+                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
                     {% endif %}
                 </td>
                 <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>

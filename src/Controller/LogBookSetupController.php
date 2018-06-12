@@ -126,7 +126,8 @@ class LogBookSetupController extends Controller
             }
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
-                ->orderBy('t.updatedAt', 'DESC')
+                ->orderBy('t.timeEnd', 'DESC') //updatedAt
+                ->addOrderBy('t.updatedAt', 'DESC')
                 ->setParameter('setup', $setup->getId());
             $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)

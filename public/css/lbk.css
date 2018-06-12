@@ -2,3 +2,9 @@
     max-width:30px!important;
     width:20px!important;
 }
+
+.setup_cycle_options_column{
+    max-width:90px!important;
+    width:70px!important;
+    text-align: right;
+}

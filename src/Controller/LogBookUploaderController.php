@@ -280,10 +280,13 @@ class LogBookUploaderController extends Controller
             $obj->data = $this->parseFile($new_file, $test, $obj);
             $this->em->refresh($cycle);
 
-            if ($build_name === null || $build_name === '') {
+            if (($build_name === null || $build_name === '') && ($cycle->getBuild() === null || $cycle->getBuild()->getName() === '')) {
                 $build_name = $cycle->getName();
             }
-            $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => $build_name)));
+            if ($build_name !== null || $build_name !== '') {
+                $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => $build_name)));
+            }
+
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
             $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));

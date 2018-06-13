@@ -35,8 +35,11 @@
             <th>Build</th>
             <td>
                 {% if cycle.build  %}
-                    <a href="{{ path('log_book_build_show', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info">
-                        <span class="label label-white middle">{{ cycle.build }}</span>
+                    <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
+                        <span class="label label-white middle">
+                            <i class="ace-icon fa fa-folder-open-o"></i>
+                            {{ cycle.build }}
+                        </span>
                     </a>
                 {% endif %}
             </td>
@@ -186,7 +189,7 @@
     {% set cycle_show_test_time_start_show = true %}
     {% set cycle_show_test_time_end_show = true %}
     {% set cycle_show_test_time_ratio_show = true %}
-    
+
     {% set cycle_show_test_time_start_format = 'H:i:s' %}
     {% set cycle_show_test_time_end_format = 'H:i:s' %}
 

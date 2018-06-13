@@ -1,0 +1,116 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK User Settings list{% endblock %}
+
+{% block content %}
+    <h1>User Settings</h1>
+
+    <div class="space-12"></div>
+
+    <div class="profile-user-info profile-user-info-striped">
+        <div class="profile-info-row">
+            <div class="profile-info-name"> Username </div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="username">{{ user.username }}</span>
+            </div>
+        </div>
+
+        <div class="profile-info-row">
+            <div class="profile-info-name"> Full name </div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="fullName">{{ user.firstName }} {{ user.lastName }}/ {{ user.fullName }}</span>
+            </div>
+        </div>
+
+        <div class="profile-info-row">
+            <div class="profile-info-name"> ID </div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="anotherId">{{ user.anotherId }} </span>
+            </div>
+        </div>
+
+
+        <div class="profile-info-row">
+            <div class="profile-info-name"> e-Mail </div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="email">{{ user.email }} </span>
+            </div>
+        </div>
+
+        <div class="profile-info-row">
+            <div class="profile-info-name"> Location </div>
+
+            <div class="profile-info-value">
+                <i class="fa fa-map-marker light-orange bigger-110"></i>
+                <span class="editable editable-click" id="country"></span>
+                <span class="editable editable-click" id="city"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-20"></div>
+    <h3 class="widget-title blue smaller">
+        <i class="ace-icon fa fa-cogs blue"></i> View settings
+    </h3>
+    <div class="space-12"></div>
+    <h4 class="widget-title blue smaller">
+        <i class="ace-icon fa fa-comment-o blue"></i> Setup view
+    </h4>
+    <div class="space-12"></div>
+    <h4 class="widget-title blue smaller">
+        <i class="ace-icon fa fa-comments blue"></i> Cycle view
+    </h4>
+
+    <div class="profile-user-info profile-user-info-striped">
+        <div class="profile-info-row">
+            <div class="profile-info-name">CycleShow Test Id Show</div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="username">{{ log_book_user_setting.cycleShowTestIdShow ? 'Yes' : 'No' }}</span>
+            </div>
+        </div>
+
+        <div class="profile-info-row">
+            <div class="profile-info-name">CycleShow Test TimeStart Show</div>
+
+            <div class="profile-info-value">
+                <span class="editable editable-click" id="username">{{ log_book_user_setting.cycleShowTestTimeStartShow ? 'Yes' : 'No' }}</span>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <tbody>
+            {#<tr>#}
+                {#<th>CycleShow Test Id Show</th>#}
+                {#<td>{{ log_book_user_setting.cycleShowTestIdShow ? 'Yes' : 'No' }}</td>#}
+            {#</tr>#}
+            {#<tr>#}
+                {#<th>CycleShow Test TimeStart Show</th>#}
+                {#<td>{{ log_book_user_setting.cycleShowTestTimeStartShow ? 'Yes' : 'No' }}</td>#}
+            {#</tr>#}
+            <tr>
+                <th>CycleShow Test TimeEnd Show</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShow Test Time Ratio Show</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeRatioShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShow Test TimeStart Format</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeStartFormat }}</td>
+            </tr>
+            <tr>
+                <th>CycleShow Test TimeEnd Format</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndFormat }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('user_settings_index') }}">back to list</a>
+    <a href="{{ path('user_settings_edit', {'id': log_book_user_setting.id}) }}">edit</a>
+
+{% endblock %}

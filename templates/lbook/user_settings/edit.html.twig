@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit LogBookUserSettings{% endblock %}
+
+{% block body %}
+    <h1>Edit LogBookUserSettings</h1>
+
+    {{ include('lbook/user_settings/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('user_settings_index') }}">back to list</a>
+
+    {{ include('lbook/user_settings/_delete_form.html.twig') }}
+{% endblock %}

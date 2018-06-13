@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}LogBookUserSettings index{% endblock %}
+
+{% block body %}
+    <h1>LogBookUserSettings index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CycleShowTestIdShow</th>
+                <th>CycleShowTestTimeStartShow</th>
+                <th>CycleShowTestTimeEndShow</th>
+                <th>CycleShowTestTimeRatioShow</th>
+                <th>CycleShowTestTimeStartFormat</th>
+                <th>CycleShowTestTimeEndFormat</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log_book_user_setting in log_book_user_settings %}
+            <tr>
+                <td>{{ log_book_user_setting.id }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestIdShow ? 'Yes' : 'No' }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestTimeStartShow ? 'Yes' : 'No' }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndShow ? 'Yes' : 'No' }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestTimeRatioShow ? 'Yes' : 'No' }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestTimeStartFormat }}</td>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndFormat }}</td>
+                <td>
+                    <a href="{{ path('user_settings_show', {'id': log_book_user_setting.id}) }}">show</a>
+                    <a href="{{ path('user_settings_edit', {'id': log_book_user_setting.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('user_settings_new') }}">Create new</a>
+{% endblock %}

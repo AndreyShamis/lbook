@@ -77,7 +77,7 @@ class LogBookUserSettingsController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('user_settings_edit', ['id' => $settings->getId()]);
+            return $this->redirectToRoute('user_settings_edit', ['id' => $logBookUser->getId()]);
         }
 
         return $this->render('lbook/user_settings/edit.html.twig', [

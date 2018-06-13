@@ -38,6 +38,17 @@ class LogBookUserSettings
     protected $cycleShowTestTimeRatioShow = 1;
 
     /**
+     * @ORM\Column(type="boolean", options={"default"="1"})
+     */
+    protected $cycleShowTestMetaDataShow = 1;
+
+    /**
+     * @var bool
+     * @ORM\Column(type="boolean", options={"default"="1"})
+     */
+    protected $cycleShowTestUptime = 1;
+
+    /**
      * @ORM\Column(type="string", length=50, options={"default"="H:i:s"})
      */
     protected $cycleShowTestTimeStartFormat = 'H:i:s';
@@ -59,6 +70,38 @@ class LogBookUserSettings
     }
 
     /**
+     * @return bool
+     */
+    public function isCycleShowTestUptime(): bool
+    {
+        return $this->cycleShowTestUptime;
+    }
+
+    /**
+     * @param bool $val
+     */
+    public function setCycleShowTestUptime(bool $val): void
+    {
+        $this->cycleShowTestUptime = $val;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCycleShowTestMetaDataShow(): bool
+    {
+        return $this->cycleShowTestMetaDataShow;
+    }
+
+    /**
+     * @param bool $val
+     */
+    public function setCycleShowTestMetaDataShow(bool $val): void
+    {
+        $this->cycleShowTestMetaDataShow = $val;
+    }
+
+    /**
      * @return mixed
      */
     public function getCycleShowTestTimeStartShow(): bool
@@ -67,15 +110,15 @@ class LogBookUserSettings
     }
 
     /**
-     * @param mixed $cycleShowTestTimeStartShow
+     * @param bool $val
      */
-    public function setCycleShowTestTimeStartShow($cycleShowTestTimeStartShow): void
+    public function setCycleShowTestTimeStartShow(bool $val): void
     {
-        $this->cycleShowTestTimeStartShow = $cycleShowTestTimeStartShow;
+        $this->cycleShowTestTimeStartShow = $val;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getCycleShowTestTimeEndShow(): bool
     {
@@ -83,15 +126,15 @@ class LogBookUserSettings
     }
 
     /**
-     * @param mixed $cycleShowTestTimeEndShow
+     * @param bool $val
      */
-    public function setCycleShowTestTimeEndShow($cycleShowTestTimeEndShow): void
+    public function setCycleShowTestTimeEndShow(bool $val): void
     {
-        $this->cycleShowTestTimeEndShow = $cycleShowTestTimeEndShow;
+        $this->cycleShowTestTimeEndShow = $val;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getCycleShowTestTimeRatioShow(): bool
     {
@@ -99,11 +142,11 @@ class LogBookUserSettings
     }
 
     /**
-     * @param mixed $cycleShowTestTimeRatioShow
+     * @param bool $val
      */
-    public function setCycleShowTestTimeRatioShow($cycleShowTestTimeRatioShow): void
+    public function setCycleShowTestTimeRatioShow(bool $val): void
     {
-        $this->cycleShowTestTimeRatioShow = $cycleShowTestTimeRatioShow;
+        $this->cycleShowTestTimeRatioShow = $val;
     }
 
     /**
@@ -131,12 +174,12 @@ class LogBookUserSettings
     }
 
     /**
-     * @param bool $cycleShowTestIdShow
+     * @param bool $val
      * @return LogBookUserSettings
      */
-    public function setCycleShowTestIdShow(bool $cycleShowTestIdShow): self
+    public function setCycleShowTestIdShow(bool $val): self
     {
-        $this->cycleShowTestIdShow = $cycleShowTestIdShow;
+        $this->cycleShowTestIdShow = $val;
 
         return $this;
     }

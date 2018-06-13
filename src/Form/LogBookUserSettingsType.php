@@ -17,6 +17,8 @@ class LogBookUserSettingsType extends AbstractType
             ->add('cycleShowTestTimeStartShow')
             ->add('cycleShowTestTimeEndShow')
             ->add('cycleShowTestTimeRatioShow')
+            ->add('cycleShowTestMetaDataShow')
+            ->add('cycleShowTestUptime')
             ->add('cycleShowTestTimeStartFormat', ChoiceType::class , $this->buildTimeShowFormat())
             ->add('cycleShowTestTimeEndFormat', ChoiceType::class , $this->buildTimeShowFormat())
 //            ->add('user')

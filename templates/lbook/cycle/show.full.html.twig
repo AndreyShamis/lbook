@@ -189,6 +189,8 @@
     {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
     {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
     {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
+    {% set show_metadata = app.user.settings.cycleShowTestMetaDataShow | default(true) %}
+    {% set show_uptime = app.user.settings.cycleShowTestUptime | default(true) %}
 
     {% set cycle_show_test_time_start_format = app.user.settings.cycleShowTestTimeStartFormat | default('H:i:s')%}
     {% set cycle_show_test_time_end_format = app.user.settings.cycleShowTestTimeEndFormat | default('H:i:s')%}
@@ -232,10 +234,12 @@
             {% if cycle_show_test_time_ratio_show == true %}
                 <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
             {% endif %}
-            {% for key, item in additional_cols %}
-                <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
-            {% endfor %}
-            {% if disabled_uptime == false %}
+            {% if show_metadata == true %}
+                {% for key, item in additional_cols %}
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
+                {% endfor %}
+            {% endif %}
+            {% if disabled_uptime == false and show_uptime == true %}
                 <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
                 <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
             {% endif %}
@@ -258,12 +262,10 @@
                 {% set test_disabled = 'test-disabled' %}
             {% endif %}
             <tr class="{{ test_disabled }}">
-                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
                 {% if cycle_show_test_id_show == true %}
                     <td>{{ test.id }}</td>
                 {% endif %}
                 <td>{{ test.executionOrder }}</td>
-                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 {% if cycle_show_test_time_start_show == true %}
@@ -275,18 +277,20 @@
                 {% if cycle_show_test_time_ratio_show == true %}
                     <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
                 {% endif %}
-                {% for key, item in additional_cols %}
-                    <td title="{{ item }}">
-                    {% if isUrl(test.metaData[item]) %}
-                        <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
-                    {% else %}
-                        <span title="{{ test.metaData[item] }}">
-                            {{ shortString(test.metaData[item], 35) }}
-                        </span>
-                    {% endif %}
-                    </td>
-                {% endfor %}
-                {% if disabled_uptime == false %}
+                {% if show_metadata == true %}
+                    {% for key, item in additional_cols %}
+                        <td title="{{ item }}">
+                        {% if isUrl(test.metaData[item]) %}
+                            <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                        {% else %}
+                            <span title="{{ test.metaData[item] }}">
+                                {{ shortString(test.metaData[item], 35) }}
+                            </span>
+                        {% endif %}
+                        </td>
+                    {% endfor %}
+                {% endif %}
+                {% if disabled_uptime == false and show_uptime == true %}
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
                 {% endif %}

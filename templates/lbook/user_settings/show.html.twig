@@ -1,0 +1,44 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK User Settings list{% endblock %}
+
+{% block content %}
+    <h1>User Settings</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ log_book_user_setting.id }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestIdShow</th>
+                <td>{{ log_book_user_setting.cycleShowTestIdShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestTimeStartShow</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeStartShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestTimeEndShow</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestTimeRatioShow</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeRatioShow ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestTimeStartFormat</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeStartFormat }}</td>
+            </tr>
+            <tr>
+                <th>CycleShowTestTimeEndFormat</th>
+                <td>{{ log_book_user_setting.cycleShowTestTimeEndFormat }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('user_settings_index') }}">back to list</a>
+
+    <a href="{{ path('user_settings_edit', {'id': log_book_user_setting.id}) }}">edit</a>
+
+{% endblock %}

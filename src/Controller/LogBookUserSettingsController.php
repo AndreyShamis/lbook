@@ -34,10 +34,11 @@ class LogBookUserSettingsController extends Controller
     protected function validateAndCreateSettings(LogBookUser $logBookUser): LogBookUserSettings
     {
         $settings = $logBookUser->getSettings();
-        if ($settings === null) {
-            $userSettings = new LogBookUserSettings();
-            $logBookUser->setSettings($userSettings);
+        if ($settings === null || $settings->getId() === null) {
             $em = $this->getDoctrine()->getManager();
+            $userSettings = new LogBookUserSettings();
+            $em->persist($userSettings);
+            $logBookUser->setSettings($userSettings);
             $em->persist($logBookUser);
             $em->flush();
             $settings = $logBookUser->getSettings();

@@ -209,9 +209,9 @@
             <th data-sortable="true" data-field="id">ID</th>
             <th data-sortable="true" data-field="order" title="Test order">Order</th>
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Name</th>
-            <th data-sortable="true" data-field="time_start">Time start</th>
-            <th data-sortable="true" data-field="time_end">Time end</th>
-            <th data-sortable="true" data-field="time_run">Runtime</th>
+            <th data-sortable="true" data-field="time_run" title="Test run time">Runtime</th>
+            <th data-sortable="true" data-field="time_start" data-sorter="htmlSorter" title="Test start time">Time start</th>
+            <th data-sortable="true" data-field="time_end" data-sorter="htmlSorter" title="Test end time">Time end</th>
             <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
             {% for key, item in additional_cols %}
                 <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
@@ -243,9 +243,9 @@
                 <td>{{ test.executionOrder }}</td>
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
-                <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
+                <td>{% if test.timeStart %}<span title="{{ test.timeStart|date('Y-m-d H:i:s') }}">{{ test.timeStart|date('H:i:s') }}</span>{% endif %}</td>
+                <td>{% if test.timeEnd %}<span title="{{ test.timeEnd|date('Y-m-d H:i:s') }}">{{ test.timeEnd|date('H:i:s') }}</span>{% endif %}</td>
                 <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
                 {% for key, item in additional_cols %}
                     <td title="{{ item }}">

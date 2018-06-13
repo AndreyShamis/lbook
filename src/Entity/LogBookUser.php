@@ -102,6 +102,11 @@ class LogBookUser implements UserInterface, \Serializable
     protected $isLdapUser = 0;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\LogBookUserSettings", mappedBy="user", cascade={"persist", "remove"})
+     */
+    protected $settings;
+
+    /**
      *
      * LogBookUser constructor.
      */
@@ -441,5 +446,32 @@ class LogBookUser implements UserInterface, \Serializable
     public function __toString(): string
     {
         return $this->getUsername();
+    }
+
+    /**
+     * @return LogBookUserSettings|null
+     */
+    public function getSettings(): ?LogBookUserSettings
+    {
+        if ($this->settings === null) {
+            $this->setSettings(new LogBookUserSettings());
+        }
+        return $this->settings;
+    }
+
+    /**
+     * @param LogBookUserSettings $settings
+     * @return LogBookUser
+     */
+    public function setSettings(LogBookUserSettings $settings): self
+    {
+        $this->settings = $settings;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $settings->getUser()) {
+            $settings->setUser($this);
+        }
+
+        return $this;
     }
 }

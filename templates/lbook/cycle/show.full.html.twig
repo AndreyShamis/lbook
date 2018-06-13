@@ -182,6 +182,14 @@
         {#{% endfor %}#}
         </tbody>
     </table>
+    {% set cycle_show_test_id_show = true %}
+    {% set cycle_show_test_time_start_show = true %}
+    {% set cycle_show_test_time_end_show = true %}
+    {% set cycle_show_test_time_ratio_show = true %}
+    
+    {% set cycle_show_test_time_start_format = 'H:i:s' %}
+    {% set cycle_show_test_time_end_format = 'H:i:s' %}
+
     {% set pagePath = "cycle_show" %}
     {% set objId = cycle.id %}
     {% include "lbook/double.paginator.html.twig" %}
@@ -206,13 +214,21 @@
     >
         <thead>
         <tr>
-            <th data-sortable="true" data-field="id">ID</th>
+            {% if cycle_show_test_id_show == true %}
+                <th data-sortable="true" data-field="id">ID</th>
+            {% endif %}
             <th data-sortable="true" data-field="order" title="Test order">Order</th>
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Name</th>
             <th data-sortable="true" data-field="time_run" title="Test run time">Runtime</th>
-            <th data-sortable="true" data-field="time_start" data-sorter="htmlSorter" title="Test start time">Time start</th>
-            <th data-sortable="true" data-field="time_end" data-sorter="htmlSorter" title="Test end time">Time end</th>
-            <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+            {% if cycle_show_test_time_start_show == true %}
+                <th data-sortable="true" data-field="time_start" data-sorter="htmlSorter" title="Test start time">Time start</th>
+            {% endif %}
+            {% if cycle_show_test_time_end_show == true %}
+                <th data-sortable="true" data-field="time_end" data-sorter="htmlSorter" title="Test end time">Time end</th>
+            {% endif %}
+            {% if cycle_show_test_time_ratio_show == true %}
+                <th data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+            {% endif %}
             {% for key, item in additional_cols %}
                 <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
             {% endfor %}
@@ -225,6 +241,7 @@
         </tr>
         </thead>
         <tbody class="searchable">
+
         {% set break = false %}
         {% set counter = 0 %}
         {% for test in iterator if not break %}
@@ -239,14 +256,22 @@
             {% endif %}
             <tr class="{{ test_disabled }}">
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
-                <td>{{ test.id }}</td>
+                {% if cycle_show_test_id_show == true %}
+                    <td>{{ test.id }}</td>
+                {% endif %}
                 <td>{{ test.executionOrder }}</td>
                 {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
-                <td>{% if test.timeStart %}<span title="{{ test.timeStart|date('Y-m-d H:i:s') }}">{{ test.timeStart|date('H:i:s') }}</span>{% endif %}</td>
-                <td>{% if test.timeEnd %}<span title="{{ test.timeEnd|date('Y-m-d H:i:s') }}">{{ test.timeEnd|date('H:i:s') }}</span>{% endif %}</td>
-                <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                {% if cycle_show_test_time_start_show == true %}
+                    <td>{% if test.timeStart %}<span title="{{ test.timeStart|date('Y-m-d H:i:s') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
+                {% endif %}
+                {% if cycle_show_test_time_end_show == true %}
+                    <td>{% if test.timeEnd %}<span title="{{ test.timeEnd|date('Y-m-d H:i:s') }}">{{ test.timeEnd|date(cycle_show_test_time_end_format) }}</span>{% endif %}</td>
+                {% endif %}
+                {% if cycle_show_test_time_ratio_show == true %}
+                    <td>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                {% endif %}
                 {% for key, item in additional_cols %}
                     <td title="{{ item }}">
                     {% if isUrl(test.metaData[item]) %}

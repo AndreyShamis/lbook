@@ -930,16 +930,16 @@
         },
         {
             "name": "easycorp/easy-log-handler",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/easy-log-handler.git",
-                "reference": "1a617a37ab9389eac4e2e1d14cb70ee0087d724d"
+                "reference": "21c442f5d08b6761a6fa7653e08a5525fb4ccd2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/easy-log-handler/zipball/1a617a37ab9389eac4e2e1d14cb70ee0087d724d",
-                "reference": "1a617a37ab9389eac4e2e1d14cb70ee0087d724d",
+                "url": "https://api.github.com/repos/EasyCorp/easy-log-handler/zipball/21c442f5d08b6761a6fa7653e08a5525fb4ccd2b",
+                "reference": "21c442f5d08b6761a6fa7653e08a5525fb4ccd2b",
                 "shasum": ""
             },
             "require": {
@@ -976,20 +976,20 @@
                 "monolog",
                 "productivity"
             ],
-            "time": "2018-01-10T08:34:20+00:00"
+            "time": "2018-06-12T06:27:09+00:00"
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v1.17.12",
+            "version": "v1.17.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "f9114922faf5be8a4d5e70a774e672a67250baec"
+                "reference": "034c0151526b766af2896e93f1f35619687820d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/f9114922faf5be8a4d5e70a774e672a67250baec",
-                "reference": "f9114922faf5be8a4d5e70a774e672a67250baec",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/034c0151526b766af2896e93f1f35619687820d0",
+                "reference": "034c0151526b766af2896e93f1f35619687820d0",
                 "shasum": ""
             },
             "require": {
@@ -1005,6 +1005,7 @@
                 "symfony/dependency-injection": "~2.3|~3.0|^4.0",
                 "symfony/doctrine-bridge": "~2.3|~3.0|^4.0",
                 "symfony/event-dispatcher": "~2.3|~3.0|^4.0",
+                "symfony/finder": "~2.3|~3.0|^4.0",
                 "symfony/form": "~2.3|~3.0|^4.0",
                 "symfony/framework-bundle": "~2.3|~3.0|^4.0",
                 "symfony/http-foundation": "~2.3|~3.0|^4.0",
@@ -1026,7 +1027,6 @@
                 "symfony/console": "~2.3|~3.0|^4.0",
                 "symfony/css-selector": "~2.3|~3.0|^4.0",
                 "symfony/dom-crawler": "~2.3|~3.0|^4.0",
-                "symfony/finder": "~2.3|~3.0|^4.0",
                 "symfony/phpunit-bridge": "^3.2|^4.0",
                 "symfony/var-dumper": "~2.3|~3.0|^4.0",
                 "symfony/yaml": "~2.3|~3.0|^4.0"
@@ -1049,22 +1049,18 @@
             ],
             "authors": [
                 {
-                    "name": "Javier Eguiluz",
-                    "email": "javiereguiluz@gmail.com"
-                },
-                {
                     "name": "Project Contributors",
-                    "homepage": "http://github.com/javiereguiluz/easyadmin/blob/master/CONTRIBUTORS.md"
+                    "homepage": "http://github.com/EasyCorp/easyadmin/blob/master/CONTRIBUTORS.md"
                 }
             ],
             "description": "Admin generator for Symfony applications",
-            "homepage": "https://github.com/javiereguiluz/EasyAdminBundle",
+            "homepage": "https://github.com/EasyCorp/EasyAdminBundle",
             "keywords": [
                 "admin",
                 "backend",
                 "generator"
             ],
-            "time": "2018-02-24T09:24:55+00:00"
+            "time": "2018-06-10T10:43:27+00:00"
         },
         {
             "name": "egulias/email-validator",

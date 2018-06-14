@@ -59,7 +59,9 @@
         </tr>
         </tbody>
     </table>
-
+    {% if test.verdict != null and test.verdict.name in ['ERROR', 'FAIL'] %}
+        {% set search_value = test.verdict.name %}
+    {% endif %}
     {% set logs = test.logs %}
     <div class="widget-box transparent">
         <div class="widget-header widget-header-flat">

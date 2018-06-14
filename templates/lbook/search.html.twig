@@ -1,5 +1,8 @@
 <div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+    {% if search_value is not defined %}
+    {% set search_value='' %}
+    {% endif %}
+    <input id="filter" type="text" class="form-control" placeholder="Type here..." value="{{ search_value }}">
 </div>
 <script>
     $(document).ready(function () {
@@ -12,5 +15,12 @@
                 }).show();
             })
         }(jQuery));
+        var f_obj = $("#filter");
+        if (f_obj.val() !== '') {
+            f_obj.trigger('keyup');
+            setTimeout(f_obj.fadeIn(500).fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(550).fadeOut(500).fadeIn(550), 500)
+
+        }
+
     });
 </script>

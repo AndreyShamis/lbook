@@ -200,20 +200,20 @@
     {% include "lbook/double.paginator.html.twig" %}
     {%  set tests = cycle.tests%}
     {% include "lbook/search.html.twig" %}
+    <div id="toolbar">
+    </div>
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="testTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
-           {#data-toolbar="#toolbar"#}
-           {#data-search="true"#}
+           data-toolbar="#toolbar"
            {#data-show-refresh="true"#}
            {#data-show-toggle="true"#}
-           {#data-show-columns="true"#}
-           {#data-show-export="true"#}
+           data-show-export="true"
+           data-show-columns="true"
            {#data-detail-view="true"#}
            {#data-detail-formatter="detailFormatter"#}
            {#data-minimum-count-columns="2"#}
            {#data-show-pagination-switch="true"#}
-           {#data-pagination="true"#}
            {#data-id-field="id"#}
            {#data-response-handler="responseHandler"#}
     >

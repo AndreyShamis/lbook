@@ -18,7 +18,7 @@
             <th data-sortable="true" title="Friendly short setup name">Short Name</th>
             <th data-sortable="true">OS</th>
             <th data-sortable="true" title="Owner Name">Owner</th>
-            <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
+            <th data-sorter="dataTitleSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sortable="true" title="Check Uptime">UPT</th>
             <th data-sortable="true" title="Moderators cound">Moderators</th>
             <th data-sortable="true" title="Shows if the setup is disabled">Disabled</th>
@@ -45,7 +45,7 @@
                 <td>{{ setup.nameShown }}</td>
                 <td>{{ setup.osStr }}</td>
                 <td>{{ setup.owner }}</td>
-                <td><span title="Updated {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
+                <td><span data-title="{{ setup.updatedAt|date('ymdHis') }}" title="Updated at {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
                 <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
                 <td>{{ setup.moderators|length }}</td>
                 <td>{{ setup.disabled ? 'Yes':'False' }}</td>

@@ -6,6 +6,14 @@ function htmlSorter(a, b) {
     return 0;
 }
 
+function dataTitleSorter(a, b) {
+    var a = $(a).attr('data-title');
+    var b = $(b).attr('data-title');
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+}
+
 /**
  * Replace url in text to htmled url
  * @param inputText

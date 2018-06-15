@@ -8,19 +8,22 @@
     $(document).ready(function () {
         (function ($) {
             $('#filter').keyup(function () {
+                var searchable_tr = $('.searchable tr');
                 var rex = new RegExp($(this).val(), 'i');
-                $('.searchable tr').hide();
-                $('.searchable tr').filter(function () {
+                searchable_tr.hide();
+                searchable_tr.filter(function () {
                     return rex.test($(this).text());
                 }).show();
             })
         }(jQuery));
+        /**
+         * Trigger keyup event if is there a text in search element
+         * @type {*|jQuery|HTMLElement}
+         */
         var f_obj = $("#filter");
         if (f_obj.val() !== '') {
             f_obj.trigger('keyup');
             setTimeout(f_obj.fadeIn(500).fadeOut(500).fadeIn(500).fadeOut(500).fadeIn(550).fadeOut(500).fadeIn(550), 500)
-
         }
-
     });
 </script>

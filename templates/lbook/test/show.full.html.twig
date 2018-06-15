@@ -3,80 +3,115 @@
 {% block content %}
     <h3><a href="{{ path('setup_show', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a> / <a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a> / Test [{{ test.id }}] : {{ test.name }}</h3>
 
-    <table class="records_list table table-striped table-condensed">
-        <tbody>
-        {#<tr>#}
-            {#<th>Id</th>#}
-            {#<td>{{ test.id }}</td>#}
-        {#</tr>#}
-        <tr>
-            <th>Order</th>
-            <td>{{ test.executionOrder }}</td>
-            <th>Download / Show</th>
-            <td>
-                <span class="ace-icon fa fa-cloud-download"> </span>
-                <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
-                /
-                <span class="ace-icon fa fa-eye"> </span>
-                <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
-            </td>
-        </tr>
-        <tr>
-            <th>Setup / Cycle info</th>
-            <td>
-                <span class="blue">
-                    {{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}
-                </span>
-                /
-                <span class="blue">
-                    {{ test.cycle.id }} : {{ test.cycle.name }}
-                </span>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab4">
+                    <li class="active">
+                        <a data-toggle="tab" href="#main" aria-expanded="false">Main</a>
+                    </li>
 
-            </td>
-            <th>File Size</th>
-            <td>
-               {{ formatBytes(test.logFileSize) }} ( {{ test.logFileSize }} )
-            </td>
-        </tr>
-        {#<tr>#}
-            {#<th>Name</th>#}
-            {#<td>{{ test.name }}</td>#}
-        {#</tr>#}
-        <tr>
-            <th>Time start / Time end</th>
-            <td>
-                <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue" title="Start time">
-                    {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
-                </span>
-                /
-                <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue" title="End time">
-                    {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
-                </span>
+                    <li class="">
+                        <a data-toggle="tab" href="#metadata" aria-expanded="false">Metadata</a>
+                    </li>
 
-            </td>
-            <th>Run time / % of cycle time</th>
-            <td>
-                <i class="ace-icon fa fa-info-circle"></i>
-                <span title="{{ test.timeRun }} seconds">
-                    {{ test.timeRun |  ExecutionTimeGeneric }}
-                </span>
-                / &nbsp;&nbsp;
-                <i class="ace-icon fa fa-info-circle"></i>
-                <span class="orange" title="Show percentage of time in whole cycle">
-                    {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <th>Verdict</th>
-            <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
-            <th></th>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
+                    <li class="">
+                        <a data-toggle="tab" href="#other" aria-expanded="true">Other</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="main" class="tab-pane active">
+                        <table class="records_list table table-striped table-condensed">
+                            <tbody>
+                            {#<tr>#}
+                            {#<th>Id</th>#}
+                            {#<td>{{ test.id }}</td>#}
+                            {#</tr>#}
+                            <tr>
+                                <th>Order</th>
+                                <td>{{ test.executionOrder }}</td>
+                                <th>Download / Show</th>
+                                <td>
+                                    <span class="ace-icon fa fa-cloud-download"> </span>
+                                    <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
+                                    /
+                                    <span class="ace-icon fa fa-eye"> </span>
+                                    <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Setup / Cycle info</th>
+                                <td>
+                                    <span class="blue">{{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}</span>
+                                    /
+                                    <span class="blue">{{ test.cycle.id }} : {{ test.cycle.name }}</span>
+                                </td>
+                                <th>File Size</th>
+                                <td>{{ formatBytes(test.logFileSize) }} ( {{ test.logFileSize }} )</td>
+                            </tr>
+                            {#<tr>#}
+                            {#<th>Name</th>#}
+                            {#<td>{{ test.name }}</td>#}
+                            {#</tr>#}
+                            <tr>
+                                <th>Time start / Time end</th>
+                                <td>
+                                    <i class="ace-icon fa fa-calendar"></i>
+                                    <span class="blue" title="Start time">
+                                        {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
+                                    </span>
+                                    /
+                                    <i class="ace-icon fa fa-calendar"></i>
+                                    <span class="blue" title="End time">
+                                        {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
+                                    </span>
+                                </td>
+                                <th>Run time / % of cycle time</th>
+                                <td>
+                                    <i class="ace-icon fa fa-info-circle"></i>
+                                    <span title="{{ test.timeRun }} seconds">
+                                        {{ test.timeRun |  ExecutionTimeGeneric }}
+                                    </span>
+                                    / &nbsp;&nbsp;
+                                    <i class="ace-icon fa fa-info-circle"></i>
+                                    <span class="orange" title="Show percentage of time in whole cycle">
+                                        {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Verdict</th>
+                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                                <th></th>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="metadata" class="tab-pane">
+                        <ul>
+                        {% for key, item in test.metaData %}
+                            <li>
+                                {{ key }} =
+                                {% if isUrl(item) %}
+                                    {{ item }} <a target="_blank" href="{{item }}" >Link_to_{{ key }}</a>
+                                {% else %}
+                                    <span title="{{ item }}">{{ shortString(item, 500) }}</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div id="other" class="tab-pane">
+                        <p>WIP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% if test.verdict != null and test.verdict.name in ['ERROR', 'FAIL'] %}
         {% set search_value = test.verdict.name %}
     {% endif %}

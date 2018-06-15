@@ -136,6 +136,31 @@ class LogBookTestController extends Controller
     }
 
     /**
+     * @Route("/{id}/showlog", name="show_log")
+     * @Method("GET")
+     * @param LogBookTest|null $test
+     * @return BinaryFileResponse|Response
+     */
+    public function showLogFile(LogBookTest $test = null): Response
+    {
+        try {
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
+            $retFileName = $test->getLogFile();
+            $cycle = $test->getCycle();
+            $setup = $cycle->getSetup();
+            $tmp = '../uploads/%d/%d/%s';
+            $path = sprintf($tmp, $setup->getId(), $cycle->getId(), $retFileName);
+            $textResponse = new Response(file_get_contents($path) , 200);
+            $textResponse->headers->set('Content-Type', 'text/plain');
+            return $textResponse;
+        } catch (\Throwable $ex) {
+            return $this->testNotFound($test, $ex);
+        }
+    }
+
+    /**
      * Finds and displays a test entity.
      *
      * @Route("/{id}", name="test_show_full")

@@ -12,11 +12,13 @@
         <tr>
             <th>Order</th>
             <td>{{ test.executionOrder }}</td>
-            <th>Download</th>
+            <th>Download / Show</th>
             <td>
-                <span class="blue">
-                    <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
-                </span>
+                <span class="ace-icon fa fa-cloud-download"> </span>
+                <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
+                /
+                <span class="ace-icon fa fa-eye"> </span>
+                <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
             </td>
         </tr>
         <tr>

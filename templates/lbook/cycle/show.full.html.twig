@@ -210,6 +210,8 @@
            {#data-show-toggle="true"#}
            data-show-export="true"
            data-show-columns="true"
+           data-advanced-search="true"
+           data-id-table="advancedTable"
            {#data-detail-view="true"#}
            {#data-detail-formatter="detailFormatter"#}
            {#data-minimum-count-columns="2"#}
@@ -220,10 +222,10 @@
         <thead>
         <tr>
             {% if cycle_show_test_id_show == true %}
-                <th data-sortable="true" data-field="id">ID</th>
+                <th data-sortable="true" data-field="TestID">ID</th>
             {% endif %}
             <th data-sortable="true" data-field="order" title="Test order">Order</th>
-            <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Name</th>
+            <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
             <th data-sortable="true" data-field="time_run" title="Test run time">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
                 <th data-sortable="true" data-field="time_start" data-sorter="htmlSorter" title="Test start time">Time start</th>

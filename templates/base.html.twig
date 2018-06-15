@@ -14,44 +14,40 @@
     <!-- bootstrap & fontawesome -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{url}}/assets/font-awesome/4.2.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/font-awesome/4.2.0/css/font-awesome.min.css') }}" />
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="{{ asset('assets/bootstrap-table/1.12.1/bootstrap-table.min.css') }}">
 
 
     <!-- page specific plugin styles -->
     <!-- text fonts -->
-    <link rel="stylesheet" href="{{url}}/assets/fonts/fonts.googleapis.com.css" />
+    <link rel="stylesheet" href="{{ asset('assets/fonts/fonts.googleapis.com.css') }}" />
 
     <!-- ace styles -->
-    <link rel="stylesheet" href="{{url}}/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+    <link rel="stylesheet" href="{{ asset('assets/css/ace.min.css') }}" class="ace-main-stylesheet" id="main-ace-style" />
     <!--[if lte IE 9] -->
-    <link rel="stylesheet" href="{{url}}/assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/ace-part2.min.css') }}" class="ace-main-stylesheet" />
     <!-- <![endif]-->
-
     <!--[if lte IE 9] -->
-    <link rel="stylesheet" href="{{url}}/assets/css/ace-ie.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/ace-ie.min.css') }}" />
     {#<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css" />#}
     <!-- <![endif]-->
-
     <!--[if !IE]> -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- <![endif]-->
-
     <!-- inline styles related to this page -->
     <!-- Custom styles for this template -->
-    <link href="{{url ~ asset('css/lbk.css') }}" rel="stylesheet">
-    <link href="{{url ~ asset('css/css.css') }}" rel="stylesheet">
-    <link href="{{url ~ asset('css/tm.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/lbk.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/css.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/tm.css') }}" rel="stylesheet">
     {#<link href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet">#}
     <!-- ace settings handler -->
-    <script src="{{url}}/assets/js/ace-extra.min.js"></script>
+    <script src="{{ asset('assets/js/ace-extra.min.js') }}"></script>
 
     <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
-
     <!--[if lte IE 8]>
-    <script src="{{url}}/assets/js/html5shiv.min.js"></script>
-    <script src="{{url}}/assets/js/respond.min.js"></script>
+    <script src="{{ asset('assets/js/html5shiv.min.js') }}"></script>
+    <script src="{{ asset('assets/js/respond.min.js') }}"></script>
     <![endif]-->
 
     <!--[if lt IE 9]>
@@ -75,22 +71,22 @@
 
     <!--[if IE]>
     <script type="text/javascript">
-        window.jQuery || document.write("<script src='{{url}}/assets/js/jquery1x.min.js'>"+"<"+"/script>");
+        window.jQuery || document.write("<script src='{{ asset('assets/js/jquery1x.min.js') }}'>"+"<"+"/script>");
     </script>
     <![endif]-->
     {#<script type="text/javascript">#}
-        {#if('ontouchstart' in document.documentElement) document.write("<script src='{{url}}/assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");#}
+        {#if('ontouchstart' in document.documentElement) document.write("<script src='{{ asset('assets/js/jquery.mobile.custom.min.js') }}'>"+"<"+"/script>");#}
     {#</script>#}
     <!-- <![endif]-->
     <!--[if IE] -->
     <script type="text/javascript">
-        window.jQuery || document.write("<script src='{{url}}/assets/js/jquery1x.min.js'>"+"<"+"/script>");
+        window.jQuery || document.write("<script src='{{ asset('assets/js/jquery1x.min.js') }}'>"+"<"+"/script>");
     </script>
     <!-- <![endif]-->
-    {#<script src="{{url}}/assets/js/bootstrap.min.js"></script>#}
+    {#<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>#}
 
     {#<script type="text/javascript">#}
-        {#if('ontouchstart' in document.documentElement) document.write("<script src='/assets/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");#}
+        {#if('ontouchstart' in document.documentElement) document.write("<script src='{{ asset('assets/js/jquery.mobile.custom.min.js') }}'>"+"<"+"/script>");#}
     {#</script>#}
     <!-- Latest compiled and minified JavaScript -->
     <script src="{{ asset('assets/bootstrap-table/1.12.1/bootstrap-table.min.js') }}"></script>
@@ -99,9 +95,9 @@
     {#<!-- Latest compiled and minified Locales -->#}
     {#<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js"></script>#}
     <!-- page specific plugin scripts -->
-    <script src="{{url}}/assets/js/jquery-ui.custom.min.js"></script>
-    <script src="{{url}}/assets/js/jquery.ui.touch-punch.min.js"></script>
-    <script src="{{url}}/assets/js/jquery.easypiechart.min.js"></script>
+    <script src="{{ asset('assets/js/jquery-ui.custom.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.ui.touch-punch.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.easypiechart.min.js') }}"></script>
 </head>
 <body class="no-skin">
 <script type="text/javascript">
@@ -114,8 +110,8 @@
 <!-- basic scripts -->
 <!-- page specific plugin scripts -->
 <!-- ace scripts -->
-<script src="{{url}}/assets/js/ace-elements.min.js"></script>
-<script src="{{url}}/assets/js/ace.min.js"></script>
-<script src="{{url}}/assets/js/clipboard.min.js"></script>
+<script src="{{ asset('assets/js/ace-elements.min.js') }}"></script>
+<script src="{{ asset('assets/js/ace.min.js') }}"></script>
+<script src="{{ asset('assets/js/clipboard.min.js') }}"></script>
 </body>
 </html>

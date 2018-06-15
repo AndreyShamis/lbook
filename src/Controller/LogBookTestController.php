@@ -10,6 +10,7 @@ use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,6 +106,36 @@ class LogBookTestController extends Controller
     }
 
     /**
+     * @Route("/{id}/downloadlog", name="download_log")
+     * @Method("GET")
+     * @param LogBookTest|null $test
+     * @return BinaryFileResponse|Response
+     */
+    public function downloadLogFile(LogBookTest $test = null): Response
+    {
+        try {
+            if (!$test) {
+                throw new \RuntimeException('');
+            }
+            $retFileName = $test->getLogFile();
+            $cycle = $test->getCycle();
+            $setup = $cycle->getSetup();
+            $tmp = '../uploads/%d/%d/%s';
+            $path = sprintf($tmp, $setup->getId(), $cycle->getId(), $retFileName);
+
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+            if ($ext !== null && $ext !== '') {
+                $tmp = '%d_%s__%d_%s__%s.%s';
+                $retFileName = sprintf($tmp, $setup->getId(), $setup->getName(), $cycle->getId(), $cycle->getName(), $test->getName(), $ext);
+            }
+            return $this->file($path, $retFileName);
+        } catch (\Throwable $ex) {
+            return $this->testNotFound($test, $ex);
+        }
+    }
+
+    /**
      * Finds and displays a test entity.
      *
      * @Route("/{id}", name="test_show_full")
@@ -112,7 +143,7 @@ class LogBookTestController extends Controller
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showAction(LogBookTest $test = null): ?Response
+    public function show(LogBookTest $test = null): ?Response
     {
         try {
             if (!$test) {
@@ -139,7 +170,7 @@ class LogBookTestController extends Controller
      * @param LogBookMessageRepository $logRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFullAction(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): ?Response
+    public function showFull(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): ?Response
     {
         try {
             if (!$test) {

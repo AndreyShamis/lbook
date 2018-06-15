@@ -12,6 +12,12 @@
         <tr>
             <th>Order</th>
             <td>{{ test.executionOrder }}</td>
+            <th>Download</th>
+            <td>
+                <span class="blue">
+                    <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
+                </span>
+            </td>
         </tr>
         <tr>
             <th>Setup / Cycle info</th>
@@ -23,6 +29,11 @@
                 <span class="blue">
                     {{ test.cycle.id }} : {{ test.cycle.name }}
                 </span>
+
+            </td>
+            <th>File Size</th>
+            <td>
+               {{ formatBytes(test.logFileSize) }} ( {{ test.logFileSize }} )
             </td>
         </tr>
         {#<tr>#}
@@ -30,7 +41,7 @@
             {#<td>{{ test.name }}</td>#}
         {#</tr>#}
         <tr>
-            <th>Time start / Time end / Run time / % of cycle time</th>
+            <th>Time start / Time end</th>
             <td>
                 <i class="ace-icon fa fa-calendar"></i>
                 <span class="blue" title="Start time">
@@ -41,7 +52,10 @@
                 <span class="blue" title="End time">
                     {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
                 </span>
-                / &nbsp;&nbsp;
+
+            </td>
+            <th>Run time / % of cycle time</th>
+            <td>
                 <i class="ace-icon fa fa-info-circle"></i>
                 <span title="{{ test.timeRun }} seconds">
                     {{ test.timeRun |  ExecutionTimeGeneric }}
@@ -55,7 +69,9 @@
         </tr>
         <tr>
             <th>Verdict</th>
-            <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td></td>
+            <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+            <th></th>
+            <td></td>
         </tr>
         </tbody>
     </table>

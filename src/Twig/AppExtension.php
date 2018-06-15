@@ -50,10 +50,38 @@ class AppExtension extends AbstractExtension
             new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
             new TwigFunction('isUrl', [$this, 'isUrl']),
+            new TwigFunction('formatBytes', [$this, 'formatBytes']),
             new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new Twig_SimpleFunction('inarray', array($this, 'inArray')),
         ];
+    }
+
+    /**
+     * @param int $size
+     * @param int $precision
+     * @return string
+     */
+    public function formatBytes($size = 0, $precision = 2): string
+    {
+        $base = log($size, 1024);
+        $suffixes = array('', 'Kb', 'Mb', 'Gb', 'Tb');
+        try {
+            $suffix = $suffixes[(int)floor($base)];
+        } catch (\Exception $ex) {
+            $suffix = 'b';
+        }
+        try {
+            if ($size > 0) {
+                $value = 1024 ** ($base - floor($base));
+            } else {
+                $value = 0;
+            }
+        } catch (\Exception $ex) {
+            $value = $size;
+        }
+
+        return round($value, $precision) . ' ' . $suffix;
     }
 
     /**

@@ -136,82 +136,92 @@
     </ul>
 
     {% set logs = test.logs %}
-    <div class="widget-box transparent">
-        <div class="widget-header widget-header-flat">
-            <h4 class="widget-title lighter">
-                <i class="ace-icon fa fa-star orange"></i>
-                Logs list
-                <div>Count : {{ size }}</div>
-                {% include "lbook/search.html.twig" %}
-                {% set pagePath = "test_show" %}
-                {% set objId = test.id %}
-                {% include "lbook/double.paginator.html.twig" %}
-            </h4>
+    {% set pagePath = "test_show" %}
+    {% set objId = test.id %}
+    <div class="row">
 
-            <div class="widget-toolbar">
-                <a href="#" data-action="collapse">
-                    <i class="ace-icon fa fa-chevron-up"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="widget-body" style="display: block;">
-            <div class="widget-main no-padding">
-                <table class="table table-bordered table-hover table-condensed">
-                    <thead class="thin-border-bottom">
-                    <tr>
-                        <th><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
-                        <th><i class="ace-icon fa fa-caret-right blue"></i>Offset</th>
-                        {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
-                        {#<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>#}
-                        <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
-                        <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Type</th>
-                    </tr>
-                    </thead>
-                    <tbody class="searchable">
-                    {% set break = false %}
-                    {% set counter = 0 %}
-                    {% for log in iterator if not break %}
-                        {% if counter == 10000 %}
-                            {% set break = true %}
-                        {% endif %}
-                        {% set counter = counter+1 %}
-                            <tr class="{{ logTypeToTableColor(log.msgType) }}">
-                                <td title="ID:{{ log.id }}, Order:{{ log.chain }}">{{ log.logTime | date('H:i:s') }}</td>
-                                <td>{{ relativeTime(test.timeStart, log.logTime) }}</td>
-                                {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
-                                {#<td title="{{ log.id }}">{{ log.chain }}</td>#}
-                                {% set link_class = '' %}
-                                {% if log.msgType.name in ["INFO", "SYSTEM"] %}
-                                    {% set link_class = 'autolink' %}
-                                {% endif %}
-                                <td class="{{ link_class }}">{{ log.message | nl2br }}</td>
-                                <td class="logType">{{ log.msgType }}</td>
-                            </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div><!-- /.widget-main -->
-        </div><!-- /.widget-body -->
+        <div class="col-sm-12 text-center">{% include "lbook/double.paginator.html.twig" %}</div>
     </div>
+    <div class="row">
+        <div class="widget-box transparent">
+            <div class="widget-header widget-header-flat">
+                <h4 class="widget-title lighter">
+                    <i class="ace-icon fa fa-star orange"></i>
+                    Logs list
 
-    <ul>
-        <li>
-            <a href="{{ path('test_index') }}">Back to the list</a>
-        </li>
-        {% if is_granted('edit', test.cycle.setup) %}
-        <li>
-            <a href="{{ path('test_edit', { 'id': test.id }) }}">Edit</a>
-        </li>
-        {% endif %}
-        {#{% if is_granted('delete', test.cycle.setup) %}#}
-        {#<li>#}
-            {#{{ form_start(delete_form) }}#}
-            {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
-            {#{{ form_end(delete_form) }}#}
-        {#</li>#}
-        {#{% endif %}#}
-    </ul>
+                </h4>
+                <div class="widget-toolbar">
+                    <a href="#" data-action="collapse">
+                        <i class="ace-icon fa fa-chevron-up"></i>
+                    </a>
+                </div>
+                <div class="widget-toolbar no-border">Count : {{ size }}</div>
+
+            </div>
+
+            <div class="widget-body" style="display: block;">
+                <div class="widget-main no-padding">
+                    {% include "lbook/search.html.twig" %}
+                    <table class="table table-bordered table-hover table-condensed">
+                        <thead class="thin-border-bottom">
+                        <tr>
+                            <th><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
+                            <th><i class="ace-icon fa fa-caret-right blue"></i>Offset</th>
+                            {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
+                            {#<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>#}
+                            <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
+                            <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Type</th>
+                        </tr>
+                        </thead>
+                        <tbody class="searchable">
+                        {% set break = false %}
+                        {% set counter = 0 %}
+                        {% for log in iterator if not break %}
+                            {% if counter == 10000 %}
+                                {% set break = true %}
+                            {% endif %}
+                            {% set counter = counter+1 %}
+                                <tr class="{{ logTypeToTableColor(log.msgType) }}">
+                                    <td title="ID:{{ log.id }}, Order:{{ log.chain }}">{{ log.logTime | date('H:i:s') }}</td>
+                                    <td>{{ relativeTime(test.timeStart, log.logTime) }}</td>
+                                    {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
+                                    {#<td title="{{ log.id }}">{{ log.chain }}</td>#}
+                                    {% set link_class = '' %}
+                                    {% if log.msgType.name in ["INFO", "SYSTEM"] %}
+                                        {% set link_class = 'autolink' %}
+                                    {% endif %}
+                                    <td class="{{ link_class }}">{{ log.message | nl2br }}</td>
+                                    <td class="logType">{{ log.msgType }}</td>
+                                </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div><!-- /.widget-main -->
+                <div class="widget-toolbox padding-8 text-center">
+                    <div>{% include "lbook/double.paginator.html.twig" %}</div>
+                </div>
+            </div><!-- /.widget-body -->
+        </div>
+    </div>
+    <div class="row">
+        <ul>
+            <li>
+                <a href="{{ path('test_index') }}">Back to the list</a>
+            </li>
+            {% if is_granted('edit', test.cycle.setup) %}
+            <li>
+                <a href="{{ path('test_edit', { 'id': test.id }) }}">Edit</a>
+            </li>
+            {% endif %}
+            {#{% if is_granted('delete', test.cycle.setup) %}#}
+            {#<li>#}
+                {#{{ form_start(delete_form) }}#}
+                {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+                {#{{ form_end(delete_form) }}#}
+            {#</li>#}
+            {#{% endif %}#}
+        </ul>
+    </div>
     <script type="text/javascript">
         function replaceUrl () {
             $(".autolink").each(function(){

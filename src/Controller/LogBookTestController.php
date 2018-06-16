@@ -212,9 +212,17 @@ class LogBookTestController extends Controller
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
+            $tmp = $this->log_size * ($page-1) + 1;
             $maxPages = ceil($totalPosts / $this->log_size);
-            $thisPage = $page;
 
+            if ($page > 1 && $totalPosts < $tmp && $iterator->count() === 0) {
+                return $this->redirectToRoute('test_show', [
+                    'id' => $test->getId(),
+                    'page' => max(1, min($maxPages, $page - 1))
+                ]);
+            }
+
+            $thisPage = $page;
             $test_left = null;
             $test_right = null;
 

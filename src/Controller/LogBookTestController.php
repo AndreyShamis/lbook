@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -195,7 +197,7 @@ class LogBookTestController extends Controller
      * @param LogBookMessageRepository $logRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFull(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo): ?Response
+    public function showFull(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo): ?Response
     {
         try {
             if (!$test) {
@@ -214,6 +216,33 @@ class LogBookTestController extends Controller
 
             $deleteForm = $this->createDeleteForm($test);
 
+            $cycle = $test->getCycle();
+            $qbq = $testRepo->createQueryBuilder('t')
+                ->where('t.cycle = :cycle_id')
+                ->andWhere('t.executionOrder = :order_lower or t.executionOrder = :order_upper')
+                ->orderBy('t.executionOrder', 'ASC')
+                ->setParameters(array(
+                    'cycle_id' => $cycle->getId(),
+                    'order_lower' => $test->getExecutionOrder() - 1,
+                    'order_upper' => $test->getExecutionOrder() + 1
+                ))
+                ->getQuery();
+            /** @var array $tests */
+            $tests = $qbq->execute();
+            $test_left = null;
+            $test_right = null;
+            if (\count($tests) === 2) {
+                $test_left = $tests[0];
+                $test_right = $tests[1];
+            } elseif (\count($tests) === 1) {
+                /** @var LogBookTest $someTest */
+                $someTest = $tests[0];
+                if ($someTest->getExecutionOrder() < $test->getExecutionOrder()) {
+                    $test_left = $someTest;
+                } else {
+                    $test_right = $someTest;
+                }
+            }
             return $this->render('lbook/test/show.full.html.twig', array(
                 'test'          => $test,
                 'size'          => $totalPosts,
@@ -221,6 +250,8 @@ class LogBookTestController extends Controller
                 'thisPage'      => $thisPage,
                 'iterator'      => $iterator,
                 'paginator'     => $paginator,
+                'test_left'     => $test_left,
+                'test_right'    => $test_right,
                 'delete_form'   => $deleteForm->createView(),
             ));
         } catch (\Throwable $ex) {

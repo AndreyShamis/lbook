@@ -282,12 +282,14 @@
                 {% if show_metadata == true %}
                     {% for key, item in additional_cols %}
                         <td title="{{ item }}">
-                        {% if isUrl(test.metaData[item]) %}
-                            <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
-                        {% else %}
-                            <span title="{{ test.metaData[item] }}">
-                                {{ shortString(test.metaData[item], 35) }}
-                            </span>
+                        {% if item in test.metaData|keys %}
+                            {% if isUrl(test.metaData[item]) %}
+                                <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                            {% else %}
+                                <span title="{{ test.metaData[item] }}">
+                                    {{ shortString(test.metaData[item], 35) }}
+                                </span>
+                        {% endif %}
                         {% endif %}
                         </td>
                     {% endfor %}

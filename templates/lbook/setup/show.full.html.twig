@@ -4,84 +4,75 @@
     <h3>Setup [{{ setup.id }}] : {{ setup.name }}</h3>
     <table class="records_list table table-striped table-condensed">
         <tbody>
-        {#<tr>#}
-        {#<th>Id</th>#}
-        {#<td>{{ setup.id }}</td>#}
-        {#</tr>#}
         <tr>
-            <th>OS</th>
-            <td><span class="label label-lg label-yellow">{{ setup.osStr }}</span></td>
-        </tr>
-        {#<tr>#}
-        {#<th>Name</th>#}
-        {#<td>{{ setup.name }}</td>#}
-        {#</tr>#}
-        <tr>
-            <th>Short Name</th>
+            <th>Short Name / OS</th>
             <td>
                 <i class="ace-icon fa fa-bookmark"></i>
                 {{ setup.nameShown }}
+                /
+                <span class="label label-lg label-yellow">{{ setup.osStr }}</span>
             </td>
-        </tr>
-        <tr>
-            <th>Disabled / Visibility / Check Uptime</th>
+            <th>
+                <span style="float: right;">Created / Updated</span>
+            </th>
             <td>
-                <span class="blue">
-                {{ setup.disabled ? '<i class="ace-icon fa fa-lock"></i> Yes':'<i class="ace-icon fa fa-unlock"></i> False' }}
-                </span>
-                /
-                <span class="green">
-                {{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}
-                </span>
-                /
-                <span class="yellow">
-                {{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <th>Created / Updated</th>
-            <td>
-                <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue">
-                    {{ setup.createdAt|date('d/m/Y H:i:s') }}
-                </span>
-                /
-                <i class="ace-icon fa fa-calendar"></i>
-                <span class="blue">
-                {{ setup.updatedAt|date('d/m/Y H:i:s') }}
-                </span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="ace-icon fa fa-info-circle"></i>
-                {%  if date(setup.updatedAt) > date('-20minutes') %}
-                    {% set updatedClass="red" %}
-                {% else %}
-                    {% set updatedClass="blue" %}
-                {% endif %}
-                <span class="{{ updatedClass }}">
-                {{ setup.updatedAt|time_diff}}
+                <span style="float: right;">
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ setup.createdAt|date('d/m/Y H:i:s') }}</span>
+                    /
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ setup.updatedAt|date('d/m/Y H:i:s') }}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
+                    {%  if date(setup.updatedAt) > date('-20minutes') %}
+                        {% set updatedClass="red" %}
+                    {% else %}
+                        {% set updatedClass="blue" %}
+                    {% endif %}
+                    <span class="{{ updatedClass }}">{{ setup.updatedAt|time_diff}}</span>
                 </span>
             </td>
         </tr>
         <tr>
-            <th>Owner / Moderators</th>
+            <th>Owners</th>
             <td>
-                <i class="ace-icon fa fa-key"></i>
-                <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <i class="ace-icon fa fa-users"></i>
-                {% for moderator in setup.moderators %}
-                    <a href="{{ path('user_show', { 'id': moderator.id }) }}" target="_blank">
+                <span>
+                    <i class="ace-icon fa fa-key" title="Owner"></i>
+                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-users" title="Moderators"></i>
+                    {% for moderator in setup.moderators %}
+                        <a href="{{ path('user_show', { 'id': moderator.id }) }}" target="_blank">
                         {% if moderator.id == setup.owner.id %}
                             <span class="label label-sm label-danger label-white arrowed arrowed-right" title="Setup owner">{{ moderator.username }}</span>
                         {% else %}
                             <span class="label label-sm label-primary label-white arrowed arrowed-right">{{ moderator.username }}</span>
                         {% endif %}
                     </a>
-                {% endfor %}
+                    {% endfor %}
+                </span>
+            </td>
+            <th>
+                <span style="float:right;">Disabled / Visibility / Check Uptime </span>
+            </th>
+            <td>
+                <span style="float:right;">
+                    <span class="blue">
+                    {{ setup.disabled ? '<i class="ace-icon fa fa-lock" title="Disabled"></i> Disabled':'<i class="ace-icon fa fa-unlock" title="Enabled"></i> Enabled' }}
+                    </span>
+                    /
+                    <span class="green">
+                    {{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}
+                    </span>
+                    /
+                    <span class="yellow">
+                    {{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}
+                    </span>
+                </span>
             </td>
         </tr>
-        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime'] %}
+
+        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN'] %}
         {% for key, value in setup|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>
@@ -170,10 +161,14 @@
 
     <ul>
         <li>
-            <a href="{{ path('setup_index') }}">Back to the list</a>
+            <a href="{{ path('setup_index') }}">Back to setup list</a>
         </li>
         {% if is_granted('edit', setup) %}
             <li><a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a></li>
+            <div class="well">
+                <h4 class="green smaller lighter">Edit information</h4>
+                Only setup owner and setup administrator can edit this setup
+            </div>
         {% endif %}
         {#{% if is_granted('delete', setup) %}#}
         {#<li>#}

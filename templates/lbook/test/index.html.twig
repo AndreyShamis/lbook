@@ -30,7 +30,7 @@
             {% set break = true %}
         {% endif %}
             <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
-                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">{{ test.cycle.id }}</a></td>
                 <td>{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>

@@ -32,10 +32,10 @@
             {% endif %}
             {% set counter = counter+1 %}
             <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
-                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.id }}</a></td>
+                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.id }}</a></td>
                 <td><a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                 <td>{{ test.executionOrder }}</td>
-                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
@@ -53,9 +53,12 @@
         {% endfor %}
         </tbody>
     </table>
-    <ul>
-        <li>
-            <a href="{{ path('test_new') }}">Create a new test</a>
-        </li>
-    </ul>
+    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
+        <div>Super admin option</div>
+        <ul>
+            <li>
+                <a href="{{ path('test_new') }}">Create a new test</a>
+            </li>
+        </ul>
+    {% endif %}
 {% endblock %}

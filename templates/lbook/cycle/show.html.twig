@@ -106,11 +106,11 @@
         <tbody class="searchable">
         {% for test in tests %}
             <tr>
-                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
+                {#<td><a href="{{ path('test_show_first', { 'id': test.id }) }}">{{ test.id }}</a></td>#}
                 <td>{{ test.id }}</td>
                 <td>{{ test.executionOrder }}</td>
-                {#<td><a href="{{ path('test_show', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
-                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                {#<td><a href="{{ path('test_show_first', { 'id': test.id }) }}">{{ test.name }}</a></td>#}
+                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
@@ -120,7 +120,7 @@
                         {{ test.verdict }}
                     </span></td>
                 {#<td>#}
-                    {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
+                    {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                     {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
                 {#</td>#}
             </tr>

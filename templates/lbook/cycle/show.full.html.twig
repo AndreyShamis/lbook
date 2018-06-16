@@ -268,7 +268,7 @@
                     <td>{{ test.id }}</td>
                 {% endif %}
                 <td>{{ test.executionOrder }}</td>
-                <td><a href="{{ path('test_show', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 {% if cycle_show_test_time_start_show == true %}
                     <td>{% if test.timeStart %}<span title="{{ test.timeStart|date('Y-m-d H:i:s') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
@@ -302,7 +302,7 @@
                     </span>
                 </td>
                 {#<td>#}
-                {#<a href="{{ path('test_show', { 'id': test.id }) }}">show</a>#}
+                {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                 {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
                 {#</td>#}
             </tr>

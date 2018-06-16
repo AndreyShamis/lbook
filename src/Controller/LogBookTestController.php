@@ -96,7 +96,7 @@ class LogBookTestController extends Controller
             $em->persist($test);
             $em->flush();
 
-            return $this->redirectToRoute('test_show', array('id' => $test->getId()));
+            return $this->redirectToRoute('test_show_first', array('id' => $test->getId()));
         }
 
         return $this->render('lbook/test/new.html.twig', array(
@@ -163,25 +163,17 @@ class LogBookTestController extends Controller
     /**
      * Finds and displays a test entity.
      *
-     * @Route("/{id}", name="test_show_full")
+     * @Route("/{id}", name="test_show_first")
      * @Method("GET")
      * @param LogBookTest $test
+     * @param PagePaginator $pagePaginator
+     * @param LogBookMessageRepository $logRepo
+     * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(LogBookTest $test = null): ?Response
+    public function show(LogBookTest $test = null, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo): ?Response
     {
-        try {
-            if (!$test) {
-                throw new \RuntimeException('');
-            }
-            $deleteForm = $this->createDeleteForm($test);
-            return $this->render('lbook/test/show.html.twig', array(
-                'test' => $test,
-                'delete_form' => $deleteForm->createView(),
-            ));
-        } catch (\Throwable $ex) {
-            return $this->testNotFound($test, $ex);
-        }
+        return $this->showFull($test, 1, $pagePaginator, $logRepo, $testRepo);
     }
 
     /**

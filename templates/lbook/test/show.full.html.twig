@@ -124,13 +124,13 @@
     <ul class="pager" style="margin: 5px 0;">
         <li class="previous">
             {% if test_left != null %}
-                <a href="{{ path('test_show', {'id': test_left.id } ) }}">← {{ test_left.name }}</a>
+                <a href="{{ path('test_show_first', {'id': test_left.id } ) }}">← {{ test_left.name }}</a>
             {% endif %}
         </li>
 
         <li class="next">
             {% if test_right!= null %}
-                <a href="{{ path('test_show', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>
+                <a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>
             {% endif %}
         </li>
     </ul>

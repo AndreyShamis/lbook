@@ -4,11 +4,9 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
-use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -205,8 +203,9 @@ class LogBookTestController extends Controller
                 throw new \RuntimeException('');
             }
 
-            $qb = $logRepo->createQueryBuilder('t')
-                ->where('t.test = :test')
+            $qb = $logRepo->createQueryBuilder('log_book_message')
+                ->where('log_book_message.test = :test')
+                ->orderBy('log_book_message.chain', 'ASC')
                 ->setParameter('test', $test->getId());
             $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
@@ -232,6 +231,8 @@ class LogBookTestController extends Controller
                 $cycle = $test->getCycle();
                 $qbq = $testRepo->createQueryBuilder('t')
                     ->where('t.cycle = :cycle_id')
+                    ->andWhere('t.disabled = 0')
+                    ->andWhere('t.forDelete = 0')
                     ->andWhere('t.executionOrder = :order_lower or t.executionOrder = :order_upper')
                     ->orderBy('t.executionOrder', 'ASC')
                     ->setParameters(array(
@@ -239,6 +240,7 @@ class LogBookTestController extends Controller
                         'order_lower' => $test->getExecutionOrder() - 1,
                         'order_upper' => $test->getExecutionOrder() + 1
                     ))
+                    ->setMaxResults(2)
                     ->getQuery();
                 /** @var array $tests */
                 $tests = $qbq->execute();

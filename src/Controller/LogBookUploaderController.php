@@ -200,6 +200,7 @@ class LogBookUploaderController extends Controller
             $setup_name = $request->request->get('setup');
             $cycle_token = $request->request->get('token');
             $build_name = $request->request->get('build');
+            $test_metadata = $request->request->get('test_metadata');
 
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
@@ -285,6 +286,12 @@ class LogBookUploaderController extends Controller
             $remote_ip = $request->getClientIp();
             $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
             $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
+
+            /** Extract metadata from request if exist */
+            if ($test_metadata !== null && $test_metadata !== '' && $this->isVariableString($test_metadata)) {
+                $arr = $this->extractTestVariables($test_metadata);
+                $test->setMetaData($arr);
+            }
 
             $cycle->setTargetUploader($uploader);
             $cycle->setController($uploader);

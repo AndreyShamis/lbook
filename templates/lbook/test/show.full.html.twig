@@ -108,9 +108,9 @@
             </div>
         </div>
     </div>
-    {% if test.verdict != null and test.verdict.name in ['ERROR', 'FAIL'] %}
-        {% set search_value = test.verdict.name %}
-    {% endif %}
+    {#{% if test.verdict != null and test.verdict.name in ['ERROR', 'FAIL'] %}#}
+        {#{% set search_value = test.verdict.name %}#}
+    {#{% endif %}#}
     <ul class="pager" style="margin: 5px 0;">
         <li class="previous">
             {% if test_left != null %}

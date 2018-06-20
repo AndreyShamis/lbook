@@ -90,24 +90,31 @@
     {%  set cycles = setup.cycles %}
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+    <div id="toolbar">
+    </div>
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
            data-pagination="true" data-search="true" data-toggle="table"
+           data-show-columns="true"
+           {#data-detail-view="true"#}
+           {#data-detail-formatter="detailFormatter"#}
+           {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+           data-toolbar="#toolbar"
            data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
-            <th data-sortable="true" title="Updated image" class="time_diff_icon">&nbsp;</th>
+            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
             <th data-sorter="htmlSorter" data-sortable="true">Id</th>
-            <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column">Name</th>
+            <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column" data-switchable="false">Name</th>
             <th data-sortable="true">Tests</th>
             <th data-sorter="htmlSorter" data-sortable="true">Build</th>
             <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
-            <th data-sortable="true">Controller</th>
-            {#<th data-sortable="true">DUT</th>#}
+            <th data-sortable="true" data-visible="false">Controller</th>
+            <th data-sortable="true" data-visible="false">DUT</th>
             <th data-sortable="true">Uploader</th>
             <th data-sortable="true">Period</th>
             <th data-sortable="true">Test time</th>
             <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
-            <th class="setup_cycle_options_column">Options</th>
+            <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
         </thead>
         <tbody class="searchable">
@@ -130,7 +137,7 @@
                 <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
-                {#<td>{{ cycle.dut }}</td>#}
+                <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
@@ -178,4 +185,15 @@
         {#</li>#}
         {#{% endif %}#}
     </ul>
+    <script>
+        function detailFormatter(index, row) {
+            var html = [];
+            $.each(row, function (key, value) {
+                if (!key.startsWith('_')) {
+                    html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+                }
+            });
+            return html.join('');
+        }
+    </script>
 {% endblock %}

@@ -99,10 +99,10 @@
             <th data-sorter="htmlSorter" data-sortable="true">Id</th>
             <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column">Name</th>
             <th data-sortable="true">Tests</th>
-            <th data-sortable="true">Build</th>
+            <th data-sorter="htmlSorter" data-sortable="true">Build</th>
             <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
             <th data-sortable="true">Controller</th>
-            <th data-sortable="true">DUT</th>
+            {#<th data-sortable="true">DUT</th>#}
             <th data-sortable="true">Uploader</th>
             <th data-sortable="true">Period</th>
             <th data-sortable="true">Test time</th>
@@ -127,10 +127,10 @@
                 <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
-                <td title="{{ cycle.build }}">{{ shortString(cycle.build, 30) }}</td>
+                <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
-                <td>{{ cycle.dut }}</td>
+                {#<td>{{ cycle.dut }}</td>#}
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>

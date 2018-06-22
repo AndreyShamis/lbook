@@ -3,18 +3,25 @@
 namespace App\Controller;
 
 use App\Entity\LogBookSetup;
+use App\Entity\LogBookUser;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookSetupType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Setup controller.
@@ -25,6 +32,87 @@ class LogBookSetupController extends Controller
 {
     protected $index_size = 50;
     protected $show_cycle_size = 100;
+
+    /**
+     * Lists all setup entities.
+     *
+     * @Route("/json/page/{page}", name="setups")
+     * @Method("GET")
+     * @param int $page
+     * @param PagePaginator $pagePaginator
+     * @param LogBookSetupRepository $setupRepo
+     * @return JsonResponse
+     */
+    public function indexJson(int $page = 1, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): JsonResponse
+    {
+        $query = $setupRepo->createQueryBuilder('setups')
+           // ->select(array('setups.id', 'setups.disabled', 'setups.updatedAt'))
+            ->where('setups.disabled = 0')
+            ->orderBy('setups.updatedAt', 'DESC')
+            ->addOrderBy('setups.id', 'DESC');
+
+
+        $encoder = new JsonEncoder();
+        $normalizer = new ObjectNormalizer();
+        $normalizer->setIgnoredAttributes(array('tests'));
+        $normalizer->setCircularReferenceLimit(1);
+
+        $normalizer->setCircularReferenceHandler(function ($object) {
+            if ($object instanceof LogBookUser) {
+                return $object->getId();
+            }
+            return $object->getId();
+        });
+        $dateTimeToStr = function ($dateTime) {
+            return $dateTime instanceof \DateTime ? $dateTime->format(\DateTime::ATOM) : ''; //'d/m/Y H:i:s'
+        };
+        $ownerCB = function ($owner) {
+            return $owner instanceof LogBookUser ? $owner->getUsername() : '';
+        };
+        $moderatorsCB = function ($moderators) {
+            return $moderators instanceof Collection ? count($moderators) : 0;
+        };
+
+        $cyclesCB = function ($cycles) {
+            return $cycles instanceof Collection ? count($cycles) : 0;
+        };
+        $normalizer->setCallbacks([
+            'cycles' => $cyclesCB,
+            'owner' => $ownerCB,
+            'moderators' => $moderatorsCB,
+            'createdAt' => $dateTimeToStr,
+            'updatedAt' => $dateTimeToStr
+        ]);
+        $serializer = new Serializer(array($normalizer), array($encoder));
+
+        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
+        $paginator->setUseOutputWalkers(false);
+        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
+        // You can also call the count methods (check PHPDoc for `paginate()`)
+        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
+        $iterator = $paginator->getIterator(); # ArrayIterator
+        $res = $paginator->getQuery()->execute();
+        $data = $serializer->normalize($res, 'json');
+//        $data = $serializer->normalize($data, null, array('attributes' => array(
+//                    'id',
+//                    'name',
+//                    'nameShown',
+//                    'disabled',
+//                    'os',
+//                    'checkUpTime',
+//                    'owner' => ['id'],
+//                    'moderators',
+//                    'isPrivate',
+//                    'createdAt' =>  [DateTimeNormalizer::FORMAT_KEY => 'Y/m'],
+//        //            'updatedAt',
+//                )));
+        $json = $serializer->serialize($data, 'json');
+
+        $response = $this->json([]);
+        $response->setJson($json);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+    }
 
     /**
      * Lists all setup entities.

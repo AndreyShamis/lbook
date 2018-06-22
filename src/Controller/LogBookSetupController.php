@@ -39,8 +39,10 @@ class LogBookSetupController extends Controller
      */
     public function index(int $page = 1, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
     {
-        $query = $setupRepo->createQueryBuilder('t')
-            ->orderBy('t.id', 'DESC');
+        $query = $setupRepo->createQueryBuilder('setups')
+            ->where('setups.disabled = 0')
+            ->orderBy('setups.updatedAt', 'DESC')
+            ->addOrderBy('setups.id', 'DESC');
 
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20

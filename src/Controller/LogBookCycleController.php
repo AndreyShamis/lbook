@@ -160,23 +160,25 @@ class LogBookCycleController extends Controller
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $test = $iterator->current();
-
-                    /**
-                     * Search for metadata with _SHOW postfix, if exist that column will be shown
-                     * @var array $md
-                     */
-                    $md = $test->getMetaData();
-                    if (\count($md) > 0) {
-                        foreach ($md as $key => $value) {
-                            if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
-                                $additional_cols[] = $key;
+                    if ($test !== null) {
+                        /**
+                         * Search for metadata with _SHOW postfix, if exist that column will be shown
+                         * @var array $md
+                         */
+                        $md = $test->getMetaData();
+                        if (\count($md) > 0) {
+                            foreach ($md as $key => $value) {
+                                if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
+                                    $additional_cols[] = $key;
+                                }
                             }
                         }
+                        /** Search for uptime if show or not */
+                        if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
+                            $nul_found++;
+                        }
                     }
-                    /** Search for uptime if show or not */
-                    if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
-                        $nul_found++;
-                    }
+
                     $iterator->next();
                 }
             }

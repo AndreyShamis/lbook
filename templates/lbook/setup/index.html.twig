@@ -5,75 +5,96 @@
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "setup_index" %}
-    {% include "lbook/paginator.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           data-pagination="true" data-toggle="table"
-           data-page-size="50" data-page-list="[5, 10, 20, 50]" data-sort-order="desc">
-        <thead>
-        <tr>
-            <th data-sortable="true" title="Updated image" class="time_diff_icon">&nbsp;</th>
-            <th data-sorter="htmlSorter" data-sortable="true">ID</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name">Name</th>
-            <th data-sortable="true" title="Cycles found">Cycles</th>
-            <th data-sortable="true">OS</th>
-            <th data-sortable="true" title="Owner Name">Owner</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
-            <th data-sortable="true" title="Check Uptime">UPT</th>
-            <th data-sortable="true" title="Moderators cound">Moderators</th>
-            <th data-sortable="true" title="Shows if the setup is disabled">Disabled</th>
-            <th class="setup_list_options_column">Options</th>
-        </tr>
-        </thead>
-        <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for setup in iterator if not break %}
-        {% if counter == 10000 %}
-            {% set break = true %}
-        {% endif %}
-        {% set counter = counter+1 %}
+    <div class="row">
+        <div class="col-sm-12 text-center">{% include "lbook/paginator.html.twig" %}</div>
+    </div>
+    <div class="row">
+        <div id="setupTableToolbar">
+        </div>
+        <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+               id="setupTable" data-pagination="true" data-search="true" data-toggle="table"
+               data-toolbar="#setupTableToolbar"
+                {#data-show-refresh="true"#}
+                {#data-show-toggle="true"#}
+               data-show-export="true"
+               data-show-columns="true"
+               data-advanced-search="true"
+               {#data-id-table="advancedTable"#}
+               data-page-size="50" data-page-list="[5, 10, 20, 50]" data-sort-order="desc">
+            <thead>
             <tr>
-                <td>
-                    {%  if date(setup.updatedAt) > date('-20minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ setup.updatedAt|time_diff }}"></i>
-                    {% endif %}
-                </td>
-                {% set setup_name = setup.name %}
-                {% if setup.name != setup.nameShown and setup.nameShown != '' %}
-                    {% set setup_name = setup.nameShown %}
-                {% endif %}
-                <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
-                <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup_name }}</a></td>
-                <td>{{ setup.cycles | length }}</td>
-                <td>{{ setup.osStr }}</td>
-                <td>{{ setup.owner }}</td>
-                <td><span data-title="{{ setup.updatedAt|date('ymdHis') }}" title="Updated at {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
-                <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
-                <td>{{ setup.moderators|length }}</td>
-                <td>{{ setup.disabled ? 'Yes':'False' }}</td>
-                <td>
-                    <div class="hidden-sm hidden-xs action-buttons">
-                        <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">
-                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
-                        </a>
-                        {% if is_granted('edit', setup) %}
-                        <a class="green" href="{{ path('setup_edit', { 'id': setup.id }) }}" title="Edit">
-                            <i class="ace-icon fa fa-pencil bigger-130"></i>
-                        </a>
-                        {% endif %}
-                        {#<a class="red" href="#" title="Delete">#}
-                            {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
-                        {#</a>#}
-                    </div>
-                </td>
+                <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
+                <th data-sorter="htmlSorter" data-sortable="true" data-switchable="false">ID</th>
+                <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false">Name</th>
+                <th data-sortable="true" title="Cycles found">Cycles</th>
+                <th data-sortable="true">OS</th>
+                <th data-sortable="true" title="Owner Name">Owner</th>
+                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
+                <th data-sortable="true" title="Check Uptime">UPT</th>
+                <th data-sortable="true" title="Moderators cound">Moderators</th>
+                <th data-sortable="true" title="Shows if the setup is disabled">Disabled</th>
+                <th class="setup_list_options_column">Options</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="searchable">
+            {% set break = false %}
+            {% set counter = 0 %}
+            {% for setup in iterator if not break %}
+            {% if counter == 10000 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
+                <tr>
+                    <td>
+                        {%  if date(setup.updatedAt) > date('-20minutes') %}
+                            <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ setup.updatedAt|time_diff }}"></i>
+                        {% endif %}
+                    </td>
+                    {% set setup_name = setup.name %}
+                    {% if setup.name != setup.nameShown and setup.nameShown != '' %}
+                        {% set setup_name = setup.nameShown %}
+                    {% endif %}
+                    <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.id }}</a></td>
+                    <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup_name }}</a></td>
+                    <td>{{ setup.cycles | length }}</td>
+                    <td>{{ setup.osStr }}</td>
+                    <td>{{ setup.owner }}</td>
+                    <td><span data-title="{{ setup.updatedAt|date('ymdHis') }}" title="Updated at {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
+                    <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
+                    <td>{{ setup.moderators|length }}</td>
+                    <td>{{ setup.disabled ? 'Yes':'False' }}</td>
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">
+                                <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                            </a>
+                            {% if is_granted('edit', setup) %}
+                            <a class="green" href="{{ path('setup_edit', { 'id': setup.id }) }}" title="Edit">
+                                <i class="ace-icon fa fa-pencil bigger-130"></i>
+                            </a>
+                            {% endif %}
+                            {#<a class="red" href="#" title="Delete">#}
+                                {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+                            {#</a>#}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
+        <div class="row">
+            <ul>
+                <li>
+                    <a href="{{ path('setup_new') }}">Create a new setup</a>
+                </li>
+            </ul>
+            <div class="well">
+                <h4 class="green smaller lighter">Setup information</h4>
+                Only ROLE_SUPER_ADMIN can add new setup
+            </div>
+        </div>
+    {% endif %}
 
-    <ul>
-        <li>
-            <a href="{{ path('setup_new') }}">Create a new setup</a>
-        </li>
-    </ul>
 {% endblock %}

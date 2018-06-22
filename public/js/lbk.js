@@ -14,6 +14,14 @@ function dataTitleDateSorter(a, b) {
     return 0;
 }
 
+function dataTitleIntSorter(a, b) {
+    var a = parseInt($(a).attr('data-title'));
+    var b = parseInt($(b).attr('data-title'));
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+}
+
 function dataPercentSorter(a, b) {
     var a = parseFloat($(a).attr('data-percent'));
     var b = parseFloat($(b).attr('data-percent'));

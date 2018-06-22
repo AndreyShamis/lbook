@@ -28,8 +28,9 @@
             <th data-sortable="true">Controller</th>
             <th data-sortable="true">DUT</th>
             <th data-sortable="true">Uploader</th>
-            <th data-sortable="true">Period</th>
-            <th data-sortable="true">Test time</th>
+            <th data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
+            <th data-sorter="dataTitleIntSorter" data-sortable="true">Test time</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time">Created</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
@@ -58,10 +59,15 @@
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
-                <td>{{ cycle.period |  ExecutionTimeInHours}}</td>
-                <td>{{ cycle.testsTimeSum |  ExecutionTimeInHours}}</td>
+                <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
+                <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
                 <td>
-                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">
+                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">
+                        {{ cycle.createdAt|time_diff}}
+                    </span>
+                </td>
+                <td>
+                    <span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">
                         {{ cycle.updatedAt|time_diff}}
                     </span>
                 </td>

@@ -25,3 +25,17 @@ th.meta_data_column{
 .meta_data_column{
     font-size: 12px;
 }
+
+.btn{
+    line-height: inherit !important;
+    padding: 2px 16px !important;
+}
+
+.dropdown-menu{
+    min-width: 260px !important;
+}
+
+.dropdown-menu label{
+    font-size: 12px !important;
+    line-height: 0.1 !important;
+}

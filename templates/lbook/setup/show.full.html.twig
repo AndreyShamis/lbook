@@ -107,7 +107,7 @@
             <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column" data-switchable="false">Name</th>
             <th data-sortable="true">Tests</th>
             <th data-sorter="htmlSorter" data-sortable="true">Build</th>
-            <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
+            <th data-sorter="dataPercentSorter" data-sortable="true">Pass Rate</th>
             <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true" data-visible="false">DUT</th>
             <th data-sortable="true">Uploader</th>
@@ -135,7 +135,7 @@
                 <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
                 <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
-                <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
+                <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>

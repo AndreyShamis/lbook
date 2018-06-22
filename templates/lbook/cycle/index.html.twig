@@ -6,23 +6,32 @@
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "cycle_index" %}
     {% include "lbook/paginator.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover">
+    <div id="cycleIndexToolbar">
+    </div>
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
+           data-pagination="true" data-search="true" data-toggle="table"
+           data-show-columns="true"
+            {#data-detail-view="true"#}
+            {#data-detail-formatter="detailFormatter"#}
+            {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+           data-toolbar="#cycleIndexToolbar"
+           data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
-            <th></th>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Setup</th>
-            <th>Tests</th>
-            <th>Pass Rate</th>
-            <th>Build</th>
-            <th>Controller</th>
-            <th>DUT</th>
-            <th>Uploader</th>
-            <th>Period</th>
-            <th>Test time</th>
-            <th>Updated</th>
-            <th>Options</th>
+            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
+            <th data-sortable="true" data-switchable="false">Id</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false">Name</th>
+            <th data-sorter="htmlSorter" data-sortable="true" >Setup</th>
+            <th data-sortable="true">Tests</th>
+            <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass Rate</th>
+            <th data-sortable="true" data-sorter="htmlSorter">Build</th>
+            <th data-sortable="true">Controller</th>
+            <th data-sortable="true">DUT</th>
+            <th data-sortable="true">Uploader</th>
+            <th data-sortable="true">Period</th>
+            <th data-sortable="true">Test time</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
+            <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
         </thead>
         <tbody class="searchable">
@@ -39,19 +48,23 @@
                     <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
                     {% endif %}
                 </td>
-                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
-                <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup }}</a></td>
+                <td>{{ cycle.id }}</td>
+                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                <td title="{{ cycle.setup }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id  }) }}">{{ shortString(cycle.setup, 35, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
                 {#<td>{{ cycle.tests | length }}</td>#}
-                <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
-                <td>{{ cycle.build }}</td>
+                <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeInHours}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeInHours}}</td>
-                <td>{{ cycle.updatedAt |date('m-d H:i:s') }}</td>
+                <td>
+                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">
+                        {{ cycle.updatedAt|time_diff}}
+                    </span>
+                </td>
                 <td>
                     <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
                     {% if is_granted('edit', cycle.setup) %}
@@ -69,4 +82,12 @@
             <a href="{{ path('cycle_new') }}">Create a new Cycle</a>
         </li>
     </ul>
+
+    <script>
+        $(document).ready(function() {
+            $( "#cycleIndexToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+        });
+    </script>
 {% endblock %}

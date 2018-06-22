@@ -200,13 +200,13 @@
     {% include "lbook/double.paginator.html.twig" %}
     {%  set tests = cycle.tests%}
     {% include "lbook/search.html.twig" %}
-    <div id="toolbar">
+    <div id="cycleShowToolbar">
     </div>
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="testTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
-           data-toolbar="#toolbar"
-           {#data-show-refresh="true"#}
+           data-toolbar="#cycleShowToolbar"
+           data-show-refresh="true"
            {#data-show-toggle="true"#}
            data-show-export="true"
            data-show-columns="true"
@@ -347,16 +347,17 @@
             });
         }
 
-        $(document).ready(
-            function() {
-                drawEasyPieChart();
+        $(document).ready(function() {
+            $( "#cycleShowToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+            drawEasyPieChart();
 
-                // var testTable = $('#testTable');
-                // testTable.bootstrapTable({
-                //     classes: "table-no-bordered",
-                //     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
-                // });
-            }
-        );
+            // var testTable = $('#testTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+        });
     </script>
 {% endblock %}

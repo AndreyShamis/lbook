@@ -331,7 +331,7 @@ class LogBookCycleController extends Controller
                 $cycleRepo->delete($obj);
             }
 
-            return $this->redirectToRoute('cycle_index');
+            return $this->redirectToRoute('cycle_index_first');
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($obj, $ex);
         }

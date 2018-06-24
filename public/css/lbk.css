@@ -2,13 +2,42 @@
     max-width:30px !important;
     width:20px !important;
 }
+
+.setup_cycle_build_column{
+    max-width:230px !important;
+    width:130px !important;
+}
+.setup_cycle_id_column{
+    max-width:90px !important;
+    width:30px !important;
+}
 .setup_cycle_name_column{
-    min-width:250px !important;
-    width:350px !important;
+    min-width:400px !important;
+    width:400px !important;
     text-align: left !important;
 }
+.setup_cycle_passrate_column{
+    max-width:65px !important;
+    width:50px !important;
+}
+.setup_cycle_testtime_column{
+    max-width:80px !important;
+    width:80px !important;
+}
+.setup_cycle_period_column{
+    max-width:80px !important;
+    width:80px !important;
+}
+.setup_cycle_updated_column{
+    max-width:80px !important;
+    width:80px !important;
+}
+.setup_cycle_tests_column{
+    max-width:75px !important;
+    width:70px !important;
+}
 .setup_cycle_options_column{
-    max-width:90px !important;
+    max-width:80px !important;
     width:70px !important;
     text-align: right !important;
 }

@@ -2,25 +2,35 @@
 {% extends 'lbook/default/index.html.twig' %}
 
 {% block content %}
-    <h1>Tests list with paginator</h1>
+    <h1>Tests list</h1>
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "test_index" %}
     {% include "lbook/paginator.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover">
+    <div id="testsList">
+    </div>
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="testsListTable"
+           data-pagination="true" data-search="true" data-toggle="table"
+           data-show-columns="true"
+        {#data-detail-view="true"#}
+        {#data-detail-formatter="detailFormatter"#}
+        {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+           data-toolbar="#testsList"
+           data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
-            <th>Id</th>
-            <th>Test</th>
-            <th>Order</th>
-            <th>Name</th>
-            <th>Time start</th>
-            <th>Time end</th>
-            <th>Runtime</th>
-            <th>Uptime</th>
-            <th>Uptime</th>
-            <th>Verdict</th>
-            <th>Actions</th>
+            <th data-sortable="true" title="Test ID">Id</th>
+            <th data-sortable="true"  data-switchable="false">Setup Name</th>
+            <th data-sortable="true"  data-switchable="false">Cycle Name</th>
+            <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
+            <th data-sorter="htmlSorter" data-sortable="true"  data-switchable="false">Test Name</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+            <th data-sortable="true">Runtime</th>
+            <th data-sortable="true" data-visible="false">Uptime</th>
+            <th data-sortable="true" data-visible="false">Uptime</th>
+            <th data-sortable="true">Verdict</th>
+            <th data-sortable="false" data-visible="false">Actions</th>
         </tr>
         </thead>
         <tbody class="searchable">
@@ -32,12 +42,13 @@
             {% endif %}
             {% set counter = counter+1 %}
             <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
-                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.id }}</a></td>
-                <td><a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
+                <td>{{ test.id }}</td>
+                <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
+                <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                 <td>{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
-                <td>{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
                 <td>{{ test.dutUpTimeStart }}</td>
                 <td>{{ test.dutUpTimeEnd }}</td>
@@ -53,6 +64,7 @@
         {% endfor %}
         </tbody>
     </table>
+    
     {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
         <div>Super admin option</div>
         <ul>

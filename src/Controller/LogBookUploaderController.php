@@ -315,7 +315,7 @@ class LogBookUploaderController extends Controller
     private function calculateAndSetBuild($build_name = null, LogBookCycle $cycle): void
     {
         if (($build_name === null || $build_name === '') && ($cycle->getBuild() === null || $cycle->getBuild()->getName() === '')) {
-            $build_name = $cycle->getName();
+            $build_name = 'Unknown';
         }
         if ($build_name !== null && $build_name !== '') {
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => $build_name)));

@@ -111,8 +111,8 @@
             <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true" data-visible="false">DUT</th>
             <th data-sortable="true" data-visible="false">Uploader</th>
-            <th class="setup_cycle_period_column" data-sortable="true" title="Time duration between First test start-time and Last test end-time">Duration</th>
-            <th class="setup_cycle_testtime_column" data-sortable="true">Test time</th>
+            <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
+            <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter">Test time</th>
             <th class="setup_cycle_updated_column" data-sorter="htmlSorter" data-sortable="true">Updated</th>
             <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
@@ -139,8 +139,8 @@
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
-                <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
-                <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
+                <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>
+                <td><span data-title="{{ cycle.testsTimeSum  }}">{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</span></td>
                 <td>
                     <span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">
                         {{ cycle.updatedAt |date('d/m H:i:s') }}

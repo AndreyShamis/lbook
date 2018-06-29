@@ -158,15 +158,15 @@ class LogBookUploaderController extends Controller
         }
 
         if ($setup === null) {
-            if (\strlen($setupName) < 3) {
+            if (\strlen($setupName) < LogBookSetup::$MIN_NAME_LEN) {
                 $setupName = $this->generateSetupName();
                 $obj->addMessage('Generating new setup NAME :' . $setupName);
             }
             $obj->addMessage('Creating setup  :' . $setupName);
-            $setup = $this->setupRepo->findOneOrCreate(array(
+            $setup = $this->setupRepo->findOneOrCreate(
+                array(
                     'name' => $setupName,
-                )
-            );
+                ));
         }
 
         return $setup;
@@ -196,8 +196,12 @@ class LogBookUploaderController extends Controller
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
+            if ($request->request->get('debug', false) === 'true') {
+                $obj->setDebug(true);
+            }
+
             $cycle_name = $request->request->get('cycle');
-            $setup_name = $request->request->get('setup');
+            $setup_name = $request->request->get('setup', '');
             $cycle_token = $request->request->get('token');
             $build_name = $request->request->get('build');
             $test_metadata = $request->request->get('test_metadata');
@@ -206,7 +210,10 @@ class LogBookUploaderController extends Controller
 
             if ($cycle_token !== null && $cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
-                $cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
+                if (mb_strlen($setup_name) > LogBookSetup::$MIN_NAME_LEN) {
+                    $setup = $this->bringSetup($obj, $setup_name);
+                }
+                $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
                 if ($cycle === null) {
                     $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
                     /**

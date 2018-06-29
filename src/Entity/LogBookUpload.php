@@ -18,23 +18,45 @@ class LogBookUpload
     private $id;
 
     protected $message='';
-    /**
-     *
-     * @Assert\NotBlank(message="Please, upload the log file as a DEBUG or INFO format file.")
-     * //@Assert\File(mimeTypes={ "text/plain" })
-     */
+
     private $logFile;
 
     protected $setup;
 
     protected $cycle;
 
+    protected $debug;
+
+    public function __construct()
+    {
+        $this->debug = false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
+     * @param mixed $debug
+     */
+    public function setDebug($debug): void
+    {
+        $this->debug = $debug;
+    }
+
     /**
      * @return string
      */
     public function getMessage(): string
     {
-        return $this->message;
+        if ($this->getDebug()) {
+            return $this->message;
+        }
+        return '';
     }
     /**
      * @param string $message

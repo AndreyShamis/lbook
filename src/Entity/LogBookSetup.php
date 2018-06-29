@@ -103,6 +103,7 @@ class LogBookSetup
      */
     protected $updatedAt;
 
+    public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
 
     /**

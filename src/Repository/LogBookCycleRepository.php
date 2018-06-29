@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookSetup;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -38,6 +39,36 @@ class LogBookCycleRepository extends ServiceEntityRepository
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
+        return $entity;
+    }
+
+    /**
+     * @param string $token
+     * @param LogBookSetup|null $setup
+     * @return LogBookCycle|null
+     */
+    public function findByToken(string $token, LogBookSetup $setup=null): ?LogBookCycle
+    {
+        /** @var LogBookCycle $entity */
+        $entity = null;
+
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.uploadToken = :token')
+            ->andWhere('c.tokenExpiration > CURRENT_TIMESTAMP()')
+            ->setParameter('token', $token)
+            ->setMaxResults(1)
+            ->orderBy('c.id', 'DESC');
+        if ($setup !== null) {
+            $qb
+                ->andWhere('c.setup = :setup')
+                ->setParameter('setup', $setup->getId());
+        }
+
+        $result = $qb->getQuery()->getResult();
+        if (\count($result) > 0) {
+            $entity = $result[0];
+        }
+
         return $entity;
     }
 

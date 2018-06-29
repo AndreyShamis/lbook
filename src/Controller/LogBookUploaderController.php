@@ -158,15 +158,15 @@ class LogBookUploaderController extends Controller
         }
 
         if ($setup === null) {
-            if (\strlen($setupName) < 3) {
+            if (\strlen($setupName) < LogBookSetup::$MIN_NAME_LEN) {
                 $setupName = $this->generateSetupName();
                 $obj->addMessage('Generating new setup NAME :' . $setupName);
             }
             $obj->addMessage('Creating setup  :' . $setupName);
-            $setup = $this->setupRepo->findOneOrCreate(array(
+            $setup = $this->setupRepo->findOneOrCreate(
+                array(
                     'name' => $setupName,
-                )
-            );
+                ));
         }
 
         return $setup;
@@ -196,24 +196,31 @@ class LogBookUploaderController extends Controller
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
-            $cycle_name = $request->request->get('cycle');
-            $setup_name = $request->request->get('setup');
-            $cycle_token = $request->request->get('token');
-            $build_name = $request->request->get('build');
-            $test_metadata = $request->request->get('test_metadata');
+            if ($request->request->get('debug', false) === 'true') {
+                $obj->setDebug(true);
+            }
+
+            $cycle_name = $request->request->get('cycle', '');
+            $setup_name = $request->request->get('setup', '');
+            $cycle_token = $request->request->get('token', '');
+            $build_name = $request->request->get('build', '');
+            $test_metadata = $request->request->get('test_metadata', '');
 
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
-            if ($cycle_token !== null && $cycle_token !== '') {
+            if ($cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
-                $cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
+                if (mb_strlen($setup_name) > LogBookSetup::$MIN_NAME_LEN) {
+                    $setup = $this->bringSetup($obj, $setup_name);
+                }
+                $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
                 if ($cycle === null) {
                     $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
                     /**
                      * TODO create new cycle? -> Need Parse Setup
                      */
                     $setup = $this->bringSetup($obj, $setup_name);
-                    if ($cycle_name === '' || $cycle_name === null) {
+                    if ($cycle_name === '') {
                         $obj->addMessage('INFO: -1- Cycle name not provided. Generating it for you.');
                         $cycle_name = $this->generateCycleName();
                         $obj->addMessage('INFO: -1- Generated cycle name [' . $cycle_name . '].');
@@ -244,7 +251,7 @@ class LogBookUploaderController extends Controller
                 $obj->addMessage('INFO: Cycle found, take SETUP from cycle');
                 $setup = $cycle->getSetup();
                 /** Update cycle name if changed */
-                if ($cycle_name !== '' && $cycle_name !== null && $cycle_name !== $cycle->getName()) {
+                if ($cycle_name !== '' && $cycle_name !== $cycle->getName()) {
                     $obj->addMessage('WARNING: cycle name changed, updating to new one ['. $cycle_name .']');
                     $cycle->setName($cycle_name);
                 }
@@ -288,7 +295,7 @@ class LogBookUploaderController extends Controller
             $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
 
             /** Extract metadata from request if exist */
-            if ($test_metadata !== null && $test_metadata !== '' && $this->isVariableString($test_metadata)) {
+            if ($test_metadata !== '' && $this->isVariableString($test_metadata)) {
                 $arr = $this->extractTestVariables($test_metadata);
                 $test->setMetaData($arr);
             }
@@ -312,12 +319,12 @@ class LogBookUploaderController extends Controller
      * @param string $build_name
      * @param LogBookCycle $cycle
      */
-    private function calculateAndSetBuild($build_name = null, LogBookCycle $cycle): void
+    private function calculateAndSetBuild($build_name, LogBookCycle $cycle): void
     {
-        if (($build_name === null || $build_name === '') && ($cycle->getBuild() === null || $cycle->getBuild()->getName() === '')) {
+        if ($build_name === '' && ($cycle->getBuild() === null || $cycle->getBuild()->getName() === '')) {
             $build_name = 'Unknown';
         }
-        if ($build_name !== null && $build_name !== '') {
+        if ($build_name !== '') {
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => $build_name)));
         }
     }

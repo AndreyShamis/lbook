@@ -55,7 +55,7 @@
                 <td>{{ cycle.testsCount }}</td>
                 {#<td>{{ cycle.tests | length }}</td>#}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
+                <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
@@ -72,7 +72,7 @@
                     </span>
                 </td>
                 <td>
-                    <a href="{{ path('cycle_show', { 'id': cycle.id }) }}">show</a>
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">show</a>
                     {% if is_granted('edit', cycle.setup) %}
                         <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
                     {% endif %}

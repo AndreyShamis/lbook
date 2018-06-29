@@ -23,11 +23,14 @@ class LogBookCycleRepository extends ServiceEntityRepository
      * @param array $criteria
      * @return LogBookCycle
      */
-    public function findOneOrCreate(array $criteria): LogBookCycle
+    public function findOneOrCreate(array $criteria, bool $find=true): LogBookCycle
     {
         $criteria['name'] = LogBookCycle::validateName($criteria['name']);
-
-        $entity = $this->findOneBy($criteria);
+        if ($find === true) {
+            $entity = $this->findOneBy($criteria);
+        } else {
+            $entity = null;
+        }
         if (! array_key_exists('uploadToken', $criteria) || $criteria['uploadToken'] === '') {
             $criteria['uploadToken'] = RandomString::generateRandomString(20);
         }

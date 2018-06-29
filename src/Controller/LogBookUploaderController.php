@@ -223,9 +223,7 @@ class LogBookUploaderController extends Controller
             $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
             if ($cycle === null) {
                 $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
-                /**
-                 * TODO create new cycle? -> Need Parse Setup
-                 */
+                /* create new cycle -> Need Parse Setup  */
                 $setup = $this->bringSetup($obj, $setup_name);
                 if ($cycle_name === '') {
                     $obj->addMessage('INFO: -1- Cycle name not provided. Generating it for you.');
@@ -239,8 +237,7 @@ class LogBookUploaderController extends Controller
                     'name' => $cycle_name,
                     'setup' => $setup,
                     'uploadToken' => $cycle_token,
-                    //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
-                ));
+                ), false);
                 $obj->addMessage('INFO: -1- Cycle created ID:' . $cycle->getId() . '.');
                 if ($cycle === null) {
                     $obj->addMessage('CRITICAL -1- Failed to generate cycle');

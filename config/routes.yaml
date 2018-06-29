@@ -11,10 +11,3 @@ register:
     controller: App\Controller\LogBookRegistrationController::register
     path:   /register
     schemes:  ['%http_protocol%']
-
-easy_admin_bundle:
-    resource: "@EasyAdminBundle/Controller/AdminController.php"
-    type:     annotation
-    prefix:   /lbadmin
-
-

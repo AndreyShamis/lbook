@@ -95,9 +95,6 @@
     "ocramius/proxy-manager": {
         "version": "2.2.0"
     },
-    "pagerfanta/pagerfanta": {
-        "version": "v1.0.5"
-    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },

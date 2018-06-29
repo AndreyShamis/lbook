@@ -83,5 +83,8 @@ success "Finish Check YAML files"
 restore_proxy
 
 info "Start unittests"
+set +e
+./vendor/bin/simple-phpunit --verbose --debug --colors=always --strict-coverage --strict-global-state --testdox-text artifacts/phpunit.txt
+set -e
 ./vendor/bin/simple-phpunit --verbose --debug --colors=always --strict-coverage --strict-global-state --testdox-text artifacts/phpunit.txt
 success "Finish unittests"

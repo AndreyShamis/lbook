@@ -20,13 +20,17 @@
         <li>
             <a href="{{ path('msg_type_index') }}">Back to the list</a>
         </li>
-        <li>
-            <a href="{{ path('msg_type_edit', { 'id': msg_type.id }) }}">Edit</a>
-        </li>
+        {% if is_granted('edit', msg_type) %}
+            <li>
+                <a href="{{ path('msg_type_edit', { 'id': msg_type.id }) }}">Edit</a>
+            </li>
+        {% endif %}
+        {% if is_granted('delete', msg_type) %}
         <li>
             {{ form_start(delete_form) }}
                 <input type="submit" value="Delete" onclick="return confirm('are u sure?')">
             {{ form_end(delete_form) }}
         </li>
+        {% endif %}
     </ul>
 {% endblock %}

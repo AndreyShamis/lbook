@@ -68,6 +68,7 @@ class LogBookMessageTypeController extends Controller
      */
     public function showAction(LogBookMessageType $obj): Response
     {
+        $this->denyAccessUnlessGranted('view', $obj);
         $deleteForm = $this->createDeleteForm($obj);
 
         return $this->render('lbook/msg_type/show.html.twig', array(
@@ -88,6 +89,7 @@ class LogBookMessageTypeController extends Controller
      */
     public function editAction(Request $request, LogBookMessageType $obj)
     {
+        $this->denyAccessUnlessGranted('edit', $obj);
         $deleteForm = $this->createDeleteForm($obj);
         $editForm = $this->createForm(LogBookMessageTypeType::class, $obj);
         $editForm->handleRequest($request);
@@ -117,6 +119,7 @@ class LogBookMessageTypeController extends Controller
      */
     public function deleteAction(Request $request, LogBookMessageType $obj): RedirectResponse
     {
+        $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 

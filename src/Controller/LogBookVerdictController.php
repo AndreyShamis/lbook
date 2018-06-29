@@ -70,6 +70,7 @@ class LogBookVerdictController extends Controller
      */
     public function showAction(LogBookVerdict $obj): Response
     {
+        $this->denyAccessUnlessGranted('view', $obj);
         $deleteForm = $this->createDeleteForm($obj);
 
         return $this->render('lbook/verdict/show.html.twig', array(
@@ -90,6 +91,7 @@ class LogBookVerdictController extends Controller
      */
     public function editAction(Request $request, LogBookVerdict $obj)
     {
+        $this->denyAccessUnlessGranted('edit', $obj);
         $deleteForm = $this->createDeleteForm($obj);
         $editForm = $this->createForm(LogBookVerdictType::class, $obj);
         $editForm->handleRequest($request);
@@ -119,6 +121,7 @@ class LogBookVerdictController extends Controller
      */
     public function deleteAction(Request $request, LogBookVerdict $obj): RedirectResponse
     {
+        $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 

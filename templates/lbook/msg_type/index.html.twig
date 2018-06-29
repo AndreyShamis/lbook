@@ -19,7 +19,9 @@
                 <td>{{ msg_type.name }}</td>
                 <td>
                     <a href="{{ path('msg_type_show', { 'id': msg_type.id }) }}">show</a>
-                    <a href="{{ path('msg_type_edit', { 'id': msg_type.id }) }}">edit</a>
+                    {% if is_granted('edit', msg_type) %}
+                        <a href="{{ path('msg_type_edit', { 'id': msg_type.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

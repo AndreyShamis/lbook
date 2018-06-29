@@ -6,10 +6,9 @@ use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookCycleType;
@@ -29,8 +28,7 @@ class LogBookCycleController extends Controller
     /**
      * Lists all cycle entities.
      *
-     * @Route("/page/{page}", name="cycle_index")
-     * @Method("GET")
+     * @Route("/page/{page}", name="cycle_index", methods={"GET"})
      * @Template(template="lbook/cycle/index.html.twig")
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -65,8 +63,7 @@ class LogBookCycleController extends Controller
     /**
      * Lists all cycle entities.
      *
-     * @Route("/", name="cycle_index_first")
-     * @Method("GET")
+     * @Route("/", name="cycle_index_first", methods={"GET"})
      * @Template(template="lbook/cycle/index.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
@@ -79,8 +76,7 @@ class LogBookCycleController extends Controller
     /**
      * Creates a new cycle entity.
      *
-     * @Route("/new", name="cycle_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="cycle_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
@@ -108,8 +104,7 @@ class LogBookCycleController extends Controller
     /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}", name="cycle_show_first")
-     * @Method("GET")
+     * @Route("/{id}", name="cycle_show_first", methods={"GET"})
      * @param LogBookCycle $cycle
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
@@ -123,8 +118,7 @@ class LogBookCycleController extends Controller
     /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}/page/{page}", name="cycle_show")
-     * @Method("GET")
+     * @Route("/{id}/page/{page}", name="cycle_show", methods={"GET"})
      * @param LogBookCycle $cycle
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -213,8 +207,7 @@ class LogBookCycleController extends Controller
     /**
      * Finds and displays a cycle entity.
      *
-     * @Route("/{id}", name="cycle_show_default")
-     * @Method("GET")
+     * @Route("/{id}", name="cycle_show_default", methods={"GET"})
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -267,8 +260,7 @@ class LogBookCycleController extends Controller
     /**
      * Displays a form to edit an existing cycle entity.
      *
-     * @Route("/{id}/edit", name="cycle_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="cycle_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycle $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -305,8 +297,7 @@ class LogBookCycleController extends Controller
     /**
      * Deletes a setup entity.
      *
-     * @Route("/{id}", name="cycle_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="cycle_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookCycle $obj
      * @return RedirectResponse|Response

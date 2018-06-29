@@ -5,8 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookVerdict;
 use App\Form\LogBookVerdictType;
 use App\Repository\LogBookVerdictRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,8 +33,7 @@ class LogBookVerdictController extends Controller
     /**
      * Creates a new verdict entity.
      *
-     * @Route("/new", name="verdict_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="verdict_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
@@ -63,8 +61,7 @@ class LogBookVerdictController extends Controller
     /**
      * Finds and displays a verdict entity.
      *
-     * @Route("/{id}", name="verdict_show")
-     * @Method("GET")
+     * @Route("/{id}", name="verdict_show", methods={"GET"})
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -81,8 +78,7 @@ class LogBookVerdictController extends Controller
     /**
      * Displays a form to edit an existing verdict entity.
      *
-     * @Route("/{id}/edit", name="verdict_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="verdict_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -110,8 +106,7 @@ class LogBookVerdictController extends Controller
     /**
      * Deletes a verdict entity.
      *
-     * @Route("/{id}", name="verdict_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="verdict_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookVerdict $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse

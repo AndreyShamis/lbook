@@ -8,8 +8,7 @@ use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -30,8 +29,7 @@ class LogBookTestController extends Controller
     /**
      * Lists all Tests entities.
      *
-     * @Route("/page/{page}", name="test_index")
-     * @Method("GET")
+     * @Route("/page/{page}", name="test_index", methods={"GET"})
      * @Template(template="lbook/test/list.html.twig")
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -64,8 +62,7 @@ class LogBookTestController extends Controller
     /**
      * Lists all Tests entities.
      *
-     * @Route("/", name="test_index_first")
-     * @Method("GET")
+     * @Route("/", name="test_index_first", methods={"GET"})
      * @Template(template="lbook/test/list.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
@@ -79,8 +76,7 @@ class LogBookTestController extends Controller
     /**
      * Creates a new test entity.
      *
-     * @Route("/new", name="test_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="test_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
@@ -106,8 +102,7 @@ class LogBookTestController extends Controller
     }
 
     /**
-     * @Route("/{id}/downloadlog", name="download_log")
-     * @Method("GET")
+     * @Route("/{id}/downloadlog", name="download_log", methods={"GET"})
      * @param LogBookTest|null $test
      * @return BinaryFileResponse|Response
      */
@@ -136,8 +131,7 @@ class LogBookTestController extends Controller
     }
 
     /**
-     * @Route("/{id}/showlog", name="show_log")
-     * @Method("GET")
+     * @Route("/{id}/showlog", name="show_log", methods={"GET"})
      * @param LogBookTest|null $test
      * @return BinaryFileResponse|Response
      */
@@ -163,8 +157,7 @@ class LogBookTestController extends Controller
     /**
      * Finds and displays a test entity.
      *
-     * @Route("/{id}", name="test_show_first")
-     * @Method("GET")
+     * @Route("/{id}", name="test_show_first", methods={"GET"})
      * @param LogBookTest $test
      * @param PagePaginator $pagePaginator
      * @param LogBookMessageRepository $logRepo
@@ -179,8 +172,7 @@ class LogBookTestController extends Controller
     /**
      * Finds and displays a test entity.
      *
-     * @Route("/{id}/page/{page}", name="test_show")
-     * @Method("GET")
+     * @Route("/{id}/page/{page}", name="test_show", methods={"GET"})
      * @param LogBookTest $test
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -309,8 +301,7 @@ class LogBookTestController extends Controller
     /**
      * Displays a form to edit an existing test entity.
      *
-     * @Route("/{id}/edit", name="test_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="test_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -348,8 +339,7 @@ class LogBookTestController extends Controller
     /**
      * Deletes a test entity.
      *
-     * @Route("/{id}", name="test_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="test_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookTest $test
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response

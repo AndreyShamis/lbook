@@ -9,8 +9,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogBookDefaultController extends Controller
@@ -19,8 +18,7 @@ class LogBookDefaultController extends Controller
     /**
      * Lists all test entities.
      *
-     * @Route("/", name="home_index")
-     * @Method("GET")
+     * @Route("/", name="home_index", methods={"GET"})
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */

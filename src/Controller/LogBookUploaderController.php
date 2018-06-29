@@ -10,14 +10,10 @@ use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
 use ArrayIterator;
 use DateTime;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\ORMException;
-use PDOException;
 use Exception;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -70,8 +66,7 @@ class LogBookUploaderController extends Controller
     }
 
     /**
-     * @Route("/", name="upload_index")
-     * @Method("GET")
+     * @Route("/", name="upload_index", methods={"GET"})
      */
     public function index()
     {
@@ -182,8 +177,7 @@ class LogBookUploaderController extends Controller
     /**
      * Creates a new Upload entity.
      *
-     * @Route("/new_cli", name="upload_new_cli")
-     * @Method({"GET", "POST"})
+     * @Route("/new_cli", name="upload_new_cli", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
@@ -376,8 +370,7 @@ class LogBookUploaderController extends Controller
     /**
      * Creates a new Upload entity.
      *
-     * @Route("/new", name="upload_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="upload_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException

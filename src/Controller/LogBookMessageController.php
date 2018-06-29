@@ -7,10 +7,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\LogBookMessage;
 use App\Repository\LogBookMessageRepository;
 use App\Service\PagePaginator;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -24,8 +23,7 @@ class LogBookMessageController extends Controller
     protected $index_size = 2000;
 
     /**
-     * @Route("/page/{page}", name="log_index")
-     * @Method("GET")
+     * @Route("/page/{page}", name="log_index", methods={"GET"})
      * @Template(template="lbook/log/index.html.twig")
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -50,8 +48,7 @@ class LogBookMessageController extends Controller
     /**
      * Creates a new Log/Message entity.
      *
-     * @Route("/new", name="log_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="log_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
@@ -79,8 +76,7 @@ class LogBookMessageController extends Controller
     /**
      * Finds and displays a Log/Message entity.
      *
-     * @Route("/{id}", name="log_show")
-     * @Method("GET")
+     * @Route("/{id}", name="log_show", methods={"GET"})
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -104,8 +100,7 @@ class LogBookMessageController extends Controller
     /**
      * Displays a form to edit an existing Log/Message entity.
      *
-     * @Route("/{id}/edit", name="log_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="log_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -140,8 +135,7 @@ class LogBookMessageController extends Controller
     /**
      * Deletes a Log / Message entity.
      *
-     * @Route("/{id}", name="log_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="log_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookMessage $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse

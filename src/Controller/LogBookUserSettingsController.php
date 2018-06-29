@@ -7,7 +7,6 @@ use App\Entity\LogBookUserSettings;
 use App\Form\LogBookUserSettingsType;
 use App\Repository\LogBookUserSettingsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

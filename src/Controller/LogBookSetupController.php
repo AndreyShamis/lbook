@@ -9,10 +9,9 @@ use App\Repository\LogBookSetupRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookSetupType;
@@ -35,8 +34,7 @@ class LogBookSetupController extends Controller
     /**
      * Lists all setup entities.
      *
-     * @Route("/json/page/{page}", name="setups")
-     * @Method("GET")
+     * @Route("/json/page/{page}", name="setups", methods={"GET"})
      * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
@@ -87,8 +85,7 @@ class LogBookSetupController extends Controller
     /**
      * Lists all setup entities.
      *
-     * @Route("/page/{page}", name="setup_index")
-     * @Method("GET")
+     * @Route("/page/{page}", name="setup_index", methods={"GET"})
      * @Template(template="lbook/setup/index.html.twig")
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -123,8 +120,7 @@ class LogBookSetupController extends Controller
     /**
      * Lists all setup entities.
      *
-     * @Route("/", name="setup_index_first")
-     * @Method("GET")
+     * @Route("/", name="setup_index_first", methods={"GET"})
      * @Template(template="lbook/setup/index.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
@@ -138,8 +134,7 @@ class LogBookSetupController extends Controller
     /**
      * Creates a new setup entity.
      *
-     * @Route("/new", name="setup_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="setup_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException|\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
@@ -170,8 +165,7 @@ class LogBookSetupController extends Controller
     /**
      * Finds and displays a setup entity.
      *
-     * @Route("/{id}/page/{page}", name="setup_show")
-     * @Method("GET")
+     * @Route("/{id}/page/{page}", name="setup_show", methods={"GET"})
      * @param LogBookSetup $setup
      * @param int $page
      * @param PagePaginator $pagePaginator
@@ -214,8 +208,7 @@ class LogBookSetupController extends Controller
     /**
      * Finds and displays a setup entity.
      *
-     * @Route("/{id}", name="setup_show_first")
-     * @Method("GET")
+     * @Route("/{id}", name="setup_show_first", methods={"GET"})
      * @param LogBookSetup $setup
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
@@ -268,8 +261,7 @@ class LogBookSetupController extends Controller
     /**
      * Displays a form to edit an existing setup entity.
      *
-     * @Route("/{id}/edit", name="setup_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="setup_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookSetup $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -320,8 +312,7 @@ class LogBookSetupController extends Controller
     /**
      * Deletes a setup entity.
      *
-     * @Route("/{id}", name="setup_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="setup_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookSetup $obj
      * @return RedirectResponse|Response

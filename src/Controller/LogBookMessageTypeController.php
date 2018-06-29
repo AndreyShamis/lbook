@@ -5,10 +5,9 @@ namespace App\Controller;
 use App\Entity\LogBookMessageType;
 use App\Form\LogBookMessageTypeType;
 use App\Repository\LogBookMessageTypeRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -32,8 +31,7 @@ class LogBookMessageTypeController extends Controller
     /**
      * Creates a new Log/Message Type entity.
      *
-     * @Route("/new", name="msg_type_new")
-     * @Method({"GET", "POST"})
+     * @Route("/new", name="msg_type_new", methods={"GET|POST"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
@@ -61,8 +59,7 @@ class LogBookMessageTypeController extends Controller
     /**
      * Finds and displays a Log/Message Type entity.
      *
-     * @Route("/{id}", name="msg_type_show")
-     * @Method("GET")
+     * @Route("/{id}", name="msg_type_show", methods={"GET"})
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -79,8 +76,7 @@ class LogBookMessageTypeController extends Controller
     /**
      * Displays a form to edit an existing Log/Message Type entity.
      *
-     * @Route("/{id}/edit", name="msg_type_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="msg_type_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -108,8 +104,7 @@ class LogBookMessageTypeController extends Controller
     /**
      * Deletes a Log/Message Type entity.
      *
-     * @Route("/{id}", name="msg_type_delete")
-     * @Method("DELETE")
+     * @Route("/{id}", name="msg_type_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookMessageType $obj
      * @return \Symfony\Component\HttpFoundation\RedirectResponse

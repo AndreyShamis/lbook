@@ -5,8 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
 use App\Repository\LogBookUserRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +31,7 @@ class LogBookUserController extends Controller
     /**
      * Finds and displays a Users  entity.
      *
-     * @Route("/{id}", name="user_show")
-     * @Method("GET")
+     * @Route("/{id}", name="user_show", methods={"GET"})
      * @param LogBookUser $obj
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
@@ -50,8 +48,7 @@ class LogBookUserController extends Controller
     /**
      * Displays a form to edit an existing User entity.
      *
-     * @Route("/{id}/edit", name="user_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}/edit", name="user_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookUser $obj
      * @param UserPasswordEncoderInterface $passwordEncoder

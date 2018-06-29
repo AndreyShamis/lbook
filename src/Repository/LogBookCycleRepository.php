@@ -57,6 +57,7 @@ class LogBookCycleRepository extends ServiceEntityRepository
             ->andWhere('c.tokenExpiration > CURRENT_TIMESTAMP()')
             ->setParameter('token', $token)
             ->setMaxResults(1)
+            ->setCacheable(false)
             ->orderBy('c.id', 'DESC');
         if ($setup !== null) {
             $qb

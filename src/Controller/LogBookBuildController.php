@@ -85,6 +85,7 @@ class LogBookBuildController extends Controller
      */
     public function show(LogBookBuild $logBookBuild): Response
     {
+        $this->denyAccessUnlessGranted('view', $logBookBuild);
         return $this->render('lbook/build/show.html.twig', ['log_book_build' => $logBookBuild]);
     }
 
@@ -139,6 +140,8 @@ class LogBookBuildController extends Controller
      */
     public function edit(Request $request, LogBookBuild $logBookBuild): Response
     {
+        $this->denyAccessUnlessGranted('edit', $logBookBuild);
+
         $form = $this->createForm(LogBookBuildType::class, $logBookBuild);
         $form->handleRequest($request);
 
@@ -163,6 +166,7 @@ class LogBookBuildController extends Controller
      */
     public function delete(Request $request, LogBookBuild $logBookBuild): Response
     {
+        $this->denyAccessUnlessGranted('delete', $logBookBuild);
         if ($this->isCsrfTokenValid('delete'.$logBookBuild->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($logBookBuild);

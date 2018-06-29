@@ -30,7 +30,9 @@
                 <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
                 <td><a href="{{ path('build_show_cycles_first', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>
                 <td>
-                    <a href="{{ path('log_book_build_edit', {'id': log_book_build.id}) }}">edit</a>
+                    {% if is_granted('edit', log_book_build) %}
+                        <a href="{{ path('log_book_build_edit', {'id': log_book_build.id}) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}

@@ -100,7 +100,7 @@ class LogBookBuildVoter extends Voter
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
-        return false;
+        return true;
     }
 
     /**

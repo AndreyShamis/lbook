@@ -3,11 +3,12 @@
 {% block title %}Edit LogBookBuild{% endblock %}
 
 {% block content %}
-    <h1>Edit LogBookBuild</h1>
+    <h1>Edit LogBook Build</h1>
 
     {{ include('lbook/build/_form.html.twig', {'button_label': 'Update'}) }}
 
     <a href="{{ path('log_book_build_index') }}">back to list</a>
-
-    {{ include('lbook/build/_delete_form.html.twig') }}
+    {% if is_granted('delete', log_book_build) %}
+        {{ include('lbook/build/_delete_form.html.twig') }}
+    {% endif %}
 {% endblock %}

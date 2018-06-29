@@ -10,6 +10,11 @@ use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
 use ArrayIterator;
 use DateTime;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\ORMException;
+use PDOException;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -43,6 +48,7 @@ class LogBookUploaderController extends Controller
     protected $_MEDIUM_TIME_LEN = 14;           // 02/22 11:36:56
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
     protected $log_first_lines = array();
+    public static $MAX_EXEC_ORDER_SEARCH_COUNTER = 50;
 
     /**
      * LogBookUploaderController constructor.
@@ -272,15 +278,18 @@ class LogBookUploaderController extends Controller
             $obj->setLogFile($fileName);
 
             $testName = $file->getClientOriginalName();
-            /** @var LogBookTest $test */
-            $test = $this->testsRepo->findOneOrCreate(array(
+
+            $test_criteria = array(
                 'id' => 1,
                 'name' => $testName,
                 'cycle' => $cycle,
                 'logFile' => $new_file->getFilename(),
                 'logFileSize' => $new_file->getSize(),
                 'executionOrder' => $this->getTestNewExecutionOrder($cycle),
-            ));
+            );
+            /** @var LogBookTest $test */
+            $test = $this->insertTest($test_criteria, $cycle, $obj);
+
             $obj->data = $this->parseFile($new_file, $test, $obj);
             $this->em->refresh($cycle);
 
@@ -311,6 +320,37 @@ class LogBookUploaderController extends Controller
         ));
     }
 
+    /**
+     * Trying to insert test into DB in order to calculated execution order.
+     * If there is UniqueConstraintViolationException new execution order will be generated
+     * @param array $test_criteria
+     * @param LogBookCycle $cycle
+     * @param LogBookUpload $obj
+     * @return LogBookTest
+     */
+    protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj): LogBookTest
+    {
+        $orderFound = false;
+        $counter = 0;
+        $test = null;
+        while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
+            try {
+                $test = $this->testsRepo->findOneOrCreate($test_criteria);
+                $orderFound = true;
+            } catch (UniqueConstraintViolationException $ex) {
+                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
+                $counter++;
+                try {
+                    /** sleep for 0.2-0.5 second */
+                    usleep(\random_int(200000, 5000000));
+                } catch (Exception $e) {
+                }
+                $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+            }
+        }
+
+        return $test;
+    }
     /**
      * @param string $build_name
      * @param LogBookCycle $cycle

@@ -19,7 +19,9 @@
                 <td>{{ verdict.name }}</td>
                 <td>
                     <a href="{{ path('verdict_show', { 'id': verdict.id }) }}">show</a>
-                    <a href="{{ path('verdict_edit', { 'id': verdict.id }) }}">edit</a>
+                    {% if is_granted('edit', verdict) %}
+                        <a href="{{ path('verdict_edit', { 'id': verdict.id }) }}">edit</a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

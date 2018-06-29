@@ -199,7 +199,7 @@ class LogBookUploaderController extends Controller
         $cycle = null;
         /** @var LogBookSetup $setup */
         $setup = null;
-        if ($p_data->count() > 1) {
+        if ($p_data->count() >= 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
             if ($request->request->get('debug', false) === 'true') {
@@ -216,39 +216,40 @@ class LogBookUploaderController extends Controller
 
             if ($cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
-                if (mb_strlen($setup_name) > LogBookSetup::$MIN_NAME_LEN) {
-                    $setup = $this->bringSetup($obj, $setup_name);
+            }
+            if (mb_strlen($setup_name) > LogBookSetup::$MIN_NAME_LEN) {
+                $setup = $this->bringSetup($obj, $setup_name);
+            }
+            $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
+            if ($cycle === null) {
+                $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
+                /**
+                 * TODO create new cycle? -> Need Parse Setup
+                 */
+                $setup = $this->bringSetup($obj, $setup_name);
+                if ($cycle_name === '') {
+                    $obj->addMessage('INFO: -1- Cycle name not provided. Generating it for you.');
+                    $cycle_name = $this->generateCycleName();
+                    $obj->addMessage('INFO: -1- Generated cycle name [' . $cycle_name . '].');
+                } else {
+                    $obj->addMessage('INFO: -1- Cycle name provided [' . $cycle_name . '].');
                 }
-                $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
+                $obj->addMessage('INFO: -1- Creating cycle.');
+                $cycle = $this->cycleRepo->findOneOrCreate(array(
+                    'name' => $cycle_name,
+                    'setup' => $setup,
+                    'uploadToken' => $cycle_token,
+                    //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
+                ));
+                $obj->addMessage('INFO: -1- Cycle created ID:' . $cycle->getId() . '.');
                 if ($cycle === null) {
-                    $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
-                    /**
-                     * TODO create new cycle? -> Need Parse Setup
-                     */
-                    $setup = $this->bringSetup($obj, $setup_name);
-                    if ($cycle_name === '') {
-                        $obj->addMessage('INFO: -1- Cycle name not provided. Generating it for you.');
-                        $cycle_name = $this->generateCycleName();
-                        $obj->addMessage('INFO: -1- Generated cycle name [' . $cycle_name . '].');
-                    } else {
-                        $obj->addMessage('INFO: -1- Cycle name provided [' . $cycle_name . '].');
-                    }
-                    $obj->addMessage('INFO: -1- Creating cycle.');
-                    $cycle = $this->cycleRepo->findOneOrCreate(array(
-                        'name' => $cycle_name,   // TODO provide cycle name
-                        'setup' => $setup,
-                        'uploadToken' => $cycle_token,
-                        //'tokenExpiration' => new \DateTime('+7 days'),   // Done in constructor
-                    ));
-                    $obj->addMessage('INFO: -1- Cycle created ID:' . $cycle->getId() . '.');
-                    if ($cycle === null) {
-                        $obj->addMessage('CRITICAL -1- Failed to generate cycle');
-                        // exit();
-                    }
-                    $obj->addMessage('PASS: -1- The LogBOOK system performed all thinks for you. Continue to log parsing.');
+                    $obj->addMessage('CRITICAL -1- Failed to generate cycle');
+                    // exit();
                 }
+                $obj->addMessage('PASS: -1- The LogBOOK system performed all thinks for you. Continue to log parsing.');
             }
 
+            $continue = true;
             if ($cycle !== null) {
                 $obj->addMessage('INFO: Cycle found, take SETUP from cycle');
                 $setup = $cycle->getSetup();
@@ -257,60 +258,70 @@ class LogBookUploaderController extends Controller
                     $obj->addMessage('WARNING: cycle name changed, updating to new one ['. $cycle_name .']');
                     $cycle->setName($cycle_name);
                 }
-            } else {
-                $obj->addMessage('ERROR: Cycle not found, take setup from POST');
-                $setup = $this->bringSetup($obj, $setup_name);
+            } else if ($cycle === null) {
+                $obj->addMessage('Cycle not created/found.');
+                $continue = false;
+            }
+//            else {
+//                $obj->addMessage('ERROR: Cycle not found, take setup from POST');
+//                $setup = $this->bringSetup($obj, $setup_name);
+//
+//                if ($setup !== null) {
+//                    $obj->addMessage('ERROR: TODO Require to create new cycle ');
+////                    /** TODO Require to create new cycle */
+////                    $cycle = $this->cycleRepo->findOneOrCreate(array(
+////                        'name' => $cycle_name,
+////                        'setup' => $setup,
+////                        'uploadToken' => $cycle_token));
+//                } else {
+//                    $obj->addMessage('ERROR: TODO - cycle not found, setup not found, Create Setup and then Cycle');
+//                    /** TODO - cycle not found, setup not found, Create Setup and then Cycle */
+//                }
+//            }
+            if ($continue) {
+                $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
 
-                if ($setup !== null) {
-                    $obj->addMessage('ERROR: TODO Require to create new cycle ');
-                    /** TODO Require to create new cycle */
-                } else {
-                    $obj->addMessage('ERROR: TODO - cycle not found, setup not found, Create Setup and then Cycle');
-                    /** TODO - cycle not found, setup not found, Create Setup and then Cycle */
+                /** @var UploadedFile $new_file */
+                $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
+
+                $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
+                $obj->setLogFile($fileName);
+
+                $testName = $file->getClientOriginalName();
+
+                $test_criteria = array(
+                    'id' => 1,
+                    'name' => $testName,
+                    'cycle' => $cycle,
+                    'logFile' => $new_file->getFilename(),
+                    'logFileSize' => $new_file->getSize(),
+                    'executionOrder' => $this->getTestNewExecutionOrder($cycle),
+                );
+                /** @var LogBookTest $test */
+                $test = $this->insertTest($test_criteria, $cycle, $obj);
+
+                $obj->data = $this->parseFile($new_file, $test, $obj);
+                $this->em->refresh($cycle);
+
+                $this->calculateAndSetBuild($build_name, $cycle);
+
+                $remote_ip = $request->getClientIp();
+                $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
+                $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
+
+                /** Extract metadata from request if exist */
+                if ($test_metadata !== '' && $this->isVariableString($test_metadata)) {
+                    $arr = $this->extractTestVariables($test_metadata);
+                    $test->setMetaData($arr);
                 }
+
+                $cycle->setTargetUploader($uploader);
+                $cycle->setController($uploader);
+                $cycle->setDut($dut);
+                $setup->setUpdatedAt();
+                $this->em->flush();
+                $obj->addMessage('TestID is ' . $test->getId() . '.');
             }
-            $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
-
-            /** @var UploadedFile $new_file */
-            $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
-
-            $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
-            $obj->setLogFile($fileName);
-
-            $testName = $file->getClientOriginalName();
-
-            $test_criteria = array(
-                'id' => 1,
-                'name' => $testName,
-                'cycle' => $cycle,
-                'logFile' => $new_file->getFilename(),
-                'logFileSize' => $new_file->getSize(),
-                'executionOrder' => $this->getTestNewExecutionOrder($cycle),
-            );
-            /** @var LogBookTest $test */
-            $test = $this->insertTest($test_criteria, $cycle, $obj);
-
-            $obj->data = $this->parseFile($new_file, $test, $obj);
-            $this->em->refresh($cycle);
-
-            $this->calculateAndSetBuild($build_name, $cycle);
-
-            $remote_ip = $request->getClientIp();
-            $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
-            $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
-
-            /** Extract metadata from request if exist */
-            if ($test_metadata !== '' && $this->isVariableString($test_metadata)) {
-                $arr = $this->extractTestVariables($test_metadata);
-                $test->setMetaData($arr);
-            }
-
-            $cycle->setTargetUploader($uploader);
-            $cycle->setController($uploader);
-            $cycle->setDut($dut);
-            $setup->setUpdatedAt();
-            $this->em->flush();
-            $obj->addMessage('TestID is ' . $test->getId() . '.');
         }
 
         return $this->render('lbook/upload/curl.html.twig', array(

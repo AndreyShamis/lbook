@@ -22,7 +22,7 @@ use App\Form\LogBookTestType;
  */
 class LogBookTestController extends Controller
 {
-    protected $index_size = 100;
+    protected $index_size = 1000;
 
     protected $log_size = 3000;
 
@@ -281,8 +281,7 @@ class LogBookTestController extends Controller
             } else {
                 $otherResponse = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-        } catch (\Exception $ex) {
-        }
+        } catch (\Exception $ex) {}
         if ($test === null) {
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Test with provided ID:[%s] not found', $possibleId),

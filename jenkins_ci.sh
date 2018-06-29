@@ -81,7 +81,7 @@ php bin/console lint:yaml config/
 success "Finish Check YAML files"
 
 restore_proxy
-
+./bin/console ca:cl
 info "Start unittests"
 ./vendor/bin/simple-phpunit --verbose --debug --colors=always --strict-coverage --strict-global-state --testdox-text artifacts/phpunit.txt
 success "Finish unittests"

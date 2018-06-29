@@ -61,15 +61,13 @@ class LogBookBuildVoter extends Voter
             // the user must be logged in; if not, deny access
             return false;
         }
-
-        // you know $subject is a Post object, thanks to supports
-        /** @var LogBookBuild $build */
-        $build = $subject;
-
         // ROLE_SUPER_ADMIN can do anything! The power!
         if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN'))) {
             return true;
         }
+        // you know $subject is a Post object, thanks to supports
+        /** @var LogBookBuild $build */
+        $build = $subject;
 
         switch ($attribute) {
             case self::VIEW:
@@ -90,15 +88,7 @@ class LogBookBuildVoter extends Voter
      */
     private function canView(LogBookBuild $build, LogBookUser $user): bool
     {
-        if (!$setup->isPrivate()) {
-            return true;
-        }
-
-        // if they can edit, they can view
-        if ($this->canEdit($setup, $user)) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -110,7 +100,7 @@ class LogBookBuildVoter extends Voter
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
-        return $user === $setup->getOwner() || $setup->getModerators()->contains($user);
+        return false;
     }
 
     /**
@@ -122,6 +112,6 @@ class LogBookBuildVoter extends Voter
     {
         // this assumes that the data object has a getOwner() method
         // to get the entity of the user who owns this data object
-        return $user === $setup->getOwner();
+        return false;
     }
 }

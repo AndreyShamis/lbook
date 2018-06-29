@@ -134,9 +134,10 @@ class LogBookUploaderController extends Controller
      * @param LogBookUpload $obj
      * @param string $setupName
      * @param int $setupId
-     * @return LogBookSetup
+     * @param bool $generate If true, and setup not found, the new one will be generated
+     * @return LogBookSetup|null
      */
-    final protected function bringSetup(LogBookUpload $obj, string $setupName = '', int $setupId = -1): LogBookSetup
+    final protected function bringSetup(LogBookUpload $obj, string $setupName = '', int $setupId = -1, $generate = true): ?LogBookSetup
     {
 
         /** @var LogBookSetup $setup */
@@ -157,16 +158,16 @@ class LogBookUploaderController extends Controller
             }
         }
 
-        if ($setup === null) {
-            if (\strlen($setupName) < 3) {
+        if ($setup === null && $generate) {
+            if (\strlen($setupName) < LogBookSetup::$MIN_NAME_LEN) {
                 $setupName = $this->generateSetupName();
                 $obj->addMessage('Generating new setup NAME :' . $setupName);
             }
             $obj->addMessage('Creating setup  :' . $setupName);
-            $setup = $this->setupRepo->findOneOrCreate(array(
+            $setup = $this->setupRepo->findOneOrCreate(
+                array(
                     'name' => $setupName,
-                )
-            );
+                ));
         }
 
         return $setup;
@@ -196,6 +197,7 @@ class LogBookUploaderController extends Controller
         if ($p_data->count() > 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
+            $debug = $request->request->get('debug');
             $cycle_name = $request->request->get('cycle');
             $setup_name = $request->request->get('setup');
             $cycle_token = $request->request->get('token');
@@ -206,7 +208,11 @@ class LogBookUploaderController extends Controller
 
             if ($cycle_token !== null && $cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
-                $cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
+                //$cycle = $this->cycleRepo->findOneBy(array('uploadToken' => $cycle_token));
+                if ($setup_name !== null && mb_strlen($setup_name) > LogBookSetup::$MIN_NAME_LEN) {
+                    $setup = $this->bringSetup($obj, $setup_name);
+                }
+                $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
                 if ($cycle === null) {
                     $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
                     /**

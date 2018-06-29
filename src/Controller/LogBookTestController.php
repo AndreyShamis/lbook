@@ -22,7 +22,7 @@ use App\Form\LogBookTestType;
  */
 class LogBookTestController extends Controller
 {
-    protected $index_size = 100;
+    protected $index_size = 1000;
 
     protected $log_size = 3000;
 

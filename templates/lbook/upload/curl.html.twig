@@ -1,1 +1,1 @@
-Finish|CycleID:{{ cycle.id }}|SetupID:{{ setup.id }} {{ upload.message }}
+Finish|{% if cycle is defined %}CycleID:{{ cycle.id }}{% endif %}|{% if setup is defined %}SetupID:{{ setup.id }}{% endif %} {{ upload.message }}

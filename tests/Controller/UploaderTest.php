@@ -31,6 +31,130 @@ class UploaderTest extends LogBookApplicationTestCase
     }
 
     /**
+     * Check that Upload CLI works without token
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     */
+    public function testUploadCliEmptyRequest():void
+    {
+        $postParams = array(
+            'debug' => 'true',
+        );
+        $postHeader = array('HTTP_REFERER' => '/upload/new_cli',);
+        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+        $passTestName = 'network_WiFi_Perf.11g';
+        $passFileName = 'PASS__' . $passTestName;
+        $errorTestName = 'network_WiFi_BluetoothStreamPerf.11a';
+        $errorFileName = 'ERROR__' . $errorTestName;
+        $currentPath = realpath(__DIR__) . '/';
+        $filePath1 = $currentPath . $passFileName;
+        $filePath2 = $currentPath . $errorFileName;
+
+        $this->resource_copy($currentPath . 'ForUpload/', $currentPath);
+
+        $file1 = new UploadedFile($filePath1, $passFileName, 'text/plain');
+        $file2 = new UploadedFile($filePath2, $errorFileName, 'text/plain');
+        $client = $this->getClient();
+
+        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file1), $postHeader);
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $firstContent = $this->getClient()->getResponse()->getContent();
+
+        $setupName = null;
+        $this->validateNotExistingTestResponse($firstContent, $setupName, null, $passFileName);
+
+        self::$entityManager->clear();
+
+        /** Second file upload */
+        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file2), $postHeader);
+
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $secondContent = $this->getClient()->getResponse()->getContent();
+
+        $setupName = null;
+        $this->validateNotExistingTestResponse($secondContent, $setupName, null, $errorFileName, false);
+        $testId = $this->findTestIdInTest($secondContent);
+        self::$entityManager->clear();
+
+        $test = $testRepo->find($testId);
+        /** @var LogBookCycle $cycle */
+        $cycle = $test->getCycle();
+        /** @var LogBookSetup $setup */
+        $setup = $cycle->getSetup();
+
+        //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
+        $this->assertSame($setupName, $setup->getName(), 'Check that AutoGEN Setup name is same: Actual: ' . $setup->getName() . ', expected ' . $setupName . 'Current testID:' . $testId);
+        $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
+        $this->assertSame(35, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
+        $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());
+        $this->assertEquals(1, $cycle->getTests()->count(), 'Check that cycle include 1 created test. count: ' . $cycle->getTests()->count());
+        $this->assertEquals(0, $cycle->getPassRate(), 'Check that cycle pass rate is 0%: Actual = ' . $cycle->getPassRate());
+    }
+
+    /**
+     * Check that Upload CLI works without token
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     */
+    public function testUploadCliNoToken():void
+    {
+        $token = RandomString::generateRandomString(20);
+        $setupName = 'UPLOAD_TOKEN_NOT_PROVIDED';
+        $postParams = array(
+            'setup' => $setupName,
+            'debug' => 'true',
+        );
+        $postHeader = array('HTTP_REFERER' => '/upload/new_cli',);
+        $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+        $passTestName = 'network_WiFi_Perf.11g';
+        $passFileName = 'PASS__' . $passTestName;
+        $errorTestName = 'network_WiFi_BluetoothStreamPerf.11a';
+        $errorFileName = 'ERROR__' . $errorTestName;
+        $currentPath = realpath(__DIR__) . '/';
+        $filePath1 = $currentPath . $passFileName;
+        $filePath2 = $currentPath . $errorFileName;
+
+        $this->resource_copy($currentPath . 'ForUpload/', $currentPath);
+
+        $file1 = new UploadedFile($filePath1, $passFileName, 'text/plain');
+        $file2 = new UploadedFile($filePath2, $errorFileName, 'text/plain');
+        $client = $this->getClient();
+
+        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file1), $postHeader);
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $firstContent = $this->getClient()->getResponse()->getContent();
+
+        $this->validateNotExistingTestResponse($firstContent, $setupName, null, $passFileName);
+
+        self::$entityManager->clear();
+
+        /** Second file upload */
+        $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file2), $postHeader);
+
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
+        $secondContent = $this->getClient()->getResponse()->getContent();
+        //echo  $secondContent;
+
+        $this->validateNotExistingTestResponse($secondContent, $setupName, null, $errorFileName, false);
+        $testId = $this->findTestIdInTest($secondContent);
+        self::$entityManager->clear();
+
+        $test = $testRepo->find($testId);
+        /** @var LogBookCycle $cycle */
+        $cycle = $test->getCycle();
+        /** @var LogBookSetup $setup */
+        $setup = $cycle->getSetup();
+
+        //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
+        $this->assertSame($setupName, $setup->getName(), 'Check that AutoGEN Setup name is same: Actual: ' . $setup->getName() . ', expected ' . $setupName . 'Current testID:' . $testId);
+        $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
+        $this->assertSame(35, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
+        $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());
+        $this->assertEquals(1, $cycle->getTests()->count(), 'Check that cycle include 1 created test. count: ' . $cycle->getTests()->count());
+        $this->assertEquals(0, $cycle->getPassRate(), 'Check that cycle pass rate is 0%: Actual = ' . $cycle->getPassRate());
+    }
+
+    /**
      * Check that Upload CLI works with Auto setup name generator
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
@@ -237,7 +361,7 @@ class UploaderTest extends LogBookApplicationTestCase
 
         //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
         $this->assertSame($failTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $failTestName);
-        $this->assertSame(111, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 111);
+        $this->assertSame(110, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 111);
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());
         $this->assertEquals(3, $cycle->getTests()->count(), 'Check that cycle include 2 created test. count: ' . $cycle->getTests()->count());
         $this->assertEquals(33.33, $cycle->getPassRate(), 'Check that cycle pass rate is 33.33%: Actual = ' . $cycle->getPassRate());
@@ -250,7 +374,7 @@ class UploaderTest extends LogBookApplicationTestCase
 
         /** Check Test Run times */
         $period = 1437;
-        $testTimeSum = 572;
+        $testTimeSum = 571;
         $this->assertEquals($period, $cycle->getPeriod(), 'Check that cycle Tests Period is '.$period.': Actual = ' . $cycle->getPeriod());
         $this->assertEquals($testTimeSum, $cycle->getTestsTimeSum(), 'Check that cycle Tests [Run Time(tests_time_sum)] is '.$testTimeSum.': Actual = ' . $cycle->getTestsTimeSum());
 
@@ -295,10 +419,12 @@ class UploaderTest extends LogBookApplicationTestCase
      * @param string $fileName
      * @param bool $new_setup Mark if setup is new and need to search for setup creation
      */
-    protected function validateNotExistingTestResponse(string $stringResponse, string &$setupName=null, string $token, string $fileName, $new_setup=true): void
+    protected function validateNotExistingTestResponse(string $stringResponse, string &$setupName=null, string $token=null, string $fileName, $new_setup=true): void
     {
         $this->assertNotRegExp('/Failed to generate cycle/', $stringResponse);
-        $this->assertRegExp('/Token provided \['.$token.'\]/', $stringResponse);
+        if ($token !== null) {
+            $this->assertRegExp('/Token provided \['.$token.'\]/', $stringResponse);
+        }
         $this->assertNotRegExp('/WARNING: cycle name changed, updating to new one \[[\w\d]+\]/', $stringResponse);
         $this->assertRegExp('/Cycle not found by token\. Parsing Setup/', $stringResponse);
         if ($setupName !== null) {

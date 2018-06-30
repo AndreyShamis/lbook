@@ -81,7 +81,7 @@ class LogBookTestController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function newAction(Request $request)
+    public function new(Request $request)
     {
         $test = new LogBookTest();
         $form = $this->createForm(LogBookTestType::class, $test);
@@ -306,7 +306,7 @@ class LogBookTestController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
-    public function editAction(Request $request, LogBookTest $test = null)
+    public function edit(Request $request, LogBookTest $test = null)
     {
         try {
             if (!$test) {
@@ -344,7 +344,7 @@ class LogBookTestController extends Controller
      * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookTest $test = null)
+    public function delete(Request $request, LogBookTest $test = null)
     {
         try {
             if (!$test) {

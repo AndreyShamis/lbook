@@ -3,11 +3,14 @@ monolog:
         main:
             type: fingers_crossed
             action_level: error
-            handler: nested
+            handler: grouped
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
-        nested:
+        grouped:
+            type:    group
+            members: [streamed, deduplicated]
+        streamed:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
@@ -16,3 +19,18 @@ monolog:
             type:   console
             process_psr_3_messages: false
             channels: ["!event", "!doctrine"]
+        deduplicated:
+            type: deduplication
+            # the time in seconds during which duplicate entries are discarded (default: 60)
+            time: 300
+            handler: swift
+        swift:
+            type:       swift_mailer
+            from_email: '%env(ADMIN_EMAIL)%'
+            to_email:   '%env(ADMIN_EMAIL)%'
+            # or list of recipients
+            # to_email:   ['dev1@example.com', 'dev2@example.com', ...]
+            subject:    'LogBook Error! %%message%%'
+            level:      error
+            formatter:  monolog.formatter.html
+            content_type: text/html

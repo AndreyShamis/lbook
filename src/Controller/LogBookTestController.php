@@ -121,8 +121,8 @@ class LogBookTestController extends Controller
             $ext = pathinfo($path, PATHINFO_EXTENSION);
 
             if ($ext !== null && $ext !== '') {
-                $tmp = '%d_%s__%d_%s__%s.%s';
-                $retFileName = sprintf($tmp, $setup->getId(), $setup->getName(), $cycle->getId(), $cycle->getName(), $test->getName(), $ext);
+                $tmp = '%d-%d-%d__%s_-_%s_-_%s.%s';
+                $retFileName = sprintf($tmp, $setup->getId(), $cycle->getId(), $test->getId(), $setup->getName(), $cycle->getName(), $test->getName(), $ext);
             }
             return $this->file($path, $retFileName);
         } catch (\Throwable $ex) {

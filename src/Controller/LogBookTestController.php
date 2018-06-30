@@ -102,6 +102,28 @@ class LogBookTestController extends Controller
     }
 
     /**
+     * @param LogBookTest $test
+     * @return bool
+     */
+    protected function isTestFileExist(LogBookTest $test): bool
+    {
+        return file_exists($this->getTestFilePath($test));
+    }
+
+    /**
+     * @param LogBookTest $test
+     * @return string
+     */
+    protected function getTestFilePath(LogBookTest $test): string
+    {
+        $retFileName = $test->getLogFile();
+        $cycle = $test->getCycle();
+        $setup = $cycle->getSetup();
+        $tmp = '../uploads/%d/%d/%s';
+        return sprintf($tmp, $setup->getId(), $cycle->getId(), $retFileName);
+    }
+
+    /**
      * @Route("/{id}/downloadlog", name="download_log", methods={"GET"})
      * @param LogBookTest|null $test
      * @return BinaryFileResponse|Response
@@ -109,20 +131,26 @@ class LogBookTestController extends Controller
     public function downloadLogFile(LogBookTest $test = null): Response
     {
         try {
-            if (!$test) {
+            if (!$test ) {
                 throw new \RuntimeException('');
             }
-            $retFileName = $test->getLogFile();
+
+            if (!$this->isTestFileExist($test)) {
+                throw new \RuntimeException(sprintf('Log file for test [%d:%s] not exist', $test->getId(), $test->getName()));
+            }
+
             $cycle = $test->getCycle();
             $setup = $cycle->getSetup();
-            $tmp = '../uploads/%d/%d/%s';
-            $path = sprintf($tmp, $setup->getId(), $cycle->getId(), $retFileName);
+            $path = $this->getTestFilePath($test);
 
             $ext = pathinfo($path, PATHINFO_EXTENSION);
 
             if ($ext !== null && $ext !== '') {
                 $tmp = '%d-%d-%d__%s_-_%s_-_%s.%s';
                 $retFileName = sprintf($tmp, $setup->getId(), $cycle->getId(), $test->getId(), $setup->getName(), $cycle->getName(), $test->getName(), $ext);
+            } else {
+                $tmp = '%d-%d-%d__%s_-_%s_-_%s.%s';
+                $retFileName = sprintf($tmp, $setup->getId(), $cycle->getId(), $test->getId(), $setup->getName(), $cycle->getName(), $test->getName(), 'txt');
             }
             return $this->file($path, $retFileName);
         } catch (\Throwable $ex) {
@@ -141,12 +169,12 @@ class LogBookTestController extends Controller
             if (!$test) {
                 throw new \RuntimeException('');
             }
-            $retFileName = $test->getLogFile();
-            $cycle = $test->getCycle();
-            $setup = $cycle->getSetup();
-            $tmp = '../uploads/%d/%d/%s';
-            $path = sprintf($tmp, $setup->getId(), $cycle->getId(), $retFileName);
-            $textResponse = new Response(file_get_contents($path) , 200);
+
+            if (!$this->isTestFileExist($test)) {
+                throw new \RuntimeException(sprintf('Log file for test [%d:%s] not exist', $test->getId(), $test->getName()));
+            }
+
+            $textResponse = new Response(file_get_contents($this->getTestFilePath($test)) , 200);
             $textResponse->headers->set('Content-Type', 'text/plain');
             return $textResponse;
         } catch (\Throwable $ex) {
@@ -254,6 +282,7 @@ class LogBookTestController extends Controller
                 'test_left'     => $test_left,
                 'test_right'    => $test_right,
                 'delete_form'   => $deleteForm->createView(),
+                'file_exist'    => $this->isTestFileExist($test),
             ));
         } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);

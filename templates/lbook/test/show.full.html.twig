@@ -25,13 +25,21 @@
                             <tr>
                                 <th>Order</th>
                                 <td>{{ test.executionOrder }}</td>
-                                <th>Download / Show</th>
+                                <th>
+                                    <span title="Click on 'Download' for download log file to your computer">Download</span>
+                                    /
+                                    <span title="Click on 'Show' to view log in row format">Show</span></th>
                                 <td>
-                                    <span class="ace-icon fa fa-cloud-download"> </span>
+                                {% if file_exist %}
+                                    <span class="ace-icon fa fa-cloud-download light-green" title="Click on download for download log file to your computer"> </span>
                                     <a href="{{ path('download_log', {'id': test.id }) }}">Downlaod</a>
                                     /
-                                    <span class="ace-icon fa fa-eye"> </span>
+                                    <span class="ace-icon fa fa-eye green" title="Click on 'Show' to view log in row format"> </span>
                                     <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
+                                {% else %}
+                                    <span class="ace-icon fa fa-exclamation-circle red"> </span>
+                                    Log file not found
+                                {% endif %}
                                 </td>
                             </tr>
                             <tr>
@@ -59,11 +67,11 @@
                                 </td>
                                 <th>Run time / % of cycle time</th>
                                 <td>
-                                    <i class="ace-icon fa fa-info-circle"></i>
+                                    <i class="ace-icon fa fa-info-circle" title="Show test run time"></i>
                                     <span title="{{ test.timeRun }} seconds">{{ test.timeRun |  ExecutionTimeGeneric }}</span>
                                     / &nbsp;&nbsp;
-                                    <i class="ace-icon fa fa-info-circle"></i>
-                                    <span class="orange" title="Show percentage of time in whole cycle">
+                                    <i class="ace-icon fa fa-info-circle" title="Show this test run time percentage in whole cycle"></i>
+                                    <span class="orange">
                                         {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
                                     </span>
                                 </td>

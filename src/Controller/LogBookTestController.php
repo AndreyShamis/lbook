@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
@@ -65,11 +66,12 @@ class LogBookTestController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return Response
      */
-    public function search(Request $request, LogBookTestRepository $testRepo): Response
+    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo): Response
     {
         set_time_limit(30);
         $tests = array();
         $verdict = null;
+        $setups = null;
         $sql = '';
         $test = new LogBookTest();
 
@@ -79,8 +81,12 @@ class LogBookTestController extends Controller
             if (array_key_exists('verdict', $post)) {
                 $verdict = $post['verdict']['name'];
             }
-
+            if (array_key_exists('setup', $post)) {
+                $setups = $post['setup']['name'];
+            }
             $test_name = $post['name'];
+
+
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('1=1')
@@ -88,6 +94,15 @@ class LogBookTestController extends Controller
             if ($verdict !== null && \count($verdict) > 0) {
                 $qb->andWhere('t.verdict IN (:verdict)')
                     ->setParameter('verdict', $verdict);
+            }
+
+            if ($setups !== null && \count($setups) > 0) {
+                $qbCycle = $cycleRepo->createQueryBuilder('c')
+                    ->where('c.setup IN (:setups)')
+                    ->setParameter('setups', $setups);
+                $queryCycle = $qbCycle->getQuery()->getResult();
+                $qb->andWhere('t.cycle IN (:cycles)')
+                    ->setParameter('cycles', $queryCycle);
             }
 
             if ($test_name !== null && \mb_strlen($test_name) > 2) {
@@ -102,7 +117,10 @@ class LogBookTestController extends Controller
 
         try {
             $form->handleRequest($request);
-        } catch (\Exception $ex) { }
+        } catch (\Exception $ex) {
+            //echo $ex->getMessage();
+        }
+
 
         return $this->render('lbook/test/search.html.twig', array(
             'test' => $test,

@@ -3,10 +3,7 @@
 namespace App\Form;
 
 use App\Entity\LogBookTest;
-use App\Entity\LogBookVerdict;
-use Doctrine\ORM\Mapping\Entity;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -59,11 +56,11 @@ class LogBookTestType extends AbstractType
 //                //'entry_options' => array('label' => false),
 //            ))
             ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
+            ->add('setup', LogBookSelectableSetupType::class, array('required' => false))
             //->add('executionOrder')
             ->add('cycle')
             //->add('disabled')
         ;
-
         //                'placeholder' => 'Choose a verdict',
 ////                'compound' => true,
 //                'multiple'  => true,

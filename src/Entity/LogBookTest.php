@@ -257,6 +257,17 @@ class LogBookTest
     }
 
     /**
+     * @return LogBookSetup|null
+     */
+    public function getSetup(): ?LogBookSetup
+    {
+        if ($this->getCycle() !== null) {
+            return $this->getCycle()->getSetup();
+        }
+        return null;
+    }
+
+    /**
      * @return LogBookVerdict
      */
     public function getVerdict(): ?LogBookVerdict

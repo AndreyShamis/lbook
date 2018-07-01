@@ -1,0 +1,24 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Test search</h1>
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {#<h3>Category</h3>#}
+    {#<div class="category">#}
+        {#|VER NAME|#}
+        {#{{ form_row(form.verdict.name) }}#}
+    {#</div>#}
+
+    <input type="submit" value="Search" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li><a href="{{ path('test_index') }}">Back to the list</a></li>
+        <li>    Found {{ tests_count }} tests
+        </li>
+        <li>{{ sql }}</li>
+    </ul>
+
+{% endblock %}

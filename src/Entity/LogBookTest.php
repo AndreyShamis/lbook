@@ -243,7 +243,7 @@ class LogBookTest
     /**
      * @return LogBookCycle
      */
-    public function getCycle(): LogBookCycle
+    public function getCycle(): ?LogBookCycle
     {
         return $this->cycle;
     }

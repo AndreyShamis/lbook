@@ -26,8 +26,14 @@ class LogBookVerdictType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            //'compound' => true,
             // uncomment if you want to bind to a class
             //'data_class' => LogBookVerdict::class,
         ]);
     }
+
+//    public function getParent()
+//    {
+//        return ChoiceType::class;
+//    }
 }

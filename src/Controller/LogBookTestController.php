@@ -60,6 +60,37 @@ class LogBookTestController extends Controller
     }
 
     /**
+     * @Route("/search", name="test_search", methods={"GET|POST"})
+     * @param Request $request
+     * @param LogBookTestRepository $testRepo
+     * @return Response
+     */
+    public function search(Request $request, LogBookTestRepository $testRepo): Response
+    {
+        set_time_limit(30);
+        $tests = array();
+        $test = new LogBookTest();
+        $form = $this->createForm(LogBookTestType::class, $test, array('search' => true));
+        $verdict = $request->request->get('log_book_test')['verdict']['name'];
+        if ($form->isSubmitted() || ($verdict !== null && \count($verdict) > 0)) {
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.verdict IN (:verdict)')
+                ->setParameter('verdict', $verdict)
+                ->orderBy('t.id', 'DESC');
+            $query = $qb->getQuery();
+            $tests = $query->execute();
+            $a = 1;
+        }
+        $form->handleRequest($request);
+
+        return $this->render('lbook/test/search.html.twig', array(
+            'test' => $test,
+            'tests' => $tests,
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
      * Lists all Tests entities.
      *
      * @Route("/", name="test_index_first", methods={"GET"})
@@ -84,7 +115,7 @@ class LogBookTestController extends Controller
     public function new(Request $request)
     {
         $test = new LogBookTest();
-        $form = $this->createForm(LogBookTestType::class, $test);
+        $form = $this->createForm(LogBookTestType::class, $test, array('search' => true));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

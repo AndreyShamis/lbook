@@ -37,7 +37,7 @@ monolog:
         deduplicated:
             type: deduplication
             # the time in seconds during which duplicate entries are discarded (default: 60)
-            time: 30
+            time: 3600
             handler: swift
         swift:
             type:       swift_mailer

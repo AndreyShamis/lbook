@@ -53,10 +53,14 @@ class LogBookVerdict
     }
 
     /**
-     * @param string $name
+     * @param mixed $name
      */
-    public function setName(string $name): void
+    public function setName($name): void
     {
+        if (\is_array($name)) {
+            // used in test search
+            return;
+        }
         $this->name = $name;
     }
 

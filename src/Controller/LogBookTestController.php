@@ -289,11 +289,11 @@ class LogBookTestController extends Controller
             }
 
             $qb = $logRepo->createQueryBuilder('log_book_message')
-                ->where('log_book_message.test = :test')
+                ->where('log_book_message.test = :test2')
                 ->setCacheable(true)
                 ->setLifetime(120)
                 ->orderBy('log_book_message.chain', 'ASC')
-                ->setParameter('test', $test->getId());
+                ->setParameter('test3', $test->getId());
             $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator

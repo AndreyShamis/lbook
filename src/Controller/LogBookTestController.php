@@ -125,8 +125,11 @@ class LogBookTestController extends Controller
         return $this->render('lbook/test/search.html.twig', array(
             'test' => $test,
             'tests' => $tests,
+            'iterator' => $tests,
             'tests_count' => \count($tests),
             'sql' => $sql,
+//            'thisPage'      => 1,
+//            'maxPages'      => 1,
             'form' => $form->createView(),
         ));
     }

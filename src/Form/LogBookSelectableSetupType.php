@@ -41,15 +41,15 @@ class LogBookSelectableSetupType extends AbstractType
         $builder
             ->add('name', ChoiceType::class,
                 array(
-                    'expanded' => true,             // false will convert to checkbox
-                    'label' => 'Select Setup',
+                    //'expanded' => true,             // false will convert to checkbox
+                    'label' => ' ',
                     'choices' => $this->getAllSetups(),
                     'choice_label' => 'Name',
                     'choice_value' => 'Id',
                     'multiple'=> true,
                     'attr' => array(
-                        'style' => 'width:400px;', // min-height:180px;
-                        'class' => 'LogBookSelectableSetupType')
+                        'style' => 'width:400px;display: none;', // min-height:180px;
+                        'class' => 'LogBookSelectableSetupType multiselect')
                 )
             );
     }

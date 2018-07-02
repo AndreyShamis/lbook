@@ -2,16 +2,159 @@
 
 {% block content %}
     <h1>Search tests</h1>
-    {{ form_start(form) }}
+    {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
+    <table>
+        <tr>
+            <td>{{ form_label(form.name, 'Test Name', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.name) }}</td>
+            <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Test Name'}}) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.verdict) }}</td>
+            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.setup) }}</td>
+            <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.cycle) }}</td>
+            <td>
+                {{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)
+            </td>
+        </tr>
+    </table>
+
     {{ form_widget(form) }}
     <input type="submit" value="Search" />
     {{ form_end(form) }}
 
     <ul>
         <li><a href="{{ path('test_index') }}">Back to the list</a></li>
-        <li>    Found {{ tests_count }} tests
-        </li>
+        <li>Found {{ tests_count }} tests</li>
         <li>{{ sql }}</li>
     </ul>
+
+    <div class="row">
+        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
+            <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
+                <div class="widget-header">
+                    <h4 class="widget-title lighter">Search results</h4>
+
+                    <div class="widget-toolbar no-border">
+                        {#<a href="#" data-action="settings">#}
+                            {#<i class="ace-icon fa fa-cog"></i>#}
+                        {#</a>#}
+
+                        <a href="#" data-action="reload">
+                            <i class="ace-icon fa fa-refresh"></i>
+                        </a>
+
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+
+                        <a href="#" data-action="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main padding-6 no-padding-left no-padding-right">
+                        {% include "lbook/search.html.twig" %}
+                        {% set pagePath = "test_search" %}
+                        {#{% include "lbook/paginator.html.twig" %}#}
+                        <div id="testsList">
+                        </div>
+                        <table class="records_list table table-condensed table-hover" data-classes="table table-no-bordered" id="testsListTable"
+                               data-pagination="true" data-search="true" data-toggle="table"
+                               data-show-columns="true"
+                                {#data-detail-view="true"#}
+                                {#data-detail-formatter="detailFormatter"#}
+                                {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+                               data-toolbar="#testsList"
+                               data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
+                            <thead>
+                            <tr>
+                                <th data-sortable="true" title="Test ID">Id</th>
+                                <th data-sortable="true"  data-switchable="false">Setup Name</th>
+                                <th data-sortable="true"  data-switchable="false">Cycle Name</th>
+                                <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
+                                <th data-sorter="htmlSorter" data-sortable="true"  data-switchable="false">Test Name</th>
+                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
+                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+                                <th data-sortable="true">Runtime</th>
+                                <th data-sortable="true" data-visible="false">Uptime</th>
+                                <th data-sortable="true" data-visible="false">Uptime</th>
+                                <th data-sortable="true">Verdict</th>
+                                <th data-sortable="false" data-visible="false">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+                            {% set break = false %}
+                            {% set counter = 0 %}
+                            {% for test in iterator if not break %}
+                                {% if counter == 10000 %}
+                                    {% set break = true %}
+                                {% endif %}
+                                {% set counter = counter+1 %}
+                                <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
+                                    <td>{{ test.id }}</td>
+                                    <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
+                                    <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
+                                    <td>{{ test.executionOrder }}</td>
+                                    <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                                    <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                                    <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                                    <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
+                                    <td>{{ test.dutUpTimeStart }}</td>
+                                    <td>{{ test.dutUpTimeEnd }}</td>
+                                    <td>
+                                        <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>
+                                    </td>
+                                    <td>
+                                        {% if is_granted('edit', test.cycle.setup) %}
+                                            <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+        $(document).ready(
+            function($){
+                $('.multiselect').multiselect({
+                    enableFiltering: true,
+                    enableHTML: true,
+                    buttonClass: 'btn btn-white btn-primary',
+                    templates: {
+                        button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> &nbsp;<b class="fa fa-caret-down"></b></button>',
+                        ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+                        filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+                        filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default btn-white btn-grey multiselect-clear-filter" type="button"><i class="fa fa-times-circle red2"></i></button></span>',
+                        li: '<li><a tabindex="0"><label></label></a></li>',
+                        divider: '<li class="multiselect-item divider"></li>',
+                        liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+                    }
+                });
+            }
+        );
+    </script>
 
 {% endblock %}

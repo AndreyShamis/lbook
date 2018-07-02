@@ -68,3 +68,13 @@ th.meta_data_column{
     font-size: 12px !important;
     line-height: 0.1 !important;
 }
+
+.testSearchSelection button{
+    width: 400px;
+    height: 32px;
+}
+
+.testSearchForm input{
+    width: 400px;
+    height: 32px;
+}

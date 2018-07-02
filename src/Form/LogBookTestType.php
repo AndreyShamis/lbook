@@ -44,17 +44,17 @@ class LogBookTestType extends AbstractType
     public function buildSearchForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, array('required' => false))
+            ->add('name', TextType::class,
+                array(
+                    'required' => false,
+                    'attr' =>
+                        array(
+                            'style' => 'width:400px;'
+                        )
+                ))
             //->add('timeStart')
             //->add('timeEnd')
             //->add('timeRun')
-            //->add('dutUpTimeStart')
-            //->add('dutUpTimeEnd')
-//                ->add('verdict', CollectionType::class, array(
-//                'entry_type' => VerdictType::class,
-//                'compound' => true,
-//                //'entry_options' => array('label' => false),
-//            ))
             ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
             ->add('setup', LogBookSelectableSetupType::class, array('required' => false))
             //->add('executionOrder')

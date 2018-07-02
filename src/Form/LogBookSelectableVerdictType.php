@@ -43,15 +43,16 @@ class LogBookSelectableVerdictType extends AbstractType
         $builder
             ->add('name', ChoiceType::class,
                 array(
-                    'expanded' => true,             // false will convert to checkbox
-                    'label' => 'Select verdict',
+                    //'expanded' => true,             // false will convert to checkbox
+                    'label' => ' ', //'Select verdict',
                     'choices' => $this->getAllVerdicts(),
                     'choice_label' => 'Name',
                     'choice_value' => 'Id',
                     'multiple'=> true,
                     'attr' => array(
-                        'style' => 'width:400px;', // min-height:180px;
-                        'class' => 'LogBookSelectableVerdictType')
+                        'style' => 'width:400px;display: none;', // min-height:180px;
+                        'class' => 'LogBookSelectableVerdictType multiselect',
+                    )
                 )
             );
     }

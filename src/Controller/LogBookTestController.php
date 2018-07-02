@@ -282,7 +282,7 @@ class LogBookTestController extends Controller
      */
     public function showFull(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo): ?Response
     {
-        set_time_limit(5);
+        set_time_limit(10);
         try {
             if (!$test) {
                 throw new \RuntimeException('');

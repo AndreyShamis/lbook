@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\TestSearch;
+use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
@@ -73,11 +75,12 @@ class LogBookTestController extends Controller
         $verdict = null;
         $setups = null;
         $sql = '';
-        $test = new LogBookTest();
+        $test = new TestSearch();
 
-        $form = $this->createForm(LogBookTestType::class, $test, array('search' => true));
+        $form = $this->createForm(TestSearchType::class, $test, array());
         $post = $request->request->get('log_book_test');
         if ($post !== null) {
+            $enableSearch = false;
             if (array_key_exists('verdict', $post)) {
                 $verdict = $post['verdict']['name'];
             }
@@ -86,14 +89,14 @@ class LogBookTestController extends Controller
             }
             $test_name = $post['name'];
 
-
-
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('1=1')
                 ->orderBy('t.id', 'DESC');
+
             if ($verdict !== null && \count($verdict) > 0) {
                 $qb->andWhere('t.verdict IN (:verdict)')
                     ->setParameter('verdict', $verdict);
+                $enableSearch = True;
             }
 
             if ($setups !== null && \count($setups) > 0) {
@@ -103,23 +106,33 @@ class LogBookTestController extends Controller
                 $queryCycle = $qbCycle->getQuery()->getResult();
                 $qb->andWhere('t.cycle IN (:cycles)')
                     ->setParameter('cycles', $queryCycle);
+                $enableSearch = True;
             }
 
             if ($test_name !== null && \mb_strlen($test_name) > 2) {
                 $qb->andWhere('t.name LIKE :test_name')
                     ->setParameter('test_name', '%'.$test_name.'%');
+                $enableSearch = True;
             }
-            $query = $qb->getQuery();
-            $sql = $query->getSQL();
-            $tests = $query->execute();
+            if ($enableSearch) {
+                $query = $qb->getQuery();
+                $sql = $query->getSQL();
+                $tests = $query->execute();
+            }
             $a = 1;
         }
 
-        try {
+//        try {
+//            $v = $form->get('verdict');
+//            $s = $form->get('setup');
+//            $form->remove('verdict');
+//            $form->remove('setup');
             $form->handleRequest($request);
-        } catch (\Exception $ex) {
-            //echo $ex->getMessage();
-        }
+            //$form->add($v)->add($s);
+
+//        } catch (\Exception $ex) {
+//            //echo $ex->getMessage();
+//        }
 
 
         return $this->render('lbook/test/search.html.twig', array(

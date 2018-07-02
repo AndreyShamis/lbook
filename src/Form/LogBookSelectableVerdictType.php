@@ -65,7 +65,7 @@ class LogBookSelectableVerdictType extends AbstractType
     {
         $resolver->setDefaults([
             //'compound' => true,
-            'data_class' => LogBookVerdict::class,
+            'data_class' => null, //LogBookVerdict::class,
         ]);
     }
 }

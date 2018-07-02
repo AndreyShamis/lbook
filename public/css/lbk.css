@@ -69,7 +69,7 @@ th.meta_data_column{
     line-height: 0.1 !important;
 }
 
-.testSearchSelection button{
+.testSearchSelection button[class~="multiselect"]{
     width: 400px;
     height: 32px;
 }

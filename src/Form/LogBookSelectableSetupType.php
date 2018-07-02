@@ -62,7 +62,7 @@ class LogBookSelectableSetupType extends AbstractType
     {
         $resolver->setDefaults([
             //'compound' => true,
-            'data_class' => LogBookSetup::class,
+            'data_class' => null,   //LogBookSetup::class,
         ]);
     }
 }

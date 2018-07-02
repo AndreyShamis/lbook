@@ -78,7 +78,7 @@ class LogBookTestController extends Controller
         $test = new TestSearch();
 
         $form = $this->createForm(TestSearchType::class, $test, array());
-        $post = $request->request->get('log_book_test');
+        $post = $request->request->get('test_search');
         if ($post !== null) {
             $enableSearch = false;
             if (array_key_exists('verdict', $post)) {
@@ -122,17 +122,9 @@ class LogBookTestController extends Controller
             $a = 1;
         }
 
-//        try {
-//            $v = $form->get('verdict');
-//            $s = $form->get('setup');
-//            $form->remove('verdict');
-//            $form->remove('setup');
+        try {
             $form->handleRequest($request);
-            //$form->add($v)->add($s);
-
-//        } catch (\Exception $ex) {
-//            //echo $ex->getMessage();
-//        }
+        } catch (\Exception $ex) {}
 
 
         return $this->render('lbook/test/search.html.twig', array(

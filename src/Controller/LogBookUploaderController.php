@@ -45,6 +45,7 @@ class LogBookUploaderController extends Controller
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
     protected $log_first_lines = array();
     public static $MAX_EXEC_ORDER_SEARCH_COUNTER = 50;
+    public static $UPLOAD_PATH = __DIR__ . '/../../uploads/';
 
     /**
      * LogBookUploaderController constructor.
@@ -53,6 +54,7 @@ class LogBookUploaderController extends Controller
      */
     public function __construct(Container $container)
     {
+        self::$UPLOAD_PATH = realpath(self::$UPLOAD_PATH);
         $this->container = $container;
         $this->em = $this->getDoctrine()->getManager();
         $this->testsRepo = $this->em->getRepository('App:LogBookTest');
@@ -273,8 +275,13 @@ class LogBookUploaderController extends Controller
             if ($continue) {
                 $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
 
-                /** @var UploadedFile $new_file */
-                $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
+                try {
+                    /** @var UploadedFile $new_file */
+                    $new_file = $file->move(self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
+                } catch (Exception $ex) {
+                    echo $ex->getMessage();
+                }
+
 
                 $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
                 $obj->setLogFile($fileName);

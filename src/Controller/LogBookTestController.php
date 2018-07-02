@@ -91,7 +91,8 @@ class LogBookTestController extends Controller
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('1=1')
-                ->orderBy('t.id', 'DESC');
+                ->orderBy('t.id', 'DESC')
+                ->setMaxResults(2000);
 
             if ($verdict !== null && \count($verdict) > 0) {
                 $qb->andWhere('t.verdict IN (:verdict)')

@@ -8,6 +8,14 @@ use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
+use App\Repository\LogBookBuildRepository;
+use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookMessageRepository;
+use App\Repository\LogBookMessageTypeRepository;
+use App\Repository\LogBookSetupRepository;
+use App\Repository\LogBookTargetRepository;
+use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookVerdictRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -30,14 +38,23 @@ class LogBookUploaderController extends Controller
 {
     /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em;
+    /** @var LogBookTestRepository $testsRepo */
     protected $testsRepo;
+    /** @var LogBookCycleRepository $cycleRepo */
     protected $cycleRepo;
+    /** @var LogBookVerdictRepository $verdictRepo */
     protected $verdictRepo;
+    /** @var LogBookMessageTypeRepository $msgTypeRepo */
     protected $msgTypeRepo;
+    /** @var LogBookMessageRepository $logsRepo */
     protected $logsRepo;
+    /** @var LogBookSetupRepository $setupRepo */
     protected $setupRepo;
+    /** @var LogBookBuildRepository $buildRepo */
     protected $buildRepo;
+    /** @var LogBookTargetRepository $targetRepo */
     protected $targetRepo;
+    
     protected $_MIN_LOG_STR_LEN = 10;
     protected $_MIN_CLEAN_LOG_STR_LEN = 1;
     protected $_SHORT_TIME_LEN = 8;             // 12:48:45

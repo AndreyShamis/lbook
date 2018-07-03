@@ -72,7 +72,7 @@
             </td>
         </tr>
 
-        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN'] %}
+        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN'] %}
         {% for key, value in setup|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>
@@ -134,7 +134,7 @@
                 <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
-                <td title="{{ cycle.build }}"><a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a></td>
+                <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>

@@ -11,6 +11,7 @@ use App\Entity\LogBookSetup;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\ORMException;
 use Exception;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -356,6 +357,16 @@ class LogBookUploaderController extends Controller
                 } catch (Exception $e) {
                 }
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+            } catch (ORMException $ex) {
+                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
+                $counter++;
+                try {
+                    /** sleep for 0.2-0.5 second */
+                    usleep(\random_int(200000, 5000000));
+                } catch (Exception $e) {
+                }
+                $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+                $this->testsRepo  = $this->em->getRepository('App:LogBookTest');
             }
         }
 

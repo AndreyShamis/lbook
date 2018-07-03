@@ -78,3 +78,7 @@ th.meta_data_column{
     width: 400px;
     height: 32px;
 }
+
+.ui-datepicker{
+    width: auto !important;
+}

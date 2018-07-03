@@ -17,18 +17,22 @@
     <link rel="stylesheet" href="{{ asset('assets/font-awesome/4.2.0/css/font-awesome.min.css') }}" />
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="{{ asset('assets/bootstrap-table/1.12.1/bootstrap-table.min.css') }}">
-
+    {#<link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.custom.min.css') }}" />#}
+    <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.min.css') }}" />
     <!-- page specific plugin styles -->
     <!-- text fonts -->
     <link rel="stylesheet" href="{{ asset('assets/fonts/fonts.googleapis.com.css') }}" />
 
     <!-- ace styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/ace.min.css') }}" class="ace-main-stylesheet" id="main-ace-style" />
-    <!--[if lte IE 9] -->
+    <link rel="stylesheet" href="{{ asset('assets/css/ace-skins.min.css') }}" />
+    <!--[if lte IE 9]>
     <link rel="stylesheet" href="{{ asset('assets/css/ace-part2.min.css') }}" class="ace-main-stylesheet" />
-    <!-- <![endif]-->
+    <![endif]-->
+
     <!--[if lte IE 9] -->
     <link rel="stylesheet" href="{{ asset('assets/css/ace-ie.min.css') }}" />
+
     <!-- <![endif]-->
     <!--[if !IE]> -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -46,6 +50,7 @@
     <script src="{{ asset('assets/js/html5shiv.min.js') }}"></script>
     <script src="{{ asset('assets/js/respond.min.js') }}"></script>
     <![endif]-->
+
 
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -84,8 +89,9 @@
     {#<!-- Latest compiled and minified Locales -->#}
     {#<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js"></script>#}
     <!-- page specific plugin scripts -->
-    <script src="{{ asset('assets/js/jquery-ui.custom.min.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.ui.touch-punch.min.js') }}"></script>
+    {#<script src="{{ asset('assets/js/jquery-ui.custom.min.js') }}"></script>#}
+    <script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
+    {#<script src="{{ asset('assets/js/jquery.ui.touch-punch.min.js') }}"></script>#}
     <script src="{{ asset('assets/js/jquery.easypiechart.min.js') }}"></script>
 </head>
 <body class="no-skin">

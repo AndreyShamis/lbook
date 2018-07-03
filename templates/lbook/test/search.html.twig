@@ -20,6 +20,30 @@
             <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
         </tr>
         <tr>
+            <td>Start Date</td>
+            <td></td>
+            <td>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            <label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            <label for="toDate"></label><input type="text" id="toDate" class="form-control" />
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
             <td>{{ form_errors(form.cycle) }}</td>
             <td>
@@ -42,25 +66,56 @@
 
     <!-- inline scripts related to this page -->
     <script type="text/javascript">
+        function setDatePicker(obj){
+            $(obj).datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: false,
+                // isRTL:true,
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                beforeShow: function() {
+                    //change button colors
+                    var datepicker = $(this).datepicker( "widget" );
+                    setTimeout(function(){
+                        var buttons = datepicker.find('.ui-datepicker-buttonpane')
+                        .find('button');
+                        buttons.eq(0).addClass('btn btn-xs');
+                        buttons.eq(1).addClass('btn btn-xs btn-success');
+                        buttons.wrapInner('<span class="bigger-110" />');
+                    }, 0);
+                }
+
+            });
+        }
+
+        function setMultiSelect(){
+            $('.multiselect').multiselect({
+                enableFiltering: true,
+                enableHTML: true,
+                buttonClass: 'btn btn-white btn-primary',
+                templates: {
+                    button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> &nbsp;<b class="fa fa-caret-down"></b></button>',
+                    ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+                    filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+                    filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default btn-white btn-grey multiselect-clear-filter" type="button"><i class="fa fa-times-circle red2"></i></button></span>',
+                    li: '<li><a tabindex="0"><label></label></a></li>',
+                    divider: '<li class="multiselect-item divider"></li>',
+                    liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+                }
+            });
+        }
+
         $(document).ready(
             function($){
-                $('.multiselect').multiselect({
-                    enableFiltering: true,
-                    enableHTML: true,
-                    buttonClass: 'btn btn-white btn-primary',
-                    templates: {
-                        button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> &nbsp;<b class="fa fa-caret-down"></b></button>',
-                        ul: '<ul class="multiselect-container dropdown-menu"></ul>',
-                        filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
-                        filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default btn-white btn-grey multiselect-clear-filter" type="button"><i class="fa fa-times-circle red2"></i></button></span>',
-                        li: '<li><a tabindex="0"><label></label></a></li>',
-                        divider: '<li class="multiselect-item divider"></li>',
-                        liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
-                    }
-                });
+                setMultiSelect();
+                setDatePicker("#fromDate");
+                setDatePicker("#toDate");
             }
         );
     </script>
+
+
 
     <div class="row">
         <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">

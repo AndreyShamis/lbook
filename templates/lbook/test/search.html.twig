@@ -97,7 +97,7 @@
                         buttons.eq(0).addClass('btn btn-xs');
                         buttons.eq(1).addClass('btn btn-xs btn-success');
                         buttons.wrapInner('<span class="bigger-110" />');
-                    }, 0);
+                    }, 10);
                 }
 
             });
@@ -173,18 +173,19 @@
                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
                             <thead>
                             <tr>
-                                <th data-sortable="true" title="Test ID">Id</th>
-                                <th data-sortable="true"  data-switchable="false">Setup Name</th>
-                                <th data-sortable="true"  data-switchable="false">Cycle Name</th>
-                                <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
+                                <th data-sortable="true" title="Test ID">ID</th>
+                                <th data-sortable="true"  data-switchable="true">Setup Name</th>
+                                <th data-sortable="true"  data-switchable="true">Cycle Name</th>
                                 <th data-sorter="htmlSorter" data-sortable="true"  data-switchable="false">Test Name</th>
+                                <th data-sorter="htmlSorter" data-visible="false" data-sortable="true"  data-switchable="true">Test Build</th>
+                                <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
                                 <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
                                 <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
                                 <th data-sortable="true">Runtime</th>
-                                <th data-sortable="true" data-visible="false">Uptime</th>
-                                <th data-sortable="true" data-visible="false">Uptime</th>
+                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
+                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
                                 <th data-sortable="true">Verdict</th>
-                                <th data-sortable="false" data-visible="false">Actions</th>
+                                {#<th data-sortable="false" data-visible="false">Actions</th>#}
                             </tr>
                             </thead>
                             <tbody class="searchable">
@@ -199,21 +200,22 @@
                                     <td>{{ test.id }}</td>
                                     <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
                                     <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
-                                    <td>{{ test.executionOrder }}</td>
                                     <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                                    <td><a href="{{ path('build_show_cycles_first', { 'id': test.cycle.build.id  }) }}">{{ test.cycle.build }}</a></td>
+                                    <td>{{ test.executionOrder }}</td>
                                     <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
-                                    <td>{{ test.dutUpTimeStart }}</td>
-                                    <td>{{ test.dutUpTimeEnd }}</td>
+                                    {#<td>{{ test.dutUpTimeStart }}</td>#}
+                                    {#<td>{{ test.dutUpTimeEnd }}</td>#}
                                     <td>
                                         <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>
                                     </td>
-                                    <td>
-                                        {% if is_granted('edit', test.cycle.setup) %}
-                                            <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>
-                                        {% endif %}
-                                    </td>
+                                    {#<td>#}
+                                        {#{% if is_granted('edit', test.cycle.setup) %}#}
+                                            {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                                        {#{% endif %}#}
+                                    {#</td>#}
                                 </tr>
                             {% endfor %}
                             </tbody>

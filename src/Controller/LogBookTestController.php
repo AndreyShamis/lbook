@@ -101,7 +101,7 @@ class LogBookTestController extends Controller
             $toDate = $post['toDate'];
 
             $qb = $testRepo->createQueryBuilder('t')
-                ->where('1=1')
+                ->where('t.disabled = 0')
                 ->orderBy('t.id', 'DESC')
                 ->setMaxResults(2000);
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
@@ -148,8 +148,9 @@ class LogBookTestController extends Controller
             }
 
             if ($test_name !== null && \mb_strlen($test_name) > 2) {
-                $qb->andWhere('t.name LIKE :test_name')
-                    ->setParameter('test_name', '%'.$test_name.'%');
+                $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata')
+                    ->setParameter('test_name', '%'.$test_name.'%')
+                    ->setParameter('metadata', $test_name.'%');
                 $enableSearch = True;
             }
             if ($enableSearch) {

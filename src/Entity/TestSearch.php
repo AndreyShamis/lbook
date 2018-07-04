@@ -21,6 +21,29 @@ class TestSearch
 
     protected $toDate;
 
+    /** @var int  */
+    protected $limit=2000;
+
+    /**
+     * @return int
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param int $limit
+     */
+    public function setLimit(int $limit = null): void
+    {
+        if ($limit === null) {
+            $this->limit = 2000;
+        } else {
+            $this->limit = $limit;
+        }
+    }
+
     /**
      * @return mixed
      */

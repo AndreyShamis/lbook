@@ -53,12 +53,17 @@
             </td>
         </tr>
         <tr>
-            <td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.cycle) }}</td>
-            <td>
-                {{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)
-            </td>
+            <td>{{ form_label(form.limit) }}</td>
+            <td>{{ form_errors(form.limit) }}</td>
+            <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
         </tr>
+        {#<tr>#}
+            {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
+            {#<td>{{ form_errors(form.cycle) }}</td>#}
+            {#<td>#}
+                {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
+            {#</td>#}
+        {#</tr>#}
     </table>
 
     {{ form_widget(form) }}

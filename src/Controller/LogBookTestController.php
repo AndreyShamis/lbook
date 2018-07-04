@@ -103,7 +103,7 @@ class LogBookTestController extends Controller
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.disabled = 0')
                 ->orderBy('t.id', 'DESC')
-                ->setMaxResults(2000);
+                ->setMaxResults($test->getLimit());
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
                 $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
                 if ($startDate !== false) {

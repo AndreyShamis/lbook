@@ -41,8 +41,9 @@ class TestSearchType extends AbstractType
             //->add('timeRun')
             ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
             ->add('setup', LogBookSelectableSetupType::class, array('required' => false))
+            ->add('limit', QueryLimitType::class)
             //->add('executionOrder')
-            ->add('cycle')
+//            ->add('cycle')
             //->add('disabled')
         ;
 

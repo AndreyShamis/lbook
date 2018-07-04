@@ -17,6 +17,42 @@ class TestSearch
 
     protected $setups;
 
+    protected $fromDate;
+
+    protected $toDate;
+
+    /**
+     * @return mixed
+     */
+    public function getToDate()
+    {
+        return $this->toDate;
+    }
+
+    /**
+     * @param mixed $toDate
+     */
+    public function setToDate($toDate): void
+    {
+        $this->toDate = $toDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFromDate()
+    {
+        return $this->fromDate;
+    }
+
+    /**
+     * @param mixed $fromDate
+     */
+    public function setFromDatet($fromDate): void
+    {
+        $this->fromDate = $fromDate;
+    }
+
     /**
      * @return string
      */

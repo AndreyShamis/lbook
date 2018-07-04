@@ -14,7 +14,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
 class TestSearchType extends AbstractType
 {
 
@@ -33,8 +32,12 @@ class TestSearchType extends AbstractType
                             'style' => 'width:400px;'
                         )
                 ))
-            //->add('timeStart')
-            //->add('timeEnd')
+            ->add('fromDate', TextType::class, array(
+                'required' => false,
+                'attr' => array('class' => 'form-control')))
+            ->add('toDate', TextType::class, array(
+                'required' => false,
+                'attr' => array('class' => 'form-control')))
             //->add('timeRun')
             ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
             ->add('setup', LogBookSelectableSetupType::class, array('required' => false))

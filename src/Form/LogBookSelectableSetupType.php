@@ -7,7 +7,6 @@
 
 namespace App\Form;
 
-
 use App\Entity\LogBookSetup;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;

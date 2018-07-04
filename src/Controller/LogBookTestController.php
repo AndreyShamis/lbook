@@ -75,7 +75,11 @@ class LogBookTestController extends Controller
         $verdict = null;
         $setups = null;
         $sql = '';
+        $leftDate = $rightDate = false;
+        $startDate = $endDate = null;
+        $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
         $test = new TestSearch();
+
 
         $form = $this->createForm(TestSearchType::class, $test, array());
         try {
@@ -93,11 +97,39 @@ class LogBookTestController extends Controller
                 $setups = $post['setup']['name'];
             }
             $test_name = $post['name'];
+            $fromDate = $post['fromDate'];
+            $toDate = $post['toDate'];
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('1=1')
                 ->orderBy('t.id', 'DESC')
                 ->setMaxResults(2000);
+            if ($fromDate !== null && mb_strlen($fromDate) > 7) {
+                $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
+                if ($startDate !== false) {
+                    $leftDate = true;
+                }
+            }
+            if ($toDate !== null && mb_strlen($toDate) > 7) {
+                $endDate = \DateTime::createFromFormat('m/d/Y H:i', $toDate . '23:59');
+                if ($endDate !== false) {
+                    $rightDate = true;
+                }
+            }
+            if ($leftDate === true && $rightDate === true) {
+                $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($leftDate === true) {
+                $qb->andWhere('t.timeStart >= :fromDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($rightDate === true) {
+                $qb->andWhere('t.timeEnd <= :endDate')
+                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            }
 
             if ($verdict !== null && \count($verdict) > 0) {
                 $qb->andWhere('t.verdict IN (:verdict)')

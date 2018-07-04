@@ -20,13 +20,21 @@
             <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
         </tr>
         <tr>
-            <td>Start Date</td>
-            <td></td>
+            <td>
+                {{ form_label(form.fromDate) }}
+                /
+                {{ form_label(form.toDate) }}
+            </td>
+            <td>
+                {{ form_errors(form.fromDate) }}
+                {{ form_errors(form.toDate) }}
+            </td>
             <td>
                 <div class="row">
                     <div class="col-xs-6">
                         <div class="input-group input-group-sm">
-                            <label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />
+                            {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
+                            {{ form_widget(form.fromDate) }}
                             <span class="input-group-addon">
                                 <i class="ace-icon fa fa-calendar"></i>
                             </span>
@@ -34,7 +42,8 @@
                     </div>
                     <div class="col-xs-6">
                         <div class="input-group input-group-sm">
-                            <label for="toDate"></label><input type="text" id="toDate" class="form-control" />
+                            {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
+                            {{ form_widget(form.toDate) }}
                             <span class="input-group-addon">
                                 <i class="ace-icon fa fa-calendar"></i>
                             </span>
@@ -109,8 +118,8 @@
         $(document).ready(
             function($){
                 setMultiSelect();
-                setDatePicker("#fromDate");
-                setDatePicker("#toDate");
+                setDatePicker("#test_search_fromDate");
+                setDatePicker("#test_search_toDate");
             }
         );
     </script>

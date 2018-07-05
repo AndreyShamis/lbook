@@ -488,7 +488,7 @@ class LogBookUploaderController extends Controller
 
         $testVerdict = null;
 
-        $controlFile = $controlVersion = $testVersion = '';
+        $controlFile = $controlFullFile = $controlVersion = $testVersion = '';
 
 //        if (count($this->log_first_lines)) {
 //            /**
@@ -584,7 +584,7 @@ class LogBookUploaderController extends Controller
                     if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
                         if ($tmpName !== null) {
-                            $controlFile = $tmpName;
+                            $controlFullFile = $tmpName;
                             $tmpTestNameFlag_AutotestTestPrint = true;
                         }
                     } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
@@ -644,6 +644,7 @@ class LogBookUploaderController extends Controller
         }
         $test->addMetaData(array(
             'TEST_FILENAME' => $controlFile,
+            'CONTROL_FILENAME_SHOW_OPT' => $controlFullFile,
             'TEST_VERSION_SHOW_OPT' => $testVersion,
             'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
         ));

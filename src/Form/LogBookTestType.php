@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\LogBookTest;
 use App\Entity\TestSearch;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -37,7 +38,7 @@ class LogBookTestType extends AbstractType
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class
-            'data_class' => TestSearch::class,
+            'data_class' => LogBookTest::class,
         ]);
     }
 }

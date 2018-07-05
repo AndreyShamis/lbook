@@ -204,6 +204,7 @@ class LogBookCycleController extends Controller
             $nul_found = 0;
 
             $additional_cols = array();
+            $additional_opt_cols = array();
             $iterator->rewind();
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
@@ -219,6 +220,8 @@ class LogBookCycleController extends Controller
                             foreach ($md as $key => $value) {
                                 if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
                                     $additional_cols[] = $key;
+                                } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
+                                    $additional_opt_cols[] = $key;
                                 }
                             }
                         }
@@ -237,15 +240,16 @@ class LogBookCycleController extends Controller
             }
 
             return $this->render('lbook/cycle/show.full.html.twig', array(
-                'cycle'             => $cycle,
-                'size'              => $totalPosts,
-                'maxPages'          => $maxPages,
-                'thisPage'          => $thisPage,
-                'iterator'          => $iterator,
-                'paginator'         => $paginator,
-                'disabled_uptime'   => $disable_uptime,
-                'delete_form'       => $deleteForm->createView(),
-                'additional_cols'   => $additional_cols
+                'cycle'                 => $cycle,
+                'size'                  => $totalPosts,
+                'maxPages'              => $maxPages,
+                'thisPage'              => $thisPage,
+                'iterator'              => $iterator,
+                'paginator'             => $paginator,
+                'disabled_uptime'       => $disable_uptime,
+                'delete_form'           => $deleteForm->createView(),
+                'additional_cols'       => $additional_cols,
+                'additional_opt_cols'   => $additional_opt_cols,
             ));
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);

@@ -255,6 +255,11 @@
                     <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
                 {% endfor %}
             {% endif %}
+            {% if show_metadata == true %}
+                {% for key, item in additional_opt_cols %}
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 15) }}</th>
+                {% endfor %}
+            {% endif %}
             {% if disabled_uptime == false and show_uptime == true %}
                 <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
                 <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
@@ -305,6 +310,21 @@
                                 </span>
                         {% endif %}
                         {% endif %}
+                        </td>
+                    {% endfor %}
+                {% endif %}
+                {% if show_metadata == true %}
+                    {% for key, item in additional_opt_cols %}
+                        <td title="{{ item }}">
+                            {% if item in test.metaData|keys %}
+                                {% if isUrl(test.metaData[item]) %}
+                                    <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                                {% else %}
+                                    <span title="{{ test.metaData[item] }}">
+                                    {{ shortString(test.metaData[item], 35) }}
+                                </span>
+                                {% endif %}
+                            {% endif %}
                         </td>
                     {% endfor %}
                 {% endif %}

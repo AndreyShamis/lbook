@@ -1,12 +1,27 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Test [{{ test.id }}:{{ test.name }}] {% endblock %}
 {% block content %}
-    <h3>
-        <a href="{{ path('setup_show', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a>
-        /
-        <a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a>
-        /
-        Test [{{ test.id }}] : {{ test.name }}</h3>
+    <div class="row">
+        <div class="col-xs-10">
+            <h3 class="test_title">
+                <a href="{{ path('setup_show', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a>
+                /
+                <a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a>
+                /
+                Test [{{ test.id }}] : {{ test.name }}
+            </h3>
+        </div>
+
+        <div class="col-xs-2">
+            {#<span style="float: right;">#}
+                {#<button class="btn btn-white btn-info btn-bold" id="saveTestAsText">#}
+                    {#<i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>#}
+                    {#Download#}
+                {#</button>#}
+            {#</span>#}
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-12">
             <div class="tabbable">

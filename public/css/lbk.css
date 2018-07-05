@@ -83,6 +83,10 @@ th.meta_data_column{
     width: auto !important;
 }
 
+.test_title{
+    margin-top: 0 !important;
+}
+
 .cycle_title{
     margin-top: 0 !important;
 }

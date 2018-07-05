@@ -83,6 +83,27 @@ class LogBookTest
     protected $dutUpTimeEnd = 0;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="test_version", type="string", length=255)
+     */
+    protected $testVersion = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="test_file_name", type="string", length=255)
+     */
+    protected $testFileName = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="test_file_version", type="string", length=255)
+     */
+    protected $testFileVersion = '';
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\LogBookCycle", inversedBy="tests", cascade={"persist"})
      * @ORM\JoinColumn(name="cycle", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      * @ORM\OrderBy({"id" = "ASC"})
@@ -463,5 +484,53 @@ class LogBookTest
         } else {
             $this->setDisabled(false);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestVersion(): string
+    {
+        return $this->testVersion;
+    }
+
+    /**
+     * @param string $testVersion
+     */
+    public function setTestVersion(string $testVersion): void
+    {
+        $this->testVersion = $testVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestFileName(): string
+    {
+        return $this->testFileName;
+    }
+
+    /**
+     * @param string $testFileName
+     */
+    public function setTestFileName(string $testFileName): void
+    {
+        $this->testFileName = $testFileName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestFileVersion(): string
+    {
+        return $this->testFileVersion;
+    }
+
+    /**
+     * @param string $testFileVersion
+     */
+    public function setTestFileVersion(string $testFileVersion): void
+    {
+        $this->testFileVersion = $testFileVersion;
     }
 }

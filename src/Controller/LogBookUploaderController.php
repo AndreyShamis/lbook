@@ -679,6 +679,7 @@ class LogBookUploaderController extends Controller
                                 $controlVersion = $tmpName[1];
                             }
                             $tmpName = $tmpName[0]; // set $tmpName to be first element in array(control file name)
+                            $controlFile = $tmpName;
                         }
                     } else if (!$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogControlPrint($log, true);
@@ -728,6 +729,9 @@ class LogBookUploaderController extends Controller
         /**
          * Test Verdict section
          */
+        $test->setTestFileName($controlFile);
+        $test->setTestFileVersion($controlVersion);
+        $test->setTestVersion($testVersion);
         if ($testVerdict !== null) {
             $test->setVerdict($testVerdict);
         } else {

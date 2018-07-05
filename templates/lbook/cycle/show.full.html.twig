@@ -257,7 +257,7 @@
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_opt_cols %}
-                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 15) }}</th>
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
                 {% endfor %}
             {% endif %}
             {% if disabled_uptime == false and show_uptime == true %}
@@ -321,7 +321,7 @@
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
                                     <span title="{{ test.metaData[item] }}">
-                                    {{ shortString(test.metaData[item], 35) }}
+                                    {{ shortString(test.metaData[item], 50) }}
                                 </span>
                                 {% endif %}
                             {% endif %}

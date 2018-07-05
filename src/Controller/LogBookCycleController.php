@@ -66,8 +66,8 @@ class LogBookCycleController extends Controller
             return '';
         }
         $setup = $cycle->getSetup();
-        $tmp = '%s/%d/';
-        return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId());
+        $tmp = '%s/%d/%d/';
+        return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId(), $cycle->getId());
     }
 
     /**
@@ -95,7 +95,7 @@ class LogBookCycleController extends Controller
             $zip = new \ZipArchive();
             $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
             $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
-            $zip->open($zipName,  \ZipArchive::CREATE);
+            $zip->open($zipName,  \ZipArchive::OVERWRITE);
             foreach ($files as $f) {
                 $zip->addFromString(basename($f),  file_get_contents($f));
             }

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
-use Symfony\Component\Finder\Finder;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +14,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookCycleType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Service\PagePaginator;
+use Symfony\Component\Filesystem\Filesystem;
+
 
 /**
  * Cycle controller.
@@ -66,7 +67,7 @@ class LogBookCycleController extends Controller
             return '';
         }
         $setup = $cycle->getSetup();
-        $tmp = '%s/%d/%d';
+        $tmp = '%s/%d/%d/';
         return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId(), $cycle->getId());
     }
 
@@ -83,25 +84,25 @@ class LogBookCycleController extends Controller
             if (!$cycle) {
                 throw new \RuntimeException('');
             }
+            $fileSystem = new Filesystem();
             $path = $this->getLogsFolder($cycle);
-            $finder = new Finder();
-            $finder->files()->in($path);
-
-            $files = array();
-            foreach ($finder as $file) {
-                $files[] = $file->getRealPath();
-            }
 
             $zip = new \ZipArchive();
             $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
             $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
 
             $zip->open($zipName,  \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-            foreach ($files as $f) {
-                $zip->addFromString(basename($f),  file_get_contents($f));
-            }
-            $zip->close();
 
+            /** @var LogBookTest $test */
+            foreach ($cycle->getTests() as $test) {
+                $log_path = $path . $test->getLogFile();
+                if ($fileSystem->exists($log_path)) {
+                    $newFileName = $test->getExecutionOrder() . '__' . $test->getName() . '.txt';
+                    $zip->addFromString(basename($newFileName),  file_get_contents($log_path));
+                }
+            }
+
+            $zip->close();
             $response = new Response(file_get_contents($zipName));
             $response->headers->set('Content-Type', 'application/zip');
             $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');

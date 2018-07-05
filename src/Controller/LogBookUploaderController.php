@@ -572,6 +572,8 @@ class LogBookUploaderController extends Controller
 
         $testVerdict = null;
 
+        $controlFile = $controlVersion = $testVersion = '';
+
 //        if (count($this->log_first_lines)) {
 //            /**
 //             * TODO : Need First time in test
@@ -666,18 +668,27 @@ class LogBookUploaderController extends Controller
                     if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
                         if ($tmpName !== null) {
+                            $controlFile = $tmpName;
                             $tmpTestNameFlag_AutotestTestPrint = true;
                         }
                     } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, false);
+                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_TestPrint = true;
+                            if ($tmpName[1] !== null) {
+                                $controlVersion = $tmpName[1];
+                            }
+                            $tmpName = $tmpName[0]; // set $tmpName to be first element in array(control file name)
                         }
                     } else if (!$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log, false);
+                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log, true);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_ControlTestPrint = true;
                             $testNameFound = true;
+                            if ($tmpName[1] !== null) {
+                                $testVersion = $tmpName[1];
+                            }
+                            $tmpName = $tmpName[0]; // set $tmpName to be first element in array(test name)
                         }
                     }
 
@@ -818,21 +829,26 @@ class LogBookUploaderController extends Controller
      * Used to parse Control print of test name with version, grup test name and test version
      * @param LogBookMessage $log
      * @param bool $includeVersion
-     * @return null|string
+     * @return null|array
      */
-    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true): ?string
+    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true): ?array
     {
         $ret = null;
-        preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)]*)\]\s*\(ver\.\s*(\d+\.?\d*)\,/', $log->getMessage(), $possibleName);
-        if (\count($possibleName) === 3) {
-            $dirty = $possibleName[0];
-            $testName = $possibleName[1];
-            $testVersion = $possibleName[2];
-            if (\strlen($dirty) > 0 && \strlen($testName) > 0 && \strlen($testVersion) > 0) {
-                if ($includeVersion) {
-                    $ret = $testName . ' ' . $testVersion;
+        [$dirty, $testName, $testVersion] = array('', '', '');
+        preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)]*)\]\s*(?>\(ver\.\s*(\d+\.?\d*))?/', $log->getMessage(), $matches);
+        if (\count($matches) >= 2) {
+            if (\count($matches) === 3) {
+                [$dirty, $testName, $testVersion] = $matches;
+            } else if (\count($matches) === 2) {
+                $testVersion = '';
+                [$dirty, $testName] = $matches;
+            }
+
+            if (\mb_strlen($dirty) > 0 && \mb_strlen($testName) > 0) {
+                if ($includeVersion && \mb_strlen($testVersion) > 0) {
+                    $ret = [$testName, $testVersion];
                 } else {
-                    $ret = $testName;
+                    $ret = [$testName, null];
                 }
             }
         }
@@ -844,21 +860,26 @@ class LogBookUploaderController extends Controller
      * Used to parse test print of test name with version, grup test name and test version
      * @param LogBookMessage $log
      * @param bool $includeVersion
-     * @return null|string
+     * @return null|array
      */
-    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true): ?string
+    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true): ?array
     {
         $ret = null;
-        preg_match('/\=+\s*Initialize\s*(.*)\s*test\s*\(ver\.\s*(\d+\.?\d*)\)/', $log->getMessage(), $possibleName);
-        if (\count($possibleName) === 3) {
-            $dirty = $possibleName[0];
-            $testName = $possibleName[1];
-            $testVersion = $possibleName[2];
-            if (\strlen($dirty) > 0 && \strlen($testName) > 0 && \strlen($testVersion) > 0) {
-                if ($includeVersion) {
-                    $ret = $testName . ' ' . $testVersion;
+        [$dirty, $testName, $testVersion] = array('', '', '');
+        preg_match('/\=+\s*Initialize\s*(.*)\s*test\s*(?>\(ver\.\s*(\d+\.?\d*)\))?/', $log->getMessage(), $matches);
+        if (\count($matches) >= 2) {
+            if (\count($matches) === 3) {
+                [$dirty, $testName, $testVersion] = $matches;
+            } else if (\count($matches) === 2) {
+                $testVersion = '';
+                [$dirty, $testName] = $matches;
+            }
+
+            if (\mb_strlen($dirty) > 0 && \mb_strlen($testName) > 0) {
+                if ($includeVersion && \mb_strlen($testVersion) > 0) {
+                    $ret = [$testName, $testVersion];
                 } else {
-                    $ret = $testName;
+                    $ret = [$testName, null];
                 }
             }
         }
@@ -874,11 +895,10 @@ class LogBookUploaderController extends Controller
     protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log): ?string
     {
         $ret = null;
-        preg_match('/START\s*([\w\.\/]*)\s*/', $log->getMessage(), $possibleName);
-        if (\count($possibleName) === 2) {
-            $dirty = $possibleName[0];
-            $testName = $possibleName[1];
-            if (\strlen($dirty) > 0 && \strlen($testName) > 0 ) {
+        preg_match('/START\s+([\w\.\/\-]+)\s+/', $log->getMessage(), $matches);
+        if (\count($matches) === 2) {
+            [$dirty, $testName] = $matches;
+            if (\mb_strlen($dirty) > 0 && \mb_strlen($testName) > 0 ) {
                 $ret = $testName;
             }
         }

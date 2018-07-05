@@ -412,90 +412,6 @@ class LogBookUploaderController extends Controller
     }
 
     /**
-     * Creates a new Upload entity.
-     *
-     * @Route("/new", name="upload_new", methods={"GET|POST"})
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException
-     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
-     */
-    public function newWeb(Request $request)
-    {
-        //curl --max-time 120 --form file=@autoserv.DEBUG --form token=2602161043 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
-        $obj = new LogBookUpload();
-        $form = $this->createForm(LogBookUploadType::class, $obj);
-        $form->handleRequest($request);
-        $setup = null;
-        if ($form->isSubmitted() && $form->isValid()) {
-            $request_str = 'log_book_upload';
-            // $file stores the uploaded PDF file
-            /** @var UploadedFile $file */
-            $file = $obj->getLogFile();
-
-            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
-
-            $post_cycle = $request->request->get($request_str)['cycle'];
-            $setup_id = $request->request->get($request_str)['setup'];
-
-            $cycle = $this->cycleRepo->findOneBy(array('id' => $post_cycle));
-            if ($cycle !== null) {
-                $obj->addMessage('Cycle found, take SETUP from cycle');
-                $setup = $cycle->getSetup();
-            } else {
-                $obj->addMessage('Cycle not found, take setup from POST');
-                $setup_name = '';   //$request->query->get('build');//$this->cleanString('Test Setup');
-                /** @var LogBookSetup $setup */
-                $setup = $this->bringSetup($obj,$setup_name , $setup_id);
-            }
-
-            $obj->addMessage('New file name is :' . $fileName);
-            $obj->addMessage('File ext :' .$file->guessExtension());
-
-            $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
-
-            $obj->new_file_info = $new_file;
-            $obj->addMessage('File copy info :' . $new_file);
-            $obj->setLogFile($fileName);
-
-            $testName = $file->getClientOriginalName();
-            /** @var LogBookTest $test */
-            $test = $this->testsRepo->findOneOrCreate(array(
-                'id' => 1,
-                'name' => $testName,
-                'cycle' => $cycle,
-                'logFile' => $new_file->getFilename(),
-                'logFileSize' => $new_file->getSize(),
-                'executionOrder' => $this->getTestNewExecutionOrder($cycle),
-                ));
-            /**
-             * Parse log in test
-             * @var array data
-             */
-            $obj->data = $this->parseFile($new_file, $test, $obj);
-
-            $this->em->refresh($cycle);
-            $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));
-            $remote_ip = $request->getClientIp();
-            $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
-            $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
-
-            $cycle->setTargetUploader($uploader);
-            $cycle->setController($uploader);
-            $cycle->setDut($dut);
-            $this->em->flush();
-            $obj->addMessage('TestID is ' . $test->getId());
-            return $this->showAction($obj);
-        }
-
-        return $this->render('lbook/upload/new.html.twig', array(
-            'setup' => $setup,
-            'verdict' => $obj,
-            'form' => $form->createView(),
-        ));
-    }
-
-    /**
      * @param array $temp_arr
      * @return array
      */
@@ -679,6 +595,7 @@ class LogBookUploaderController extends Controller
                                 $controlVersion = $tmpName[1];
                             }
                             $tmpName = $tmpName[0]; // set $tmpName to be first element in array(control file name)
+                            $controlFile = $tmpName;
                         }
                     } else if (!$tmpTestNameFlag_ControlTestPrint) {
                         $tmpName = $this->searchTestNameInSingleLogControlPrint($log, true);
@@ -725,6 +642,15 @@ class LogBookUploaderController extends Controller
                 }
             }
         }
+        $test->addMetaData(array(
+            'TEST_FILENAME' => $controlFile,
+            'TEST_VERSION_SHOW_OPT' => $testVersion,
+            'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
+        ));
+        //$test->setTestFileName($controlFile);
+        //$test->setTestFileVersion($controlVersion);
+        //$test->setTestVersion($testVersion);
+
         /**
          * Test Verdict section
          */
@@ -844,8 +770,8 @@ class LogBookUploaderController extends Controller
                 [$dirty, $testName] = $matches;
             }
 
-            if (\mb_strlen($dirty) > 0 && \mb_strlen($testName) > 0) {
-                if ($includeVersion && \mb_strlen($testVersion) > 0) {
+            if ($dirty !== '' && $testName !== '') {
+                if ($includeVersion && $testVersion !== '') {
                     $ret = [$testName, $testVersion];
                 } else {
                     $ret = [$testName, null];
@@ -875,8 +801,8 @@ class LogBookUploaderController extends Controller
                 [$dirty, $testName] = $matches;
             }
 
-            if (\mb_strlen($dirty) > 0 && \mb_strlen($testName) > 0) {
-                if ($includeVersion && \mb_strlen($testVersion) > 0) {
+            if ($testName !== '' && $dirty !== '') {
+                if ($includeVersion && $testVersion !== '') {
                     $ret = [$testName, $testVersion];
                 } else {
                     $ret = [$testName, null];
@@ -905,6 +831,7 @@ class LogBookUploaderController extends Controller
 
         return $ret;
     }
+
     /**
      * Convert string time to object DateTime
      * @param string $input
@@ -996,5 +923,89 @@ class LogBookUploaderController extends Controller
     {
         // md5() reduces the similarity of the file names generated by uniqid(), which is based on timestamps
         return md5(uniqid('', true));
+    }
+
+    /**
+     * Creates a new Upload entity.
+     *
+     * @Route("/new", name="upload_new", methods={"GET|POST"})
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
+     */
+    public function newWeb(Request $request)
+    {
+        //curl --max-time 120 --form file=@autoserv.DEBUG --form token=2602161043 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2 http://127.0.0.1:8080/upload/new
+        $obj = new LogBookUpload();
+        $form = $this->createForm(LogBookUploadType::class, $obj);
+        $form->handleRequest($request);
+        $setup = null;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $request_str = 'log_book_upload';
+            // $file stores the uploaded PDF file
+            /** @var UploadedFile $file */
+            $file = $obj->getLogFile();
+
+            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
+
+            $post_cycle = $request->request->get($request_str)['cycle'];
+            $setup_id = $request->request->get($request_str)['setup'];
+
+            $cycle = $this->cycleRepo->findOneBy(array('id' => $post_cycle));
+            if ($cycle !== null) {
+                $obj->addMessage('Cycle found, take SETUP from cycle');
+                $setup = $cycle->getSetup();
+            } else {
+                $obj->addMessage('Cycle not found, take setup from POST');
+                $setup_name = '';   //$request->query->get('build');//$this->cleanString('Test Setup');
+                /** @var LogBookSetup $setup */
+                $setup = $this->bringSetup($obj,$setup_name , $setup_id);
+            }
+
+            $obj->addMessage('New file name is :' . $fileName);
+            $obj->addMessage('File ext :' .$file->guessExtension());
+
+            $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
+
+            $obj->new_file_info = $new_file;
+            $obj->addMessage('File copy info :' . $new_file);
+            $obj->setLogFile($fileName);
+
+            $testName = $file->getClientOriginalName();
+            /** @var LogBookTest $test */
+            $test = $this->testsRepo->findOneOrCreate(array(
+                'id' => 1,
+                'name' => $testName,
+                'cycle' => $cycle,
+                'logFile' => $new_file->getFilename(),
+                'logFileSize' => $new_file->getSize(),
+                'executionOrder' => $this->getTestNewExecutionOrder($cycle),
+            ));
+            /**
+             * Parse log in test
+             * @var array data
+             */
+            $obj->data = $this->parseFile($new_file, $test, $obj);
+
+            $this->em->refresh($cycle);
+            $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));
+            $remote_ip = $request->getClientIp();
+            $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
+            $dut = $this->targetRepo->findOneOrCreate(array('name' => 'testDut'));
+
+            $cycle->setTargetUploader($uploader);
+            $cycle->setController($uploader);
+            $cycle->setDut($dut);
+            $this->em->flush();
+            $obj->addMessage('TestID is ' . $test->getId());
+            return $this->showAction($obj);
+        }
+
+        return $this->render('lbook/upload/new.html.twig', array(
+            'setup' => $setup,
+            'verdict' => $obj,
+            'form' => $form->createView(),
+        ));
     }
 }

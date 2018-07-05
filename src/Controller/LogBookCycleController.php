@@ -79,38 +79,38 @@ class LogBookCycleController extends Controller
      */
     public function downloadArchive(LogBookCycle $cycle = null): Response
     {
-//        try {
-        if (!$cycle) {
-            throw new \RuntimeException('');
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('');
+            }
+            $path = $this->getLogsFolder($cycle);
+            $finder = new Finder();
+            $finder->files()->in($path);
+
+            $files = array();
+            foreach ($finder as $file) {
+                $files[] = $file->getRealPath();
+            }
+
+            $zip = new \ZipArchive();
+            $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
+            $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
+
+            $zip->open($zipName,  \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+            foreach ($files as $f) {
+                $zip->addFromString(basename($f),  file_get_contents($f));
+            }
+            $zip->close();
+
+            $response = new Response(file_get_contents($zipName));
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');
+            $response->headers->set('Content-length', filesize($zipName));
+
+            return $response;
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($cycle, $ex);
         }
-        $path = $this->getLogsFolder($cycle);
-        $finder = new Finder();
-        $finder->files()->in($path);
-
-        $files = array();
-        foreach ($finder as $file) {
-            $files[] = $file->getRealPath();
-        }
-
-        $zip = new \ZipArchive();
-        $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
-        $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
-
-        $zip->open($zipName,  \ZipArchive::OVERWRITE);
-        foreach ($files as $f) {
-            $zip->addFromString(basename($f),  file_get_contents($f));
-        }
-        $zip->close();
-
-        $response = new Response(file_get_contents($zipName));
-        $response->headers->set('Content-Type', 'application/zip');
-        $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');
-        $response->headers->set('Content-length', filesize($zipName));
-
-        return $response;
-//        } catch (\Throwable $ex) {
-//            return $this->cycleNotFound($cycle, $ex);
-//        }
     }
 
     /**

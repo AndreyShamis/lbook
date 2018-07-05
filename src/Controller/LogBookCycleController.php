@@ -66,8 +66,8 @@ class LogBookCycleController extends Controller
             return '';
         }
         $setup = $cycle->getSetup();
-        $tmp = '%s/%d/';
-        return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId());
+        $tmp = '%s/%d/%d/';
+        return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId(), $cycle->getId());
     }
 
     /**

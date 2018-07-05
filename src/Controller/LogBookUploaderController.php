@@ -72,7 +72,7 @@ class LogBookUploaderController extends Controller
      */
     public function __construct(Container $container)
     {
-        self::$UPLOAD_PATH = realpath(self::$UPLOAD_PATH);
+        self::$UPLOAD_PATH = self::getUploadPath();
         $this->container = $container;
         $this->em = $this->getDoctrine()->getManager();
         $this->testsRepo = $this->em->getRepository('App:LogBookTest');
@@ -83,6 +83,14 @@ class LogBookUploaderController extends Controller
         $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
+    }
+
+    /**
+     * @return string
+     */
+    public static function getUploadPath(): string
+    {
+        return realpath(self::$UPLOAD_PATH);
     }
 
     /**

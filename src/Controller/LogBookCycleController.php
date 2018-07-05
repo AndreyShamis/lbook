@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use Symfony\Component\Finder\Finder;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Symfony\Component\Routing\Annotation\Route;
@@ -59,6 +60,57 @@ class LogBookCycleController extends Controller
         );
     }
 
+    protected function getLogsFolder(LogBookCycle $cycle = null): string
+    {
+        if ($cycle === null) {
+            return '';
+        }
+        $setup = $cycle->getSetup();
+        $tmp = '%s/%d/';
+        return sprintf($tmp,  LogBookUploaderController::getUploadPath(), $setup->getId());
+    }
+
+    /**
+     * Download full cycle as archive
+     *
+     * @Route("/{id}/download", name="cycle_download", methods={"GET"})
+     * @param LogBookCycle|null $cycle
+     * @return Response
+     */
+    public function downloadArchive(LogBookCycle $cycle = null): Response
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('');
+            }
+            $path = $this->getLogsFolder($cycle);
+            $finder = new Finder();
+            $finder->files()->in($path);
+
+            $files = array();
+            foreach ($finder as $file) {
+                $files[] = $file->getRealPath();
+            }
+
+            $zip = new \ZipArchive();
+            $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
+            $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
+            $zip->open($zipName,  \ZipArchive::CREATE);
+            foreach ($files as $f) {
+                $zip->addFromString(basename($f),  file_get_contents($f));
+            }
+            $zip->close();
+
+            $response = new Response(file_get_contents($zipName));
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');
+            $response->headers->set('Content-length', filesize($zipName));
+
+            return $response;
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($cycle, $ex);
+        }
+    }
 
     /**
      * Lists all cycle entities.
@@ -73,6 +125,7 @@ class LogBookCycleController extends Controller
     {
         return $this->index(1, $pagePaginator, $cycleRepo);
     }
+
     /**
      * Creates a new cycle entity.
      *

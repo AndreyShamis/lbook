@@ -82,3 +82,7 @@ th.meta_data_column{
 .ui-datepicker{
     width: auto !important;
 }
+
+.cycle_title{
+    margin-top: 0 !important;
+}

@@ -3,7 +3,21 @@
 {% block content %}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
-    <h3><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+    <div class="row">
+        <div class="col-xs-10">
+            <h3 class="cycle_title"><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+        </div>
+
+        <div class="col-xs-2">
+            <span style="float: right;">
+                <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
+                    <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
+                    Download
+                </button>
+            </span>
+        </div>
+    </div>
+
     <table class="records_list table table-striped table-condensed">
         <tbody>
         {#<tr>#}
@@ -352,7 +366,9 @@
                 location.reload();
             });
             drawEasyPieChart();
-
+            $( "#saveCycleAsArchive" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
+            });
             // var testTable = $('#testTable');
             // testTable.bootstrapTable({
             //     classes: "table-no-bordered",

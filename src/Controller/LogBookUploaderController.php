@@ -669,12 +669,12 @@ class LogBookUploaderController extends Controller
                             $tmpTestNameFlag_AutotestTestPrint = true;
                         }
                     } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
+                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, false);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_TestPrint = true;
                         }
                     } else if (!$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log);
+                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log, false);
                         if ($tmpName !== null) {
                             $tmpTestNameFlag_ControlTestPrint = true;
                             $testNameFound = true;

@@ -178,8 +178,8 @@
                             {% endif %}
                             {% set counter = counter+1 %}
                                 <tr class="{{ logTypeToTableColor(log.msgType) }}">
-                                    <td title="ID:{{ log.id }}, Order:{{ log.chain }}">{{ log.logTime | date('H:i:s') }}</td>
-                                    <td>{{ relativeTime(test.timeStart, log.logTime) }}</td>
+                                    <td title="ID:{{ log.id }}, Order:{{ log.chain }}" class="logType">{{ log.logTime | date('H:i:s') }}</td>
+                                    <td class="logType">{{ relativeTime(test.timeStart, log.logTime) }}</td>
                                     {#<td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>#}
                                     {#<td title="{{ log.id }}">{{ log.chain }}</td>#}
                                     {% set link_class = '' %}

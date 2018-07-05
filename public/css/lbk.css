@@ -98,5 +98,10 @@ th.meta_data_column{
 .testLog td{
     padding: 2px !important;
     /* overflow: auto; */
-    line-height: 1px;
+    line-height: 1 !important;
+    border: 0 !important;
+}
+
+.testLog tr:hover{
+    border: 1px solid rgba(0, 0, 255, 0.25);
 }

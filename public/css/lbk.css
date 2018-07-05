@@ -86,3 +86,17 @@ th.meta_data_column{
 .cycle_title{
     margin-top: 0 !important;
 }
+
+.log_text{
+    word-wrap: break-word;         /* All browsers since IE 5.5+ */
+    overflow-wrap: break-word;     /* Renamed property in CSS3 draft spec */
+    display: table-cell;
+    /*overflow: auto;*/
+    max-width: 1200px;
+}
+
+.testLog td{
+    padding: 2px !important;
+    /* overflow: auto; */
+    line-height: 1px;
+}

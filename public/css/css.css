@@ -19,7 +19,7 @@
 .log-step{background-color: #eeffd3;}
 .log-na{background-color: #a0fcff;}
 .log-fail{background-color: #ffb499;}
-.log-error{background-color: #f9ef90;}
+.log-error{background-color: #f5efb8;}
 .log-warning{background-color: #f0f5dc;}
 .log-info{
     /*background-color:#00acd6*/
@@ -27,7 +27,7 @@
 .log-critical{background-color:#ff7665;}
 .log-debug{
     /*color: #ada6a6;*/
-    background-color: #eaedf1;
+    background-color: #f7f7f7; /*#eaedf1;*/
     border-color: #6a858e;
     font-size: 11px;
 }

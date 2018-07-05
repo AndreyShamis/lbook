@@ -98,5 +98,5 @@ th.meta_data_column{
 .testLog td{
     padding: 2px !important;
     /* overflow: auto; */
-    line-height: 1px;
+    line-height: 1 !important;
 }

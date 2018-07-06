@@ -147,9 +147,14 @@ class LogBookTestController extends Controller
                 $enableSearch = True;
             }
 
-            if ($test_name !== null && \mb_strlen($test_name) > 2) {
-                $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata')
-                    ->setParameter('test_name', '%'.$test_name.'%')
+            if ($test_name !== null && \mb_strlen($test_name) >= 2) {
+                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
+                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
+                        ->setParameter('test_id', (int)$test_name);
+                } else {
+                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata');
+                }
+                $qb->setParameter('test_name', '%'.$test_name.'%')
                     ->setParameter('metadata', $test_name.'%');
                 $enableSearch = True;
             }

@@ -8,6 +8,10 @@ error() {
     echo -e "\033[1;31m[Error]   $1  \033[0m"
 }
 
+fail() {
+    echo -e "\033[41m[Fail] $1 \033[0m"
+}
+
 success() {
     echo -e "\033[1;32m[Success] $1 \033[0m"
 }
@@ -27,6 +31,8 @@ restore_proxy(){
     export HTTPS_PROXY=${TMP_HTTPS_PROXY_BIG}
     success "Proxy restored"
 }
+
+export sym="php bin/console"
 
 # Requirements
 #sudo apt install php7.2-ldap php7.2-zip php7.2-xml php7.2-mbstring
@@ -58,7 +64,7 @@ ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
 mkdir -p artifacts
-composer -vvv update &> artifacts/update.log.txt
+composer -vvv --profile update &> artifacts/update.log.txt
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
 #composer validate --no-check-all --strict  # TODO
@@ -73,12 +79,22 @@ success " ----> Check that the composer.json for different errors, like autoload
 #composer require  symfony/phpunit-bridge
 
 #info "Start Check DataBase"
-#php bin/console doctrine:schema:validate -e=prod
+#${sym} doctrine:schema:validate -e=prod
 #success "Finish Check DataBase"
 
 info "Start Check YAML files"
-php bin/console lint:yaml config/
+${sym} lint:yaml config/
 success "Finish Check YAML files"
+
+STEP="Verify that Doctrine is properly configured for a production environment"
+info "${STEP}"
+${sym} doctrine:ensure-production-settings --env=prod -vvv --complete  || fail "Failed to validate production environment"
+success "Finish - ${STEP}"
+
+STEP="Get mapping info"
+info "${STEP}"
+${sym} doctrine:mapping:info -n -vvv
+success "Finish - ${STEP}"
 
 restore_proxy
 ./bin/console ca:cl

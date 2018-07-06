@@ -124,7 +124,8 @@ class LogBookTest
 
     /**
      * @var array
-     * @ORM\Column(type="array", nullable=true, columnDefinition="LONGTEXT DEFAULT NULL")
+     * @ORM\Column(type="array", nullable=true)
+     * //, columnDefinition="LONGTEXT DEFAULT NULL"
      */
     protected $meta_data = [];
 
@@ -136,6 +137,7 @@ class LogBookTest
         $this->timeStart = new \DateTime();
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
+        $this->meta_data = [];
     }
 
     /**

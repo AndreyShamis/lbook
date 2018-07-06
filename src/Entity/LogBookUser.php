@@ -90,7 +90,7 @@ class LogBookUser implements UserInterface, \Serializable
     protected $isActive;
 
     /**
-     * @ORM\Column(type="json", columnDefinition="TEXT NOT NULL")
+     * @ORM\Column(type="json")
      */
     protected $roles = [];
 

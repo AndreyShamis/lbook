@@ -204,6 +204,7 @@
     {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
     {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
     {% set show_metadata = app.user.settings.cycleShowTestMetaDataShow | default(true) %}
+    {% set show_metadata_opt = app.user.settings.cycleShowTestMetaDataOptShow | default(true) %}
     {% set show_uptime = app.user.settings.cycleShowTestUptime | default(true) %}
 
     {% set cycle_show_test_time_start_format = app.user.settings.cycleShowTestTimeStartFormat | default('H:i:s')%}
@@ -255,7 +256,7 @@
                     <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
                 {% endfor %}
             {% endif %}
-            {% if show_metadata == true %}
+            {% if show_metadata_opt == true %}
                 {% for key, item in additional_opt_cols %}
                     <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
                 {% endfor %}
@@ -313,7 +314,7 @@
                         </td>
                     {% endfor %}
                 {% endif %}
-                {% if show_metadata == true %}
+                {% if show_metadata_opt == true %}
                     {% for key, item in additional_opt_cols %}
                         <td title="{{ item }}">
                             {% if item in test.metaData|keys %}

@@ -18,29 +18,39 @@ class LogBookUserSettings
     protected $id;
 
     /**
+     * @var bool
      * @ORM\Column(type="boolean", options={"default"="1"})
      */
     protected $cycleShowTestIdShow = 1;
 
     /**
+     * @var bool
      * @ORM\Column(type="boolean", options={"default"="1"})
      */
     protected $cycleShowTestTimeStartShow = 1;
 
     /**
+     * @var bool
      * @ORM\Column(type="boolean", options={"default"="1"})
      */
     protected $cycleShowTestTimeEndShow = 1;
 
     /**
+     * @var bool
      * @ORM\Column(type="boolean", options={"default"="1"})
      */
     protected $cycleShowTestTimeRatioShow = 1;
 
     /**
+     * @var bool
      * @ORM\Column(type="boolean", options={"default"="1"})
      */
     protected $cycleShowTestMetaDataShow = 1;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"="1"})
+     */
+    protected $cycleShowTestMetaDataOptShow = 1;
 
     /**
      * @var bool
@@ -83,6 +93,22 @@ class LogBookUserSettings
     public function setCycleShowTestUptime(bool $val): void
     {
         $this->cycleShowTestUptime = $val;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCycleShowTestMetaDataOptShow(): bool
+    {
+        return $this->cycleShowTestMetaDataOptShow;
+    }
+
+    /**
+     * @param bool $cycleShowTestMetaDataOptShow
+     */
+    public function setCycleShowTestMetaDataOptShow(bool $cycleShowTestMetaDataOptShow): void
+    {
+        $this->cycleShowTestMetaDataOptShow = $cycleShowTestMetaDataOptShow;
     }
 
     /**

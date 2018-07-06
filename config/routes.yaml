@@ -5,7 +5,9 @@ index:
 login:
     controller: App\Controller\LogBookSecurityController::login
     path:   /login
+    schemes:  ['%http_protocol%']
 
 register:
     controller: App\Controller\LogBookRegistrationController::register
     path:   /register
+    schemes:  ['%http_protocol%']

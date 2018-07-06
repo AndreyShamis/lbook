@@ -7,7 +7,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookMessageRepository")
- * \\@ORM\Table(name="lbook_messages")
  */
 class LogBookMessage
 {
@@ -22,7 +21,7 @@ class LogBookMessage
      * [20]	(1, 2, 3, 4, 5) Chosen if the column length is less or equal to 2 ^ 32 - 1 = 4294967295 or empty.
      * @var string
      *
-     * @ORM\Column(name="message", type="string", length=4294967295)
+     * @ORM\Column(name="message", type="text", length=4294967295)
      * @Assert\NotBlank(message="test log cannot be blank, please provide message")
      */
     protected $message = '';

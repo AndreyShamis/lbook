@@ -42,6 +42,30 @@ class LogBookTestRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array $criteria
+     * @param bool $flush
+     * @return LogBookTest
+     */
+    public function create(array $criteria, $flush = false): ?LogBookTest
+    {
+        $criteria['name'] = LogBookTest::validateName($criteria['name']);
+        $entity = new LogBookTest();
+        $entity->setName($criteria['name']);
+        //$entity->setVerdict($criteria['verdict']);
+        $entity->setCycle($criteria['cycle']);
+        $entity->setLogFile($criteria['logFile']);
+        $entity->setLogFileSize($criteria['logFileSize']);
+        $entity->setExecutionOrder($criteria['executionOrder']);
+        $this->_em->persist($entity);
+        $this->_em->flush($entity);
+        if ($flush === true) {
+            $this->_em->flush();
+        }
+
+        return $entity;
+    }
+
+    /**
      * @param LogBookCycle $cycle
      */
     public function deleteByCycle(LogBookCycle $cycle): void

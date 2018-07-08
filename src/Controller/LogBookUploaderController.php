@@ -209,6 +209,7 @@ class LogBookUploaderController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @throws Exception
      */
     public function newCli(Request $request)
     {
@@ -363,6 +364,7 @@ class LogBookUploaderController extends Controller
      * @param LogBookCycle $cycle
      * @param LogBookUpload $obj
      * @return LogBookTest
+     * @throws Exception
      */
     protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj): LogBookTest
     {
@@ -371,30 +373,38 @@ class LogBookUploaderController extends Controller
         $test = null;
         while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
             try {
-                $test = $this->testsRepo->findOneOrCreate($test_criteria);
-                $orderFound = true;
+                $test = $this->testsRepo->create($test_criteria);
+                if ($test !== null) {
+                    $orderFound = true;
+                } else {
+                    try {
+                        /** sleep for 0.2-0.5 second */
+                        usleep(\random_int(200000, 500000));
+                    } catch (Exception $e) {}
+                }
             } catch (UniqueConstraintViolationException $ex) {
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
-                $counter++;
                 try {
                     /** sleep for 0.2-0.5 second */
-                    usleep(\random_int(200000, 5000000));
-                } catch (Exception $e) {
-                }
+                    usleep(\random_int(200000, 500000));
+                } catch (Exception $e) {}
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
             } catch (ORMException $ex) {
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
-                $counter++;
                 try {
                     /** sleep for 0.2-0.5 second */
-                    usleep(\random_int(200000, 5000000));
-                } catch (Exception $e) {
-                }
+                    usleep(\random_int(200000, 500000));
+                } catch (Exception $e) {}
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
                 $this->testsRepo  = $this->em->getRepository('App:LogBookTest');
             }
+
+            $counter++;
         }
 
+        if ($test === null) {
+            throw new \Exception('[insertTest] counter=' . $counter . ' orderFound='. (int)$orderFound);
+        }
         return $test;
     }
     /**

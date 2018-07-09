@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class LogBookTestRepository extends ServiceEntityRepository
@@ -45,6 +47,7 @@ class LogBookTestRepository extends ServiceEntityRepository
      * @param array $criteria
      * @param bool $flush
      * @return LogBookTest
+     * @throws ORMException|UniqueConstraintViolationException
      */
     public function create(array $criteria, $flush = false): ?LogBookTest
     {

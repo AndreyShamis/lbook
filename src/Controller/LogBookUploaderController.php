@@ -21,6 +21,7 @@ use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -207,11 +208,11 @@ class LogBookUploaderController extends Controller
      *
      * @Route("/new_cli", name="upload_new_cli", methods={"GET|POST"})
      * @param Request $request
+     * @param LoggerInterface $logger
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      * @throws Exception
      */
-    public function newCli(Request $request)
+    public function newCli(Request $request, LoggerInterface $logger)
     {
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
         //curl --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
@@ -324,7 +325,7 @@ class LogBookUploaderController extends Controller
                     'executionOrder' => $this->getTestNewExecutionOrder($cycle),
                 );
                 /** @var LogBookTest $test */
-                $test = $this->insertTest($test_criteria, $cycle, $obj);
+                $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
 
                 $obj->data = $this->parseFile($new_file, $test, $obj);
                 $this->em->refresh($cycle);
@@ -363,16 +364,26 @@ class LogBookUploaderController extends Controller
      * @param array $test_criteria
      * @param LogBookCycle $cycle
      * @param LogBookUpload $obj
+     * @param LoggerInterface $logger
      * @return LogBookTest
      * @throws Exception
      */
-    protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj): LogBookTest
+    protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): LogBookTest
     {
         $orderFound = false;
         $counter = 0;
         $test = null;
         while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
             try {
+                if ($counter > 0) {
+                    $logger->critical('[insertTest] Found counter increment',
+                        array(
+                        'counter' => $counter,
+                        'orderFound' => $orderFound,
+                        'test_criteria' => $test_criteria,
+                        'cycle' => $cycle,
+                    ));
+                }
                 $test = $this->testsRepo->create($test_criteria);
                 if ($test !== null) {
                     $orderFound = true;
@@ -383,6 +394,7 @@ class LogBookUploaderController extends Controller
                     } catch (Exception $e) {}
                 }
             } catch (UniqueConstraintViolationException $ex) {
+                $logger->critical('[insertTest] Found UniqueConstraintViolationException', array('ex' => $ex));
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
                 try {
                     /** sleep for 0.2-0.5 second */
@@ -390,6 +402,7 @@ class LogBookUploaderController extends Controller
                 } catch (Exception $e) {}
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
             } catch (ORMException $ex) {
+                $logger->critical('[insertTest] Found ORMException', array('ex' => $ex));
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
                 try {
                     /** sleep for 0.2-0.5 second */
@@ -403,7 +416,14 @@ class LogBookUploaderController extends Controller
         }
 
         if ($test === null) {
-            throw new \Exception('[insertTest] counter=' . $counter . ' orderFound='. (int)$orderFound);
+            $msg = '[THROW][Exception][insertTest] counter=' . $counter . ' orderFound='. (int)$orderFound;
+            $logger->critical($msg, array(
+                'counter' => $counter,
+                'orderFound' => $orderFound,
+                'test_criteria' => $test_criteria,
+                'cycle' => $cycle,
+            ));
+            throw new \Exception($msg);
         }
         return $test;
     }

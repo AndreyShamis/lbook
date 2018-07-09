@@ -376,7 +376,7 @@ class LogBookUploaderController extends Controller
         while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
             try {
                 if ($counter > 0) {
-                    $logger->critical('[insertTest] Found counter increment',
+                    $logger->alert('[insertTest] Found counter increment',
                         array(
                         'counter' => $counter,
                         'orderFound' => $orderFound,
@@ -394,7 +394,7 @@ class LogBookUploaderController extends Controller
                     } catch (Exception $e) {}
                 }
             } catch (UniqueConstraintViolationException $ex) {
-                $logger->critical('[insertTest] Found UniqueConstraintViolationException', array('ex' => $ex));
+                $logger->alert('[insertTest] Found UniqueConstraintViolationException', array('ex' => $ex));
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
                 try {
                     /** sleep for 0.2-0.5 second */
@@ -402,7 +402,7 @@ class LogBookUploaderController extends Controller
                 } catch (Exception $e) {}
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
             } catch (ORMException $ex) {
-                $logger->critical('[insertTest] Found ORMException', array('ex' => $ex));
+                $logger->alert('[insertTest] Found ORMException', array('ex' => $ex));
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
                 try {
                     /** sleep for 0.2-0.5 second */

@@ -674,7 +674,6 @@ class LogBookUploaderController extends Controller
         }
         $test->addMetaData(array(
             'TEST_FILENAME' => $controlFile,
-            'CONTROL_FILENAME_SHOW_OPT' => $controlFullFile,
             'TEST_VERSION_SHOW_OPT' => $testVersion,
             'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
         ));

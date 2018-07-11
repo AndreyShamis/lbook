@@ -306,8 +306,8 @@
                             {% if isUrl(test.metaData[item]) %}
                                 <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                             {% else %}
-                                <span title="{{ test.metaData[item] }}">
-                                    {{ shortString(test.metaData[item], 35) }}
+                                <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}
+                                    {#{{ shortString(test.metaData[item], 35) }}#}
                                 </span>
                         {% endif %}
                         {% endif %}
@@ -321,8 +321,8 @@
                                 {% if isUrl(test.metaData[item]) %}
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
-                                    <span title="{{ test.metaData[item] }}">
-                                    {{ shortString(test.metaData[item], 50) }}
+                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}
+                                    {#{{ shortString(test.metaData[item], 50) }}#}
                                 </span>
                                 {% endif %}
                             {% endif %}

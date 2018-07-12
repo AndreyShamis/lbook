@@ -327,7 +327,7 @@ class LogBookUploaderController extends Controller
                 /** @var LogBookTest $test */
                 $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
 
-                $obj->data = $this->parseFile($new_file, $test, $obj);
+                $this->parseFile($new_file, $test, $obj);
                 $this->em->refresh($cycle);
 
                 $this->calculateAndSetBuild($build_name, $cycle);
@@ -709,7 +709,7 @@ class LogBookUploaderController extends Controller
         foreach ($tmp_arr as $single) {
             $tmp_pair = explode('::', $single);
             $key = trim($tmp_pair[0]);
-            if ($this->startsWithUpper($key) && mb_strlen($key) >= 2 && mb_strlen($key) <= 100) {
+            if (mb_strlen($key) >= 2 && $this->startsWithUpper($key) && mb_strlen($key) <= 100) {
                 $ret[$key] = trim($tmp_pair[1]);
             }
         }
@@ -742,6 +742,7 @@ class LogBookUploaderController extends Controller
         $chr = mb_substr ($str, 0, 1, 'UTF-8');
         return mb_strtolower($chr, 'UTF-8') !== $chr;
     }
+
     /**
      * Parse from string Test Verdict
      * @param string $input
@@ -998,7 +999,6 @@ class LogBookUploaderController extends Controller
 
             $new_file = $file->move('../uploads/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
 
-            $obj->new_file_info = $new_file;
             $obj->addMessage('File copy info :' . $new_file);
             $obj->setLogFile($fileName);
 
@@ -1012,11 +1012,8 @@ class LogBookUploaderController extends Controller
                 'logFileSize' => $new_file->getSize(),
                 'executionOrder' => $this->getTestNewExecutionOrder($cycle),
             ));
-            /**
-             * Parse log in test
-             * @var array data
-             */
-            $obj->data = $this->parseFile($new_file, $test, $obj);
+            /** Parse log in test **/
+            $this->parseFile($new_file, $test, $obj);
 
             $this->em->refresh($cycle);
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));

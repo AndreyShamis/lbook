@@ -215,7 +215,7 @@ class LogBookUploaderController extends Controller
     public function newCli(Request $request, LoggerInterface $logger)
     {
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
-        //curl --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
+        //curl --noproxy "127.0.0.1" --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
 
         $obj = new LogBookUpload();
         $p_data = $request->request;
@@ -568,7 +568,8 @@ class LogBookUploaderController extends Controller
                         }
                     }
                     else{
-                        preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/D', $msg_str, $possibleMessageType);
+                        /** Will replace log line verdict if found something from next regex */
+                        preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/', $msg_str, $possibleMessageType);
                         if (\count($possibleMessageType) === 3) {
                             if ($possibleMessageType[1] === 'GOOD') {
                                 $possibleMessageType[1] = 'PASS';
@@ -678,6 +679,8 @@ class LogBookUploaderController extends Controller
             'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
         ));
         //$test->setTestFileName($controlFile);
+        //$test->setTestFileVersion($controlVersion);
+        //$test->setTestFileVersion($controlVersion);
         //$test->setTestFileVersion($controlVersion);
         //$test->setTestVersion($testVersion);
 

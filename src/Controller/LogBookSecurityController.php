@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookUser;
+use App\Repository\LogBookUserRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -92,16 +93,11 @@ class LogBookSecurityController extends Controller
      * @param Request $request
      * @param AuthenticationUtils $authUtils
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param LogBookUserRepository $userRepo
      * @return Response
-     * @throws \Symfony\Component\Ldap\Exception\NotBoundException
-     * @throws \Symfony\Component\Ldap\Exception\LdapException
-     * @throws \LogicException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @throws \InvalidArgumentException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function login(Request $request, AuthenticationUtils $authUtils, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function login(Request $request, AuthenticationUtils $authUtils, UserPasswordEncoderInterface $passwordEncoder, LogBookUserRepository $userRepo): Response
     {
         $error = $authUtils->getLastAuthenticationError();
         /** @var LogBookUser $user */
@@ -114,34 +110,33 @@ class LogBookSecurityController extends Controller
             if ($request->isMethod('POST')) {
                 $user_name = $request->request->get('_username');
                 $password = $request->request->get('_password');
-                // Retrieve the security encoder of symfony
-                $user_manager = $this->getDoctrine()->getManager()->getRepository('App:LogBookUser');
 
                 if ($use_ldap === 'true') {
                     $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
                     if (\is_array($ldapUserArr)) {
                         $ldapLogin = true;
-                        $user = $user_manager->loadUserByUsername($ldapUserArr['username']);
+                        $user = $userRepo->loadUserByUsername($ldapUserArr['username']);
                         if ($user === null) {
                             /** Need to create the user in DataBase **/
-                            $user = $user_manager->create($ldapUserArr);
+                            $user = $userRepo->create($ldapUserArr);
                         }
                     }
                 } else {
-                    $user = $user_manager->loadUserByUsername($user_name);
+                    $user = $userRepo->loadUserByUsername($user_name);
                 }
 
                 if ($user !== null) {
+                    $active = $user->getIsActive();
                     //$encoded_pass = $passwordEncoder->encodePassword($user, $password);
                     //$salt = $user->getSalt();
-                    if (!$user->getIsActive()){
+                    if (!$active) {
                         throw new AuthenticationException('The user is disabled.');
                     }
-                    if (
-                    ($passwordEncoder->isPasswordValid($user, $password) && !$ldapLogin && $user->getIsActive())
-                            ||
-                    ($ldapLogin && $user->isLdapUser() && $user->getIsActive())
-                    ) {
+
+                    $ldap_LdapUser_Active = $ldapLogin && $user->isLdapUser() && $active;
+                    $notLdap_Active = $passwordEncoder->isPasswordValid($user, $password) && !$ldapLogin && $active;
+
+                    if ($notLdap_Active || $ldap_LdapUser_Active) {
                         // The password matches ! then proceed to set the user in session
 
                         //Handle getting or creating the user entity likely with a posted form

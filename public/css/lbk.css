@@ -86,7 +86,9 @@ th.meta_data_column{
 .test_title{
     margin-top: 0 !important;
 }
-
+.generic_title{
+    margin-top: 0 !important;
+}
 .cycle_title{
     margin-top: 0 !important;
 }

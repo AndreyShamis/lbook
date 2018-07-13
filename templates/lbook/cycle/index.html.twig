@@ -1,9 +1,24 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Cycles list{% endblock %}
 {% block content %}
-    <h1>Cycle list</h1>
-    <div>Count : {{ size }}</div>
-    {% include "lbook/search.html.twig" %}
+    <div class="row">
+        <div class="col-xs-10">
+            <h1 class="generic_title">Cycle list</h1>
+        </div>
+
+        <div class="col-xs-2">
+            <span style="float: right;">
+                Count : {{ size }}
+                <i class="fa fa-flag blue bigger-130"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            {% include "lbook/search.html.twig" %}
+        </div>
+    </div>
+
     {% set pagePath = "cycle_index" %}
     {% include "lbook/paginator.html.twig" %}
     <div id="cycleIndexToolbar">
@@ -19,18 +34,18 @@
         <thead>
         <tr>
             <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
-            <th data-sortable="true" data-switchable="false">Id</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false">Name</th>
-            <th data-sorter="htmlSorter" data-sortable="true" >Setup</th>
-            <th data-sortable="true">Tests</th>
-            <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass Rate</th>
-            <th data-sortable="true" data-sorter="htmlSorter">Build</th>
-            <th data-sortable="true">Controller</th>
-            <th data-sortable="true">DUT</th>
-            <th data-sortable="true">Uploader</th>
-            <th data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
+            <th data-sortable="true" data-switchable="false" title="Cycle ID">ID</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false" data-title="Cycle Name">Cycle Name</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Setup Name">Setup</th>
+            <th data-sortable="true" title="Tests count in the cycle">Tests</th>
+            <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">PR</th>
+            <th data-sortable="true" data-sorter="htmlSorter" title="Build Name">Build</th>
+            <th data-sortable="true" data-visible="false" title="Controller">Controller</th>
+            <th data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
+            <th data-sortable="true" title="Cycle Uploader Machine">Uploader</th>
+            <th data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time">Duration</th>
             <th data-sorter="dataTitleIntSorter" data-sortable="true">Test time</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time">Created</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>

@@ -13,6 +13,10 @@
                 <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
                     <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
                     Download
+                    {% if cycle.downloads > 0 %}
+                    ({{ cycle.downloads }})
+                    {% endif %}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                 </button>
             </span>
         </div>

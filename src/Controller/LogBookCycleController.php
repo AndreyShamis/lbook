@@ -107,7 +107,14 @@ class LogBookCycleController extends Controller
             $response->headers->set('Content-Type', 'application/zip');
             $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');
             $response->headers->set('Content-length', filesize($zipName));
+            try {
+                $em = $this->getDoctrine()->getManager();
+                $cycle->increaseDownloads();
+                $em->persist($cycle);
+                $em->flush();
+            } catch (\Exception $ex) {
 
+            }
             return $response;
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);

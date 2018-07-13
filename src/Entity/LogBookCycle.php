@@ -216,6 +216,13 @@ class LogBookCycle
      */
     protected $forDelete = false;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="downloads_count", type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    protected $downloads = 0;
+
     public static $MAX_NAME_LEN = 250;
     /**
      * LogBookCycle constructor.
@@ -234,6 +241,30 @@ class LogBookCycle
          * Other stuff
          */
         $this->tests = new ArrayCollection();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDownloads(): int
+    {
+        return $this->downloads;
+    }
+
+    /**
+     * @param int $downloads
+     */
+    public function setDownloads(int $downloads): void
+    {
+        $this->downloads = $downloads;
+    }
+
+    /**
+     *
+     */
+    public function increaseDownloads(): void
+    {
+        $this->setDownloads($this->getDownloads()+1);
     }
 
     /**

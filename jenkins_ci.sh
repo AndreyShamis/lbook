@@ -33,6 +33,7 @@ restore_proxy(){
 }
 
 export sym="php bin/console"
+mkdir -p artifacts
 
 # Requirements
 #sudo apt install php7.2-ldap php7.2-zip php7.2-xml php7.2-mbstring php7.2-mysql
@@ -45,6 +46,11 @@ info "Composer selfupdate"
 composer selfupdate || true
 info "Print composer info"
 composer -V
+success "Composer update. Composer version."
+
+info "Get installed vendors before update"
+composer show --installed > artifacts/vendors_before.txt
+success "Versions finished"
 
 success "Composer about: "
 composer about
@@ -63,8 +69,15 @@ success "***************************** Composer validation finished ************
 ls -l
 success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
-mkdir -p artifacts
+
 composer -vvv --profile update &> artifacts/update.log.txt
+success "Composer update finished"
+
+info "Get installed vendors after update"
+composer show --installed > artifacts/vendors_after.txt
+success "Versions finished"
+
+
 info "Check that the composer.json for different errors, like autoload issue:"
 #composer validate --no-check-all
 #composer validate --no-check-all --strict  # TODO

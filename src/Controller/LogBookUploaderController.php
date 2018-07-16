@@ -76,11 +76,6 @@ class LogBookUploaderController extends Controller
         self::$UPLOAD_PATH = self::getUploadPath();
         $this->container = $container;
         $this->em = $this->getDoctrine()->getManager();
-        $this->startRepo();
-    }
-
-    protected function startRepo(): void
-    {
         $this->testsRepo = $this->em->getRepository('App:LogBookTest');
         $this->cycleRepo = $this->em->getRepository('App:LogBookCycle');
         $this->verdictRepo = $this->em->getRepository('App:LogBookVerdict');
@@ -90,6 +85,7 @@ class LogBookUploaderController extends Controller
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
     }
+
     /**
      * @return string
      */
@@ -404,8 +400,6 @@ class LogBookUploaderController extends Controller
                     /** sleep for 0.2-0.5 second */
                     usleep(\random_int(200000, 500000));
                 } catch (Exception $e) {}
-                $this->em = $this->getDoctrine()->resetManager();
-                $this->startRepo();
                 $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
             } catch (ORMException $ex) {
                 $logger->alert('[insertTest] Found ORMException', array('ex' => $ex));

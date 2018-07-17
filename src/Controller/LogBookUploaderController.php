@@ -540,7 +540,8 @@ class LogBookUploaderController extends Controller
          * Dont remove & from  &$value -> will cause to additional duplicated line
          */
         foreach ($newTempArr as $key => $value) {
-            preg_match_all('/(\d{2,}.*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
+            preg_match_all('/(\d{2,2}[.|:| |\/|\d]*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
+            //preg_match_all('/(\d{2,}.*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
             if (\count($oneLine[2]) > 0) {
                 /** Clean double DEBUG OUTPUT **/

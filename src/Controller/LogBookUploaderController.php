@@ -326,6 +326,7 @@ class LogBookUploaderController extends Controller
                 );
                 /** @var LogBookTest $test */
                 $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                $test->setVerdict($this->parseVerdict('ERROR'));
 
                 $this->parseFile($new_file, $test, $obj);
                 $this->em->refresh($cycle);

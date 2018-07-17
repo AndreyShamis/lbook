@@ -34,7 +34,7 @@ class LogBookVerdictRepository extends ServiceEntityRepository
         }
         return $entity;
     }
-    
+
     /*
     public function findBySomething($value)
     {

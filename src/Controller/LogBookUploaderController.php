@@ -540,7 +540,7 @@ class LogBookUploaderController extends Controller
          * Dont remove & from  &$value -> will cause to additional duplicated line
          */
         foreach ($newTempArr as $key => $value) {
-            preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
+            preg_match_all('/(\d{2,}.*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
 
             if (\count($oneLine[2]) > 0) {
                 /** Clean double DEBUG OUTPUT **/
@@ -568,8 +568,7 @@ class LogBookUploaderController extends Controller
                                 $msgType_str = $testVerdict->getName();
                             }
                         }
-                    }
-                    else{
+                    } else {
                         /** Will replace log line verdict if found something from next regex */
                         preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/', $msg_str, $possibleMessageType);
                         if (\count($possibleMessageType) === 3) {
@@ -589,12 +588,12 @@ class LogBookUploaderController extends Controller
 
                 /** **/
                 $ret_data[$counter] = array(
-                    'logTime'   => $this->getLogTime($logTime_str),
-                    'message'   => $msg_str,
-                    'chain'     => $counter,
-                    'test'      => $test,
-                    'msgType'   => $this->msgTypeRepo->findOneOrCreate(array(
-                        'name'      => $this->prepareDebugLevel($msgType_str)
+                    'logTime' => $this->getLogTime($logTime_str),
+                    'message' => $msg_str,
+                    'chain' => $counter,
+                    'test' => $test,
+                    'msgType' => $this->msgTypeRepo->findOneOrCreate(array(
+                        'name' => $this->prepareDebugLevel($msgType_str)
                     )),
                 );
 
@@ -667,13 +666,14 @@ class LogBookUploaderController extends Controller
                 $testEndTime = max($testEndTime, $log->getLogTime());
                 /** **/
                 $counter++;
-            } else {
-                if ($counter > 0) {
-                    echo \count($oneLine) . ' '.   $value . ':<pre>';
-                    print_r($oneLine);
-                    echo '</pre><br/>';
-                }
             }
+//            } else {
+//                if ($counter > 0) {
+//                    echo \count($oneLine) . ' '.   $value . ':<pre>';
+//                    print_r($oneLine);
+//                    echo '</pre><br/>';
+//                }
+//            }
         }
         $test->addMetaData(array(
             'TEST_FILENAME' => $controlFile,

@@ -322,8 +322,10 @@ class LogBookUploaderController extends Controller
                     'cycle' => $cycle,
                     'logFile' => $new_file->getFilename(),
                     'logFileSize' => $new_file->getSize(),
+                    'verdict' => $this->parseVerdict('ERROR'),
                     'executionOrder' => $this->getTestNewExecutionOrder($cycle),
                 );
+
                 /** @var LogBookTest $test */
                 $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
 

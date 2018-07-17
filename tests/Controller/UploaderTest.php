@@ -67,9 +67,9 @@ class UploaderTest extends LogBookApplicationTestCase
 
         /** Second file upload */
         $client->request('POST', '/upload/new_cli', $postParams, array('file' => $file2), $postHeader);
-
-        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode());
         $secondContent = $this->getClient()->getResponse()->getContent();
+        $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), 'Actual code is ' . $this->getClient()->getResponse()->getStatusCode() . ' ' . $secondContent);
+
 
         $setupName = null;
         $this->validateNotExistingTestResponse($secondContent, $setupName, null, $errorFileName, false);

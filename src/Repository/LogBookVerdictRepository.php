@@ -25,26 +25,16 @@ class LogBookVerdictRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria): LogBookVerdict
     {
         $criteria['name'] = strtoupper($criteria['name']);
-        $add_hash = true;
-        if (isset(self::$hashedData[$criteria['name']])) {
-            $entity = self::$hashedData[$criteria['name']];
-            $add_hash = false;
-        } else {
-            $entity = $this->findOneBy($criteria);
-        }
-
+        $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookVerdict();
             $entity->setName($criteria['name']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }
-        if ($add_hash) {
-            self::$hashedData[$criteria['name']] = $entity;
-        }
-
         return $entity;
     }
+    
     /*
     public function findBySomething($value)
     {

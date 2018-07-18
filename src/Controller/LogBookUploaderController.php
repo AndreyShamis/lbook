@@ -329,7 +329,7 @@ class LogBookUploaderController extends Controller
                 /** @var LogBookTest $test */
                 $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
 
-                $this->parseFile($new_file, $test, $obj);
+                $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
 
                 $this->calculateAndSetBuild($build_name, $cycle);
@@ -498,9 +498,10 @@ class LogBookUploaderController extends Controller
      * @param String $file
      * @param LogBookTest $test
      * @param LogBookUpload $uploadObj
+     * @param LoggerInterface $logger
      * @return array
      */
-    protected function parseFile($file, LogBookTest $test, LogBookUpload $uploadObj): array
+    protected function parseFile($file, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
     {
         $ret_data = array();
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
@@ -534,7 +535,6 @@ class LogBookUploaderController extends Controller
         $testStartTime = new \DateTime('+100 years');
         $testEndTime = new \DateTime('-100 years');
 
-
         /**
          * If in previous FOR used "&" and use same array
          * Dont remove & from  &$value -> will cause to additional duplicated line
@@ -542,6 +542,7 @@ class LogBookUploaderController extends Controller
         foreach ($newTempArr as $key => $value) {
             preg_match_all('/(\d{2,2}[.|:| |\/|\d]*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
             //preg_match_all('/(\d{2,}.*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
+            //preg_match_all('/(?'TIME'^\d{2,2}.[^\|]*\d{2,3})\s+(?'LEVEL'[A-Z]+)\s*\|\s*(?'MSG'.*)/s', $value,$oneLine); https://regex101.com/r/9T3jd8/2
 
             if (\count($oneLine[2]) > 0) {
                 /** Clean double DEBUG OUTPUT **/
@@ -575,11 +576,9 @@ class LogBookUploaderController extends Controller
                         if (\count($possibleMessageType) === 3) {
                             if ($possibleMessageType[1] === 'GOOD') {
                                 $possibleMessageType[1] = 'PASS';
-                            }
-                            if ($possibleMessageType[1] === 'WARN') {
+                            } elseif ($possibleMessageType[1] === 'WARN') {
                                 $possibleMessageType[1] = 'WARNING';
-                            }
-                            if ($possibleMessageType[1] === 'NOTIC') {
+                            } elseif  ($possibleMessageType[1] === 'NOTIC') {
                                 $possibleMessageType[1] = 'NOTICE';
                             }
                             $msgType_str = $possibleMessageType[1];
@@ -588,28 +587,24 @@ class LogBookUploaderController extends Controller
                 }
 
                 /** **/
-                $ret_data[$counter] = array(
-                    'logTime' => $this->getLogTime($logTime_str),
-                    'message' => $msg_str,
-                    'chain' => $counter,
-                    'test' => $test,
-                    'msgType' => $this->msgTypeRepo->findOneOrCreate(array(
-                        'name' => $this->prepareDebugLevel($msgType_str)
-                    )),
-                );
+                try {
+                    $ret_data[$counter] = array(
+                        'logTime' => $this->getLogTime($logTime_str),
+                        'message' => $msg_str,
+                        'chain' => $counter,
+                        'test' => $test,
+                        'msgType' => $this->msgTypeRepo->findOneOrCreate(array(
+                            'name' => $this->prepareDebugLevel($msgType_str)
+                        )),
+                    );
+                } catch (\Exception $ex) {
+                    $logger->alert('[parseFile] Fail in create log_criteria', array('ex' => $ex));
+                }
 
                 /** @var LogBookMessage $log */
                 $log = $this->logsRepo->Create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
-//                if ($counter%20000 == 0) {
-//                    $this->em->flush();
-//                    foreach ($objectsToClear as $obj) {
-//                        $this->em->detach($obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-//                    }
-//                    unset($objectsToClear);
-//                    $objectsToClear = array();
-//                }
                 /** Test Name section */
                 if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
                     $tmpName = null;
@@ -713,7 +708,8 @@ class LogBookUploaderController extends Controller
         foreach ($tmp_arr as $single) {
             $tmp_pair = explode('::', $single);
             $key = trim($tmp_pair[0]);
-            if (mb_strlen($key) >= 2 && $this->startsWithUpper($key) && mb_strlen($key) <= 100) {
+            $key_len = mb_strlen($key);
+            if ($key_len >= 2 && $key_len <= 100 && $this->startsWithUpper($key) ) {
                 $ret[$key] = trim($tmp_pair[1]);
             }
         }
@@ -879,25 +875,30 @@ class LogBookUploaderController extends Controller
         $timeFormat = 'U.u';
         $ret = \DateTime::createFromFormat('U', time());
 
-        if ($len === $this->_MEDIUM_TIME_LEN) {
-            $timeFormat = 'm/d H:i:s';
-        } else if ($len === $this->_SHORT_TIME_LEN) {
-            $timeFormat = 'H:i:s';
-        } else if ($len === $this->_SHORT_MILISEC_TIME_LEN) {
-            $timeFormat = 'H:i:s.u';
-        } else if ($len === $this->_MEDIUM_MILISEC_TIME_LEN) {
-            $timeFormat = 'm/d H:i:s.u';
-        } else {
-            $try_format = new DateTime($tmp_time);
-            $tmp_time = $try_format->format('U.u');
-        }
+        try {
+            if ($len === $this->_MEDIUM_TIME_LEN) {
+                $timeFormat = 'm/d H:i:s';
+            } else if ($len === $this->_SHORT_TIME_LEN) {
+                $timeFormat = 'H:i:s';
+            } else if ($len === $this->_SHORT_MILISEC_TIME_LEN) {
+                $timeFormat = 'H:i:s.u';
+            } else if ($len === $this->_MEDIUM_MILISEC_TIME_LEN) {
+                $timeFormat = 'm/d H:i:s.u';
+            } else {
+                $try_format = new DateTime($tmp_time);
+                $tmp_time = $try_format->format('U.u');
+            }
 
-        try{
-            $ret = \DateTime::createFromFormat($timeFormat, $tmp_time);
-        } catch (\Exception $ex) {
+            try{
+                $ret = \DateTime::createFromFormat($timeFormat, $tmp_time);
+            } catch (\Exception $ex) {
 //            print_r($ex);
 //            exit();
+            }
+        } catch (\Exception $ex) {
+
         }
+
         return $ret;
     }
 
@@ -1017,7 +1018,7 @@ class LogBookUploaderController extends Controller
                 'executionOrder' => $this->getTestNewExecutionOrder($cycle),
             ));
             /** Parse log in test **/
-            $this->parseFile($new_file, $test, $obj);
+            $this->parseFile($new_file, $test, $obj, null);
 
             $this->em->refresh($cycle);
             $cycle->setBuild($this->buildRepo->findOneOrCreate(array('name' => 'Some Build')));

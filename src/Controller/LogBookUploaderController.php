@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use App\Utils\RandomName;
 use App\Form\LogBookUploadType;
+use Symfony\Component\Lock\Store\FlockStore;
 
 /**
  * Uploader controller.
@@ -315,20 +316,27 @@ class LogBookUploaderController extends Controller
                 $obj->setLogFile($fileName);
 
                 $testName = $file->getClientOriginalName();
+                $testVerdictDefault = $this->parseVerdict('ERROR');
 
-                $test_criteria = array(
-                    'id' => 1,
-                    'name' => $testName,
-                    'cycle' => $cycle,
-                    'logFile' => $new_file->getFilename(),
-                    'logFileSize' => $new_file->getSize(),
-                    'verdict' => $this->parseVerdict('ERROR'),
-                    'executionOrder' => $this->getTestNewExecutionOrder($cycle),
-                );
+                // the argument is the path of the directory where the locks are created
+                $store = new FlockStore(sys_get_temp_dir());
+                $factory = new \Symfony\Component\Lock\Factory($store);
+                $lock = $factory->createLock('cycle_' . $cycle->getId(). '_order', 10);
+                if ($lock->acquire(true)) {
+                    $test_criteria = array(
+                        'id' => 1,
+                        'name' => $testName,
+                        'cycle' => $cycle,
+                        'logFile' => $new_file->getFilename(),
+                        'logFileSize' => $new_file->getSize(),
+                        'verdict' => $testVerdictDefault,
+                        'executionOrder' => $this->getTestNewExecutionOrder($cycle),
+                    );
 
-                /** @var LogBookTest $test */
-                $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
-
+                    /** @var LogBookTest $test */
+                    $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                    $lock->release();
+                }
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
 

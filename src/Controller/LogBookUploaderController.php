@@ -22,6 +22,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Lock\Factory;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +31,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use App\Utils\RandomName;
 use App\Form\LogBookUploadType;
+use Symfony\Component\Lock\Store\FlockStore;
 
 /**
  * Uploader controller.
@@ -219,6 +222,8 @@ class LogBookUploaderController extends Controller
 
         $obj = new LogBookUpload();
         $p_data = $request->request;
+        /** @var LogBookTest $test */
+        $test = null;
         /** @var LogBookCycle $cycle */
         $cycle = null;
         /** @var LogBookSetup $setup */
@@ -310,25 +315,27 @@ class LogBookUploaderController extends Controller
                     echo $ex->getMessage();
                 }
 
-
                 $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
                 $obj->setLogFile($fileName);
 
                 $testName = $file->getClientOriginalName();
+                $testVerdictDefault = $this->parseVerdict('ERROR');
 
-                $test_criteria = array(
-                    'id' => 1,
-                    'name' => $testName,
-                    'cycle' => $cycle,
-                    'logFile' => $new_file->getFilename(),
-                    'logFileSize' => $new_file->getSize(),
-                    'verdict' => $this->parseVerdict('ERROR'),
-                    'executionOrder' => $this->getTestNewExecutionOrder($cycle),
-                );
-
-                /** @var LogBookTest $test */
-                $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
-
+                // the argument is the path of the directory where the locks are created
+                $store = new FlockStore(sys_get_temp_dir());
+                $factory = new Factory($store);
+                $lockName = 'cycle_' . $cycle->getId(). '_order';
+                $lock = $factory->createLock($lockName, 15);
+                if ($lock->acquire(true)) {
+                    try {
+                        $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
+                        $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                    } catch (Exception $ex) {
+                        $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                    } finally {
+                        $lock->release();
+                    }
+                }
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
 
@@ -358,6 +365,26 @@ class LogBookUploaderController extends Controller
             'setup' => $setup,
             'upload' => $obj,
         ));
+    }
+
+    /**
+     * @param string $name
+     * @param LogBookCycle $cycle
+     * @param File $file
+     * @param LogBookVerdict $verdict
+     * @return array
+     */
+    protected function createTestCriteria(string $name, LogBookCycle $cycle, File $file, LogBookVerdict $verdict): array
+    {
+        return array(
+            'id' => 1,
+            'name' => $name,
+            'cycle' => $cycle,
+            'logFile' => $file->getFilename(),
+            'logFileSize' => $file->getSize(),
+            'verdict' => $verdict,
+            'executionOrder' => $this->getTestNewExecutionOrder($cycle),
+        );
     }
 
     /**

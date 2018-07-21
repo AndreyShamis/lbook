@@ -28,7 +28,7 @@ monolog:
         streamed:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
-            level: error
+            level: notice
             channels: ["!event", "!doctrine"]
         console:
             type:   console

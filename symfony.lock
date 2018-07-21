@@ -239,6 +239,9 @@
     "symfony/ldap": {
         "version": "v4.0.5"
     },
+    "symfony/lock": {
+        "version": "v4.1.1"
+    },
     "symfony/lts": {
         "version": "4-dev"
     },

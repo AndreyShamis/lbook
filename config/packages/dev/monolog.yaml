@@ -45,7 +45,7 @@ monolog:
             to_email:   '%env(ADMIN_EMAIL)%'
             # or list of recipients
             # to_email:   ['dev1@example.com', 'dev2@example.com', ...]
-            subject:    '[%kernel.environment%] [%router.request_context.host%] LogBook Error! %%message%%'
+            subject:    '[%kernel.environment%] LogBook Error! %%message%%'
             level:      error
             formatter:  monolog.formatter.html
             content_type: text/html

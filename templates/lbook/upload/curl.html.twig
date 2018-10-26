@@ -1,3 +1,3 @@
-{% if cycle.id is defined %}Finish|{% if cycle is defined %}CycleID:{{ cycle.id }}{% endif %}|{% if setup is defined %}SetupID:{{ setup.id }}{% endif %}{{ upload.message }}
+{% if cycle.id is defined %}Finish|{% if cycle is defined %}CycleID:{{ cycle.id }}{% endif %}|{% if setup is defined %}SetupID:{{ setup.id }}{% endif %}|{% if test is defined %}TestID:{{ $test.id }}{% endif %}{{ upload.message }}
 {% else %}
 Test not uploaded{% endif %}

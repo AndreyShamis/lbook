@@ -365,6 +365,7 @@ class LogBookUploaderController extends Controller
             'cycle' => $cycle,
             'setup' => $setup,
             'upload' => $obj,
+            'test' => $test,
         ));
     }
 

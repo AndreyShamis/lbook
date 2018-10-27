@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use App\Utils\RandomName;
 use App\Form\LogBookUploadType;
 use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Uploader controller.
@@ -228,6 +229,11 @@ class LogBookUploaderController extends Controller
         $cycle = null;
         /** @var LogBookSetup $setup */
         $setup = null;
+
+        $return_urls_only = $request->request->get('return_urls_only', 'false');
+        if ($return_urls_only === '1' || mb_strtolower($return_urls_only) === 'true' || mb_strtolower($return_urls_only) === 'yes') {
+            $return_urls_only = 'true';
+        }
         if ($p_data->count() >= 1) {
             /** @var UploadedFile $file */
             $file = $request->files->get('file');
@@ -360,12 +366,20 @@ class LogBookUploaderController extends Controller
                 $obj->addMessage('TestID is ' . $test->getId() . '.');
             }
         }
-
+        $test_link = $this->generateUrl('test_show_first',
+            ['id' => $test->getId()], UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $cycle_link = $this->generateUrl('cycle_show_first',
+            ['id' => $cycle->getId()], UrlGeneratorInterface::ABSOLUTE_URL
+        );
         return $this->render('lbook/upload/curl.html.twig', array(
             'cycle' => $cycle,
             'setup' => $setup,
             'upload' => $obj,
             'test' => $test,
+            'test_link' => $test_link,
+            'cycle_link' => $cycle_link,
+            'return_urls_only' => $return_urls_only,
         ));
     }
 

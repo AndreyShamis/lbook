@@ -1,3 +1,7 @@
+{% if return_urls_only is defined and return_urls_only == 'true' %}{% if test_link is defined %}Link to detailed test {{ test_link }}   {% endif %} {% if cycle_link is defined %}Link to detailed cycle {{ cycle_link }}
+{% endif %}
+{% else %}
 {% if cycle.id is defined %}Finish|{% if cycle is defined %}CycleID:{{ cycle.id }}{% endif %}|{% if setup is defined %}SetupID:{{ setup.id }}{% endif %}|{% if test is defined %}TestID:{{ test.id }}{% endif %}{{ upload.message }}
 {% else %}
 Test not uploaded{% endif %}
+{% endif %}

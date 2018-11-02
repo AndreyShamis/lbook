@@ -191,6 +191,23 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    {% if cycle.testsUnknown > 0 %}
+                        <div class="infobox infobox-grey">
+                            <div class="infobox-progress">
+                                <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.unknownRate }}" data-color="#abbac3"
+                                     style="height: 50px; width: 50px; line-height: 49px;">
+                                    <span class="percent">{{ cycle.testsUnknown |  getPercentage (testsCount, 1) }}%</span>
+                                </div>
+                            </div>
+                            <div class="infobox-data" title="{{ cycle.unknownRate }}%">
+                                <span class="infobox-text" style="color: #abbac3">Unknown</span>
+                                <div class="infobox-content">
+                                    <span class="bigger-110">{{ cycle.testsUnknown }} tests</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </td>
         </tr>

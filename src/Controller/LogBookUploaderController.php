@@ -349,6 +349,8 @@ class LogBookUploaderController extends Controller
                         $lock->release();
                     }
                 }
+                $this->em->flush();
+                
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
 

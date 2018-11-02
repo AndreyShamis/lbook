@@ -251,6 +251,12 @@ class LogBookCycle
     protected $forDelete = false;
 
     /**
+     * @var boolean
+     * @ORM\Column(name="keep_forever", type="boolean", options={"default"="0"})
+     */
+    protected $keepForever = false;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="downloads_count", type="integer", options={"unsigned"=true, "default"="0"})
@@ -280,9 +286,9 @@ class LogBookCycle
         $this->setTokenExpiration(new \DateTime('+1 hours'));
         $this->setUploadToken(RandomString::generateRandomString(50));
         $this->meta_data = [];
-        /**
-         * Other stuff
-         */
+        $this->setKeepForever(false);
+
+        /**  Other stuff */
         $this->tests = new ArrayCollection();
     }
 
@@ -338,6 +344,21 @@ class LogBookCycle
         } else {
             $this->addMetaData($meta_data);
         }
+    }
+    /**
+     * @return bool
+     */
+    public function isKeepForever(): bool
+    {
+        return $this->keepForever;
+    }
+
+    /**
+     * @param bool $keepForever
+     */
+    public function setKeepForever(bool $keepForever): void
+    {
+        $this->keepForever = $keepForever;
     }
 
     /**

@@ -79,6 +79,13 @@ class LogBookCycle
     protected $warningRate = 0;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="na_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
+     */
+    protected $naRate = 0;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
@@ -205,6 +212,13 @@ class LogBookCycle
     protected $testsWarning = 0;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="tests_na", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $testsNa = 0;
+
+    /**
      * @var boolean
      * @ORM\Column(name="disabled", type="boolean")
      */
@@ -307,7 +321,7 @@ class LogBookCycle
         if ($this->isForDelete() === true) {
             return;
         }
-        $passCount = $failCount = $errorCount = $warningCount = $disabledCount = $forDeleteCount = 0;
+        $passCount = $failCount = $errorCount = $warningCount = $naCount = $disabledCount = $forDeleteCount = 0;
         $tests = $this->getTests();
         $allCount = $tests->count();
         if (\is_object($tests) && $allCount > 0) {
@@ -323,6 +337,8 @@ class LogBookCycle
                         $errorCount++;
                     } else if(strcasecmp($verdictStr, 'WARNING') === 0) {
                         $warningCount++;
+                    } else if(strcasecmp($verdictStr, 'TEST_NA') === 0) {
+                        $naCount++;
                     }
                 } else {
                     if ($test->isForDelete() === false) {
@@ -338,6 +354,7 @@ class LogBookCycle
         $this->setTestsFail($failCount);
         $this->setTestsError($errorCount);
         $this->setTestsWarning($warningCount);
+        $this->setTestsNa($naCount);
 
         $allCount -= ($disabledCount + $forDeleteCount);
         $this->setTestsCount($allCount);
@@ -349,11 +366,13 @@ class LogBookCycle
             $this->setFailRate($this->getTestsFail() * $coefficient);
             $this->setErrorRate($this->getTestsError() * $coefficient);
             $this->setWarningRate($this->getTestsWarning() * $coefficient);
+            $this->setNaRate($this->getTestsNa() * $coefficient);
         } else {
             $this->setPassRate(0);
             $this->setFailRate(0);
             $this->setErrorRate(0);
             $this->setWarningRate(0);
+            $this->setNaRate(0);
         }
     }
 
@@ -419,6 +438,22 @@ class LogBookCycle
     public function setTestsWarning(int $testsWarning): void
     {
         $this->testsWarning = $testsWarning;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsNa(): int
+    {
+        return $this->testsNa;
+    }
+
+    /**
+     * @param int $testsNa
+     */
+    public function setTestsNa(int $testsNa): void
+    {
+        $this->testsNa = $testsNa;
     }
 
     /**
@@ -708,6 +743,24 @@ class LogBookCycle
     {
         $this->warningRate = round($warningRate, $precision);
     }
+
+    /**
+     * @return float
+     */
+    public function getNaRate(): float
+    {
+        return $this->naRate;
+    }
+
+    /**
+     * @param float $naRate
+     * @param int $precision
+     */
+    public function setNaRate(float $naRate, $precision=2): void
+    {
+        $this->naRate = round($naRate, $precision);
+    }
+
 
     /**
      * @return Collection|LogBookTest[]

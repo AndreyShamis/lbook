@@ -350,7 +350,7 @@ class LogBookUploaderController extends Controller
                     }
                 }
                 $this->em->flush();
-                
+
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
 

@@ -76,6 +76,7 @@ class UploaderTest extends LogBookApplicationTestCase
         $testId = $this->findTestIdInTest($secondContent);
         self::$entityManager->clear();
 
+        /** @var LogBookTest $test */
         $test = $testRepo->find($testId);
         /** @var LogBookCycle $cycle */
         $cycle = $test->getCycle();
@@ -86,6 +87,7 @@ class UploaderTest extends LogBookApplicationTestCase
         $this->assertSame($setupName, $setup->getName(), 'Check that AutoGEN Setup name is same: Actual: ' . $setup->getName() . ', expected ' . $setupName . 'Current testID:' . $testId);
         $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
         $this->assertSame(35, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
+        $this->assertSame(35, $test->getLogs()->count(), 'Check that test Logs count is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());
         $this->assertEquals(1, $cycle->getTests()->count(), 'Check that cycle include 1 created test. count: ' . $cycle->getTests()->count());
         $this->assertEquals(0, $cycle->getPassRate(), 'Check that cycle pass rate is 0%: Actual = ' . $cycle->getPassRate());

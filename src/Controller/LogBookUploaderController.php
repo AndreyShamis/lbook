@@ -394,7 +394,7 @@ class LogBookUploaderController extends AbstractController
             $fileSize = $new_file->getSize();
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
-            if ($fileSize > 1*1024*1024) {
+            if ($fileSize > 0.3*1024*1024) {
                 $this->addBlackListLevel('DEBUG');
             }
             $obj->setLogFile($fileName);
@@ -450,7 +450,7 @@ class LogBookUploaderController extends AbstractController
     /**
      * @param string $levelName
      */
-    private final function addBlackListLevel(string $levelName): void
+    private function addBlackListLevel(string $levelName): void
     {
         $preparedLevelName = $this->prepareDebugLevel($levelName);
         if (!isset($this->blackListLevels[$preparedLevelName])) {
@@ -621,6 +621,8 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookUpload $uploadObj
      * @param LoggerInterface $logger
      * @return array
+     * @throws ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function parseFile($file, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
     {
@@ -650,11 +652,14 @@ class LogBookUploaderController extends AbstractController
 //             */
 //            $counter = $this->recoverFirstLines($newTempArr);
 //        }
-        /*
-         * Test Time section
-         */
-        $testStartTime = new \DateTime('+100 years');
-        $testEndTime = new \DateTime('-100 years');
+
+        /* Test Time section*/
+        $testStartTime = $testEndTime = null;
+        try {
+            $testStartTime = new \DateTime('+100 years');
+            $testEndTime = new \DateTime('-100 years');
+        } catch (Exception $e) {
+        }
 
         /**
          * If in previous FOR used "&" and use same array
@@ -818,17 +823,22 @@ class LogBookUploaderController extends AbstractController
         }
         $test->setTimeStart($testStartTime);
         $test->setTimeEnd($testEndTime);
-        if ($testName !== null && \strlen($testName) > 0) {
+        if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
         $this->em->flush();
         foreach ($objectsToClear as $tmp_obj) {
-            $this->em->detach($tmp_obj);   // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+            $this->em->detach($tmp_obj);
         }
 
         return $ret_data;
     }
 
+    /**
+     * @param $string
+     * @return array
+     */
     private function extractTestVariables($string): array
     {
         $ret = array();
@@ -845,6 +855,10 @@ class LogBookUploaderController extends AbstractController
         return $ret;
     }
 
+    /**
+     * @param $string
+     * @return bool
+     */
     private function isMultipleVariable($string): bool
     {
         if (substr_count($string, ';;') > 0) {
@@ -854,17 +868,29 @@ class LogBookUploaderController extends AbstractController
         return false;
     }
 
+    /**
+     * @param $string
+     * @return bool
+     */
     private function isVariableString($string): bool
     {
         return $this->startsWithUpper($string) && strpos($string, '::') !== false;
     }
 
+    /**
+     * @param $string
+     * @return bool
+     */
     private function isJson($string): bool
     {
         json_decode($string);
         return (json_last_error() === JSON_ERROR_NONE);
     }
 
+    /**
+     * @param $str
+     * @return bool
+     */
     private function startsWithUpper($str): bool
     {
         $chr = mb_substr ($str, 0, 1, 'UTF-8');

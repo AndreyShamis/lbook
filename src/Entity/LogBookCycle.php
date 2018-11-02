@@ -19,7 +19,7 @@ class LogBookCycle
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(type="integer", options={"unsigned"=true})
+     * @ORM\Column(type="bigint", options={"unsigned"=true})
      */
     protected $id;
 
@@ -251,6 +251,12 @@ class LogBookCycle
     protected $forDelete = false;
 
     /**
+     * @var boolean
+     * @ORM\Column(name="keep_forever", type="boolean", options={"default"="0"})
+     */
+    protected $keepForever = false;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="downloads_count", type="integer", options={"unsigned"=true, "default"="0"})
@@ -263,6 +269,13 @@ class LogBookCycle
      * //, columnDefinition="LONGTEXT DEFAULT NULL"
      */
     protected $meta_data = [];
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="delete_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
+     */
+    protected $deleteAt;
 
     public static $MAX_NAME_LEN = 250;
 
@@ -278,12 +291,29 @@ class LogBookCycle
         $this->setUpdatedAt();
         $this->setCreatedAt();
         $this->setTokenExpiration(new \DateTime('+1 hours'));
+        $this->setDeleteAt(new \DateTime('+100 days'));
         $this->setUploadToken(RandomString::generateRandomString(50));
         $this->meta_data = [];
-        /**
-         * Other stuff
-         */
+        $this->setKeepForever(false);
+
+        /**  Other stuff */
         $this->tests = new ArrayCollection();
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDeleteAt(): \DateTime
+    {
+        return $this->deleteAt;
+    }
+
+    /**
+     * @param \DateTime $deleteAt
+     */
+    public function setDeleteAt(\DateTime $deleteAt): void
+    {
+        $this->deleteAt = $deleteAt;
     }
 
     /**
@@ -338,6 +368,21 @@ class LogBookCycle
         } else {
             $this->addMetaData($meta_data);
         }
+    }
+    /**
+     * @return bool
+     */
+    public function isKeepForever(): bool
+    {
+        return $this->keepForever;
+    }
+
+    /**
+     * @param bool $keepForever
+     */
+    public function setKeepForever(bool $keepForever): void
+    {
+        $this->keepForever = $keepForever;
     }
 
     /**
@@ -394,6 +439,16 @@ class LogBookCycle
         $this->setTimeEnd($max_time);
         $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
         $this->setTestsTimeSum($testsTimeSum);
+
+        try {
+            $setup = $this->getSetup();
+            if ($setup !== null) {
+                $new_delete = new \DateTime(sprintf('+%d days', $setup->getRetentionPolicy()));
+                $this->setDeleteAt($new_delete);
+            }
+        } catch (\Exception $ex) {
+            print $ex->getMessage();
+        }
     }
 
     /**
@@ -971,6 +1026,7 @@ class LogBookCycle
 
     /**
      * @PrePersist
+     * @throws \Exception
      */
     public function setCreatedAt(): void
     {
@@ -988,6 +1044,7 @@ class LogBookCycle
     /**
      * @PreFlush
      * @PrePersist
+     * @throws \Exception
      */
     public function setUpdatedAt(): void
     {

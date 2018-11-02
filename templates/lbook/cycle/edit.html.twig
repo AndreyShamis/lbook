@@ -37,9 +37,9 @@
     <script>
         $(document).ready(function() {
             $( "#cycleEditForm form" ).css( "width", "800px" );
-            $( "#cycleEditForm input[type = 'text']" ).css( "width", "400px" );
-            $( "#cycleEditForm select" ).css( "width", "400px" );
-            $( "#cycleEditForm label" ).css( "width", "400px" );
+            $( "#cycleEditForm input[type = 'text']" ).css( "width", "600px" );
+            $( "#cycleEditForm select" ).css( "width", "600px" );
+            $( "#cycleEditForm label" ).css( "width", "200px" );
             $( "#cycleEditCancel, button[name = 'cancel'].btn" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_show_first', { 'id': cycle.id }) }}";
             });
@@ -56,6 +56,23 @@
             $( "#cycleEditSave, button[name = 'save'].btn" ).bind( "click", function() {
                 $("#cycleEditForm").submit();
             });
+            if(!ace.vars['old_ie']) $('.deleteAt-date-timepicker').datetimepicker({
+                format: 'YYYY/MM/DD HH:mm:ss',//use this option to display seconds
+                icons: {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-arrows ',
+                    clear: 'fa fa-trash',
+                    close: 'fa fa-times'
+                }
+            }).next().on(ace.click_event, function(){
+                $(this).prev().focus();
+            });
+
         });
     </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}LogBOOK Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
+{% block title %}Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
     <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
     {% spaceless %}
@@ -54,7 +54,7 @@
                 </span>
             </td>
             <th>
-                <span style="float:right;">Disabled / Visibility / Check Uptime </span>
+                <span style="float:right;">Disabled / Visibility / Check Uptime / Retention Policy</span>
             </th>
             <td>
                 <span style="float:right;">
@@ -69,11 +69,14 @@
                     <span class="yellow">
                     {{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}
                     </span>
+                    /<span class="label label-info arrowed-right arrowed-in" title="Retention Policy in days">
+                        {{ setup.retentionPolicy }}
+                    </span>
                 </span>
             </td>
         </tr>
 
-        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN'] %}
+        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN', 'retentionPolicy'] %}
         {% for key, value in setup|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>

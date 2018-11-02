@@ -35,6 +35,7 @@ class LogBookSetupType extends AbstractType
             //->add('owner')
             ->add('moderators')
             ->add('isPrivate')
+            ->add('retentionPolicy')
         ;
     }
 

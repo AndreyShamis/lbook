@@ -19,9 +19,25 @@ class LogBookCycleRepository extends ServiceEntityRepository
         parent::__construct($registry, LogBookCycle::class);
     }
 
+    public function findByDeleteAt()
+    {
+        try {
+            $qb = $this->createQueryBuilder('c')
+                ->where('c.deleteAt <= :now')
+                ->andWhere('c.keepForever = 0')
+                ->setParameter('now', new \DateTime('now'));
+        } catch (\Exception $e) {
+        }
+        return $qb->getQuery()->execute();
+    }
+
     /**
      * @param array $criteria
+     * @param bool $find
      * @return LogBookCycle
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function findOneOrCreate(array $criteria, bool $find=true): LogBookCycle
     {
@@ -78,6 +94,8 @@ class LogBookCycleRepository extends ServiceEntityRepository
 
     /**
      * @param LogBookCycle $cycle
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function delete(LogBookCycle $cycle): void
     {

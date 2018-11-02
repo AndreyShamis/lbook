@@ -53,7 +53,7 @@ composer about
 success "Composer Shows information about packages: "
 composer show
 success "Shows a list of locally modified packages: "
-composer status
+composer status   || fail "Failed on [composer status]"
 
 # TODO Enable
 #info "Validates a composer.json and composer.lock: "

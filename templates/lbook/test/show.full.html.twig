@@ -173,6 +173,7 @@
             <div class="widget-body" style="display: block;">
                 <div class="widget-main no-padding testLog">
                     {% include "lbook/search.html.twig" %}
+                    {% spaceless %}
                     <table class="table table-bordered table-hover table-condensed">
                         <thead class="thin-border-bottom">
                         <tr>
@@ -207,6 +208,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
+                    {% endspaceless %}
                 </div><!-- /.widget-main -->
                 <div class="widget-toolbox padding-8 text-center">
                     <div>{% include "lbook/double.paginator.html.twig" %}</div>

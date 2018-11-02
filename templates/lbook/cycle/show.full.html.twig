@@ -7,21 +7,16 @@
         <div class="col-xs-10">
             <h3 class="generic_title cycle_title"><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
         </div>
-
         <div class="col-xs-2">
             <span style="float: right;">
                 <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
                     <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
-                    Download
-                    {% if cycle.downloads > 0 %}
-                    ({{ cycle.downloads }})
-                    {% endif %}
-                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
                 </button>
             </span>
         </div>
     </div>
-
+    {% spaceless %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
         {#<tr>#}
@@ -237,6 +232,7 @@
         {#{% endfor %}#}
         </tbody>
     </table>
+    {% endspaceless %}
     {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
     {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
     {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
@@ -255,6 +251,7 @@
     {% include "lbook/search.html.twig" %}
     <div id="cycleShowToolbar">
     </div>
+    {% spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="testTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
@@ -281,10 +278,10 @@
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
             <th data-sortable="true" data-field="time_run" title="Test run time">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
-                <th data-sortable="true" data-field="time_start" data-sorter="dataTitleDateSorter" title="Test start time">Time start</th>
+                <th data-sortable="true" data-field="time_start" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
             {% endif %}
             {% if cycle_show_test_time_end_show == true %}
-                <th data-sortable="true" data-field="time_end" data-sorter="dataTitleDateSorter" title="Test end time">Time end</th>
+                <th data-sortable="true" data-field="time_end" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
             {% endif %}
             {% if cycle_show_test_time_ratio_show == true %}
                 <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
@@ -307,7 +304,7 @@
             {#<th>Actions</th>#}
         </tr>
         </thead>
-        {% spaceless %}
+
         <tbody class="searchable">
 
         {% set break = false %}
@@ -322,8 +319,8 @@
                 {% set test_disabled = 'test-disabled' %}
             {% endif %}
             <tr class="{{ test_disabled }}">
-                {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
-                <td>{{ test.executionOrder }}</td>
+                {% if cycle_show_test_id_show == true %}<td class="font11">{{ test.id }}</td>{% endif %}
+                <td class="font11">{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 {% if cycle_show_test_time_start_show == true %} {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
@@ -355,7 +352,7 @@
                                 {% if isUrl(test.metaData[item]) %}
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
-                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 50) }}#}</span>
+                                    <span title="{{ test.metaData[item] }}" class="font11">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 50) }}#}</span>
                                 {% endif %}
                             {% endif %}
                         </td>
@@ -365,7 +362,7 @@
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
                 {% endif %}
-                <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                <td><span class="badge {{verdictToBadge(test.verdict)}} font11">{{ test.verdict }}</span></td>
                 {#<td>#}
                 {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                 {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
@@ -373,9 +370,9 @@
             </tr>
         {% endfor %}
         </tbody>
-        {% endspaceless %}
-    </table>
 
+    </table>
+    {% endspaceless %}
     <ul>
         <li><a href="{{ path('cycle_index') }}">Back to the list</a></li>
         {% if is_granted('edit', cycle.setup) %}

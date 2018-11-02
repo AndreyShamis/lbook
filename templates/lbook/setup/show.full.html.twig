@@ -92,6 +92,7 @@
     {% include "lbook/search.html.twig" %}
     <div id="toolbar">
     </div>
+    {% spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
            data-pagination="true" data-search="true" data-toggle="table"
            data-show-columns="true"
@@ -165,7 +166,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+    {% endspaceless %}
     <ul>
         <li>
             <a href="{{ path('setup_index') }}">Back to setup list</a>

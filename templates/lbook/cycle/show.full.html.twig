@@ -1,5 +1,5 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}LBOOK Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
+{% block title %}Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
 {% block content %}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
@@ -185,7 +185,7 @@
     {% set cycle_show_test_time_start_format = app.user.settings.cycleShowTestTimeStartFormat | default('H:i:s')%}
     {% set cycle_show_test_time_end_format = app.user.settings.cycleShowTestTimeEndFormat | default('H:i:s')%}
 
-    {% set pagePath = "cycle_show" %}
+    {% set pagePath = "cycle_show_page" %}
     {% set objId = cycle.id %}
     {% include "lbook/double.paginator.html.twig" %}
     {%  set tests = cycle.tests%}

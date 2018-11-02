@@ -114,7 +114,7 @@
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#82af6f"
                                  style="height: 50px; width: 50px; line-height: 49px; color: rgb(135, 184, 127);">
-                                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 0) }}%</span>
+                                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 1) }}%</span>
                             </div>
                         </div>
                         <div class="infobox-data" title="{{ cycle.passRate }}%">
@@ -129,7 +129,7 @@
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.warningRate }}" data-color="#6FB3E0"
                                  style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsWarning |  getPercentage (testsCount, 0) }}%</span>
+                                <span class="percent">{{ cycle.testsWarning |  getPercentage (testsCount, 1) }}%</span>
                             </div>
                         </div>
                         <div class="infobox-data" title="{{ cycle.warningRate }}%">
@@ -146,7 +146,7 @@
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.failRate }}" data-color="#d15b47"
                                  style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsFail | getPercentage (testsCount, 0) }}%</span>
+                                <span class="percent">{{ cycle.testsFail | getPercentage (testsCount, 1) }}%</span>
                             </div>
                         </div>
                         <div class="infobox-data" title="{{ cycle.failRate }}%">
@@ -163,7 +163,7 @@
                         <div class="infobox-progress">
                             <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.errorRate }}" data-color="#f89406"
                                  style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsError |  getPercentage (testsCount, 0) }}%</span>
+                                <span class="percent">{{ cycle.testsError |  getPercentage (testsCount, 1) }}%</span>
                             </div>
                         </div>
                         <div class="infobox-data" title="{{ cycle.errorRate }}%">
@@ -178,9 +178,9 @@
                     {% if cycle.testsNa > 0 %}
                         <div class="infobox infobox-blue">
                             <div class="infobox-progress">
-                                <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.errorRate }}" data-color="#f89406"
+                                <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.naRate }}" data-color="#1da8f8"
                                      style="height: 50px; width: 50px; line-height: 49px;">
-                                    <span class="percent">{{ cycle.testsNa |  getPercentage (testsCount, 0) }}%</span>
+                                    <span class="percent">{{ cycle.testsNa |  getPercentage (testsCount, 1) }}%</span>
                                 </div>
                             </div>
                             <div class="infobox-data" title="{{ cycle.naRate }}%">

@@ -11,6 +11,7 @@
     <div class="row">
         <div id="setupTableToolbar">
         </div>
+        {% spaceless %}
         <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
                id="setupTable" data-pagination="true" data-search="true" data-toggle="table"
                data-toolbar="#setupTableToolbar"
@@ -87,6 +88,7 @@
             {% endfor %}
             </tbody>
         </table>
+        {% endspaceless %}
     </div>
     {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
         <div class="row">

@@ -4,7 +4,9 @@
 {% block body %}
 
     {#{% if admin_service.isAdmin != 1 %}#}
+    {% spaceless %}
     {% include 'lbook/menu.top.html.twig' %}
+    {% endspaceless %}
     {#{% endif %}#}
     <div class="main-container" id="main-container">
 
@@ -12,19 +14,19 @@
             try{ace.settings.check('main-container' , 'fixed')}catch(e){}
         </script>
         <div id="sidebar" class="sidebar responsive">
-
-
             {#{% if admin_service.isAdmin != 1 %}#}
+            {% spaceless %}
             {% include 'lbook/menu.left.html.twig' %}
+            {% endspaceless %}
             {#{% endif %}#}
             {#{% if admin_service.isAdmin == 1 %}#}
             {#{% endif %}#}
-
         </div>
 
         <div class="main-content">
             <div class="main-content-inner">
                 <div class="page-content">
+                    {% spaceless %}
                     <div class="ace-settings-container" id="ace-settings-container">
                         <div class="btn btn-app btn-xs btn-warning ace-settings-btn" id="ace-settings-btn">
                             <i class="ace-icon fa fa-cog bigger-130"></i>
@@ -91,7 +93,7 @@
                             </div><!-- /.pull-left -->
                         </div><!-- /.ace-settings-box -->
                     </div><!-- /.ace-settings-container -->
-
+                    {% endspaceless %}
                     <div class="row">
                         <div class="col-xs-12">
                             <!-- PAGE CONTENT BEGINS -->

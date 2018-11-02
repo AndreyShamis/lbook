@@ -371,6 +371,7 @@ class LogBookCycle
         $this->setTestsNa($naCount);
         $allCount -= ($disabledCount + $forDeleteCount);
         $unknown = $allCount - ($passCount + $failCount + $errorCount + $warningCount + $naCount);
+        $this->setTestsUnknown($unknown);
         $this->setTestsCount($allCount);
         $this->setTestsDisabled($disabledCount);
 

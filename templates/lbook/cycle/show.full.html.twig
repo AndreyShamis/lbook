@@ -233,6 +233,7 @@
         </tbody>
     </table>
     {% endspaceless %}
+
     {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
     {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
     {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
@@ -306,7 +307,7 @@
         </thead>
 
         <tbody class="searchable">
-
+        {% set builder = '' %}
         {% set break = false %}
         {% set counter = 0 %}
         {% for test in iterator if not break %}
@@ -319,6 +320,9 @@
                 {% set test_disabled = 'test-disabled' %}
             {% endif %}
             <tr class="{{ test_disabled }}">
+                {% if is_granted('edit', cycle.setup) %}
+                {%  set builder = builder ~ '[\'' ~ test.verdict ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
+                {% endif %}
                 {% if cycle_show_test_id_show == true %}<td class="font11">{{ test.id }}</td>{% endif %}
                 <td class="font11">{{ test.executionOrder }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
@@ -387,6 +391,10 @@
         {#{% endif %}#}
     </ul>
 
+    {% if is_granted('edit', cycle.setup) %}
+        <div id="example5.1" style="height: 400px;"></div>
+    {% endif %}
+
     <script>
         function drawEasyPieChart(){
             jQuery(function($) {
@@ -419,4 +427,31 @@
             // });
         });
     </script>
+    {% if is_granted('edit', cycle.setup) %}
+    <script type="text/javascript">
+        google.charts.load("current", {packages:["timeline"]});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+
+            var container = document.getElementById('example5.1');
+            var chart = new google.visualization.Timeline(container);
+            var dataTable = new google.visualization.DataTable();
+
+            dataTable.addColumn({ type: 'string', id: 'Room' });
+            dataTable.addColumn({ type: 'string', id: 'Name' });
+            dataTable.addColumn({ type: 'date', id: 'Start' });
+            dataTable.addColumn({ type: 'date', id: 'End' });
+            dataTable.addRows([
+                {{
+                builder|raw
+                }}]);
+
+            var options = {
+                timeline: { singleColor: '#8d8' },
+            };
+
+            chart.draw(dataTable, options);
+        }
+    </script>
+    {% endif %}
 {% endblock %}

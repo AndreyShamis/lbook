@@ -59,7 +59,9 @@ class LogBookUploaderController extends Controller
     protected $buildRepo;
     /** @var LogBookTargetRepository $targetRepo */
     protected $targetRepo;
-    
+
+    private $blackListLevels = array();
+
     protected $_MIN_LOG_STR_LEN = 10;
     protected $_MIN_CLEAN_LOG_STR_LEN = 1;
     protected $_SHORT_TIME_LEN = 8;             // 12:48:45
@@ -320,8 +322,12 @@ class LogBookUploaderController extends Controller
                 } catch (Exception $ex) {
                     echo $ex->getMessage();
                 }
+                $fileSize = $new_file->getSize();
+                $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $fileSize);
 
-                $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $new_file->getSize());
+                if ($fileSize > 10000000) {
+                    $this->addBlackListLevel('DEBUG');
+                }
                 $obj->setLogFile($fileName);
 
                 $testName = $file->getClientOriginalName();
@@ -381,6 +387,17 @@ class LogBookUploaderController extends Controller
             'cycle_link' => $cycle_link,
             'return_urls_only' => $return_urls_only,
         ));
+    }
+
+    private final function addBlackListLevel(string $levelName): void
+    {
+        $preparedLevelName = $this->prepareDebugLevel($levelName);
+        if (!isset($this->blackListLevels[$preparedLevelName])) {
+            $level = $this->msgTypeRepo->findOneOrCreate(array(
+                'name' => $preparedLevelName
+            ));
+            $this->blackListLevels[$preparedLevelName] = $level;
+        }
     }
 
     /**
@@ -631,13 +648,20 @@ class LogBookUploaderController extends Controller
 
                 /** **/
                 try {
+                    /** @var string $preparedLevelName */
+                    $preparedLevelName = $this->prepareDebugLevel($msgType_str);
+                    if (isset($this->blackListLevels[$preparedLevelName])) {
+                        // In case this log LEVEL ignored for DB insert
+                        continue;
+                    }
+
                     $ret_data[$counter] = array(
                         'logTime' => $this->getLogTime($logTime_str),
                         'message' => $msg_str,
                         'chain' => $counter,
                         'test' => $test,
                         'msgType' => $this->msgTypeRepo->findOneOrCreate(array(
-                            'name' => $this->prepareDebugLevel($msgType_str)
+                            'name' => $preparedLevelName
                         )),
                     );
                 } catch (\Exception $ex) {

@@ -204,7 +204,12 @@
             {% endif %}
             <tr class="{{ test_disabled }}">
                 {% if is_granted('edit', cycle.setup) %}
-                {%  set builder = builder ~ '[\'' ~ test.verdict ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
+                    {% if 'CLUSTER_SHOW' in test.metaData|keys %}
+                        {%  set column =  test.metaData['CLUSTER_SHOW'] %}
+                    {% else %}
+                        {%  set column =  test.verdict %}
+                    {% endif %}
+                {%  set builder = builder ~ '[\'' ~ column ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
                 {% endif %}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
@@ -320,8 +325,8 @@
             var chart = new google.visualization.Timeline(container);
             var dataTable = new google.visualization.DataTable();
 
-            dataTable.addColumn({ type: 'string', id: 'Room' });
-            dataTable.addColumn({ type: 'string', id: 'Name' });
+            dataTable.addColumn({ type: 'string', id: 'Selector' });
+            dataTable.addColumn({ type: 'string', id: 'Test Name' });
             dataTable.addColumn({ type: 'date', id: 'Start' });
             dataTable.addColumn({ type: 'date', id: 'End' });
             dataTable.addRows([
@@ -330,7 +335,13 @@
                 }}]);
 
             var options = {
-                timeline: { singleColor: '#8d8' },
+                timeline: {
+                    //singleColor: '#8d8',
+                    groupByRowLabel: true,
+
+                },
+                // colors: ['#cbb69d', '#603913', '#c69c6e'],
+
             };
 
             chart.draw(dataTable, options);

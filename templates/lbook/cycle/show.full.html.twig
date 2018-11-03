@@ -17,7 +17,7 @@
         </div>
     </div>
     {% spaceless %}
-    <table class="records_list table table-striped table-condensed">
+    <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
         <tbody>
         {#<tr>#}
             {#<th>#}
@@ -60,150 +60,33 @@
         <tr>
             <th>Start Time</th>
             <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
-            <th>Token EXP</th>
-            <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
-            <th>Updated</th>
-            <td>{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</td>
             <th>Created</th>
-            <td>{{ cycle.createdAt|date('Y-m-d H:i:s') }}</td>
+            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+            <th>Token EXP</th>
+            <td colspan="3">{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
         </tr>
         <tr>
             <th>End Time</th>
             <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+            <th>Updated</th>
+            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
             <th>Token</th>
-            <td colspan="5"><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
+            <td colspan="3"><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
         </tr>
         <tr>
-            <th>All Tests count</th>
-            <td>
-                {{ allTestsCount}}
-                <i class="ace-icon fa fa-exclamation-circle" title="Disabled tests also included"></i>
-            </td>
-            <th>Setup</th>
-            <td colspan="5">
+
+            <td colspan="5">{% include 'lbook/cycle/infobox.html.twig' %}</td>
+            <td colspan="3">
                 <table class="records_list table table-striped table-condensed">
                     <tr>
-                        <td><a target="_blank" href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><span class="label label-success label-white middle">{{ cycle.setup}}</span></a></td>
-                        <td>Short name <span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
-                        <td>OS :{{ cycle.setup.os }}</td>
-                        <td>Owner :{{ cycle.setup.owner }}</td>
+                        <th title="Short Setup Name">Short</th>
+                        <td><span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
+                    </tr>
+                    <tr>
+                        <td title="Operational System">OS :{{ cycle.setup.os }}</td>
+                        <td title="Setup Owner">Owner :{{ cycle.setup.owner }}</td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="8">
-                <div class="infobox-container">
-
-                    <div class="infobox infobox-orange2">
-                        <div class="infobox-icon">
-                            <i class="ace-icon fa fa-flask"></i>
-                        </div>
-                        <div class="infobox-data" title="Also there is {{ cycle.testsDisabled }}({{ getPercentage (cycle.testsDisabled, allTestsCount, 2) }}%) disabled tests.">
-                            <span class="infobox-data-number">{{ testsCount }}</span>
-                            <div class="infobox-content">Total tests</div>
-                        </div>
-                    </div>
-
-                    <div class="infobox infobox-green">
-                        <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#82af6f"
-                                 style="height: 50px; width: 50px; line-height: 49px; color: rgb(135, 184, 127);">
-                                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 1) }}%</span>
-                            </div>
-                        </div>
-                        <div class="infobox-data" title="{{ cycle.passRate }}%">
-                            <span class="infobox-text" style="color: #82af6f">Pass Rate</span>
-                            <div class="infobox-content">
-                                <span class="bigger-110">{{ cycle.testsPass }} tests</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% if cycle.testsWarning > 0 %}
-                    <div class="infobox infobox-black">
-                        <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.warningRate }}" data-color="#6FB3E0"
-                                 style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsWarning |  getPercentage (testsCount, 1) }}%</span>
-                            </div>
-                        </div>
-                        <div class="infobox-data" title="{{ cycle.warningRate }}%">
-                            <span class="infobox-text" style="color: #6FB3E0">Warning Rate</span>
-                            <div class="infobox-content">
-                                <span class="bigger-110">{{ cycle.testsWarning }} tests</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if cycle.testsFail > 0 %}
-                    <div class="infobox infobox-red">
-                        <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.failRate }}" data-color="#d15b47"
-                                 style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsFail | getPercentage (testsCount, 1) }}%</span>
-                            </div>
-                        </div>
-                        <div class="infobox-data" title="{{ cycle.failRate }}%">
-                            <span class="infobox-text" style="color: #d15b47">Fail Rate</span>
-                            <div class="infobox-content">
-                                <span class="bigger-110">{{ cycle.testsFail }} tests</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if cycle.testsError > 0 %}
-                    <div class="infobox infobox-orange">
-                        <div class="infobox-progress">
-                            <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.errorRate }}" data-color="#f89406"
-                                 style="height: 50px; width: 50px; line-height: 49px;">
-                                <span class="percent">{{ cycle.testsError |  getPercentage (testsCount, 1) }}%</span>
-                            </div>
-                        </div>
-                        <div class="infobox-data" title="{{ cycle.errorRate }}%">
-                            <span class="infobox-text" style="color: #f89406">Error Rate</span>
-                            <div class="infobox-content">
-                                <span class="bigger-110">{{ cycle.testsError }} tests</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if cycle.testsNa > 0 %}
-                        <div class="infobox infobox-blue">
-                            <div class="infobox-progress">
-                                <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.naRate }}" data-color="#1da8f8"
-                                     style="height: 50px; width: 50px; line-height: 49px;">
-                                    <span class="percent">{{ cycle.testsNa |  getPercentage (testsCount, 1) }}%</span>
-                                </div>
-                            </div>
-                            <div class="infobox-data" title="{{ cycle.naRate }}%">
-                                <span class="infobox-text" style="color: #1da8f8">NA Rate</span>
-                                <div class="infobox-content">
-                                    <span class="bigger-110">{{ cycle.testsNa }} tests</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    {% if cycle.testsUnknown > 0 %}
-                        <div class="infobox infobox-grey">
-                            <div class="infobox-progress">
-                                <div class="easy-pie-chart percentage" data-size="50" data-percent="{{ cycle.unknownRate }}" data-color="#abbac3"
-                                     style="height: 50px; width: 50px; line-height: 49px;">
-                                    <span class="percent">{{ cycle.testsUnknown |  getPercentage (testsCount, 1) }}%</span>
-                                </div>
-                            </div>
-                            <div class="infobox-data" title="{{ cycle.unknownRate }}%">
-                                <span class="infobox-text" style="color: #abbac3">Unknown</span>
-                                <div class="infobox-content">
-                                    <span class="bigger-110">{{ cycle.testsUnknown }} tests</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
             </td>
         </tr>
         {#<tr>#}
@@ -254,7 +137,7 @@
     </div>
     {% spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           id="testTable" data-pagination="true" data-search="true" data-toggle="table"
+           id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
            data-toolbar="#cycleShowToolbar"
            data-show-refresh="true"
@@ -323,15 +206,15 @@
                 {% if is_granted('edit', cycle.setup) %}
                 {%  set builder = builder ~ '[\'' ~ test.verdict ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
                 {% endif %}
-                {% if cycle_show_test_id_show == true %}<td class="font11">{{ test.id }}</td>{% endif %}
-                <td class="font11">{{ test.executionOrder }}</td>
-                <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
+                <td>{{ test.executionOrder }}</td>
+                <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
                 {% if cycle_show_test_time_start_show == true %} {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
-                    <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}" class="font11">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
+                    <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
                 {% endif %}
                 {% if cycle_show_test_time_end_show == true %}
-                    <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}" class="font11">{{ test.timeEnd|date(cycle_show_test_time_end_format) }}</span>{% endif %}</td>
+                    <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date(cycle_show_test_time_end_format) }}</span>{% endif %}</td>
                 {% endif %}
                 {% if cycle_show_test_time_ratio_show == true %}
                     <td><span data-title="{{ test.timeRun }}"></span>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
@@ -356,7 +239,7 @@
                                 {% if isUrl(test.metaData[item]) %}
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
-                                    <span title="{{ test.metaData[item] }}" class="font11">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 50) }}#}</span>
+                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 50) }}#}</span>
                                 {% endif %}
                             {% endif %}
                         </td>
@@ -366,7 +249,7 @@
                     <td>{{ test.dutUpTimeStart }}</td>
                     <td>{{ test.dutUpTimeEnd }}</td>
                 {% endif %}
-                <td><span class="badge {{verdictToBadge(test.verdict)}} font11">{{ test.verdict }}</span></td>
+                <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
                 {#<td>#}
                 {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                 {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
@@ -404,9 +287,9 @@
                         trackColor: '#EEEEEE',
                         scaleColor: false,
                         lineCap: 'butt',
-                        lineWidth: 6,
-                        animate: ace.vars['old_ie'] ? false : 3000,
-                        size:55
+                        lineWidth: 3,
+                        animate: ace.vars['old_ie'] ? false : 1200,
+                        size:45
                     }).css('color', $(this).data('color'));
                 });
             });
@@ -420,7 +303,7 @@
             $( "#saveCycleAsArchive" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
             });
-            // var testTable = $('#testTable');
+            // var testTable = $('#cycleTestsTable');
             // testTable.bootstrapTable({
             //     classes: "table-no-bordered",
             //     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']

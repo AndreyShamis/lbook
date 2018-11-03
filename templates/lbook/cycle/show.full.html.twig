@@ -280,7 +280,7 @@
     </ul>
 
     {% if is_granted('edit', cycle.setup) %}
-        <div id="example5.1" style="height: 400px;"></div>
+        <div id="example5.1"></div>
     {% endif %}
 
     <script>
@@ -333,17 +333,17 @@
                 {{
                 builder|raw
                 }}]);
-
+            var paddingHeight = 40;
+            var rowHeight = dataTable.getNumberOfRows() * 50;
+            var chartHeight = rowHeight + paddingHeight;
             var options = {
+                height: chartHeight,
                 timeline: {
                     //singleColor: '#8d8',
                     groupByRowLabel: true,
-
+                    colorByRowLabel: true,
                 },
-                // colors: ['#cbb69d', '#603913', '#c69c6e'],
-
             };
-
             chart.draw(dataTable, options);
         }
     </script>

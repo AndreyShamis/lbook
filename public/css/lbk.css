@@ -74,6 +74,27 @@ th.meta_data_column{
     height: 32px;
 }
 
+/* Cycle show full */
+#cycleFullShowInfoTable .infobox{
+    width: 140px !important;
+}
+/* Cycle show full */
+#cycleFullShowInfoTable .percentage{
+    font-size: 11px;
+}
+/* Cycle show full */
+#cycleFullShowInfoTable .infobox>.infobox-data{
+    min-width: 80px !important;
+}
+
+#cycleTestsTable, #cycleTestsTable .badge{
+    font-size: 11px !important;
+}
+#cycleTestsTable .cycleName{
+    font-size: 12px !important;
+    font-family: "Helvetica Neue", serif;
+}
+
 .testSearchForm input{
     width: 400px;
     height: 32px;

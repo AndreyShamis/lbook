@@ -628,7 +628,7 @@ class LogBookCycle
     /**
      * @return LogBookBuild
      */
-    public function getBuild(): ?LogBookBuild
+    public function getBuild(): LogBookBuild
     {
         return $this->build;
     }

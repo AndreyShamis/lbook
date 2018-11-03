@@ -49,9 +49,15 @@
             {% endif %}
             {% set counter = counter+1 %}
                 <tr>
-                    <td>
-                        {%  if date(setup.updatedAt) > date('-20minutes') %}
-                            <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ setup.updatedAt|time_diff }}"></i>
+                    <td title="Updated {{ setup.updatedAt|time_diff }}">
+                        {% if date(setup.updatedAt) > date('-5 minutes') %}
+                            <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
+                        {% elseif date(setup.updatedAt) > date('-30 minutes') %}
+                            <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
+                        {% elseif date(setup.updatedAt) > date('-60 minutes') %}
+                            <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
+                        {% elseif date(setup.updatedAt) > date('-12 hours') %}
+                            <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                         {% endif %}
                     </td>
                     {% set setup_name = setup.name %}

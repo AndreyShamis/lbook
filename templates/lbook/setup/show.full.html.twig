@@ -90,16 +90,16 @@
     {%  set cycles = setup.cycles %}
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
-    <div id="toolbar">
+    <div id="toolbarSetupsList">
     </div>
     {% spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
            data-pagination="true" data-search="true" data-toggle="table"
-           data-show-columns="true"
+           data-show-columns="true" data-show-refresh="true"
            {#data-detail-view="true"#}
            {#data-detail-formatter="detailFormatter"#}
            {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
-           data-toolbar="#toolbar"
+           data-toolbar="#toolbarSetupsList"
            data-page-size="100" data-page-list="[20, 50, 100, 'ALL']" data-sort-order="desc">
         <thead>
         <tr>
@@ -107,7 +107,9 @@
             <th class="setup_cycle_id_column" data-sorter="htmlSorter" data-sortable="true">Id</th>
             <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column" data-switchable="false">Name</th>
             <th class="setup_cycle_tests_column" data-sortable="true">Tests</th>
+            {%  if show_build %}
             <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
+            {% endif %}
             <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true">Pass Rate</th>
             <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true" data-visible="false">DUT</th>
@@ -127,15 +129,31 @@
             {% endif %}
             {% set counter = counter+1 %}
             <tr>
-                <td>
-                    {% if date(cycle.updatedAt) > date('-60minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-90" title="Updated {{ cycle.updatedAt|time_diff }}"></i>
+                <td title="Updated {{ cycle.updatedAt|time_diff }}">
+                    {% if date(cycle.updatedAt) > date('-5 minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
+                    {% elseif date(cycle.updatedAt) > date('-30 minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
+                    {% elseif date(cycle.updatedAt) > date('-60 minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
+                    {% elseif date(cycle.updatedAt) > date('-12 hours') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                     {% endif %}
                 </td>
-                <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
-                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a></td>
+                <td>
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a>
+                </td>
+                <td title="{{ cycle.name }}">
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a>
+                </td>
                 <td>{{ cycle.testsCount }}</td>
-                <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
+                {%  if show_build %}
+                <td title="{{ cycle.build }}">
+                    {% if cycle.build.id is defined %}
+                        <a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>
+                    {% endif %}
+                </td>
+                {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
@@ -196,5 +214,12 @@
             });
             return html.join('');
         }
+    </script>
+    <script>
+        $(document).ready(function() {
+            $( "#toolbarSetupsList, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+        });
     </script>
 {% endblock %}

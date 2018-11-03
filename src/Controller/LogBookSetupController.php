@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookUser;
 use App\Repository\LogBookCycleRepository;
@@ -172,10 +173,10 @@ class LogBookSetupController extends Controller
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
+    public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
         try {
-            if ($setup === null) {
+            if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
                 throw new \RuntimeException('');
             }
             $qb = $cycleRepo->createQueryBuilder('t')
@@ -191,6 +192,25 @@ class LogBookSetupController extends Controller
             $thisPage = $page;
             $deleteForm = $this->createDeleteForm($setup);
 
+            $iterator->rewind();
+            $prev_build_id = 0;
+            $show_build = false;
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookCycle $cycle */
+                    $cycle = $iterator->current();
+                    if ($cycle !== null) {
+                        $build_id = $cycle->getBuild()->getId();
+                        if ($prev_build_id > 0 && $prev_build_id !== $build_id) {
+                            $show_build = true;
+                            break;
+                        }
+                    }
+                    $iterator->next();
+                }
+            }
+
+
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup'          => $setup,
                 'size'          => $totalPosts,
@@ -199,6 +219,7 @@ class LogBookSetupController extends Controller
                 'iterator'      => $iterator,
                 'paginator'     => $paginator,
                 'delete_form'   => $deleteForm->createView(),
+                'show_build'    => $show_build,
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($setup, $ex);

@@ -110,12 +110,12 @@
             {%  if show_build %}
             <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
             {% endif %}
-            <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true">Pass Rate</th>
-            <th data-sortable="true" data-visible="false">Controller</th>
-            <th data-sortable="true" data-visible="false">DUT</th>
+            <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass %</th>
+            {#<th data-sortable="true" data-visible="false">Controller</th>#}
+            {#<th data-sortable="true" data-visible="false">DUT</th>#}
             <th data-sortable="true" data-visible="false">Uploader</th>
             <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
-            <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter">Test time</th>
+            <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="The total summary time of all tests in this cycle">Test time</th>
             <th class="setup_cycle_updated_column" data-sorter="htmlSorter" data-sortable="true">Updated</th>
             <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
@@ -155,13 +155,13 @@
                 </td>
                 {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                <td>{{ cycle.controller }}</td>
-                <td>{{ cycle.dut }}</td>
+                {#<td>{{ cycle.controller }}</td>#}
+                {#<td>{{ cycle.dut }}</td>#}
                 <td>{{ cycle.targetUploader }}</td>
                 <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>
                 <td><span data-title="{{ cycle.testsTimeSum  }}">{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</span></td>
                 <td>
-                    <span title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}] {{ cycle.updatedAt|time_diff }}">
+                    <span title="{{ cycle.updatedAt|time_diff }}">
                         {{ cycle.updatedAt |date('d/m H:i:s') }}
                     </span>
                 </td>

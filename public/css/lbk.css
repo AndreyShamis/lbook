@@ -20,6 +20,10 @@
     max-width:65px !important;
     width:50px !important;
 }
+.setup_cycle_uploader_column{
+    max-width:80px !important;
+    width:80px !important;
+}
 .setup_cycle_testtime_column{
     max-width:80px !important;
     width:80px !important;

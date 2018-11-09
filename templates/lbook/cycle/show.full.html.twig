@@ -146,6 +146,7 @@
            data-show-columns="true"
            data-advanced-search="true"
            data-id-table="advancedTable"
+           {#data-url="http://127.0.0.1:8080/cycle/json/167/page/1"#}
            {#data-detail-view="true"#}
            {#data-detail-formatter="detailFormatter"#}
            {#data-minimum-count-columns="2"#}
@@ -156,28 +157,28 @@
         <thead>
         <tr>
             {% if cycle_show_test_id_show == true %}
-                <th data-sortable="true" data-field="TestID">ID</th>
+                <th data-sortable="true" data-field="id">ID</th>
             {% endif %}
-            <th data-sortable="true" data-field="order" title="Test order">Order</th>
+            <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
-            <th data-sortable="true" data-field="time_run" title="Test run time">Runtime</th>
+            <th data-sortable="true" data-field="timeRun" title="Test run time">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
-                <th data-sortable="true" data-field="time_start" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
+                <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
             {% endif %}
             {% if cycle_show_test_time_end_show == true %}
-                <th data-sortable="true" data-field="time_end" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
+                <th data-sortable="true" data-field="timeEnd" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
             {% endif %}
             {% if cycle_show_test_time_ratio_show == true %}
                 <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}
-                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
                 {% endfor %}
             {% endif %}
             {% if show_metadata_opt == true %}
                 {% for key, item in additional_opt_cols %}
-                    <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
                 {% endfor %}
             {% endif %}
             {% if disabled_uptime == false and show_uptime == true %}
@@ -215,7 +216,8 @@
                 <td>{{ test.executionOrder }}</td>
                 <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
-                {% if cycle_show_test_time_start_show == true %} {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
+                {% if cycle_show_test_time_start_show == true %}
+                    {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
                     <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
                 {% endif %}
                 {% if cycle_show_test_time_end_show == true %}
@@ -231,7 +233,10 @@
                             {% if isUrl(test.metaData[item]) %}
                                 <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                             {% else %}
-                                <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 35) }}#}</span>
+                                <span title="{{ test.metaData[item] }}">
+                                    {{ test.metaData[item] }}
+                                    {#{{ shortString(test.metaData[item], 35) }}#}
+                                </span>
                         {% endif %}
                         {% endif %}
                         </td>
@@ -244,7 +249,10 @@
                                 {% if isUrl(test.metaData[item]) %}
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
-                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}{#{{ shortString(test.metaData[item], 50) }}#}</span>
+                                    <span title="{{ test.metaData[item] }}">
+                                        {{ test.metaData[item] }}
+                                        {#{{ shortString(test.metaData[item], 50) }}#}
+                                    </span>
                                 {% endif %}
                             {% endif %}
                         </td>
@@ -256,8 +264,8 @@
                 {% endif %}
                 <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
                 {#<td>#}
-                {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
-                {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                    {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
+                    {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
                 {#</td>#}
             </tr>
         {% endfor %}
@@ -325,39 +333,40 @@
     </script>
     {% if is_granted('edit', cycle.setup) %}
     <script type="text/javascript">
-        google.charts.load("current", {packages:["timeline"]});
-        google.charts.setOnLoadCallback(drawChart);
-        function drawChart() {
+    {%  set builder = ''%}
+google.charts.load("current", {packages:["timeline"]});
+google.charts.setOnLoadCallback(drawChart);
+function drawChart() {
 
-            var container = document.getElementById('example5.1');
-            var chart = new google.visualization.Timeline(container);
-            var dataTable = new google.visualization.DataTable();
+  var container = document.getElementById('example5.1');
+  var chart = new google.visualization.Timeline(container);
+  var dataTable = new google.visualization.DataTable();
 
-            dataTable.addColumn({ type: 'string', id: 'Selector' });
-            dataTable.addColumn({ type: 'string', id: 'Test Name' });
-            dataTable.addColumn({ type: 'date', id: 'Start' });
-            dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
+  dataTable.addColumn({ type: 'string', id: 'Selector' });
+  dataTable.addColumn({ type: 'string', id: 'Test Name' });
+  dataTable.addColumn({ type: 'date', id: 'Start' });
+  dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
 
 
-            dataTable.addRows([
-                {{
-                builder|raw
-                }}]);
-            var options = {
-                tooltip: {isHtml: true},
-                height: '100%',
-                timeline: {
-                    //singleColor: '#8d8',
-                    groupByRowLabel: true,
-                    colorByRowLabel: true,
-                },
-                // hAxis: {
-                //     format: 'M/d/yy',
-                //     gridlines: {count: 15}
-                // }
-            };
-            chart.draw(dataTable, options);
-        }
-    </script>
-    {% endif %}
+  dataTable.addRows([
+      {{
+      builder|raw
+      }}]);
+  var options = {
+      tooltip: {isHtml: true},
+      height: '100%',
+      timeline: {
+          //singleColor: '#8d8',
+          groupByRowLabel: true,
+          colorByRowLabel: true,
+      },
+      // hAxis: {
+      //     format: 'M/d/yy',
+      //     gridlines: {count: 15}
+      // }
+  };
+  chart.draw(dataTable, options);
+}
+</script>
+{% endif %}
 {% endblock %}

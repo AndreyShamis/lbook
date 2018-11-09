@@ -1,0 +1,294 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
+{% block content %}
+    {% set testsCount = cycle.testsCount %}
+    {% set allTestsCount = cycle.tests|length  %}
+    <div class="row">
+        <div class="col-xs-10">
+            <h3 class="generic_title cycle_title"><a href="{{ path('setup_show', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+        </div>
+        <div class="col-xs-2">
+            <span style="float: right;">
+                <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
+                    <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
+                    Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </span>
+        </div>
+    </div>
+    {% spaceless %}
+        <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
+            <tbody>
+            {#<tr>#}
+            {#<th>#}
+            {#<span title="Time in seconds between min tests time to max tests time">Period</span>#}
+            {#/#}
+            {#<span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+            {#</th>#}
+            {#<td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>#}
+            {#<th>Pass Rate</th>#}
+            {#<td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>#}
+            {#<th>Name</th>#}
+            {#<td><span class="label label-info label-white">{{ cycle.name }}</span></td>#}
+            {#<th>Id</th>#}
+            {#<td>{{ cycle.id }}</td>#}
+            {#</tr>#}
+            <tr>
+                <th>
+                    <span title="Time in seconds between min tests time to max tests time">Period</span>/
+                    <span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>
+                </th>
+                <td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
+                <th>DUT</th>
+                <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
+                <th>Controller/Uploader</th>
+                <td>
+                    <span class="label label-purple label-white middle">{{ cycle.controller }}</span>/
+                    <span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
+                <th>Build</th>
+                <td>
+                    {% if cycle.build  %}
+                        <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
+                        <span class="label label-white middle">
+                            <i class="ace-icon fa fa-folder-open-o"></i>
+                            {{ cycle.build }}
+                        </span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Start Time</th>
+                <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+                <th>Created</th>
+                <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+                <th>Token EXP</th>
+                <td colspan="3">{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>End Time</th>
+                <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+                <th>Updated</th>
+                <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
+                <th>Token</th>
+                <td colspan="3"><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
+            </tr>
+            <tr>
+
+                <td colspan="5">{% include 'lbook/cycle/infobox.html.twig' %}</td>
+                <td colspan="3">
+                    <table class="records_list table table-striped table-condensed">
+                        <tr>
+                            <th title="Short Setup Name">Short</th>
+                            <td><span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
+                        </tr>
+                        <tr>
+                            <td title="Operational System">OS :{{ cycle.setup.os }}</td>
+                            <td title="Setup Owner">Owner :{{ cycle.setup.owner }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            {#<tr>#}
+            {#<th>Pass</th>#}
+            {#<td>{{ cycle.testsPass }}</td>#}
+            {#<th>Fail</th>#}
+            {#<td>{{ cycle.testsFail }}</td>#}
+            {#<th>Error</th>#}
+            {#<td>{{ cycle.testsError }}</td>#}
+            {#<th>Count</th>#}
+            {#<td>{{ cycle.testsCount }}</td>#}
+            {#</tr>#}
+            {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
+            {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
+            {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
+            {#'updatedAt', 'createdAt', 'testsTimeSum',#}
+            {#'controller', 'targetUploader', 'dut',#}
+            {#'build', 'disabled', 'forDelete'] %}#}
+            {#{% for key, value in cycle|cast_to_array %}#}
+            {#{% if key not in already_printed%}#}
+            {#<tr>#}
+            {#<th>{{ key | capitalize}}</th>#}
+            {#<td>{{ dump(value) }}</td>#}
+            {#</tr>#}
+            {#{% endif %}#}
+            {#{% endfor %}#}
+            </tbody>
+        </table>
+    {% endspaceless %}
+
+    {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
+    {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
+    {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
+    {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
+    {% set show_metadata = app.user.settings.cycleShowTestMetaDataShow | default(true) %}
+    {% set show_metadata_opt = app.user.settings.cycleShowTestMetaDataOptShow | default(true) %}
+    {% set show_uptime = app.user.settings.cycleShowTestUptime | default(true) %}
+
+    {% set cycle_show_test_time_start_format = app.user.settings.cycleShowTestTimeStartFormat | default('H:i:s')%}
+    {% set cycle_show_test_time_end_format = app.user.settings.cycleShowTestTimeEndFormat | default('H:i:s')%}
+
+    {% set pagePath = "cycle_show" %}
+    {% set objId = cycle.id %}
+    {% include "lbook/double.paginator.html.twig" %}
+    {%  set tests = cycle.tests%}
+    {% include "lbook/search.html.twig" %}
+    <div id="cycleShowToolbar">
+    </div>
+    {% spaceless %}
+        <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+               id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
+               data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
+               data-toolbar="#cycleShowToolbar"
+               data-show-refresh="true"
+                {#data-show-toggle="true"#}
+               data-show-export="true"
+               data-show-columns="true"
+               data-advanced-search="true"
+               data-id-table="advancedTable"
+               data-url="http://127.0.0.1:8080/cycle/json/{{ objId }}"
+                {#data-detail-view="true"#}
+                {#data-detail-formatter="detailFormatter"#}
+                {#data-minimum-count-columns="2"#}
+                {#data-show-pagination-switch="true"#}
+                {#data-id-field="id"#}
+                {#data-response-handler="responseHandler"#}
+        >
+            <thead>
+            <tr>
+                {% if cycle_show_test_id_show == true %}
+                    <th data-sortable="true" data-field="id">ID</th>
+                {% endif %}
+                <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
+                <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
+                <th data-sortable="true" data-field="timeRun" title="Test run time">Runtime</th>
+                {% if cycle_show_test_time_start_show == true %}
+                    <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
+                {% endif %}
+                {% if cycle_show_test_time_end_show == true %}
+                    <th data-sortable="true" data-field="timeEnd" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
+                {% endif %}
+                {% if cycle_show_test_time_ratio_show == true %}
+                    <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+                {% endif %}
+                {% if show_metadata == true %}
+                    {% for key, item in additional_cols %}
+                        <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
+                    {% endfor %}
+                {% endif %}
+                {% if show_metadata_opt == true %}
+                    {% for key, item in additional_opt_cols %}
+                        <th data-sortable="true" title="{{ key }}-{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
+                    {% endfor %}
+                {% endif %}
+                {% if disabled_uptime == false and show_uptime == true %}
+                    <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
+                    <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
+                {% endif %}
+                <th data-sortable="true" data-field="verdict">Verdict</th>
+                {#<th>Actions</th>#}
+            </tr>
+            </thead>
+
+            <tbody class="searchable">
+            </tbody>
+
+        </table>
+    {% endspaceless %}
+    <ul>
+        <li><a href="{{ path('cycle_index') }}">Back to the list</a></li>
+        {% if is_granted('edit', cycle.setup) %}
+            <li><a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a></li>
+        {% endif %}
+        {#{% if is_granted('delete', cycle.setup) %}#}
+        {#<li>#}
+        {#{{ form_start(delete_form) }}#}
+        {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+        {#{{ form_end(delete_form) }}#}
+        {#</li>#}
+        {#{% endif %}#}
+    </ul>
+
+    {% if is_granted('edit', cycle.setup) %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="container" style="width: 100%;height: 100%;min-height: 700px;">
+                    <div id="example5.1"  class="chart" style="width: 100%;height: 100%;min-height: 700px;"></div>
+                </div>
+            </div>
+        </div>
+
+
+    {% endif %}
+
+    <script>
+        function drawEasyPieChart(){
+            jQuery(function($) {
+                $('.easy-pie-chart.percentage').each(function(){
+                    $(this).easyPieChart({
+                        barColor: $(this).data('color'),
+                        trackColor: '#EEEEEE',
+                        scaleColor: false,
+                        lineCap: 'butt',
+                        lineWidth: 3,
+                        animate: ace.vars['old_ie'] ? false : 1200,
+                        size:45
+                    }).css('color', $(this).data('color'));
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            $( "#cycleShowToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+            drawEasyPieChart();
+            $( "#saveCycleAsArchive" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
+            });
+            // var testTable = $('#cycleTestsTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+        });
+    </script>
+    {% if is_granted('edit', cycle.setup) %}
+        <script type="text/javascript">
+            {%  set builder = ''%}
+            google.charts.load("current", {packages:["timeline"]});
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+
+                var container = document.getElementById('example5.1');
+                var chart = new google.visualization.Timeline(container);
+                var dataTable = new google.visualization.DataTable();
+
+                dataTable.addColumn({ type: 'string', id: 'Selector' });
+                dataTable.addColumn({ type: 'string', id: 'Test Name' });
+                dataTable.addColumn({ type: 'date', id: 'Start' });
+                dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
+
+
+                dataTable.addRows([
+                    {{
+                    builder|raw
+                    }}]);
+                var options = {
+                    tooltip: {isHtml: true},
+                    height: '100%',
+                    timeline: {
+                        //singleColor: '#8d8',
+                        groupByRowLabel: true,
+                        colorByRowLabel: true,
+                    },
+                    // hAxis: {
+                    //     format: 'M/d/yy',
+                    //     gridlines: {count: 15}
+                    // }
+                };
+                chart.draw(dataTable, options);
+            }
+        </script>
+    {% endif %}
+{% endblock %}

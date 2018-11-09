@@ -4,8 +4,12 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookVerdict;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +19,9 @@ use App\Form\LogBookCycleType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Service\PagePaginator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 
 /**
@@ -37,7 +44,7 @@ class LogBookCycleController extends Controller
      * @param LogBookCycleRepository $cycleRepo
      * @return array
      */
-    public function index($page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): array
+    public function index(PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo, $page = 1): array
     {
 //        $em = $this->getDoctrine()->getManager();
 //        $cycleRepo = $em->getRepository('App:LogBookCycle');
@@ -132,7 +139,7 @@ class LogBookCycleController extends Controller
      */
     public function indexFirst(PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): array
     {
-        return $this->index(1, $pagePaginator, $cycleRepo);
+        return $this->index($pagePaginator, $cycleRepo, 1);
     }
 
     /**
@@ -172,22 +179,115 @@ class LogBookCycleController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFirstPage(LogBookCycle $cycle = null, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
+    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): ?Response
     {
-        return $this->show($cycle, 1, $pagePaginator, $testRepo);
+        return $this->show($pagePaginator, $testRepo, $cycle, 1);
     }
 
     /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}/page/{page}", name="cycle_show", methods={"GET"})
+     * @Route("/json/{id}", name="cycle_tests_json", methods={"GET"})
      * @param LogBookCycle $cycle
-     * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
+     * @return JsonResponse
+     */
+    public function cycleTestsJson(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle): ?JsonResponse
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('');
+            }
+
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.cycle = :cycle')
+                ->andWhere('t.disabled = :disabled')
+                ->orderBy('t.executionOrder', 'ASC')
+                ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+
+            $encoder = new JsonEncoder();
+            $normalizer = new ObjectNormalizer();
+            //$normalizer->setCircularReferenceLimit(0);
+//
+//            $dateTimeToStr = function ($dateTime) {
+//                return $dateTime instanceof \DateTime ? $dateTime->format(\DateTime::ATOM) : ''; //'d/m/Y H:i:s'
+//            };
+//            $tests = function ($test) {
+//                return ''; //$test instanceof LogBookTest ? $test->getName() : ''; //'d/m/Y H:i:s'
+//            };
+//            $verdicts = function ($verdict) {
+//                return $verdict instanceof LogBookVerdict ? $verdict->getName() : ''; //'d/m/Y H:i:s'
+//            };
+//            $logs = function ($log) {
+//                return  ''; //'d/m/Y H:i:s'
+//            };
+////            $owner_callback = function ($owner) {
+////                return $owner instanceof LogBookUser ? $owner->getUsername() : '';
+////            };
+//            $counter_callback = function ($obj) {
+//                return $obj instanceof Collection ? \count($obj) : 0;
+//            };
+//            $normalizer->setCallbacks([
+////                'id' => $counter_callback,
+////                'name' => $owner_callback,
+//                'log' => $logs,
+//                'verdict' => $verdicts,
+//                'test' => $tests,
+//                'timeStart' => $dateTimeToStr,
+//                'timeEnd' => $dateTimeToStr
+//            ]);
+            $serializer = new Serializer(array($normalizer), array($encoder));
+
+            $paginator = $pagePaginator->paginate($qb, 1, $this->show_tests_size*10);
+            //$paginator->setUseOutputWalkers(false);
+            $res = $paginator->getQuery()->execute(null,Query::HYDRATE_ARRAY);
+//            $additional_cols = array();
+//            $additional_opt_cols = array();
+
+            foreach ($res as $key => $val) {
+                //$val['timeStart'] = $val['timeStart']->format('H:i:s');
+                $val['timeStart'] = $val['timeStart']->format(\DateTime::ATOM);
+                //$val['timeEnd'] = $val['timeEnd']->format('H:i:s');
+                $val['timeEnd'] = $val['timeEnd']->format(\DateTime::ATOM);
+                unset($val['disabled'], $val['logFile'], $val['dutUpTimeStart'], $val['dutUpTimeEnd'], $val['forDelete']);
+                foreach ($val['meta_data'] as $md_key => $md_val) {
+                    $val[$md_key] = $md_val;
+                }
+                unset($val['meta_data']);
+                $res[$key] = $val;
+            }
+            $fin_res['total'] = $paginator->count();
+            $fin_res['rows'] = $res;
+            $json = $serializer->serialize($fin_res, 'json');
+            return new JsonResponse($json, 200, array(), true);
+
+//            $response = $this->json([]);
+//            $response->setJson($json);
+//            $response->setContent('text/json');
+//            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        } catch (\Throwable $ex) {
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+    /**
+     * Finds and displays a cycle entity with paginator.
+     *
+     * @Route("/{id}/page/{page}/use_json/{forJson}", name="cycle_show", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param int $page
+     * @param bool $forJson if True the JSON table for tests will be used
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(LogBookCycle $cycle = null, $page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false): ?Response
     {
         try {
             if (!$cycle) {
@@ -225,10 +325,17 @@ class LogBookCycleController extends Controller
                         $md = $test->getMetaData();
                         if (\count($md) > 0) {
                             foreach ($md as $key => $value) {
-                                if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
-                                    $additional_cols[] = $key;
-                                } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
-                                    $additional_opt_cols[] = $key;
+                                if ($forJson) {
+                                    $tmp_key = $key;
+                                    if (!\in_array($tmp_key, $additional_cols, true)) {
+                                        $additional_cols[] = $tmp_key;
+                                    }
+                                } else {
+                                    if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
+                                        $additional_cols[] = $key;
+                                    } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
+                                        $additional_opt_cols[] = $key;
+                                    }
                                 }
                             }
                         }
@@ -245,19 +352,24 @@ class LogBookCycleController extends Controller
             if ($nul_found === $totalPosts) {
                 $disable_uptime = true;
             }
-
-            return $this->render('lbook/cycle/show.full.html.twig', array(
+            if ($forJson) {
+                $iterator = null;
+            }
+            $ret_arr = array(
                 'cycle'                 => $cycle,
                 'size'                  => $totalPosts,
                 'maxPages'              => $maxPages,
                 'thisPage'              => $thisPage,
                 'iterator'              => $iterator,
-                'paginator'             => $paginator,
                 'disabled_uptime'       => $disable_uptime,
                 'delete_form'           => $deleteForm->createView(),
                 'additional_cols'       => $additional_cols,
                 'additional_opt_cols'   => $additional_opt_cols,
-            ));
+                'tests_in_json'         => $forJson,
+            );
+
+            return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);
+
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($cycle, $ex);
         }

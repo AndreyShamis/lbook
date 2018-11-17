@@ -29,8 +29,8 @@ use Doctrine\Common\Collections\Collection;
  */
 class LogBookSetupController extends Controller
 {
-    protected $index_size = 50;
-    protected $show_cycle_size = 100;
+    protected $index_size = 250;
+    protected $show_cycle_size = 500;
 
     /**
      * Lists all setup entities.

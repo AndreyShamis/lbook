@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Serializer;
 class LogBookCycleController extends Controller
 {
     protected $show_tests_size = 2000;
-    protected $index_size = 100;
+    protected $index_size = 300;
 
     /**
      * Lists all cycle entities.

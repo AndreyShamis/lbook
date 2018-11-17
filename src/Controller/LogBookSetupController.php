@@ -200,7 +200,11 @@ class LogBookSetupController extends Controller
                     /** @var LogBookCycle $cycle */
                     $cycle = $iterator->current();
                     if ($cycle !== null) {
-                        $build_id = $cycle->getBuild()->getId();
+                        try {
+                            $build_id = $cycle->getBuild()->getId();
+                        } catch (\Exception $ex) {
+                            $build_id = $prev_build_id;
+                        }
                         if ($prev_build_id > 0 && $prev_build_id !== $build_id) {
                             $show_build = true;
                             break;

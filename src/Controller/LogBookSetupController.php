@@ -194,21 +194,25 @@ class LogBookSetupController extends Controller
 
             $iterator->rewind();
             $show_build = false;
-            $prev_build_id = 0;
-            if ($totalPosts > 0) {
-                for ($x = 0; $x < $totalPosts; $x++) {
-                    /** @var LogBookCycle $cycle */
-                    $cycle = $iterator->current();
-                    if ($cycle !== null && $cycle->getBuild() !== null) {
-                        $build_id = $cycle->getBuild()->getId();
-                        if ($prev_build_id > 0 && $prev_build_id !== $build_id) {
-                            $show_build = true;
-                            break;
-                        }
-                    }
-                    $iterator->next();
-                }
-            }
+//            $prev_build_id = 0;
+//            if ($totalPosts > 0) {
+//                for ($x = 0; $x < $totalPosts; $x++) {
+//                    /** @var LogBookCycle $cycle */
+//                    $cycle = $iterator->current();
+//                    if ($cycle !== null) {
+//                        try {
+//                            $build_id = $cycle->getBuild()->getId();
+//                        } catch (\Exception $ex) {
+//                            $build_id = $prev_build_id;
+//                        }
+//                        if ($prev_build_id > 0 && $prev_build_id !== $build_id) {
+//                            $show_build = true;
+//                            break;
+//                        }
+//                    }
+//                    $iterator->next();
+//                }
+//            }
 
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup'          => $setup,

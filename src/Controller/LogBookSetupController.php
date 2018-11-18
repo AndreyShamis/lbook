@@ -191,24 +191,7 @@ class LogBookSetupController extends Controller
             $maxPages = ceil($totalPosts / $this->show_cycle_size);
             $thisPage = $page;
             $deleteForm = $this->createDeleteForm($setup);
-
-            $iterator->rewind();
-            $show_build = false;
-            $prev_build_id = 0;
-            if ($totalPosts > 0) {
-                for ($x = 0; $x < $totalPosts; $x++) {
-                    /** @var LogBookCycle $cycle */
-                    $cycle = $iterator->current();
-                    if ($cycle !== null && $cycle->getBuild() !== null) {
-                        $build_id = $cycle->getBuild()->getId();
-                        if ($prev_build_id > 0 && $prev_build_id !== $build_id) {
-                            $show_build = true;
-                            break;
-                        }
-                    }
-                    $iterator->next();
-                }
-            }
+            $show_build = $this->showBuild($paginator);
 
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup'          => $setup,
@@ -223,6 +206,43 @@ class LogBookSetupController extends Controller
         } catch (\Throwable $ex) {
             return $this->setupNotFound($setup, $ex);
         }
+    }
+
+    /**
+     * @param \Doctrine\ORM\Tools\Pagination\Paginator $paginator
+     * @return bool
+     */
+    protected function showBuild($paginator): bool
+    {
+        $show_build = false;
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+        $prev_build_id = 0;
+        $iterator->rewind();
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookCycle $cycle */
+                    $cycle = $iterator->current();
+                    if ($cycle !== null) {
+                        $build = $cycle->getBuild();
+                        if ($build !== null) {
+                            $build_id = $build->getId();
+                            if ($prev_build_id === 0) {
+                                $prev_build_id = $build_id;
+                            }
+                            if ($prev_build_id !== $build_id) {
+                                $show_build = true;
+                                break;
+                            }
+                        }
+                    }
+                    $iterator->next();
+                }
+            }
+        } catch (\Throwable $ex) { }
+
+        return $show_build;
     }
 
     /**

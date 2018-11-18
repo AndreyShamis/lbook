@@ -18,8 +18,8 @@ use App\Service\PagePaginator;
  */
 class LogBookBuildController extends Controller
 {
-    protected $index_size = 100;
-    protected $show_cycle_size = 100;
+    protected $index_size = 500;
+    protected $show_cycle_size = 1000;
 
     /**
      * @Route("/page/{page}", name="log_book_build_index", methods="GET")

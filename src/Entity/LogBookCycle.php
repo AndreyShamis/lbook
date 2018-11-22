@@ -251,6 +251,13 @@ class LogBookCycle
      */
     protected $downloads = 0;
 
+    /**
+     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     * //, columnDefinition="LONGTEXT DEFAULT NULL"
+     */
+    protected $meta_data = [];
+
     public static $MAX_NAME_LEN = 250;
     /**
      * LogBookCycle constructor.
@@ -264,11 +271,42 @@ class LogBookCycle
         $this->setCreatedAt();
         $this->setTokenExpiration(new \DateTime('+7 days'));
         $this->setUploadToken(RandomString::generateRandomString(50));
-
+        $this->meta_data = [];
         /**
          * Other stuff
          */
         $this->tests = new ArrayCollection();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaData(): array
+    {
+        if ($this->meta_data === null) {
+            $this->meta_data = array();
+        }
+        return $this->meta_data;
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function addMetaData(array $meta_data): void
+    {
+        $this->meta_data = array_merge($this->meta_data, $meta_data);
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function setMetaData(array $meta_data): void
+    {
+        if ($this->meta_data === null || \count($this->meta_data) === 0) {
+            $this->meta_data = $meta_data;
+        } else {
+            $this->addMetaData($meta_data);
+        }
     }
 
     /**

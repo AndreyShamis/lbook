@@ -103,5 +103,13 @@
             </div>
         </div>
     {% endif %}
+    <div class="infobox infobox-black" style="width: 160px !important;">
+        <div class="infobox-data" title="Run Time">
+            <span class="infobox-text">{{ cycle.testsTimeSum |  ExecutionTimeGeneric }}</span>
+            <div class="infobox-content">
+                <span class="bigger-110" title="TestsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>
+            </div>
+        </div>
+    </div>
 </div>
 {% endspaceless %}

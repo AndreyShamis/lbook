@@ -66,6 +66,7 @@ class LogBookTestController extends Controller
      * @Route("/search", name="test_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTestRepository $testRepo
+     * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
     public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo): Response

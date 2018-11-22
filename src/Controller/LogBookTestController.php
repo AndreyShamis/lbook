@@ -39,7 +39,7 @@ class LogBookTestController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return array
      */
-    public function index($page = 1, PagePaginator $pagePaginator, LogBookTestRepository $testRepo): array
+    public function index(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, $page = 1): array
     {
         set_time_limit(10);
         $query = $testRepo->createQueryBuilder('t')
@@ -66,6 +66,7 @@ class LogBookTestController extends Controller
      * @Route("/search", name="test_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTestRepository $testRepo
+     * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
     public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo): Response
@@ -310,9 +311,9 @@ class LogBookTestController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(LogBookTest $test = null, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo, LogBookTest $test = null): ?Response
     {
-        return $this->showFull($test, 1, $pagePaginator, $logRepo, $testRepo);
+        return $this->showFull($pagePaginator, $logRepo, $testRepo, $test, 1);
     }
 
     /**
@@ -326,7 +327,7 @@ class LogBookTestController extends Controller
      * @param LogBookTestRepository $testRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFull(LogBookTest $test = null, $page = 1, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo): ?Response
+    public function showFull(PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo, LogBookTest $test = null, $page = 1): ?Response
     {
         set_time_limit(10);
         try {

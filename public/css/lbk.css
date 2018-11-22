@@ -2,7 +2,10 @@
     max-width:30px !important;
     width:20px !important;
 }
-
+.setup_cycle_user{
+    max-width:100px !important;
+    width:30px !important;
+}
 .setup_cycle_build_column{
     max-width:230px !important;
     width:130px !important;
@@ -49,6 +52,14 @@
     max-width:90px !important;
     width:70px !important;
     text-align: center !important;
+}
+.test_show_full_time{
+    max-width:60px !important;
+    width:50px !important;
+}
+.test_show_full_offset{
+    max-width:45px !important;
+    width:35px !important;
 }
 
 th.meta_data_column{

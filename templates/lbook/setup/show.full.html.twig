@@ -111,6 +111,9 @@
             {%  if show_build %}
             <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
             {% endif %}
+            {%  if show_user %}
+            <th class="setup_cycle_user" data-sorter="htmlSorter" data-sortable="true">User</th>
+            {% endif %}
             <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass %</th>
             <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
             <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="The total summary time of all tests in this cycle">Test time</th>
@@ -153,6 +156,11 @@
                     {% if cycle.build.id is defined %}
                         <a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>
                     {% endif %}
+                </td>
+                {% endif %}
+                {%  if show_user %}
+                <td title="{{ cycle.user.FullName }}">
+                    {{ cycle.user.UserNameShort }}
                 </td>
                 {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
@@ -221,6 +229,10 @@
             $( "#toolbarSetupsList, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
             });
+
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+            } catch (e) {}
         });
     </script>
     {% endspaceless %}

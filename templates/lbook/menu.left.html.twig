@@ -36,6 +36,14 @@
         <b class="arrow"></b>
     </li>
 
+    <li class="{% if route starts with 'log_book_build_' %}active{% endif %}">
+        <a href="{{asset(path('log_book_build_index'))}}" >
+            <i class="menu-icon fa fa-pencil-square-o"></i>
+            <span class="menu-text" title="Build">Builds</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
     <li class="{% if route starts with 'cycle_' %}active{% endif %}">
         <a href="{{asset(path('cycle_index_first'))}}">
             <i class="menu-icon fa fa-cogs"></i>
@@ -45,7 +53,6 @@
     </li>
 
     <li class="{% if route starts with 'test_' %}active{% endif %}">
-        {#<a href="{{absolute_url(asset(('user')))}}">#}
         <a href="{{asset(path('test_index_first'))}}">
             <i class="menu-icon fa fa-list-alt"></i>
             <span class="menu-text bigger-120"> Tests </span>
@@ -60,7 +67,7 @@
         {#</a>#}
         {#<b class="arrow"></b>#}
     {#</li>#}
-    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
+    {% if 1== 2 and app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
     <li class="{% if route starts with 'upload_' %}active{% endif %}">
         <a href="{{asset(path('upload_new'))}}" >
             <i class="menu-icon fa fa-cloud-upload"></i>
@@ -130,12 +137,12 @@
                 </a>
                 <b class="arrow"></b>
             </li>
-            <li class="{% if route starts with 'log_book_build_' %}active{% endif %}">
-                <a href="{{asset(path('log_book_build_index'))}}">
-                    <i class="menu-icon fa fa-caret-right"></i>Builds
-                </a>
-                <b class="arrow"></b>
-            </li>
+            {#<li class="{% if route starts with 'log_book_build_' %}active{% endif %}">#}
+                {#<a href="{{asset(path('log_book_build_index'))}}">#}
+                    {#<i class="menu-icon fa fa-caret-right"></i>Builds#}
+                {#</a>#}
+                {#<b class="arrow"></b>#}
+            {#</li>#}
 
             {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
             <li class="{% if route starts with 'log_' %}active{% endif %}">

@@ -177,8 +177,8 @@
                     <table class="table table-bordered table-hover table-condensed">
                         <thead class="thin-border-bottom">
                         <tr>
-                            <th><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
-                            <th><i class="ace-icon fa fa-caret-right blue"></i>Offset</th>
+                            <th class="test_show_full_time"><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
+                            <th class="test_show_full_offset" title="[Offset] Relative time"><i class="ace-icon fa fa-caret-right blue"></i>R</th>
                             {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
                             {#<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>#}
                             <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
@@ -238,8 +238,11 @@
                 $(this).html(linkify($(this).html()));
             });
         }
-        $(document).ready(
-            setTimeout(replaceUrl, 1500)
-        );
+        $(document).ready(function() {
+            setTimeout(replaceUrl, 1500);
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+            } catch (e) {}
+        });
     </script>
 {% endblock %}

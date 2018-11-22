@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Serializer;
  */
 class LogBookCycleController extends Controller
 {
-    protected $index_size = 300;
+    protected $index_size = 1000;
     protected $show_tests_size = 2000;
 
     /**

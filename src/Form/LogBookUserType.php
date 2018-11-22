@@ -42,6 +42,8 @@ class LogBookUserType extends AbstractType
             /** @var LogBookUser $edited_user */
             $edited_user = $options['data'];
             if(!$edited_user->isLdapUser()){
+                $builder->add('firstName', TextType::class);
+                $builder->add('lastName', TextType::class);
                 $builder->add('plainPassword', RepeatedType::class, array(
                     'required' => false,
                     'type' => PasswordType::class,

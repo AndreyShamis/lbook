@@ -38,6 +38,7 @@ class LogBookUserRepository extends ServiceEntityRepository implements UserLoade
     /**
      * @param array $criteria
      * @return LogBookUser
+     * @throws \Doctrine\ORM\ORMException
      */
     public function create(array $criteria): LogBookUser
     {

@@ -331,12 +331,12 @@ class AppExtension extends AbstractExtension
      */
     public function ExecutionTimeGeneric(int $time): string
     {
-        $seconds  =   $time%60;
-        $minutes  =   ($time/60)%60;
-        $hours    =   number_format (floor($time/60/60));
-        $hour_print = sprintf('%dh',$hours);
-        $min_print = sprintf('%02dm',$minutes);
-        $sec_print = sprintf('%02ds',$seconds);
+        $seconds = $time%60;
+        $minutes = ($time/60)%60;
+        $hours = floor($time/60/60);
+        $hour_print = sprintf('%dh', $hours);
+        $min_print = sprintf('%02dm', $minutes);
+        $sec_print = sprintf('%02ds', $seconds);
         if ($hours > 0) {
             $ret = sprintf('%s %s %s', $hour_print, $min_print, $sec_print);
         } else {

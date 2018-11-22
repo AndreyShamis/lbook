@@ -249,6 +249,7 @@ class LogBookUploaderController extends Controller
             $build_name = $request->request->get('build', '');
             $test_dut = $request->request->get('dut', '');
             $test_metadata = $request->request->get('test_metadata', '');
+            $cycle_metadata = $request->request->get('cycle_metadata', '');
 
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
 
@@ -314,6 +315,11 @@ class LogBookUploaderController extends Controller
 //                }
 //            }
             if ($continue) {
+                /** Extract CYCLE metadata from request if exist */
+                if ($cycle_metadata !== '' && $this->isVariableString($cycle_metadata)) {
+                    $arr = $this->extractTestVariables($cycle_metadata);
+                    $cycle->setMetaData($arr);
+                }
                 $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
 
                 try {

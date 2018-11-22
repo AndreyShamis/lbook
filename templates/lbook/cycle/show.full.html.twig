@@ -16,106 +16,161 @@
             </span>
         </div>
     </div>
-    {% spaceless %}
-    <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
-        <tbody>
-        {#<tr>#}
-            {#<th>#}
-                {#<span title="Time in seconds between min tests time to max tests time">Period</span>#}
-                {#/#}
-                {#<span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
-            {#</th>#}
-            {#<td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>#}
-            {#<th>Pass Rate</th>#}
-            {#<td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>#}
-            {#<th>Name</th>#}
-            {#<td><span class="label label-info label-white">{{ cycle.name }}</span></td>#}
-            {#<th>Id</th>#}
-            {#<td>{{ cycle.id }}</td>#}
-        {#</tr>#}
-        <tr>
-            <th>
-                <span title="Time in seconds between min tests time to max tests time">Period</span>/
-                <span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>
-            </th>
-            <td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
-            <th>DUT</th>
-            <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
-            <th>Controller/Uploader</th>
-            <td>
-                <span class="label label-purple label-white middle">{{ cycle.controller }}</span>/
-                <span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
-            <th>Build</th>
-            <td>
-                {% if cycle.build  %}
-                    <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
-                        <span class="label label-white middle">
-                            <i class="ace-icon fa fa-folder-open-o"></i>
-                            {{ cycle.build }}
-                        </span>
-                    </a>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th>Start Time</th>
-            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
-            <th>Created</th>
-            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
-            <th>Token EXP</th>
-            <td colspan="3">{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
-        </tr>
-        <tr>
-            <th>End Time</th>
-            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
-            <th>Updated</th>
-            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
-            <th>Token</th>
-            <td colspan="3"><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
-        </tr>
-        <tr>
 
-            <td colspan="5">{% include 'lbook/cycle/infobox.html.twig' %}</td>
-            <td colspan="3">
-                <table class="records_list table table-striped table-condensed">
-                    <tr>
-                        <th title="Short Setup Name">Short</th>
-                        <td><span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
-                    </tr>
-                    <tr>
-                        <td title="Operational System">OS :{{ cycle.setup.os }}</td>
-                        <td title="Setup Owner">Owner :{{ cycle.setup.owner }}</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        {#<tr>#}
-            {#<th>Pass</th>#}
-            {#<td>{{ cycle.testsPass }}</td>#}
-            {#<th>Fail</th>#}
-            {#<td>{{ cycle.testsFail }}</td>#}
-            {#<th>Error</th>#}
-            {#<td>{{ cycle.testsError }}</td>#}
-            {#<th>Count</th>#}
-            {#<td>{{ cycle.testsCount }}</td>#}
-        {#</tr>#}
-        {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
-            {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
-            {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
-            {#'updatedAt', 'createdAt', 'testsTimeSum',#}
-            {#'controller', 'targetUploader', 'dut',#}
-            {#'build', 'disabled', 'forDelete'] %}#}
-        {#{% for key, value in cycle|cast_to_array %}#}
-            {#{% if key not in already_printed%}#}
-                {#<tr>#}
-                    {#<th>{{ key | capitalize}}</th>#}
-                    {#<td>{{ dump(value) }}</td>#}
-                {#</tr>#}
-            {#{% endif %}#}
-        {#{% endfor %}#}
-        </tbody>
-    </table>
-    {% endspaceless %}
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="testInfoNav">
+                    <li class="active"><a data-toggle="tab" href="#main">Main</a></li>
+                    {% if cycle.metaData %}
+                        <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ cycle.metaData | length }})</a></li>
+                    {% endif %}
+                    <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
+                    <li class=""><a data-toggle="tab" href="#other">Other</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="main" class="tab-pane active">
+
+                        {% spaceless %}
+                            <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
+                                <tbody>
+                                {#<tr>#}
+                                {#<th>#}
+                                {#<span title="Time in seconds between min tests time to max tests time">Period</span>#}
+                                {#/#}
+                                {#<span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+                                {#</th>#}
+                                {#<td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>#}
+                                {#<th>Pass Rate</th>#}
+                                {#<td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>#}
+                                {#<th>Name</th>#}
+                                {#<td><span class="label label-info label-white">{{ cycle.name }}</span></td>#}
+                                {#<th>Id</th>#}
+                                {#<td>{{ cycle.id }}</td>#}
+                                {#</tr>#}
+                                <tr>
+                                    <th>
+                                        <span title="Time in seconds between min tests time to max tests time">Period</span>/
+                                        <span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>
+                                    </th>
+                                    <td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>
+                                    <th>Build</th>
+                                    <td>
+                                        {% if cycle.build  %}
+                                            <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
+                                                <span class="label label-white middle">
+                                                    <i class="ace-icon fa fa-folder-open-o"></i>
+                                                    {{ cycle.build }}
+                                                </span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    <th>DUT</th>
+                                    <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
+                                    <th>Controller</th>
+                                    <td><span class="label label-purple label-white middle">{{ cycle.controller }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Start Time</th>
+                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Created</th>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Uploader</th>
+                                    <td colspan="3"><span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>End Time</th>
+                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Updated</th>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <th></th>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr>
+
+                                    <td colspan="8">{% include 'lbook/cycle/infobox.html.twig' %}</td>
+                                </tr>
+                                {#<tr>#}
+                                {#<th>Pass</th>#}
+                                {#<td>{{ cycle.testsPass }}</td>#}
+                                {#<th>Fail</th>#}
+                                {#<td>{{ cycle.testsFail }}</td>#}
+                                {#<th>Error</th>#}
+                                {#<td>{{ cycle.testsError }}</td>#}
+                                {#<th>Count</th>#}
+                                {#<td>{{ cycle.testsCount }}</td>#}
+                                {#</tr>#}
+                                {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
+                                {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
+                                {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
+                                {#'updatedAt', 'createdAt', 'testsTimeSum',#}
+                                {#'controller', 'targetUploader', 'dut',#}
+                                {#'build', 'disabled', 'forDelete'] %}#}
+                                {#{% for key, value in cycle|cast_to_array %}#}
+                                {#{% if key not in already_printed%}#}
+                                {#<tr>#}
+                                {#<th>{{ key | capitalize}}</th>#}
+                                {#<td>{{ dump(value) }}</td>#}
+                                {#</tr>#}
+                                {#{% endif %}#}
+                                {#{% endfor %}#}
+                                </tbody>
+                            </table>
+                        {% endspaceless %}
+
+
+                    </div>
+
+                    {% if cycle.metaData %}
+                        <div id="metadata" class="tab-pane">
+                            <ul>
+                                {% for key, item in cycle.metaData %}
+                                    <li>
+                                        {{ key }} =
+                                        {% if isUrl(item) %}
+                                            {{ item }} <a target="_blank" href="{{item }}" >Link_to_{{ key }}</a>
+                                        {% else %}
+                                            <span title="{{ item }}">{{ shortString(item, 500) }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div id="view" class="tab-pane">
+                        <div class="container" style="width: 100%;height: 100%;min-height: 700px;">
+                            <div id="graphResults"  class="chart" style="width: 100%;height: 100%;min-height: 700px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="other" class="tab-pane">
+                        <table class="records_list table table-striped table-condensed">
+                            <tr>
+                                <th title="Short Setup Name">Short</th>
+                                <td><span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
+                            </tr>
+                            <tr>
+                                <th title="Operational System">OS</th>
+                                <td title="Operational System">{{ cycle.setup.os }}</td>
+                                <th title="Setup Owner">Owner</th>
+                                <td title="Setup Owner">{{ cycle.setup.owner }}</td>
+                            </tr>
+                            <tr>
+                                <th>Token EXP</th>
+                                <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
+                                <th>Token</th>
+                                <td><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
     {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
@@ -293,16 +348,6 @@
         {#{% endif %}#}
     </ul>
 
-    {% if is_granted('edit', cycle.setup) %}
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="container" style="width: 100%;height: 100%;min-height: 700px;">
-                    <div id="graphResults"  class="chart" style="width: 100%;height: 100%;min-height: 700px;"></div>
-                </div>
-            </div>
-        </div>
-
-    {% endif %}
 
     <script>
         function drawEasyPieChart(){
@@ -338,17 +383,7 @@
     </script>
     {% if is_granted('edit', cycle.setup) %}
     <script type="text/javascript">
-
     google.charts.load("current", {packages:["timeline"]});
-    google.charts.setOnLoadCallback(loadDataAndDrowChart);
-
-    function loadDataAndDrowChart() {
-        $.ajax({
-            dataType: "json",
-            url: "/cycle/json/{{ objId }}",
-            success: drawChart
-        });
-    }
 
     function drawChart(jsonData) {
         var dataTable = new google.visualization.DataTable();
@@ -389,9 +424,67 @@
           //     gridlines: {count: 15}
           // }
         };
-        var chart = new google.visualization.Timeline($('#graphResults')[0]);
-        chart.draw(dataTable, options);
+
+        function chartSelectHandler(e) {
+            var selection = chart.getSelection();
+            var message = '';
+            var yRange = dataTable.getColumnRange(1);
+            var xRange = dataTable.getColumnRange(0);
+
+            for (var i = 0; i < selection.length; i++) {
+                var item = selection[i];
+                var str;
+                if (item.row != null && item.column != null) {
+                    str = dataTable.getFormattedValue(item.row, item.column);
+                    message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+                } else if (item.row != null) {
+                    str = dataTable.getFormattedValue(item.row, 0);
+                    message += '{row:' + item.row + '};value= ' + str + '\n';
+                } else if (item.column != null) {
+                    str = dataTable.getFormattedValue(0, item.column);
+                    message += '{column:' + item.column + '};value= ' + str + '\n';
+                }
+            }
+            try {
+                console.log('selected ' + message);
+            } catch (e) {}
         }
+
+        var chart = new google.visualization.Timeline($('#graphResults')[0]);
+        google.visualization.events.addListener(chart, 'select', chartSelectHandler);
+
+        chart.draw(dataTable, options);
+        try {
+            console.log('Draw graph finish')
+        } catch (e) {}
+
+    }
+
+
+    $(document).ready(function() {
+
+        $("#view_graph").on("click", function(event){
+            try {
+                console.log("precallback - draw graph ");
+            } catch (e) {}
+
+            setTimeout(function(){
+                {% if tests_in_json == true %}
+                google.charts.setOnLoadCallback(loadDataAndDrawChart);
+                function loadDataAndDrawChart() {
+                    $.ajax({
+                        dataType: "json",
+                        url: "/cycle/json/{{ objId }}",
+                        success: drawChart
+                    });
+                }
+                {% else %}
+                drawChart();
+                {% endif %}
+            }, 50); // small delay for give time to exporer build html
+        });
+
+    });
 </script>
 {% endif %}
 {% endblock %}

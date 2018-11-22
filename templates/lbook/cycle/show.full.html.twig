@@ -16,6 +16,15 @@
             </span>
         </div>
     </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul>
+            {% for key, item in cycle.metaData %}
+                <li><strong>{{ key }}</strong>={{ item }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
     {% spaceless %}
     <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
         <tbody>

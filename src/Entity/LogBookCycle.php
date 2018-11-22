@@ -51,6 +51,12 @@ class LogBookCycle
     protected $build;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="user_executor", referencedColumnName="id", nullable=true)
+     */
+    protected $user;
+
+    /**
      * @var float
      *
      * @ORM\Column(name="pass_rate", type="float", precision=3, scale=2, options={"unsigned"=true, "default"="0"})
@@ -251,9 +257,18 @@ class LogBookCycle
      */
     protected $downloads = 0;
 
+    /**
+     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     * //, columnDefinition="LONGTEXT DEFAULT NULL"
+     */
+    protected $meta_data = [];
+
     public static $MAX_NAME_LEN = 250;
+
     /**
      * LogBookCycle constructor.
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -264,11 +279,65 @@ class LogBookCycle
         $this->setCreatedAt();
         $this->setTokenExpiration(new \DateTime('+7 days'));
         $this->setUploadToken(RandomString::generateRandomString(50));
-
+        $this->meta_data = [];
         /**
          * Other stuff
          */
         $this->tests = new ArrayCollection();
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaData(): array
+    {
+        if ($this->meta_data === null) {
+            $this->meta_data = array();
+        }
+        return $this->meta_data;
+    }
+
+    /**
+     * @return LogBookUser
+     */
+    public function getUser(): LogBookUser
+    {
+        if ($this->user === null) {
+            $dummy_user = new LogBookUser();
+            $dummy_user->setUsername('');
+            $dummy_user->setEmail('none@domain.com');
+            $dummy_user->setFullName('none');
+            $this->user = $dummy_user;
+        }
+        return $this->user;
+    }
+
+    /**
+     * @param LogBookUser $user
+     */
+    public function setUser(LogBookUser $user): void
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function addMetaData(array $meta_data): void
+    {
+        $this->meta_data = array_merge($this->meta_data, $meta_data);
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function setMetaData(array $meta_data): void
+    {
+        if ($this->meta_data === null || \count($this->meta_data) === 0) {
+            $this->meta_data = $meta_data;
+        } else {
+            $this->addMetaData($meta_data);
+        }
     }
 
     /**
@@ -297,6 +366,7 @@ class LogBookCycle
 
     /**
      * @PreFlush
+     * @throws \Exception
      */
     public function updateTimes(): void
     {

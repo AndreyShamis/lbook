@@ -15,6 +15,7 @@ use App\Repository\LogBookMessageTypeRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
 use ArrayIterator;
 use DateTime;
@@ -59,6 +60,8 @@ class LogBookUploaderController extends Controller
     protected $buildRepo;
     /** @var LogBookTargetRepository $targetRepo */
     protected $targetRepo;
+    /** @var LogBookUserRepository $targetRepo */
+    protected $userRepo;
 
     private $blackListLevels = array();
 
@@ -90,6 +93,7 @@ class LogBookUploaderController extends Controller
         $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
+        $this->userRepo = $this->em->getRepository('App:LogBookUser');
     }
 
     /**
@@ -103,7 +107,7 @@ class LogBookUploaderController extends Controller
     /**
      * @Route("/", name="upload_index", methods={"GET"})
      */
-    public function index()
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
         return $this->render('lbook/upload/index.html.twig', array());
     }
@@ -114,10 +118,10 @@ class LogBookUploaderController extends Controller
      */
     protected function getTestNewExecutionOrder(LogBookCycle $cycle): int
     {
-        /**
-         * Find proper execution order | The correct Way
-         */
-        $latestTestInCycle = $this->testsRepo->findOneBy(array('cycle' => $cycle->getId()), array('executionOrder' => 'DESC'));
+        // Find proper execution order | The correct Way
+        $latestTestInCycle = $this->testsRepo->findOneBy(
+            array('cycle' => $cycle->getId()),
+            array('executionOrder' => 'DESC'));
         if ($latestTestInCycle !== null) {
             $executionOrder = $latestTestInCycle->getExecutionOrder() + 1;
         } else {
@@ -153,14 +157,12 @@ class LogBookUploaderController extends Controller
             if ($counter%100 === 0) {
                 try {
                     $post_fix = random_int(1, 9999);
-                } catch (\Exception $e) {
-                }
+                } catch (\Exception $e) {}
             }
             if ($counter%1000 === 0) {
                 try {
                     $post_fix = $counter . random_int(1, 9999);
-                } catch (\Exception $e) {
-                }
+                } catch (\Exception $e) {}
             }
         }
         return $setup_name;
@@ -174,7 +176,6 @@ class LogBookUploaderController extends Controller
      */
     final protected function bringSetup(LogBookUpload $obj, string $setupName = '', int $setupId = -1): LogBookSetup
     {
-
         /** @var LogBookSetup $setup */
         $setup = null;
         if ($setupId > 0) {
@@ -185,7 +186,7 @@ class LogBookUploaderController extends Controller
             }
         }
 
-        if ($setup === null && \strlen($setupName) > 0) {
+        if ($setup === null && $setupName !== '') {
             $obj->addMessage('Searching setup by NAME :' . $setupName);
             $setup = $this->setupRepo->findByName($setupName);
             if ($setup !== null) {
@@ -204,10 +205,8 @@ class LogBookUploaderController extends Controller
                     'name' => $setupName,
                 ));
         }
-
         return $setup;
     }
-
 
     /**
      * Creates a new Upload entity.
@@ -222,7 +221,6 @@ class LogBookUploaderController extends Controller
     {
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
         //curl --noproxy "127.0.0.1" --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
-
         $obj = new LogBookUpload();
         $p_data = $request->request;
         /** @var LogBookTest $test */
@@ -231,9 +229,9 @@ class LogBookUploaderController extends Controller
         $cycle = null;
         /** @var LogBookSetup $setup */
         $setup = null;
-
         $return_urls_only = $request->request->get('return_urls_only', 'false');
-        if ($return_urls_only === '1' || mb_strtolower($return_urls_only) === 'true' || mb_strtolower($return_urls_only) === 'yes') {
+        $ruo_low = mb_strtolower($return_urls_only);
+        if ($return_urls_only === '1' || $ruo_low === 'true' || $ruo_low === 'yes') {
             $return_urls_only = 'true';
         }
         if ($p_data->count() >= 1) {
@@ -242,15 +240,13 @@ class LogBookUploaderController extends Controller
             if ($request->request->get('debug', false) === 'true') {
                 $obj->setDebug(true);
             }
-
             $cycle_name = $request->request->get('cycle', '');
             $setup_name = $request->request->get('setup', '');
             $cycle_token = $request->request->get('token', '');
             $build_name = $request->request->get('build', '');
             $test_dut = $request->request->get('dut', '');
             $test_metadata = $request->request->get('test_metadata', '');
-
-            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
+            $cycle_metadata = $request->request->get('cycle_metadata', '');
 
             if ($cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
@@ -314,21 +310,9 @@ class LogBookUploaderController extends Controller
 //                }
 //            }
             if ($continue) {
-                $obj->addMessage('File name is :' . $fileName . '. \tFile ext :'  .$file->guessExtension());
+                $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
 
-                try {
-                    /** @var UploadedFile $new_file */
-                    $new_file = $file->move(self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId(), $fileName);
-                } catch (Exception $ex) {
-                    echo $ex->getMessage();
-                }
-                $fileSize = $new_file->getSize();
-                $obj->addMessage('File copy info :' . $new_file . ' File size is ' . $fileSize);
-
-                if ($fileSize > 1 * 1024*1024) {
-                    $this->addBlackListLevel('DEBUG');
-                }
-                $obj->setLogFile($fileName);
+                $new_file = $this->fileHandler($file, $setup, $cycle, $obj);
 
                 $testName = $file->getClientOriginalName();
                 $testVerdictDefault = $this->parseVerdict('ERROR');
@@ -350,21 +334,14 @@ class LogBookUploaderController extends Controller
                     }
                 }
                 $this->em->flush();
-
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
-
                 $this->calculateAndSetBuild($build_name, $cycle);
-
                 $remote_ip = $request->getClientIp();
                 $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
                 $dut = $this->targetRepo->findOneOrCreate(array('name' => $test_dut));
 
-                /** Extract metadata from request if exist */
-                if ($test_metadata !== '' && $this->isVariableString($test_metadata)) {
-                    $arr = $this->extractTestVariables($test_metadata);
-                    $test->setMetaData($arr);
-                }
+                $this->testMetaDataHandler($test_metadata, $test, $obj);
 
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
@@ -391,6 +368,86 @@ class LogBookUploaderController extends Controller
         ));
     }
 
+    /**
+     * @param UploadedFile $file
+     * @param LogBookSetup $setup
+     * @param LogBookCycle $cycle
+     * @param LogBookUpload $obj
+     * @return File
+     */
+    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj): File
+    {
+        /** @var UploadedFile $new_file */
+        $new_file = null;
+        try {
+            $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
+            $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
+
+            try {
+                $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
+                $new_file = $file->move($dir, $fileName);
+            } catch (\Throwable $ex) {
+                $obj->addMessage('Fail in fileHandler[move]:' . $ex->getMessage());
+            }
+            $fileSize = $new_file->getSize();
+            $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
+
+            if ($fileSize > 1*1024*1024) {
+                $this->addBlackListLevel('DEBUG');
+            }
+            $obj->setLogFile($fileName);
+        } catch (\Throwable $ex) {
+            $obj->addMessage('Fail in fileHandler :' . $ex->getMessage());
+        }
+        return $new_file;
+    }
+
+    /**
+     * @param string $cycle_metadata
+     * @param LogBookCycle $cycle
+     * @param LogBookUpload $obj
+     */
+    protected function cycleMetaDataHandler(string $cycle_metadata, LogBookCycle $cycle, LogBookUpload $obj): void
+    {
+        try {
+            /** Extract CYCLE metadata from request if exist */
+            if ($cycle_metadata !== '' && $this->isVariableString($cycle_metadata)) {
+                $arr = $this->extractTestVariables($cycle_metadata);
+                if (array_key_exists('USER', $arr) && array_key_exists('EMAIL', $arr)) {
+                    $user = $this->userRepo->createByEmail($arr['USER_EMAIL'], $arr['USER_NAME']);
+                    if ($user !== null) {
+                        $cycle->setUser($user);
+                        $obj->addMessage('User from MT cycle added :' . $user);
+                    }
+                }
+                $cycle->setMetaData($arr);
+            }
+        } catch (\Throwable $ex) {
+            $obj->addMessage('Failed in cycle_metadata :' . $cycle_metadata . ' ' . $ex->getMessage());
+        }
+    }
+
+    /**
+     * @param string $test_metadata
+     * @param LogBookTest $test
+     * @param LogBookUpload $obj
+     */
+    protected function testMetaDataHandler(string $test_metadata, LogBookTest $test, LogBookUpload $obj): void
+    {
+        try {
+            /** Extract TEST metadata from request if exist */
+            if ($test_metadata !== '' && $this->isVariableString($test_metadata)) {
+                $arr = $this->extractTestVariables($test_metadata);
+                $test->setMetaData($arr);
+            }
+        } catch (\Throwable $ex) {
+            $obj->addMessage('Failed in test_metadata :' . $test_metadata . ' ' . $ex->getMessage());
+        }
+    }
+
+    /**
+     * @param string $levelName
+     */
     private final function addBlackListLevel(string $levelName): void
     {
         $preparedLevelName = $this->prepareDebugLevel($levelName);

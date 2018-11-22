@@ -2,7 +2,10 @@
     max-width:30px !important;
     width:20px !important;
 }
-
+.setup_cycle_user{
+    max-width:100px !important;
+    width:30px !important;
+}
 .setup_cycle_build_column{
     max-width:230px !important;
     width:130px !important;

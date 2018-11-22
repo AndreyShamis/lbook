@@ -8,8 +8,13 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Full Name</th>
+            <th>First Name</th>
+            <th>Last Name</th>
             <th>Email</th>
+            <th title="Another iD">Self ID</th>
             <th>Active</th>
+            <th>LDAP</th>
             <th>Options</th>
 
         </tr>
@@ -19,8 +24,13 @@
             <tr>
                 <td><a href="{{ path('user_show', { 'id': user.id }) }}">{{ user.id }}</a></td>
                 <td><a href="{{ path('user_show', { 'id': user.id }) }}">{{ user.username }}</a></td>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName }}</td>
                 <td>{{ user.email }}</td>
+                <td>{{ user.anotherId }}</td>
                 <td>{{ user.isActive ? 'Yes':'DISABLED' }}</td>
+                <td>{{ user.isLdapUser ? 'LDAP':'No' }}</td>
                 <td>
                     {% if is_granted('view', user) %}
                     <a href="{{ path('user_show', { 'id': user.id }) }}">show</a>

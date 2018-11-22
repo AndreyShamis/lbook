@@ -449,6 +449,22 @@ class LogBookUser implements UserInterface, \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getUserNameShort(): string
+    {
+        $nameArray = explode(' ', $this->getFullName());
+        $ret = '';
+        foreach ($nameArray as $value) {
+            $ret .= substr($value, 0, 1);
+        }
+        if (\mb_strlen($ret) > 1) {
+            return $ret;
+        }
+        return $this->getUsername();
+    }
+
+    /**
      * @return LogBookUserSettings
      */
     public function getSettings(): LogBookUserSettings

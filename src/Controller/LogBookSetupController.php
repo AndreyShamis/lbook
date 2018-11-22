@@ -192,7 +192,7 @@ class LogBookSetupController extends Controller
             $thisPage = $page;
             $deleteForm = $this->createDeleteForm($setup);
             $show_build = $this->showBuild($paginator);
-
+            $show_user = $this->showUsers($paginator);
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup'          => $setup,
                 'size'          => $totalPosts,
@@ -202,10 +202,47 @@ class LogBookSetupController extends Controller
                 'paginator'     => $paginator,
                 'delete_form'   => $deleteForm->createView(),
                 'show_build'    => $show_build,
+                'show_user'     => $show_user,
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($setup, $ex);
         }
+    }
+
+    /**
+     * @param \Doctrine\ORM\Tools\Pagination\Paginator $paginator
+     * @return bool
+     */
+    protected function showUsers($paginator): bool
+    {
+        $show_user = false;
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+        $prev_user_id = 0;
+        $iterator->rewind();
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookCycle $cycle */
+                    $cycle = $iterator->current();
+                    if ($cycle !== null) {
+                        $user = $cycle->getUser();
+                        if ($user !== null) {
+                            $user_id = $user->getId();
+                            if ($user_id > 0) {
+                                if ($prev_user_id !== $user_id) {
+                                    $show_user = true;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                    $iterator->next();
+                }
+            }
+        } catch (\Throwable $ex) { }
+        return $show_user;
     }
 
     /**
@@ -241,7 +278,6 @@ class LogBookSetupController extends Controller
                 }
             }
         } catch (\Throwable $ex) { }
-
         return $show_build;
     }
 

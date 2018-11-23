@@ -28,6 +28,8 @@ class LogBookBuild
      */
     protected $name = '';
 
+    protected $cycles = 0;
+
     /**
      * @return mixed
      */
@@ -35,6 +37,23 @@ class LogBookBuild
     {
         return $this->id;
     }
+
+    /**
+     * @return int
+     */
+    public function getCycles(): int
+    {
+        return $this->cycles;
+    }
+
+    /**
+     * @param int $cycles
+     */
+    public function setCycles(int $cycles): void
+    {
+        $this->cycles = $cycles;
+    }
+
 
     /**
      * @param mixed $id

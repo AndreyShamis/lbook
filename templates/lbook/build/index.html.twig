@@ -15,6 +15,7 @@
             <tr>
                 <th data-sorter="htmlSorter" data-sortable="true">Id</th>
                 <th data-sorter="htmlSorter" data-sortable="true">Name</th>
+                <th data-sorter="htmlSorter" data-sortable="true">Cycles</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -29,6 +30,7 @@
             <tr>
                 <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
                 <td><a href="{{ path('build_show_cycles_first', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>
+                <td>{{ log_book_build.cycles }}</td>
                 <td>
                     {% if is_granted('edit', log_book_build) %}
                         <a href="{{ path('log_book_build_edit', {'id': log_book_build.id}) }}">edit</a>

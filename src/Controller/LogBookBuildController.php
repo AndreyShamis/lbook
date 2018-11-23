@@ -29,7 +29,7 @@ class LogBookBuildController extends Controller
      * @param LogBookBuildRepository $logBookBuildRepository
      * @return array
      */
-    public function index($page = 1, PagePaginator $pagePaginator, LogBookBuildRepository $logBookBuildRepository): array
+    public function index(LogBookCycleRepository $cycleRepo, PagePaginator $pagePaginator, LogBookBuildRepository $logBookBuildRepository, $page = 1): array
     {
         $query = $logBookBuildRepository->createQueryBuilder('log_book_build')
             ->orderBy('log_book_build.id', 'DESC');
@@ -39,6 +39,23 @@ class LogBookBuildController extends Controller
         //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
         $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
         $iterator = $paginator->getIterator(); # ArrayIterator
+
+        $iterator->rewind();
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookBuild $build */
+                    $build = $iterator->current();
+                    if ($build !== null) {
+                        $build_id = $build->getId();
+                        $build->setCycles($cycleRepo->count(array('build' => $build_id)));
+                    }
+                    $iterator->next();
+                }
+            }
+        } catch (\Throwable $ex) { }
+
+
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
@@ -98,7 +115,7 @@ class LogBookBuildController extends Controller
      */
     public function showCyclesFirst(LogBookBuild $logBookBuild, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): Response
     {
-        return $this->showCycles($logBookBuild, 1 , $pagePaginator, $cycleRepo);
+        return $this->showCycles($logBookBuild , $pagePaginator, $cycleRepo, 1);
     }
 
     /**
@@ -109,7 +126,7 @@ class LogBookBuildController extends Controller
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showCycles(LogBookBuild $logBookBuild, $page = 1, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): Response
+    public function showCycles(LogBookBuild $logBookBuild, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo, $page = 1): Response
     {
         $qb = $cycleRepo->createQueryBuilder('t')
             ->where('t.build = :build')

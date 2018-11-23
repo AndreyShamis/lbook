@@ -346,6 +346,8 @@ class LogBookUploaderController extends Controller
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
                 $cycle->setDut($dut);
+                // Set token exparation after each test +1 hour
+                $cycle->setTokenExpiration(new \DateTime('+1 hours'));
                 $setup->setUpdatedAt();
                 $this->em->flush();
                 $obj->addMessage('TestID is ' . $test->getId() . '.');

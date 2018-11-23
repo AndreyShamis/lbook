@@ -40,7 +40,7 @@
             <th data-sortable="true" title="Tests count in the cycle">Tests</th>
             <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">PR</th>
             <th data-sortable="true" data-sorter="htmlSorter" title="Build Name">Build</th>
-            <th data-sortable="true" data-sorter="htmlSorter" title="User Name">User</th>
+            <th data-sortable="true" title="User Name">User</th>
             <th data-sortable="true" data-visible="false" title="Controller">Controller</th>
             <th data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
             <th data-sortable="true" title="Cycle Uploader Machine">Uploader</th>
@@ -72,7 +72,7 @@
                 {#<td>{{ cycle.tests | length }}</td>#}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
-                <td title="{{ cycle.user.userNameShort }}">{{ cycle.user.fullName }}</td>
+                <td title="{{ cycle.user.userNameShort }} {{ cycle.user.userNameMedium }}">{{ cycle.user.fullName }}</td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>

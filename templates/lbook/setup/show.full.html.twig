@@ -112,7 +112,7 @@
             <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
             {% endif %}
             {%  if show_user %}
-            <th class="setup_cycle_user" data-sorter="htmlSorter" data-sortable="true">User</th>
+            <th class="setup_cycle_user" data-sortable="true">User</th>
             {% endif %}
             <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass %</th>
             <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
@@ -159,9 +159,7 @@
                 </td>
                 {% endif %}
                 {%  if show_user %}
-                <td title="{{ cycle.user.FullName }}">
-                    {{ cycle.user.UserNameShort }}
-                </td>
+                <td title="{{ cycle.user.FullName }}">{{ cycle.user.UserNameMedium }}</td>
                 {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>

@@ -23,6 +23,7 @@
     {% include "lbook/paginator.html.twig" %}
     <div id="cycleIndexToolbar">
     </div>
+    {% spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
            data-pagination="true" data-search="true" data-toggle="table"
            data-show-columns="true"
@@ -40,6 +41,7 @@
             <th data-sortable="true" title="Tests count in the cycle">Tests</th>
             <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">PR</th>
             <th data-sortable="true" data-sorter="htmlSorter" title="Build Name">Build</th>
+            <th data-sortable="true" title="Status" class="cycle_index_status">Status</th>
             <th data-sortable="true" title="User Name">User</th>
             <th data-sortable="true" data-visible="false" title="Controller">Controller</th>
             <th data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
@@ -72,24 +74,42 @@
                 {#<td>{{ cycle.tests | length }}</td>#}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
-                <td title="{{ cycle.user.userNameShort }} {{ cycle.user.userNameMedium }}">{{ cycle.user.fullName }}</td>
+                <td>
+                    <div class="progress progress-mini cycle_pb">
+                        {% if cycle.passRate > 0 %}
+                        <div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>
+                        {% endif %}
+                        {% if cycle.errorRate > 0 %}
+                        <div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>
+                        {% endif %}
+                        {% if cycle.failRate > 0 %}
+                        <div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>
+                        {% endif %}
+                        {% if cycle.warningRate > 0 %}
+                        <div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>
+                        {% endif %}
+                        {% if cycle.unknownRate > 0 %}
+                        <div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>
+                        {% endif %}
+                        {% if cycle.naRate > 0 %}
+                        <div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
                 <td>{{ cycle.controller }}</td>
                 <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
                 <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
                 <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
                 <td>
-                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">
-                        {{ cycle.createdAt|time_diff}}
-                    </span>
+                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span>
                 </td>
                 <td>
-                    <span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">
-                        {{ cycle.updatedAt|time_diff}}
-                    </span>
+                    <span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span>
                 </td>
                 <td>
-                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">show</a>
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">show </a>
                     {% if is_granted('edit', cycle.setup) %}
                         <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
                     {% endif %}
@@ -99,7 +119,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+    {% endspaceless %}
     <ul>
         <li>
             <a href="{{ path('cycle_new') }}">Create a new Cycle</a>

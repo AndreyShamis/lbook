@@ -61,7 +61,10 @@
     max-width:45px !important;
     width:35px !important;
 }
-
+.cycle_index_status{
+    max-width:80px !important;
+    width:80px !important;
+}
 th.meta_data_column{
     font-size: 10px !important;
     font-weight: lighter !important;
@@ -70,6 +73,10 @@ th.meta_data_column{
     font-size: 12px;
 }
 
+.cycle_pb{
+    border-radius: 20px !important;
+    margin-bottom: 0;
+}
 .btn{
     line-height: inherit !important;
     padding: 2px 16px !important;

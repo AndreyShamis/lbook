@@ -114,6 +114,10 @@
             $( "#setupTableToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
             });
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
+            } catch (e) {}
         });
     </script>
 {% endblock %}

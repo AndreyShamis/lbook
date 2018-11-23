@@ -107,14 +107,14 @@
 												<i class="ace-icon fa fa-sitemap"></i>
 												Log Book 2.0
 											</span>
-                                            Welcome to Log Book site, the next generation of WLOG
+                                            Welcome to Log Book site
                                         </h1>
                                         {#{% for key, value in _context  %}#}
                                             {#<h2>{{ key }}</h2>#}
                                             {#{{ dump(value) }}#}
                                         {#{% endfor %}#}
                                         <hr />
-                                        <h3 class="lighter smaller">Site under construction</h3>
+
 
                                         <div>
                                             {#<form class="form-search">#}
@@ -130,6 +130,14 @@
                                             <h4 class="smaller">List:</h4>
 
                                             <ul class="list-unstyled spaced inline bigger-110 margin-15">
+                                                <li class="bigger-150">
+                                                    <i class="ace-icon fa fa-desktop green"></i>
+                                                    <a href="{{asset(path('setup_index_first'))}}" class="green">&nbsp;Visit setups list</a>
+                                                </li>
+                                                <li class="bigger-150">
+                                                    <i class="ace-icon fa fa-pencil-square-o yellow"></i>
+                                                    <a href="{{asset(path('log_book_build_index'))}}" class="yellow">&nbsp;Show list of builds</a>
+                                                </li>
                                                 <li>
                                                     <i class="ace-icon fa fa-eye blue"></i>
                                                     <a href="https://review.gerrithub.io/#/admin/projects/AndreyShamis/lbook" target="_blank">Code review </a> on https://review.gerrithub.io
@@ -150,14 +158,6 @@
                                                     <i class="ace-icon fa fa-hand-o-right blue"></i>
                                                     The log file can be uploaded via /upload link
                                                 </li>
-                                                <li>
-                                                    <i class="ace-icon fa fa-hand-o-right blue"></i>
-                                                    WIP: Generation of cycle
-                                                </li>
-                                                <li>
-                                                    <i class="ace-icon fa fa-hand-o-right blue"></i>
-                                                    Nice random name will be generated got new Setup
-                                                </li>
                                                 <li>&nbsp;</li>
                                                 <li>&nbsp;</li>
                                                 <li>&nbsp;</li>
@@ -166,6 +166,8 @@
                                             </ul>
                                         </div>
 
+                                        <hr />
+                                        <h3 class="lighter smaller">Site under construction</h3>
                                         <hr />
                                         <div class="space"></div>
 

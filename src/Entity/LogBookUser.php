@@ -476,6 +476,7 @@ class LogBookUser implements UserInterface, \Serializable
             $newFullName = implode('', $nameArray);
             $ret = $newFullName[0] . substr($lastName, 0, 7);
             $ret = strtolower($ret);
+            $ret = str_replace(',', '',  $ret);
 
         } else {
             foreach ($nameArray as $value) {

@@ -414,7 +414,7 @@ class LogBookUploaderController extends Controller
             if ($cycle_metadata !== '' && $this->isVariableString($cycle_metadata)) {
                 $arr = $this->extractTestVariables($cycle_metadata);
                 if (array_key_exists('USER', $arr) && array_key_exists('EMAIL', $arr)) {
-                    $user = $this->userRepo->createByEmail($arr['USER_EMAIL'], $arr['USER_NAME']);
+                    $user = $this->userRepo->createByEmail($arr['EMAIL'], $arr['USER']);
                     if ($user !== null) {
                         $cycle->setUser($user);
                         $obj->addMessage('User from MT cycle added :' . $user);

@@ -254,7 +254,7 @@
 
         function detailFormatter(index, row, object){
             var html = [];
-            var url = "/cycle/ajax/" + row.id;
+            var url = "/cycle/ajax/" + row['id'];
             var p = $.post(url , function( data ) {
                 html.push(data);
             });

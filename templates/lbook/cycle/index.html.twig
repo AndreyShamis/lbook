@@ -61,7 +61,7 @@
             <thead>
             <tr>
                 <th data-field="TimeDiff" data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
-                <th data-field="ID" data-sortable="true" data-switchable="false" title="Cycle ID">ID</th>
+                <th data-field="id" data-sortable="true" data-switchable="false" title="Cycle ID">ID</th>
                 <th data-field="CycleName" data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false" data-title="Cycle Name"  data-cell-style="cellStyle">Cycle Name</th>
                 <th data-field="Setup" data-sorter="htmlSorter" data-sortable="true" title="Setup Name">Setup</th>
                 <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
@@ -69,12 +69,12 @@
                 <th data-field="Build" data-sortable="true" data-sorter="htmlSorter" title="Build Name" data-footer-formatter="totalFormatter">Build</th>
                 <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status">Status</th>
                 <th data-field="User" data-sortable="true" title="User Name">User</th>
-                <th data-field="CTRL" data-sortable="true" data-visible="false" title="Controller">Controller</th>
-                <th data-field="DUT" data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
+                {#<th data-field="CTRL" data-sortable="true" data-visible="false" title="Controller">Controller</th>#}
+                {#<th data-field="DUT" data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>#}
                 <th data-field="Uploader" data-sortable="true" title="Cycle Uploader Machine" data-formatter="colorFormatter" data-footer-formatter="runningFormatter">Uploader</th>
                 <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
                 <th data-field="TestTime" data-sorter="dataTitleIntSorter" data-sortable="true" data-footer-formatter="timeSumFormatter">Test time</th>
-                <th data-field="Created" data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
+                {#<th data-field="Created" data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>#}
                 <th data-field="Updated" data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
                 <th data-field="Options" class="setup_cycle_options_column" data-switchable="false">Options</th>
             </tr>
@@ -123,12 +123,12 @@
                         </div>
                     </td>
                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
-                    <td>{{ cycle.controller }}</td>
-                    <td>{{ cycle.dut }}</td>
+                    {#<td>{{ cycle.controller }}</td>#}
+                    {#<td>{{ cycle.dut }}</td>#}
                     <td>{{ cycle.targetUploader }}</td>
                     <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
                     <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
-                    <td><span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span></td>
+                    {#<td><span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span></td>#}
                     <td><span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span></td>
                     <td>{% if is_granted('edit', cycle.setup) %}
                             <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
@@ -189,9 +189,9 @@
                 if (field === 'PassRate') {
                     var val = extractContent(row[field]);
                     return sum + (+parseFloat(val));
-                }else  if (field === 'pppppppppppppppppppppp') {
-                    var val = extractContent(row[field]);
-                    return val;
+                // }else  if (field === 'pppppppppppppppppppppp') {
+                //     var val = extractContent(row[field]);
+                //     return val;
                 } else {
                     return sum + (+ row[field]);
                 }
@@ -205,7 +205,6 @@
             } else {
                 return '0';
             }
-
         }
 
         function avgFormatter(data) {
@@ -214,7 +213,6 @@
             } else {
                 return '0';
             }
-
         }
 
         function timestrToSec(timestr) {
@@ -240,17 +238,21 @@
         }
 
         function testsFormatter(value, row) {
-            var icon = row.id % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
-            return '<i class="glyphicon ' + icon + '"></i> ' + value;
+            var icon = parseInt(row.id) % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
+            return '<i class="glyphicon ' + icon + '"></i>' + value;
         }
 
         function colorFormatter(value) {
-            // 16777215 == ffffff in decimal
-            var color = '#'+Math.floor(Math.random() * 6777215).toString(16);
-            return '<div  style="color: ' + color + '">' +
-                '<i class="fa fa-laptop"></i>' +
-                value +
-                '</div>';
+            if (value === '') {
+                return '';
+            }
+            var parsed_value = parseFloat(value);
+            if (isNaN(parsed_value)){
+                parsed_value = parseFloat(value.toString().length.toString());
+            }
+            var st = Math.floor(parsed_value * 6777215).toString(16);
+            var color = '#'+ st.substring(0, 6);
+            return '<div style="color:' + color + '"><i class="fa fa-laptop"></i>' + value + '</div>';
         }
 
         function detailFormatter(index, row, object){
@@ -285,11 +287,11 @@
             var classes = ['active', 'success', 'info', 'warning', 'danger'];
 
             var pass_rate = extractDataPercent(row['PassRate']);
-            if (pass_rate === 100) {
-                return {
-                    classes: classes[1]
-                };
-            }
+            // if (pass_rate === 100) {
+            //     return {
+            //         classes: classes[1]
+            //     };
+            // }
             if (pass_rate === 0) {
                 return {
                     classes: classes[4]

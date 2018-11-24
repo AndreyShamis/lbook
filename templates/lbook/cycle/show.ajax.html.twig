@@ -1,0 +1,494 @@
+
+{% block content %}
+    {% set testsCount = cycle.testsCount %}
+    {% set tests_in_json = false %}
+    {% set allTestsCount = cycle.tests|length  %}
+    <div class="row">
+        <div class="col-xs-10">
+            <h3 class="generic_title cycle_title">Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+        </div>
+        <div class="col-xs-2">
+            <span style="float: right;">
+                <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
+                    <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
+                    Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                </button>
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="tabbable">
+                <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="testInfoNav">
+                    <li class="active"><a data-toggle="tab" href="#main">Main</a></li>
+                    {% if cycle.metaData %}
+                        <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ cycle.metaData | length }})</a></li>
+                    {% endif %}
+                    <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
+                    <li class=""><a data-toggle="tab" href="#other">Other</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="main" class="tab-pane active">
+
+                        {% spaceless %}
+                            <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
+                                <tbody>
+                                {#<tr>#}
+                                {#<th>#}
+                                {#<span title="Time in seconds between min tests time to max tests time">Period</span>#}
+                                {#/#}
+                                {#<span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+                                {#</th>#}
+                                {#<td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>#}
+                                {#<th>Pass Rate</th>#}
+                                {#<td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>#}
+                                {#<th>Name</th>#}
+                                {#<td><span class="label label-info label-white">{{ cycle.name }}</span></td>#}
+                                {#<th>Id</th>#}
+                                {#<td>{{ cycle.id }}</td>#}
+                                {#</tr>#}
+                                <tr>
+                                    <th>
+                                        <span title="Time in seconds between min tests time to max tests time">Period</span>
+                                        {#<span title="TestsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+                                    </th>
+                                    <td>{{ cycle.period |  ExecutionTimeGeneric}}
+                                        {#/ {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}#}
+                                    </td>
+                                    <th>Build</th>
+                                    <td>
+                                        {% if cycle.build  %}
+                                            <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
+                                                <span class="label label-white middle">
+                                                    <i class="ace-icon fa fa-folder-open-o"></i>
+                                                    {{ cycle.build }}
+                                                </span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    <th>DUT</th>
+                                    <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
+                                    <th>Controller</th>
+                                    <td><span class="label label-purple label-white middle">{{ cycle.controller }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Start Time</th>
+                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Created</th>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Uploader</th>
+                                    <td colspan="3"><span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>End Time</th>
+                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+                                    <th>Updated</th>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <th></th>
+                                    <td colspan="3"></td>
+                                </tr>
+                                <tr>
+
+                                    <td colspan="8">{% include 'lbook/cycle/infobox.html.twig' %}</td>
+                                </tr>
+                                {#<tr>#}
+                                {#<th>Pass</th>#}
+                                {#<td>{{ cycle.testsPass }}</td>#}
+                                {#<th>Fail</th>#}
+                                {#<td>{{ cycle.testsFail }}</td>#}
+                                {#<th>Error</th>#}
+                                {#<td>{{ cycle.testsError }}</td>#}
+                                {#<th>Count</th>#}
+                                {#<td>{{ cycle.testsCount }}</td>#}
+                                {#</tr>#}
+                                {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
+                                {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
+                                {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
+                                {#'updatedAt', 'createdAt', 'testsTimeSum',#}
+                                {#'controller', 'targetUploader', 'dut',#}
+                                {#'build', 'disabled', 'forDelete'] %}#}
+                                {#{% for key, value in cycle|cast_to_array %}#}
+                                {#{% if key not in already_printed%}#}
+                                {#<tr>#}
+                                {#<th>{{ key | capitalize}}</th>#}
+                                {#<td>{{ dump(value) }}</td>#}
+                                {#</tr>#}
+                                {#{% endif %}#}
+                                {#{% endfor %}#}
+                                </tbody>
+                            </table>
+                        {% endspaceless %}
+
+
+                    </div>
+
+                    {% if cycle.metaData %}
+                        <div id="metadata" class="tab-pane">
+                            <ul>
+                                {% for key, item in cycle.metaData %}
+                                    <li>
+                                        {{ key }} =
+                                        {% if isUrl(item) %}
+                                            {{ item }} <a target="_blank" href="{{item }}" >Link_to_{{ key }}</a>
+                                        {% else %}
+                                            <span title="{{ item }}">{{ shortString(item, 500) }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div id="view" class="tab-pane">
+                        <div class="container" style="width: 100%;height: 100%;min-height: 700px;">
+                            <div id="graphResults"  class="chart" style="width: 100%;height: 100%;min-height: 700px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="other" class="tab-pane">
+                        <table class="records_list table table-striped table-condensed">
+                            <tr>
+                                <th title="Short Setup Name">Short</th>
+                                <td><span class="label label-success label-white middle">{{ cycle.setup.nameShown }}</span></td>
+                            </tr>
+                            <tr>
+                                <th title="Operational System">OS</th>
+                                <td title="Operational System">{{ cycle.setup.os }}</td>
+                                <th title="Setup Owner">Owner</th>
+                                <td title="Setup Owner">{{ cycle.setup.owner }}</td>
+                            </tr>
+                            <tr>
+                                <th>Token EXP</th>
+                                <td>{{ cycle.tokenExpiration|date('Y-m-d H:i:s') }}</td>
+                                <th>Token</th>
+                                <td><span style="font-size: 9px;">{{ cycle.uploadToken }}</span></td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
+    {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
+    {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
+    {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
+    {% set show_metadata = app.user.settings.cycleShowTestMetaDataShow | default(true) %}
+    {% set show_metadata_opt = app.user.settings.cycleShowTestMetaDataOptShow | default(true) %}
+    {% set show_uptime = app.user.settings.cycleShowTestUptime | default(true) %}
+
+    {% set cycle_show_test_time_start_format = app.user.settings.cycleShowTestTimeStartFormat | default('H:i:s')%}
+    {% set cycle_show_test_time_end_format = app.user.settings.cycleShowTestTimeEndFormat | default('H:i:s')%}
+
+    {% set pagePath = "cycle_show" %}
+    {% set objId = cycle.id %}
+    {% include "lbook/double.paginator.html.twig" %}
+    {%  set tests = cycle.tests%}
+    {#{% include "lbook/search.html.twig" %}#}
+    <div id="cycleShowToolbar">
+    </div>
+    {% spaceless %}
+        <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+               id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
+               data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
+               data-toolbar="#cycleShowToolbar"
+               data-show-refresh="true"
+                {#data-show-toggle="true"#}
+               data-show-export="true"
+               data-show-columns="true"
+               data-advanced-search="true"
+               data-id-table="advancedTable"
+                {% if tests_in_json == true %}
+                    data-url="http://127.0.0.1:8080/cycle/json/{{ objId }}"
+                    data-side-pagination="server"
+                {% endif %}
+                {#data-url="http://127.0.0.1:8080/cycle/json/167/page/1"#}
+                {#data-detail-view="true"#}
+                {#data-detail-formatter="detailFormatter"#}
+                {#data-minimum-count-columns="2"#}
+                {#data-show-pagination-switch="true"#}
+                {#data-id-field="id"#}
+                {#data-response-handler="responseHandler"#}
+        >
+            <thead>
+            <tr>
+                {% if cycle_show_test_id_show == true %}
+                    <th data-sortable="true" data-field="id">ID</th>
+                {% endif %}
+                <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
+                <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
+                <th data-sortable="true" data-field="timeRun" title="Test run time">Runtime</th>
+                {% if cycle_show_test_time_start_show == true %}
+                    <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
+                {% endif %}
+                {% if cycle_show_test_time_end_show == true %}
+                    <th data-sortable="true" data-field="timeEnd" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
+                {% endif %}
+                {% if cycle_show_test_time_ratio_show == true %}
+                    <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+                {% endif %}
+                {% if show_metadata == true %}
+                    {% for key, item in additional_cols %}
+                        <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
+                    {% endfor %}
+                {% endif %}
+                {% if show_metadata_opt == true %}
+                    {% for key, item in additional_opt_cols %}
+                        <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
+                    {% endfor %}
+                {% endif %}
+                {% if disabled_uptime == false and show_uptime == true %}
+                    <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
+                    <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
+                {% endif %}
+                <th data-sortable="true" data-field="verdict">Verdict</th>
+                {#<th>Actions</th>#}
+            </tr>
+            </thead>
+
+            <tbody class="searchable">
+            {% if tests_in_json != true %}
+                {% set builder = '' %}
+                {% set break = false %}
+                {% set counter = 0 %}
+                {% for test in iterator if not break %}
+                    {% if counter == 10000 %}
+                        {% set break = true %}
+                    {% endif %}
+                    {% set counter = counter+1 %}
+                    {% set test_disabled = '' %}
+                    {% if test.isDisabled == 1 %}
+                        {% set test_disabled = 'test-disabled' %}
+                    {% endif %}
+                    <tr class="{{ test_disabled }}">
+                        {% if is_granted('edit', cycle.setup) %}
+                            {% if 'CLUSTER_SHOW' in test.metaData|keys %}
+                                {%  set column =  test.metaData['CLUSTER_SHOW'] %}
+                            {% else %}
+                                {%  set column =  test.verdict %}
+                            {% endif %}
+                            {%  set builder = builder ~ '[\'' ~ column ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
+                        {% endif %}
+                        {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
+                        <td>{{ test.executionOrder }}</td>
+                        <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                        <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
+                        {% if cycle_show_test_time_start_show == true %}
+                            {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
+                            <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>
+                        {% endif %}
+                        {% if cycle_show_test_time_end_show == true %}
+                            <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date(cycle_show_test_time_end_format) }}</span>{% endif %}</td>
+                        {% endif %}
+                        {% if cycle_show_test_time_ratio_show == true %}
+                            <td><span data-title="{{ test.timeRun }}"></span>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                        {% endif %}
+                        {% if show_metadata == true %}
+                            {% for key, item in additional_cols %}
+                                <td title="{{ item }}">
+                                    {% if item in test.metaData|keys %}
+                                        {% if isUrl(test.metaData[item]) %}
+                                            <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                                        {% else %}
+                                            <span title="{{ test.metaData[item] }}">
+                                    {{ test.metaData[item] }}
+                                                {#{{ shortString(test.metaData[item], 35) }}#}
+                                </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        {% endif %}
+                        {% if show_metadata_opt == true %}
+                            {% for key, item in additional_opt_cols %}
+                                <td title="{{ item }}">
+                                    {% if item in test.metaData|keys %}
+                                        {% if isUrl(test.metaData[item]) %}
+                                            <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                                        {% else %}
+                                            <span title="{{ test.metaData[item] }}">
+                                        {{ test.metaData[item] }}
+                                                {#{{ shortString(test.metaData[item], 50) }}#}
+                                    </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        {% endif %}
+                        {% if disabled_uptime == false and show_uptime == true %}
+                            <td>{{ test.dutUpTimeStart }}</td>
+                            <td>{{ test.dutUpTimeEnd }}</td>
+                        {% endif %}
+                        <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                        {#<td>#}
+                        {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
+                        {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                        {#</td>#}
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+
+        </table>
+    {% endspaceless %}
+    <ul>
+        {% if is_granted('edit', cycle.setup) %}
+            <li><a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a></li>
+        {% endif %}
+        {#{% if is_granted('delete', cycle.setup) %}#}
+        {#<li>#}
+        {#{{ form_start(delete_form) }}#}
+        {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+        {#{{ form_end(delete_form) }}#}
+        {#</li>#}
+        {#{% endif %}#}
+    </ul>
+
+
+    <script>
+        function drawEasyPieChart(){
+            jQuery(function($) {
+                $('.easy-pie-chart.percentage').each(function(){
+                    $(this).easyPieChart({
+                        barColor: $(this).data('color'),
+                        trackColor: '#EEEEEE',
+                        scaleColor: false,
+                        lineCap: 'butt',
+                        lineWidth: 3,
+                        animate: ace.vars['old_ie'] ? false : 1200,
+                        size:45
+                    }).css('color', $(this).data('color'));
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            $( "#cycleShowToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+            drawEasyPieChart();
+            $( "#saveCycleAsArchive" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
+            });
+            // var testTable = $('#cycleTestsTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     // pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+        });
+    </script>
+    {% if is_granted('edit', cycle.setup) %}
+        <script type="text/javascript">
+            google.charts.load("current", {packages:["timeline"]});
+
+            function drawChart(jsonData) {
+                var dataTable = new google.visualization.DataTable();
+                dataTable.addColumn({ type: 'string', id: 'Selector' });
+                dataTable.addColumn({ type: 'string', id: 'Test Name' });
+                dataTable.addColumn({ type: 'date', id: 'Start' });
+                dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
+                {% if tests_in_json == true %}
+                $.each(jsonData['rows'], function (i, row) {
+                    dataTable.addRow([
+                        row.verdict,
+                        row.name,
+                        new Date(row.timeStart),
+                        new Date(row.timeEnd)
+                    ]);
+                });
+                {% endif %}
+
+                {% if tests_in_json == true %}
+                // "tests_in_json=true
+                {% else %}
+                // "tests_in_json=false
+                dataTable.addRows([
+                    {{builder|raw}}
+                ]);
+                {% endif %}
+
+                var options = {
+                    tooltip: {isHtml: true},
+                    height: '100%',
+                    timeline: {
+                        //singleColor: '#8d8',
+                        groupByRowLabel: true,
+                        colorByRowLabel: true,
+                    },
+                    // hAxis: {
+                    //     format: 'M/d/yy',
+                    //     gridlines: {count: 15}
+                    // }
+                };
+
+                function chartSelectHandler(e) {
+                    var selection = chart.getSelection();
+                    var message = '';
+                    var yRange = dataTable.getColumnRange(1);
+                    var xRange = dataTable.getColumnRange(0);
+
+                    for (var i = 0; i < selection.length; i++) {
+                        var item = selection[i];
+                        var str;
+                        if (item.row != null && item.column != null) {
+                            str = dataTable.getFormattedValue(item.row, item.column);
+                            message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+                        } else if (item.row != null) {
+                            str = dataTable.getFormattedValue(item.row, 0);
+                            message += '{row:' + item.row + '};value= ' + str + '\n';
+                        } else if (item.column != null) {
+                            str = dataTable.getFormattedValue(0, item.column);
+                            message += '{column:' + item.column + '};value= ' + str + '\n';
+                        }
+                    }
+                    try {
+                        console.log('selected ' + message);
+                    } catch (e) {}
+                }
+
+                var chart = new google.visualization.Timeline($('#graphResults')[0]);
+                google.visualization.events.addListener(chart, 'select', chartSelectHandler);
+
+                chart.draw(dataTable, options);
+                try {
+                    console.log('Draw graph finish')
+                } catch (e) {}
+
+            }
+
+
+            $(document).ready(function() {
+
+                $("#view_graph").on("click", function(event){
+                    try {
+                        console.log("precallback - draw graph ");
+                    } catch (e) {}
+
+                    setTimeout(function(){
+                        {% if tests_in_json == true %}
+                        google.charts.setOnLoadCallback(loadDataAndDrawChart);
+                        function loadDataAndDrawChart() {
+                            $.ajax({
+                                dataType: "json",
+                                url: "/cycle/json/{{ objId }}",
+                                success: drawChart
+                            });
+                        }
+                        {% else %}
+                        drawChart();
+                        {% endif %}
+                    }, 50); // small delay for give time to exporer build html
+                });
+                try {
+                    ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                    ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
+                } catch (e) {}
+            });
+        </script>
+    {% endif %}
+{% endblock %}

@@ -34,7 +34,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
     protected function checkIndex(Crawler $crawler): void
     {
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
-        $this->assertGreaterThan(0, $crawler->filter('h1:contains("Cycle list")')->count());
+        $this->assertGreaterThan(0, $crawler->filter('h5:contains("Cycle list")')->count());
     }
 
     /**

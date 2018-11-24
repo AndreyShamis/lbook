@@ -21,104 +21,310 @@
 
     {% set pagePath = "cycle_index" %}
     {% include "lbook/paginator.html.twig" %}
-    <div id="cycleIndexToolbar">
-    </div>
-    {% spaceless %}
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
-           data-pagination="true" data-search="true" data-toggle="table"
-           data-show-columns="true"
-            {#data-detail-view="true"#}
-            {#data-detail-formatter="detailFormatter"#}
-            {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
-           data-toolbar="#cycleIndexToolbar"
-           data-page-size="1000" data-page-list="[20, 50, 100, 300, 500, 1000, 'ALL']" data-sort-order="desc">
-        <thead>
-        <tr>
-            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
-            <th data-sortable="true" data-switchable="false" title="Cycle ID">ID</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false" data-title="Cycle Name">Cycle Name</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Setup Name">Setup</th>
-            <th data-sortable="true" title="Tests count in the cycle">Tests</th>
-            <th data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">PR</th>
-            <th data-sortable="true" data-sorter="htmlSorter" title="Build Name">Build</th>
-            <th data-sortable="true" title="Status" class="cycle_index_status">Status</th>
-            <th data-sortable="true" title="User Name">User</th>
-            <th data-sortable="true" data-visible="false" title="Controller">Controller</th>
-            <th data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
-            <th data-sortable="true" title="Cycle Uploader Machine">Uploader</th>
-            <th data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time">Duration</th>
-            <th data-sorter="dataTitleIntSorter" data-sortable="true">Test time</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
-            <th class="setup_cycle_options_column" data-switchable="false">Options</th>
-        </tr>
-        </thead>
-        <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for cycle in iterator if not break %}
-        {% if counter == 10000 %}
-            {% set break = true %}
-        {% endif %}
-        {% set counter = counter+1 %}
+<div id="container">
+    <div class="row">
+        <div id="cycleIndexToolbar" class="cycleIndexToolbar">
+            <div class="form-inline" role="form">
+                <div class="form-group">
+                    <span>Offset: </span>
+                    <input name="offset" class="form-control w70" type="number" value="0"/>
+                </div>
+                <div class="form-group">
+                    <span>Limit: </span>
+                    <input name="limit" class="form-control w70" type="number" value="5"/>
+                </div>
+                <div class="form-group">
+                    <input name="search" class="form-control" type="text" placeholder="Search">
+                </div>
+                <button id="ok" type="submit" class="btn btn-default">OK</button>
+            </div>
+        </div>
+        {% spaceless %}
+        <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="cycle_index_table"
+               data-pagination="true"
+               data-search="true"
+               data-toggle="table"
+               data-show-columns="true"
+               data-show-refresh="true"
+               {#data-show-toggle="true"#}
+               data-response-handler="responseHandler"
+               data-query-params="queryParams"
+               {#data-height="800"#}
+               {#data-side-pagination="client"#}
+               data-row-style="rowStyle"
+               data-show-footer="true"
+               data-detail-view="true"
+               data-detail-formatter="detailFormatter"
+               data-show-export="true"
+               data-toolbar="#cycleIndexToolbar"
+               data-page-size="1000" data-page-list="[20, 50, 100, 300, 500, 1000, 'ALL']" data-sort-order="desc">
+            <thead>
             <tr>
-                <td>
-                    {%  if date(cycle.updatedAt) > date('-30minutes') %}
-                    <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
-                    {% endif %}
-                </td>
-                <td>{{ cycle.id }}</td>
-                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
-                <td title="{{ cycle.setup }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id  }) }}">{{ shortString(cycle.setup, 35, "...") }}</a></td>
-                <td>{{ cycle.testsCount }}</td>
-                {#<td>{{ cycle.tests | length }}</td>#}
-                <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
-                <td>
-                    <div class="progress progress-mini cycle_pb">
-                        {% if cycle.passRate > 0 %}
-                        <div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>
-                        {% endif %}
-                        {% if cycle.errorRate > 0 %}
-                        <div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>
-                        {% endif %}
-                        {% if cycle.failRate > 0 %}
-                        <div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>
-                        {% endif %}
-                        {% if cycle.warningRate > 0 %}
-                        <div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>
-                        {% endif %}
-                        {% if cycle.unknownRate > 0 %}
-                        <div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>
-                        {% endif %}
-                        {% if cycle.naRate > 0 %}
-                        <div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>
-                        {% endif %}
-                    </div>
-                </td>
-                <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
-                <td>{{ cycle.controller }}</td>
-                <td>{{ cycle.dut }}</td>
-                <td>{{ cycle.targetUploader }}</td>
-                <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
-                <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
-                <td>
-                    <span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span>
-                </td>
-                <td>
-                    <span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span>
-                </td>
-                <td>
-                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">show </a>
-                    {% if is_granted('edit', cycle.setup) %}
-                        <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
-                    {% endif %}
-
-                </td>
+                <th data-field="TimeDiff" data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
+                <th data-field="ID" data-sortable="true" data-switchable="false" title="Cycle ID">ID</th>
+                <th data-field="CycleName" data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false" data-title="Cycle Name"  data-cell-style="cellStyle">Cycle Name</th>
+                <th data-field="Setup" data-sorter="htmlSorter" data-sortable="true" title="Setup Name">Setup</th>
+                <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
+                <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
+                <th data-field="Build" data-sortable="true" data-sorter="htmlSorter" title="Build Name" data-footer-formatter="totalFormatter">Build</th>
+                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status">Status</th>
+                <th data-field="User" data-sortable="true" title="User Name">User</th>
+                <th data-field="CTRL" data-sortable="true" data-visible="false" title="Controller">Controller</th>
+                <th data-field="DUT" data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>
+                <th data-field="Uploader" data-sortable="true" title="Cycle Uploader Machine" data-formatter="colorFormatter" data-footer-formatter="runningFormatter">Uploader</th>
+                <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
+                <th data-field="TestTime" data-sorter="dataTitleIntSorter" data-sortable="true" data-footer-formatter="timeSumFormatter">Test time</th>
+                <th data-field="Created" data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
+                <th data-field="Updated" data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
+                <th data-field="Options" class="setup_cycle_options_column" data-switchable="false">Options</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="searchable">
+            {% set break = false %}
+            {% set counter = 0 %}
+            {% for cycle in iterator if not break %}
+            {% if counter == 10000 %}
+                {% set break = true %}
+            {% endif %}
+            {% set counter = counter+1 %}
+                <tr>
+                    <td>
+                        {%  if date(cycle.updatedAt) > date('-30minutes') %}
+                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ cycle.id }}</td>
+                    <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                    <td title="{{ cycle.setup }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id  }) }}">{{ shortString(cycle.setup, 35, "...") }}</a></td>
+                    <td>{{ cycle.testsCount }}</td>
+                    {#<td>{{ cycle.tests | length }}</td>#}
+                    <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                    <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
+                    <td>
+                        <div class="progress progress-mini cycle_pb">
+                            {% if cycle.passRate > 0 %}
+                            <div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>
+                            {% endif %}
+                            {% if cycle.errorRate > 0 %}
+                            <div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>
+                            {% endif %}
+                            {% if cycle.failRate > 0 %}
+                            <div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>
+                            {% endif %}
+                            {% if cycle.warningRate > 0 %}
+                            <div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>
+                            {% endif %}
+                            {% if cycle.unknownRate > 0 %}
+                            <div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>
+                            {% endif %}
+                            {% if cycle.naRate > 0 %}
+                            <div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
+                    <td>{{ cycle.controller }}</td>
+                    <td>{{ cycle.dut }}</td>
+                    <td>{{ cycle.targetUploader }}</td>
+                    <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
+                    <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
+                    <td><span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span></td>
+                    <td><span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span></td>
+                    <td>{% if is_granted('edit', cycle.setup) %}
+                            <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    <script>
+
+        function runningFormatter(value, row, index) {
+            return index;
+        }
+
+        function totalTextFormatter(data) {
+            return 'Total';
+        }
+
+        function totalFormatter(data) {
+            return data.length;
+        }
+
+        function extractContent(s) {
+            var span = document.createElement('span');
+            span.innerHTML = s;
+            return span.textContent || span.innerText;
+        }
+
+        function extractTitle(s) {
+            var span = document.createElement('span');
+            span.innerHTML = s;
+            return parseInt($(span).children().first().attr('data-title'));
+        }
+
+        function extractDataPercent(s) {
+            var span = document.createElement('span');
+            span.innerHTML = s;
+            return parseInt($(span).children().first().attr('data-percent'));
+        }
+
+        function timeSumFormatter(data) {
+            var field = this.field;
+            var ret_data = data.reduce(function(sum, row) {
+                if (field === 'Duration' || field === 'TestTime') {
+                    var val = extractTitle(row[field]);
+                    return sum + (+ (val))
+                }
+            }, 0);
+            return formatTime(ret_data);
+        }
+
+        function sumFormatter(data) {
+            field = this.field;
+            return data.reduce(function(sum, row) {
+                if (field === 'PassRate') {
+                    var val = extractContent(row[field]);
+                    return sum + (+parseFloat(val));
+                }else  if (field === 'pppppppppppppppppppppp') {
+                    var val = extractContent(row[field]);
+                    return val;
+                } else {
+                    return sum + (+ row[field]);
+                }
+
+            }, 0);
+        }
+
+        function avgPercentFormatter(data) {
+            if (data.length > 0) {
+                return Math.round(sumFormatter.call(this, data) / data.length  * 100) / 100 + '%';
+            } else {
+                return '0';
+            }
+
+        }
+
+        function avgFormatter(data) {
+            if (data.length > 0) {
+                return sumFormatter.call(this, data) / data.length;
+            } else {
+                return '0';
+            }
+
+        }
+
+        function timestrToSec(timestr) {
+            var parts = timestr.split(":");
+            return (parts[0] * 3600) +
+                (parts[1] * 60) +
+                (+parts[2]);
+        }
+
+        function pad(num) {
+            if(num < 10) {
+                return "0" + num;
+            } else {
+                return "" + num;
+            }
+        }
+
+        function formatTime(seconds) {
+            return [pad(Math.floor(seconds/3600)),
+                pad(Math.floor(seconds/60)%60),
+                pad(seconds%60),
+            ].join(":");
+        }
+
+        function testsFormatter(value, row) {
+            var icon = row.id % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
+            return '<i class="glyphicon ' + icon + '"></i> ' + value;
+        }
+
+        function colorFormatter(value) {
+            // 16777215 == ffffff in decimal
+            var color = '#'+Math.floor(Math.random() * 6777215).toString(16);
+            return '<div  style="color: ' + color + '">' +
+                '<i class="fa fa-laptop"></i>' +
+                value +
+                '</div>';
+        }
+
+        function detailFormatter(index, row, object){
+            var html = [];
+            var url = "/cycle/ajax/" + row['ID'];
+            var p = $.post(url , function( data ) {
+                html.push(data);
+            });
+            p.done(function(data) {
+                object.html(data);
+                return data;
+            });
+            p.fail(function(data, error_type, error_message) {
+                var msg = error_type + ':' + error_message;
+                object.html(msg);
+                console.log(msg);
+            });
+        }
+
+        function cellStyle(value, row, index) {
+            // var classes = ['active', 'success', 'info', 'warning', 'danger'];
+            // //console.log(value);
+            // if (index % 2 === 0 && index / 2 < classes.length) {
+            //     return {
+            //         classes: classes[index / 2]
+            //     };
+            // }
+            return {};
+        }
+
+        function rowStyle(row, index) {
+            var classes = ['active', 'success', 'info', 'warning', 'danger'];
+
+            var pass_rate = extractDataPercent(row['PassRate']);
+            if (pass_rate === 100) {
+                return {
+                    classes: classes[1]
+                };
+            }
+            if (pass_rate === 0) {
+                return {
+                    classes: classes[4]
+                };
+            }
+            if (pass_rate < 50) {
+                return {
+                    classes: classes[3]
+                };
+            }
+            return {};
+        }
+
+        var table = $('#cycle_index_table'),
+            ok = $('#ok');
+        // $(function () {
+        //     ok.keyup(function () {
+        //         table.bootstrapTable('refresh');
+        //     });
+        // });
+
+        function queryParams() {
+            console.log('HERE');
+            var params = {};
+            $('#cycleIndexToolbar').find('input[name]').each(function () {
+                params[$(this).attr('name')] = $(this).val();
+            });
+            return params;
+        }
+
+        function responseHandler(res) {
+            console.log(res);
+            return res.rows;
+        }
+    </script>
     {% endspaceless %}
     <ul>
         <li>
@@ -135,6 +341,14 @@
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
+
+
+        });
+
+        $(document).ready(function(){
+            $(".cycle_index_table").bootstrapTable({
+                showFullscreen: true,
+            });
         });
     </script>
 {% endblock %}

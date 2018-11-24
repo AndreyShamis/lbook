@@ -401,6 +401,95 @@ class LogBookCycleController extends Controller
         }
     }
 
+    /**
+     * Finds and displays a cycle entity with paginator.
+     *
+     * @Route("/ajax/{id}", name="cycle_show_ajax", methods={"GET", "POST"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showAjax(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): ?Response
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('');
+            }
+
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.cycle = :cycle')
+                ->andWhere('t.disabled = :disabled')
+                ->orderBy('t.executionOrder', 'ASC')
+                //->setParameter('cycle', $cycle->getId());
+                ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+            $paginator = $pagePaginator->paginate($qb, 1, $this->show_tests_size);
+            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $iterator = $paginator->getIterator(); # ArrayIterator
+
+            $maxPages = ceil($totalPosts / $this->show_tests_size);
+            $thisPage = 1;
+            $disable_uptime = false;
+            $deleteForm = $this->createDeleteForm($cycle);
+            $nul_found = 0;
+
+            $additional_cols = array();
+            $additional_opt_cols = array();
+            $iterator->rewind();
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookTest $test */
+                    $test = $iterator->current();
+                    if ($test !== null) {
+                        /**
+                         * Search for metadata with _SHOW postfix, if exist that column will be shown
+                         * @var array $md
+                         */
+                        $md = $test->getMetaData();
+                        if (\count($md) > 0) {
+                            foreach ($md as $key => $value) {
+                                if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
+                                    $additional_cols[] = $key;
+                                } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
+                                    $additional_opt_cols[] = $key;
+                                }
+
+                            }
+                        }
+                        /** Search for uptime if show or not */
+                        if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
+                            $nul_found++;
+                        }
+                    }
+
+                    $iterator->next();
+                }
+            }
+
+            if ($nul_found === $totalPosts) {
+                $disable_uptime = true;
+            }
+
+            $ret_arr = array(
+                'cycle'                 => $cycle,
+                'size'                  => $totalPosts,
+                'maxPages'              => $maxPages,
+                'thisPage'              => $thisPage,
+                'iterator'              => $iterator,
+                'disabled_uptime'       => $disable_uptime,
+                'delete_form'           => $deleteForm->createView(),
+                'additional_cols'       => $additional_cols,
+                'additional_opt_cols'   => $additional_opt_cols
+            );
+
+            return $this->render('lbook/cycle/show.ajax.html.twig', $ret_arr);
+
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($cycle, $ex);
+        }
+    }
+
+
     private function endsWith($haystack, $needle): bool
     {
         $length = mb_strlen($needle);

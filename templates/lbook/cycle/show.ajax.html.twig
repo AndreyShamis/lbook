@@ -1,0 +1,90 @@
+{% set testsCount = cycle.testsCount %}
+{% set allTestsCount = cycle.tests|length  %}
+{% spaceless %}
+    <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
+        <tbody>
+        {#<tr>#}
+        {#<th>#}
+        {#<span title="Time in seconds between min tests time to max tests time">Period</span>#}
+        {#/#}
+        {#<span title="testsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+        {#</th>#}
+        {#<td>{{ cycle.period |  ExecutionTimeGeneric}} / {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>#}
+        {#<th>Pass Rate</th>#}
+        {#<td><span class="label label-danger label-white middle">{{ cycle.passRate }} %</span></td>#}
+        {#<th>Name</th>#}
+        {#<td><span class="label label-info label-white">{{ cycle.name }}</span></td>#}
+        {#<th>Id</th>#}
+        {#<td>{{ cycle.id }}</td>#}
+        {#</tr>#}
+        <tr>
+            <th>
+                <span title="Time in seconds between min tests time to max tests time">Period</span>
+                {#<span title="TestsTimeSum:Time in seconds calculated from all execution time of tests">Run Time</span>#}
+            </th>
+            <td>{{ cycle.period |  ExecutionTimeGeneric}}
+                {#/ {{ cycle.testsTimeSum |  ExecutionTimeGeneric}}#}
+            </td>
+            <th>Build</th>
+            <td>
+                {% if cycle.build  %}
+                    <a href="{{ path('build_show_cycles_first', {'id': cycle.build.id}) }}" target="_blank" title="Open Build Info for all cycles with this build">
+                        <span class="label label-white middle">
+                            <i class="ace-icon fa fa-folder-open-o"></i>
+                            {{ cycle.build }}
+                        </span>
+                    </a>
+                {% endif %}
+            </td>
+            <th>DUT</th>
+            <td><span class="label label-danger label-white middle">{{ cycle.dut }}</span></td>
+            <th>Controller</th>
+            <td><span class="label label-purple label-white middle">{{ cycle.controller }}</span></td>
+        </tr>
+        <tr>
+            <th>Start Time</th>
+            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+            <th>Created</th>
+            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+            <th>Uploader</th>
+            <td colspan="3"><span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
+        </tr>
+        <tr>
+            <th>End Time</th>
+            <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+            <th>Updated</th>
+            <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
+            <th></th>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+
+            <td colspan="8">{% include 'lbook/cycle/infobox.html.twig' %}</td>
+        </tr>
+        {#<tr>#}
+        {#<th>Pass</th>#}
+        {#<td>{{ cycle.testsPass }}</td>#}
+        {#<th>Fail</th>#}
+        {#<td>{{ cycle.testsFail }}</td>#}
+        {#<th>Error</th>#}
+        {#<td>{{ cycle.testsError }}</td>#}
+        {#<th>Count</th>#}
+        {#<td>{{ cycle.testsCount }}</td>#}
+        {#</tr>#}
+        {#{% set already_printed = [ 'testsPass', 'testsFail', 'testsError', 'testsWarning', 'testsCount', 'testsDisabled',#}
+        {#'dirty', 'uploadToken', 'tokenExpiration', 'id', 'name' , 'tests', 'setup', 'period',#}
+        {#'passRate', 'errorRate', 'failRate', 'warningRate', 'timeStart', 'timeEnd',#}
+        {#'updatedAt', 'createdAt', 'testsTimeSum',#}
+        {#'controller', 'targetUploader', 'dut',#}
+        {#'build', 'disabled', 'forDelete'] %}#}
+        {#{% for key, value in cycle|cast_to_array %}#}
+        {#{% if key not in already_printed%}#}
+        {#<tr>#}
+        {#<th>{{ key | capitalize}}</th>#}
+        {#<td>{{ dump(value) }}</td>#}
+        {#</tr>#}
+        {#{% endif %}#}
+        {#{% endfor %}#}
+        </tbody>
+    </table>
+{% endspaceless %}

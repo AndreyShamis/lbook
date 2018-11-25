@@ -240,16 +240,22 @@
         }
 
         function colorFormatter(value) {
+            var src_value = value;
+            value = value.split('.').reverse().join('');
             if (value === '') {
                 return '';
             }
             var parsed_value = parseFloat(value);
+            //console.log(parsed_value);
             if (isNaN(parsed_value)){
-                parsed_value = parseFloat(value.toString().length.toString());
+                var str_len = value.toString().length;
+                parsed_value = parseFloat(( str_len * 11 * str_len * Math.sqrt(str_len) ).toString());
+                //console.log(parsed_value);
             }
-            var st = Math.floor(parsed_value * 6777215).toString(16);
+            var st = Math.floor((parsed_value * 7) % 6777215).toString(16);
             var color = '#'+ st.substring(0, 6);
-            return '<div style="color:' + color + '"><i class="fa fa-laptop"></i>' + value + '</div>';
+            //console.log(color);
+            return '<div style="color:' + color + '"><i class="fa fa-laptop"></i>' + src_value + '</div>';
         }
 
         function detailFormatter(index, row, object){

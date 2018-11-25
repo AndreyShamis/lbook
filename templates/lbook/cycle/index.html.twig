@@ -64,7 +64,7 @@
                 <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
                 <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
                 <th data-field="Build" data-sortable="true" data-sorter="htmlSorter" title="Build Name" data-footer-formatter="totalFormatter">Build</th>
-                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status">Status</th>
+                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>
                 <th data-field="User" data-sortable="true" title="User Name">User</th>
                 {#<th data-field="CTRL" data-sortable="true" data-visible="false" title="Controller">Controller</th>#}
                 {#<th data-field="DUT" data-sortable="true" data-visible="false" title="Device Under Tests">DUT</th>#}
@@ -97,28 +97,28 @@
                     {#<td>{{ cycle.tests | length }}</td>#}
                     <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                     <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
-                    <td>
-                        <div class="progress progress-mini cycle_pb">
-                            {% if cycle.passRate > 0 %}
-                            <div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>
-                            {% endif %}
-                            {% if cycle.errorRate > 0 %}
-                            <div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>
-                            {% endif %}
-                            {% if cycle.failRate > 0 %}
-                            <div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>
-                            {% endif %}
-                            {% if cycle.warningRate > 0 %}
-                            <div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>
-                            {% endif %}
-                            {% if cycle.unknownRate > 0 %}
-                            <div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>
-                            {% endif %}
-                            {% if cycle.naRate > 0 %}
-                            <div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>
-                            {% endif %}
-                        </div>
-                    </td>
+                    <td>{{ cycle.passRate }}:{{ cycle.errorRate }}:{{ cycle.failRate }}:{{ cycle.warningRate }}:{{ cycle.unknownRate }}:{{ cycle.naRate }}</td>
+                        {#<div class="progress progress-mini cycle_pb">#}
+                            {#{% if cycle.passRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>#}
+                            {#{% endif %}#}
+                            {#{% if cycle.errorRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>#}
+                            {#{% endif %}#}
+                            {#{% if cycle.failRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>#}
+                            {#{% endif %}#}
+                            {#{% if cycle.warningRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>#}
+                            {#{% endif %}#}
+                            {#{% if cycle.unknownRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>#}
+                            {#{% endif %}#}
+                            {#{% if cycle.naRate > 0 %}#}
+                            {#<div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>#}
+                            {#{% endif %}#}
+                        {#</div>#}
+                    {#</td>#}
                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
                     {#<td>{{ cycle.controller }}</td>#}
                     {#<td>{{ cycle.dut }}</td>#}
@@ -273,6 +273,33 @@
                 object.html(msg);
                 console.log(msg);
             });
+        }
+
+        /**
+         * @param {string} value
+         */
+        function statusCellStyle(value) {
+            var ta = value.split(':');
+            var ret = '';
+            if (ta[0] > 0) {
+                ret += '<div class="progress-bar progress-bar-success" style="width: '+ta[0]+'%;" title="Pass"></div>';
+            }
+            if (ta[1] > 0) {
+                ret += '<div class="progress-bar progress-bar-warning" style="width: '+ta[1]+'%;" title="Error"></div>';
+            }
+            if (ta[2] > 0) {
+                ret += '<div class="progress-bar progress-bar-danger" style="width: '+ta[2]+'%;" title="Fail"></div>';
+            }
+            if (ta[3] > 0) {
+                ret += '<div class="progress-bar progress-bar-yellow" style="width: '+ta[3]+'%;" title="Warining"></div>';
+            }
+            if (ta[4] > 0) {
+                ret += '<div class="progress-bar progress-bar-purple" style="width: '+ta[4]+'%;" title="Unknown"></div>';
+            }
+            if (ta[5] > 0) {
+                ret += '<div class="progress-bar progress-bar-pink" style="width: '+ta[5]+'%;" title="NA"></div>';
+            }
+            return '<div class="progress progress-mini cycle_pb">'+ret+'</div>';
         }
 
         function cellStyle(value, row, index) {

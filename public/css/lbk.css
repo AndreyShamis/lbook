@@ -95,8 +95,22 @@ th.meta_data_column{
     width: 400px;
     height: 32px;
 }
+#cycle_index_table td{
+    font-size: 11px;
+    line-height: 1.0;
+}
+#cycle_index_table th{
+    font-size: 12px;
+}
 
-/* Cycle show full */
+.fixed-table-container thead th .sortable{
+    padding-right: 5px;
+}
+
+.fixed-table-container tbody td .th-inner, .fixed-table-container thead th .th-inner{
+    padding: 1px;
+}
+    /* Cycle show full */
 #cycleFullShowInfoTable .infobox{
     width: 140px !important;
 }

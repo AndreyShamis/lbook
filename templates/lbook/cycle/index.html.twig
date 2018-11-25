@@ -73,7 +73,7 @@
                 <th data-field="TestTime" data-sorter="dataTitleIntSorter" data-sortable="true" data-footer-formatter="timeSumFormatter">Test time</th>
                 {#<th data-field="Created" data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>#}
                 <th data-field="Updated" data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
-                <th data-field="Options" class="setup_cycle_options_column" data-switchable="false">Options</th>
+                <th data-field="options" class="setup_cycle_options_column" data-switchable="false" title="Option">O</th>
             </tr>
             </thead>
             <tbody class="searchable">
@@ -122,11 +122,11 @@
                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
                     {#<td>{{ cycle.controller }}</td>#}
                     {#<td>{{ cycle.dut }}</td>#}
-                    <td>{{ cycle.targetUploader }}</td>
+                    <td nowrap>{{ cycle.targetUploader }}</td>
                     <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
                     <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
                     {#<td><span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span></td>#}
-                    <td><span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span></td>
+                    <td nowrap><span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span></td>
                     <td>{% if is_granted('edit', cycle.setup) %}
                             <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
                         {% endif %}

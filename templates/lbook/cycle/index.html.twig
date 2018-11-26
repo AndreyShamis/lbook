@@ -85,11 +85,7 @@
             {% endif %}
             {% set counter = counter+1 %}
                 <tr>
-                    <td>
-                        {%  if date(cycle.updatedAt) > date('-30minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>
-                        {% endif %}
-                    </td>
+                    <td>{%  if date(cycle.updatedAt) > date('-30minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>{% endif %}</td>
                     <td>{{ cycle.id }}</td>
                     <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
                     <td title="{{ cycle.setup }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id  }) }}">{{ shortString(cycle.setup, 35, "...") }}</a></td>
@@ -98,27 +94,6 @@
                     <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                     <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
                     <td>{{ cycle.passRate }}:{{ cycle.errorRate }}:{{ cycle.failRate }}:{{ cycle.warningRate }}:{{ cycle.unknownRate }}:{{ cycle.naRate }}</td>
-                        {#<div class="progress progress-mini cycle_pb">#}
-                            {#{% if cycle.passRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-success" style="width: {{ cycle.passRate }}%;"></div>#}
-                            {#{% endif %}#}
-                            {#{% if cycle.errorRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-warning" style="width:{{ cycle.errorRate }}%;" title="Error {{ cycle.errorRate }}%"></div>#}
-                            {#{% endif %}#}
-                            {#{% if cycle.failRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-danger" style="width: {{ cycle.failRate }}%;" title="Fail {{ cycle.failRate }}%"></div>#}
-                            {#{% endif %}#}
-                            {#{% if cycle.warningRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-yellow" style="width: {{ cycle.warningRate }}%;" title="Warining {{ cycle.warningRate }}%"></div>#}
-                            {#{% endif %}#}
-                            {#{% if cycle.unknownRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-purple" style="width: {{ cycle.unknownRate }}%;" title="Unknown {{ cycle.unknownRate }}%"></div>#}
-                            {#{% endif %}#}
-                            {#{% if cycle.naRate > 0 %}#}
-                            {#<div class="progress-bar progress-bar-pink" style="width: {{ cycle.naRate }}%;" title="NA {{ cycle.naRate }}%"></div>#}
-                            {#{% endif %}#}
-                        {#</div>#}
-                    {#</td>#}
                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
                     {#<td>{{ cycle.controller }}</td>#}
                     {#<td>{{ cycle.dut }}</td>#}
@@ -127,10 +102,7 @@
                     <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
                     {#<td><span data-title="{{ cycle.createdAt|date('ymdHis') }}" title="Created [{{ cycle.createdAt |date('d/m/Y H:i:s') }}]">{{ cycle.createdAt|time_diff}}</span></td>#}
                     <td nowrap><span data-title="{{ cycle.updatedAt|date('ymdHis') }}" title="Updated [{{ cycle.updatedAt |date('d/m/Y H:i:s') }}]">{{ cycle.updatedAt|time_diff}}</span></td>
-                    <td>{% if is_granted('edit', cycle.setup) %}
-                            <a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>
-                        {% endif %}
-                    </td>
+                    <td>{% if is_granted('edit', cycle.setup) %}<a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">edit</a>{% endif %}</td>
                 </tr>
             {% endfor %}
             </tbody>

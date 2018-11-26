@@ -189,7 +189,7 @@ class LogBookTestController extends Controller
      */
     public function indexFirst(PagePaginator $pagePaginator, LogBookTestRepository $testRepo): array
     {
-        return $this->index(1, $pagePaginator, $testRepo);
+        return $this->index($pagePaginator, $testRepo, 1);
     }
 
     /**

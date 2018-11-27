@@ -199,6 +199,7 @@
            data-toolbar="#cycleShowToolbar"
            data-show-refresh="true"
            {#data-show-toggle="true"#}
+           data-show-footer="true"
            data-show-export="true"
            data-show-columns="true"
            data-advanced-search="true"
@@ -221,8 +222,8 @@
                 <th data-sortable="true" data-field="id">ID</th>
             {% endif %}
             <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
-            <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name">Test Name</th>
-            <th data-sortable="true" data-field="timeRun" title="Test run time">Runtime</th>
+            <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name" data-footer-formatter="totalFormatter">Test Name</th>
+            <th data-sortable="true" data-field="timeRun" title="Test run time" data-footer-formatter="timeSumFormatter">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
                 <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
             {% endif %}
@@ -277,7 +278,7 @@
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
                 <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
-                <td>{{ test.timeRun | ExecutionTimeGeneric}}</td>
+                <td><span data-title="{{ test.timeRun }}">{{ test.timeRun | ExecutionTimeGeneric}}</span></td>
                 {% if cycle_show_test_time_start_show == true %}
                     {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
                     <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date(cycle_show_test_time_start_format) }}</span>{% endif %}</td>

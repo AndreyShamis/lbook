@@ -285,6 +285,7 @@ class LogBookTestController extends AbstractController
      */
     public function new(Request $request)
     {
+        // DONT MERGE IT
         $test = new LogBookTest();
         $form = $this->createForm(LogBookTestType::class, $test, array('search' => true));
         $form->handleRequest($request);

@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -40,7 +40,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @Route("upload")
  */
-class LogBookUploaderController extends Controller
+class LogBookUploaderController extends AbstractController
 {
     /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em;

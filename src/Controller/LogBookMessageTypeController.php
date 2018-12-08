@@ -6,7 +6,7 @@ use App\Entity\LogBookMessageType;
 use App\Form\LogBookMessageTypeType;
 use App\Repository\LogBookMessageTypeRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @Route("msg_type")
  */
-class LogBookMessageTypeController extends Controller
+class LogBookMessageTypeController extends AbstractController
 {
     /**
      * @Route("/", name="msg_type_index")

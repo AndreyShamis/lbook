@@ -10,7 +10,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +23,7 @@ use App\Form\LogBookTestType;
  *
  * @Route("test")
  */
-class LogBookTestController extends Controller
+class LogBookTestController extends AbstractController
 {
     protected $index_size = 500;
 

@@ -5,12 +5,12 @@ namespace App\Controller;
 use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class LogBookRegistrationController extends Controller
+class LogBookRegistrationController extends AbstractController
 {
     /**
      * @Route("/register", name="register")

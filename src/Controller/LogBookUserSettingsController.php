@@ -6,7 +6,7 @@ use App\Entity\LogBookUser;
 use App\Entity\LogBookUserSettings;
 use App\Form\LogBookUserSettingsType;
 use App\Repository\LogBookUserSettingsRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/user_settings")
  */
-class LogBookUserSettingsController extends Controller
+class LogBookUserSettingsController extends AbstractController
 {
     /**
      * @Route("/", name="user_settings_index", methods="GET")

@@ -52,8 +52,8 @@ success "Composer about: "
 composer about
 success "Composer Shows information about packages: "
 composer show
-success "Shows a list of locally modified packages: "
-composer status   || fail "Failed on [composer status]"
+#success "Shows a list of locally modified packages: "
+#composer status   || fail "Failed on [composer status]"
 
 # TODO Enable
 #info "Validates a composer.json and composer.lock: "
@@ -62,11 +62,12 @@ composer status   || fail "Failed on [composer status]"
 
 #"cd /usr/share; ln -s php/data ."
 success "***************************** Composer validation finished *****************************"
-ls -l
-success "ls"
+#ls -l
+#success "ls"
 #----------------------------------------------------------------------------------------------------------------------------
 
-composer -vvv --profile update &> artifacts/update.log.txt
+#composer -vvv --profile update &> artifacts/update.log.txt
+composer -vvv --profile update
 success "Composer update finished"
 
 info "Get installed vendors after update"

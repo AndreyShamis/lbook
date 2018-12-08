@@ -9,7 +9,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,7 +27,7 @@ use Doctrine\Common\Collections\Collection;
  *
  * @Route("setup")
  */
-class LogBookSetupController extends Controller
+class LogBookSetupController extends AbstractController
 {
     protected $index_size = 250;
     protected $show_cycle_size = 500;

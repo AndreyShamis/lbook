@@ -6,7 +6,7 @@ use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
 use App\Repository\LogBookUserRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  *
  * @Route("user")
  */
-class LogBookUserController extends Controller
+class LogBookUserController extends AbstractController
 {
     /**
      * @Route("/", name="user_index")

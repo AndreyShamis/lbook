@@ -8,7 +8,7 @@ use App\Entity\LogBookMessage;
 use App\Repository\LogBookMessageRepository;
 use App\Service\PagePaginator;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -18,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  *
  * @Route("log")
  */
-class LogBookMessageController extends Controller
+class LogBookMessageController extends AbstractController
 {
     protected $index_size = 2000;
 

@@ -40,24 +40,39 @@ class LogBookApplicationTestCase extends WebTestCase
         return self::$client;
     }
 
+    public function getContainer(): Client
+    {
+        return self::$client;
+    }
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
-        if (self::$container === null || self::isSetupPass() === false) {
+        if (self::isSetupPass() === false) {
+            //self::$container === null ||
             self::runCommand('doctrine:database:drop --force');
             self::runCommand('doctrine:database:create');
             self::runCommand('doctrine:schema:create --dump-sql');
             self::runCommand('doctrine:schema:create -vvv');
             //self::runCommand('doctrine:fixtures:load --append --no-interaction');
-            self::$client = static::createClient();
+            try{
+                self::$client = static::createClient();
+                self::$container = self::$client->getContainer();
+                parent::setUp();
+                self::logIn();
+                self::setSetupPass(true);
+            } catch (\Throwable $ex) {
+                print 'Error in static::createClient' . $ex;
+            }
 
+
+        }
+        if (self::$container === null) {
+            self::$client = static::createClient();
             self::$container = self::$client->getContainer();
             parent::setUp();
-
             self::logIn();
-            self::setSetupPass(true);
         }
         self::$entityManager = self::$container->get('doctrine.orm.entity_manager');
 

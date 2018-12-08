@@ -6,7 +6,7 @@ use App\Entity\LogBookCycle;
 use App\Repository\LogBookCycleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * @package App\Controller
  * @Route("bot")
  */
-class LogBookBotController extends Controller
+class LogBookBotController extends AbstractController
 {
     /**
      * @Route("/delete_cycles", name="bot_delete_cycles")

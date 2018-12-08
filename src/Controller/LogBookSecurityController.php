@@ -96,6 +96,7 @@ class LogBookSecurityController extends AbstractController
      * @param LogBookUserRepository $userRepo
      * @return Response
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function login(Request $request, AuthenticationUtils $authUtils, UserPasswordEncoderInterface $passwordEncoder, LogBookUserRepository $userRepo): Response
     {
@@ -149,8 +150,8 @@ class LogBookSecurityController extends AbstractController
                         $this->get('session')->set('_security_main', serialize($token));
 
                         // Fire the login event manually
-                        $event = new InteractiveLoginEvent($request, $token);
-                        $this->get('event_dispatcher')->dispatch('security.interactive_login', $event);
+                        //$event = new InteractiveLoginEvent($request, $token);
+                        //$this->get('event_dispatcher')->dispatch('security.interactive_login', $event);
 
                         if ($this->container->get('session')->has($key)) {
                             //set the url based on the link they were trying to access before being authenticated

@@ -18,8 +18,10 @@ class LogBookMessageRepository extends ServiceEntityRepository
      * @param array $criteria
      * @param bool $flush
      * @return LogBookMessage
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function Create(array $criteria, $flush = true): LogBookMessage
+    public function create(array $criteria, $flush = true): LogBookMessage
     {
         $entity = new LogBookMessage();
         $entity->setMessage($criteria['message']);

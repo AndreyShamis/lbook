@@ -162,3 +162,14 @@ $ sudo service mysql start
 ~~~
 ###  Upload file
 curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 'UPTIME_START=1.73 2.68' --form 'UPTIME_END=3.73 4.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4 --form testCaseName=sa --form testSetName=sa --form build=Build --form testCount=2  --form file=@results-03-network_WiFi_Perf.ht40/debug/autoserv.DEBUG --form setup='SUPER SETUP3' --form token=144224564212603434  http://127.0.0.1:8080/upload/new_cli
+
+
+### MongoDB
+
+sudo apt-get install php-mongodb
+
+https://websiteforstudents.com/install-mongodb-with-apache2-php-7-2-support-on-ubuntu-16-04-17-10-18-04/
+
+composer config "platform.ext-mongo" "1.6.7" && composer require alcaeus/mongo-php-adapter
+
+composer require doctrine/mongodb-odm-bundle

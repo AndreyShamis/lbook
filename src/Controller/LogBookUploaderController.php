@@ -3,14 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
-use App\Entity\LogBookMessage;
+use App\Document\LogBookMessageMongo;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
+use App\ObjectInterface\LogBookLog;
 use App\Repository\LogBookBuildRepository;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
+use App\Repository\LogBookMessageMongoRepository;
 use App\Repository\LogBookMessageTypeRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTargetRepository;
@@ -34,6 +36,7 @@ use App\Utils\RandomName;
 use App\Form\LogBookUploadType;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Uploader controller.
@@ -44,6 +47,8 @@ class LogBookUploaderController extends AbstractController
 {
     /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em;
+    /** @var DocumentManager */
+    protected $dm;
     /** @var LogBookTestRepository $testsRepo */
     protected $testsRepo;
     /** @var LogBookCycleRepository $cycleRepo */
@@ -54,6 +59,8 @@ class LogBookUploaderController extends AbstractController
     protected $msgTypeRepo;
     /** @var LogBookMessageRepository $logsRepo */
     protected $logsRepo;
+    /** @var LogBookMessageMongoRepository $logsRepoMongo */
+    protected $logsRepoMongo;
     /** @var LogBookSetupRepository $setupRepo */
     protected $setupRepo;
     /** @var LogBookBuildRepository $buildRepo */
@@ -84,12 +91,15 @@ class LogBookUploaderController extends AbstractController
     {
         self::$UPLOAD_PATH = self::getUploadPath();
         $this->container = $container;
+
         $this->em = $this->getDoctrine()->getManager();
+        $this->dm = $this->get('doctrine_mongodb')->getManager();
         $this->testsRepo = $this->em->getRepository('App:LogBookTest');
         $this->cycleRepo = $this->em->getRepository('App:LogBookCycle');
         $this->verdictRepo = $this->em->getRepository('App:LogBookVerdict');
         $this->msgTypeRepo = $this->em->getRepository('App:LogBookMessageType');
         $this->logsRepo = $this->em->getRepository('App:LogBookMessage');
+        $this->logsRepoMongo = $this->dm->getRepository(LogBookMessageMongo::class);
         $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
@@ -743,12 +753,14 @@ class LogBookUploaderController extends AbstractController
                     $logger->alert('[parseFile] Fail in create log_criteria', array('ex' => $ex));
                 }
 
-                /** @var LogBookMessage $log */
-                $log = $this->logsRepo->create($ret_data[$counter], false);
+//                /** @var LogBookMessage $log */
+//                $log = $this->logsRepo->create($ret_data[$counter], false);
+                /** @var LogBookMessageMongo $log */
+                $log = $this->logsRepoMongo->create($ret_data[$counter], true);
                 $objectsToClear[] = $log;
 
                 /** Test Name section */
-                if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
+                if (!$testNameFound && $log->getMsgType() === 'INFO') {
                     $tmpName = null;
 
                     if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
@@ -785,7 +797,7 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 /** SYSTEM section */
-                if ($log->getMsgType()->getName() === 'SYSTEM') {
+                if ($log->getMsgType() === 'SYSTEM') {
                     /** Parse KEY::STR_VALUE */
                     if ($this->isVariableString($log->getMessage())) {
                         //$uploadObj->addMessage('START WITH UPPER FOUND '. $log->getMessage());
@@ -947,11 +959,11 @@ class LogBookUploaderController extends AbstractController
 
     /**
      * Used to parse Control print of test name with version, grup test name and test version
-     * @param LogBookMessage $log
+     * @param LogBookLog $log
      * @param bool $includeVersion
      * @return null|array
      */
-    protected function searchTestNameInSingleLogControlPrint(LogBookMessage $log, $includeVersion = true): ?array
+    protected function searchTestNameInSingleLogControlPrint(LogBookLog $log, $includeVersion = true): ?array
     {
         $ret = null;
         [$dirty, $testName, $testVersion] = array('', '', '');
@@ -978,11 +990,11 @@ class LogBookUploaderController extends AbstractController
 
     /**
      * Used to parse test print of test name with version, grup test name and test version
-     * @param LogBookMessage $log
+     * @param LogBookLog $log
      * @param bool $includeVersion
      * @return null|array
      */
-    protected function searchTestNameInSingleLogTestPrint(LogBookMessage $log, $includeVersion = true): ?array
+    protected function searchTestNameInSingleLogTestPrint(LogBookLog $log, $includeVersion = true): ?array
     {
         $ret = null;
         [$dirty, $testName, $testVersion] = array('', '', '');
@@ -1009,10 +1021,10 @@ class LogBookUploaderController extends AbstractController
 
     /**
      * Used to parse Autotest print of test start, grup test name
-     * @param LogBookMessage $log
+     * @param LogBookLog $log
      * @return null|string
      */
-    protected function searchTestNameInSingleLogAutoTestPrint(LogBookMessage $log): ?string
+    protected function searchTestNameInSingleLogAutoTestPrint(LogBookLog $log): ?string
     {
         $ret = null;
         preg_match('/START\s+([\w\.\/\-]+)\s+/', $log->getMessage(), $matches);

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Model\EventStatus;
 use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreFlush;
 use App\Model\EventType;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -81,7 +80,6 @@ class Event
 
     public function __construct(int $type=0)
     {
-        $this->metadata = [];
         $this->setEventType($type);
         $this->setStatus(EventStatus::CREATED);
     }
@@ -212,24 +210,6 @@ class Event
     }
 
     /**
-     * @PrePersist
-     * Run on creation only
-     */
-    public function prePersist()
-    {
-
-    }
-
-    /**
-     * @PreFlush
-     * Run always, creation update
-     */
-    public function preFlush()
-    {
-
-    }
-
-    /**
      * @return mixed
      */
     public function getCreatedAt()
@@ -266,7 +246,7 @@ class Event
      * @PrePersist
      * @throws \Exception
      */
-    public function setUpdatedAt()
+    public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();
     }

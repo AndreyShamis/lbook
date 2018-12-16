@@ -1,55 +1,51 @@
 <?php
+/**
+ * User: Andrey Shamis
+ * Date: 16/12/18
+ * Time: 10:27
+ */
 
-namespace App\Entity;
+namespace App\Document;
 
 use App\ObjectInterface\LogBookLog;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\LogBookMessageRepository")
+ * @MongoDB\Document(repositoryClass="App\Repository\LogBookMessageMongoRepository")
  */
-class LogBookMessage implements LogBookLog
+class LogBookMessageMongo implements LogBookLog
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="bigint", options={"unsigned"=true})
+     * @MongoDB\Id
      */
     protected $id;
 
     /**
-     * [20]	(1, 2, 3, 4, 5) Chosen if the column length is less or equal to 2 ^ 32 - 1 = 4294967295 or empty.
-     * @var string
-     *
-     * @ORM\Column(name="message", type="text", length=4294967295)
-     * @Assert\NotBlank(message="test log cannot be blank, please provide message")
+     * @MongoDB\Field(name="message", type="string")
      */
     protected $message = '';
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookMessageType", cascade={"persist"})
-     * @ORM\JoinColumn(name="msg_type", fieldName="id", referencedColumnName="id")
+     * @MongoDB\Field(name="msg_type", type="string")
      */
     protected $msgType;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="chain", type="smallint", options={"unsigned"=true})
+     * @MongoDB\Field(name="chain", type="int")
      */
     protected $chain = 0;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTest", inversedBy="logs", cascade={"persist"})
-     * @ORM\JoinColumn(name="test", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
+     * @MongoDB\Field(name="test", type="int")
      */
     protected $test;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="log_time", type="datetime")
+     * @MongoDB\Field(name="log_time", type="date")
      */
     protected $logTime;
 
@@ -118,17 +114,17 @@ class LogBookMessage implements LogBookLog
     }
 
     /**
-     * @return LogBookMessageType
+     * @return string
      */
-    public function getMsgType(): LogBookMessageType
+    public function getMsgType(): string
     {
         return $this->msgType;
     }
 
     /**
-     * @param LogBookMessageType $msgType
+     * @param string $msgType
      */
-    public function setMsgType(LogBookMessageType $msgType): void
+    public function setMsgType(string $msgType): void
     {
         $this->msgType = $msgType;
     }

@@ -21,6 +21,7 @@ class LogBookBotController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function deleteCycle(LogBookCycleRepository $cycleRepo): Response
     {

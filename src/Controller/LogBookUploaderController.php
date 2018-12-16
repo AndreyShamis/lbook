@@ -730,7 +730,7 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 /** @var LogBookMessage $log */
-                $log = $this->logsRepo->Create($ret_data[$counter], false);
+                $log = $this->logsRepo->create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
                 /** Test Name section */

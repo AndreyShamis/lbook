@@ -84,14 +84,14 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $list = $cycleRepo->findByDeleteAt(100);
-        echo 'Found ' . count($list) . '<br/>';
+        $list = $cycleRepo->findByDeleteAt(80);
+        echo "\n\n\n" . 'Found ' . count($list) . '<br/>' . "\n";
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
         foreach ($list as $cycle) {
 
             $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
-            echo $msg . '<br/>';
+            echo $msg . '<br/> . "\n"';
             $type = EventType::DELETE_CYCLE;
             $new_event = new Event($type);
             $name = EventType::getTypeName($type) . '_' . $cycle->getId();
@@ -120,7 +120,7 @@ class LogBookBotController extends AbstractController
                 $this->em->persist($new_event);
 
             } else {
-                echo $new_event . ' already exist<br/>';
+                echo $new_event . ' already exist<br/>' . "\n";
             }
 
         }
@@ -141,14 +141,14 @@ class LogBookBotController extends AbstractController
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
-        $limit = 100;
+        $limit = 50;
         $list = $events->findBy(
             array(
                 'eventType' => EventType::DELETE_CYCLE,
                 'status' => EventStatus::CREATED,
             ),
-        null, $limit);
-        echo 'Found ' . count($list) . ' Limit is ' . $limit . '<br/>';
+            null, $limit);
+        echo "\n\n" . 'Found ' . count($list) . ' Limit is ' . $limit . '<br/>' . "\n";
         foreach ($list as $event) {
             $event->setStatus(EventStatus::PROGRESS);
             $event->setStartedAt(new \DateTime());
@@ -160,7 +160,7 @@ class LogBookBotController extends AbstractController
             $this->em->persist($event);
 
             $cycle = $cycleRepo->find($event->getObjectId());
-            echo 'Working with: ' . $event . '<br/>';
+            echo 'Working with: ' . $event . '<br/>' . "\n";
             try {
                 if ( $cycle !== null ) {
                     $cycleRepo->delete($cycle);
@@ -222,7 +222,7 @@ class LogBookBotController extends AbstractController
 //            //->andWhere('s.disabled = 0')
 //            //->setParameter(':now',  new \DateTime('now'))
 //            ->setParameter(':this_day', 'CURRENT_TIMESTAMP()-INTERVAL s.retentionPolicy DAY')
-            //->setParameter(':this_day', 'CURRENT_TIMESTAMP()-INTERVAL s.retentionPolicy DAY')
+        //->setParameter(':this_day', 'CURRENT_TIMESTAMP()-INTERVAL s.retentionPolicy DAY')
 
 //
 //        $qd_setups = $setupRepo->createQueryBuilder('s')

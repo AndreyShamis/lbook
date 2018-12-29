@@ -183,7 +183,7 @@ class LogBookBotController extends AbstractController
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
         $this->log('-----------------------------------------------------------------');
-        $limit = 15;
+        $limit = 11;
         $list = $events->findBy(
             array(
                 'eventType' => EventType::DELETE_CYCLE,

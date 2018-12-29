@@ -182,7 +182,7 @@ class LogBookBotController extends AbstractController
                 'status' => EventStatus::CREATED,
             ),
             null, $limit);
-        $this->log("\n\n" . 'Found ' . count($list) . ' Limit is ' . $limit);
+        $this->log("\n\n" . 'Found ' . count($list) . ' for PROGRESS, Limit is ' . $limit);
         foreach ($list as $event) {
             $event->setStatus(EventStatus::PROGRESS);
             $event->setStartedAt(new \DateTime());
@@ -197,7 +197,9 @@ class LogBookBotController extends AbstractController
             $this->log('Working with: ' . $event);
             try {
                 if ( $cycle !== null ) {
+                    $id = $cycle->getId();
                     $cycleRepo->delete($cycle);
+                    $this->log('delete ID:' . $id);
                     $event->setStatus(EventStatus::FINISH);
                 } else {
                     $event->addMetaData(array('message' => 'Object with ID ' . $event->getObjectId() . ' not found'));

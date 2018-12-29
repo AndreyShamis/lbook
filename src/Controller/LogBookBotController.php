@@ -84,7 +84,7 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $list = $cycleRepo->findByDeleteAt(300
+        $list = $cycleRepo->findByDeleteAt(300);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
@@ -189,6 +189,7 @@ class LogBookBotController extends AbstractController
             $this->em->persist($event);
         }
         $this->em->flush();
+        $this->log('Start loop: ');
         foreach ($list as $event) {
 
             $this->em->persist($event);

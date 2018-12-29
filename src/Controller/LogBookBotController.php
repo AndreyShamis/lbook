@@ -84,14 +84,14 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $list = $cycleRepo->findByDeleteAt(80);
-        echo "\n\n\n" . 'Found ' . count($list) . '<br/>' . "\n";
+        $list = $cycleRepo->findByDeleteAt(5000);
+        $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
         foreach ($list as $cycle) {
 
             $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
-            echo $msg . '<br/> . "\n"';
+            $this->log($msg);
             $type = EventType::DELETE_CYCLE;
             $new_event = new Event($type);
             $name = EventType::getTypeName($type) . '_' . $cycle->getId();
@@ -120,7 +120,7 @@ class LogBookBotController extends AbstractController
                 $this->em->persist($new_event);
 
             } else {
-                echo $new_event . ' already exist<br/>' . "\n";
+                $this->log($new_event . ' already exist');
             }
 
         }
@@ -133,6 +133,39 @@ class LogBookBotController extends AbstractController
     }
 
     /**
+     * @param string $msg
+     * @throws \Exception
+     */
+    protected function log(string $msg): void
+    {
+        $time = new \DateTime();
+        echo $time->format('Y-m-d H:i:s') . ' ' . $msg . "\n";
+    }
+
+    /**
+     * @param EventRepository $events
+     * @return Response
+     * @throws \Exception
+     */
+    protected function clearSuccess(EventRepository $events): Response
+    {
+        $limit = 100;
+        $list = $events->findBy(
+            array(
+                'status' => EventStatus::FINISH,
+            ),
+            null, $limit);
+        $this->log("\n\n" . 'Found ' . count($list) . ' to clear,  Limit is ' . $limit);
+        foreach ($list as $event) {
+            if ($event->getStartedAt() > new \DateTime()) { //new \DateTime('+7 days')) {
+                $this->em->remove($event);
+                $this->em->flush();
+            }
+        }
+        exit();
+    }
+
+    /**
      * @Route("/cycle_event_delete", name="delete_cycle_from_event_table")
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
@@ -141,6 +174,7 @@ class LogBookBotController extends AbstractController
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
+        $this->clearSuccess($events);
         $limit = 50;
         $list = $events->findBy(
             array(
@@ -148,7 +182,7 @@ class LogBookBotController extends AbstractController
                 'status' => EventStatus::CREATED,
             ),
             null, $limit);
-        echo "\n\n" . 'Found ' . count($list) . ' Limit is ' . $limit . '<br/>' . "\n";
+        $this->log("\n\n" . 'Found ' . count($list) . ' Limit is ' . $limit);
         foreach ($list as $event) {
             $event->setStatus(EventStatus::PROGRESS);
             $event->setStartedAt(new \DateTime());
@@ -160,7 +194,7 @@ class LogBookBotController extends AbstractController
             $this->em->persist($event);
 
             $cycle = $cycleRepo->find($event->getObjectId());
-            echo 'Working with: ' . $event . '<br/>' . "\n";
+            $this->log('Working with: ' . $event);
             try {
                 if ( $cycle !== null ) {
                     $cycleRepo->delete($cycle);
@@ -173,9 +207,6 @@ class LogBookBotController extends AbstractController
                 $event->addMetaData(array('message' => 'ERROR:' . $ex->getMessage()));
                 $event->setStatus(EventStatus::ERROR);
             }
-
-
-
         }
         $this->em->flush();
         exit();

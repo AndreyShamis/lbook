@@ -88,7 +88,7 @@ class LogBookBotController extends AbstractController
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
-        $counter = 0;
+        $counter = $skip = 0;
         foreach ($list as $cycle) {
 
             $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
@@ -122,11 +122,12 @@ class LogBookBotController extends AbstractController
                 $counter++;
 
             } else {
-                $this->log($new_event . ' already exist');
+                $skip++;
+                //$this->log($new_event . ' already exist');
             }
 
         }
-        $this->log('Finish adding ' . $counter . ' objects');
+        $this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
         $this->em->flush();
         exit();
 
@@ -182,7 +183,7 @@ class LogBookBotController extends AbstractController
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $limit = 20;
+        $limit = 30;
         $list = $events->findBy(
             array(
                 'eventType' => EventType::DELETE_CYCLE,

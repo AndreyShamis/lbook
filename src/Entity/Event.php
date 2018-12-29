@@ -50,7 +50,7 @@ class Event
     private $objectId = 0;
 
     /**
-     * @ORM\Column(name="object_class", type="string", length=500, nullable=true)
+     * @ORM\Column(name="object_class", type="string", length=190, nullable=true)
      */
     private $objectClass = '';
 

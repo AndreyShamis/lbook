@@ -91,7 +91,7 @@ class LogBookBotController extends AbstractController
          * @throws \Exception
          */
 
-        $list = $cycleRepo->findByDeleteAt();
+        $list = $cycleRepo->findByDeleteAt(100);
         echo 'Found ' . count($list) . '<br/>';
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
@@ -125,6 +125,7 @@ class LogBookBotController extends AbstractController
                         'pass_rate' => $cycle->getPassRate()
                     ));
                 $this->em->persist($new_event);
+
             } else {
                 echo $new_event . ' already exist<br/>';
             }

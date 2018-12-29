@@ -19,12 +19,17 @@ class LogBookCycleRepository extends ServiceEntityRepository
         parent::__construct($registry, LogBookCycle::class);
     }
 
-    public function findByDeleteAt()
+    /**
+     * @param int $max_results
+     * @return mixed
+     */
+    public function findByDeleteAt(int $max_results=100)
     {
         try {
             $qb = $this->createQueryBuilder('c')
                 ->where('c.deleteAt <= :now')
                 ->andWhere('c.keepForever = 0')
+                ->setMaxResults($max_results)
                 ->setParameter('now', new \DateTime('now'));
         } catch (\Exception $e) {
         }

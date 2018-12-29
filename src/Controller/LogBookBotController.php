@@ -174,7 +174,7 @@ class LogBookBotController extends AbstractController
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
-        $this->clearSuccess($events);
+
         $limit = 50;
         $list = $events->findBy(
             array(
@@ -211,6 +211,7 @@ class LogBookBotController extends AbstractController
             }
         }
         $this->em->flush();
+        $this->clearSuccess($events);
         exit();
     }
 

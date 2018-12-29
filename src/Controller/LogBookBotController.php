@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\LogBookCycle;
+use App\Model\EventStatus;
 use App\Model\EventType;
 use App\Repository\EventRepository;
 use App\Repository\LogBookCycleRepository;
@@ -76,20 +77,12 @@ class LogBookBotController extends AbstractController
     /**
      * @Route("/find_cycles_for_delete", name="find_cycles_for_delete")
      * @param LogBookCycleRepository $cycleRepo
-     * @param LogBookSetupRepository $setupRepo
+     * @param EventRepository $events
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
-
-        /**
-         * @Route("/delete_cycles_retention", name="bot_delete_cycles_retention")
-         * @param LogBookCycleRepository $cycleRepo
-         * @param LogBookSetupRepository $setupRepo
-         * @return \Symfony\Component\HttpFoundation\Response
-         * @throws \Exception
-         */
 
         $list = $cycleRepo->findByDeleteAt(100);
         echo 'Found ' . count($list) . '<br/>';
@@ -137,6 +130,55 @@ class LogBookBotController extends AbstractController
         echo '</pre>';
         exit();
 
+    }
+
+    /**
+     * @Route("/cycle_event_delete", name="delete_cycle_from_event_table")
+     * @param LogBookCycleRepository $cycleRepo
+     * @param EventRepository $events
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     */
+    public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
+    {
+        $limit = 10;
+        $list = $events->findBy(
+            array(
+                'eventType' => EventType::DELETE_CYCLE,
+                'status' => EventStatus::CREATED,
+            ),
+        null, $limit);
+        echo 'Found ' . count($list) . ' Limit is ' . $limit . '<br/>';
+        foreach ($list as $event) {
+            $event->setStatus(EventStatus::PROGRESS);
+            $event->setStartedAt(new \DateTime());
+            $this->em->persist($event);
+        }
+        $this->em->flush();
+        foreach ($list as $event) {
+
+            $this->em->persist($event);
+
+            $cycle = $cycleRepo->find($event->getObjectId());
+            echo 'Working with: ' . $event . '<br/>';
+            try {
+                if ( $cycle !== null ) {
+                    $cycleRepo->delete($cycle);
+                    $event->setStatus(EventStatus::FINISH);
+                } else {
+                    $event->addMetaData(array('message' => 'Object with ID ' . $event->getObjectId() . ' not found'));
+                    $event->setStatus(EventStatus::ERROR);
+                }
+            } catch (\Throwable $ex) {
+                $event->addMetaData(array('message' => 'ERROR:' . $ex->getMessage()));
+                $event->setStatus(EventStatus::ERROR);
+            }
+
+
+
+        }
+        $this->em->flush();
+        exit();
     }
 
     public function deleteCycleRetention(LogBookCycleRepository $cycleRepo, LogBookSetupRepository $setupRepo): Response

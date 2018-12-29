@@ -13,12 +13,14 @@ abstract class EventStatus
     public const CREATED = 1;
     public const PROGRESS = 2;
     public const FINISH = 3;
+    public const ERROR = 100;
 
     /** @var array friendly named Status */
     protected static $status_list = [
         self::CREATED => 'CREATED',
         self::PROGRESS => 'PROGRESS',
         self::FINISH => 'FINISH',
+        self::ERROR => 'ERROR',
     ];
 
     /**
@@ -42,6 +44,7 @@ abstract class EventStatus
             self::CREATED,
             self::PROGRESS,
             self::FINISH,
+            self::ERROR,
         ];
     }
 

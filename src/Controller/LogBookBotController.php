@@ -84,10 +84,11 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $list = $cycleRepo->findByDeleteAt(300);
+        $list = $cycleRepo->findByDeleteAt(100);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
+        $counter = 0;
         foreach ($list as $cycle) {
 
             $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
@@ -108,7 +109,7 @@ class LogBookBotController extends AbstractController
                 ));
 
             if ($res === null) {
-                $new_event->setMessage($msg);
+                $new_event->setMessage($name. ' - ' . $msg);
                 $new_event->addMetaData(
                     array(
                         'id' => $new_event->getObjectId(),
@@ -118,16 +119,15 @@ class LogBookBotController extends AbstractController
                         'pass_rate' => $cycle->getPassRate()
                     ));
                 $this->em->persist($new_event);
+                $counter++;
 
             } else {
                 $this->log($new_event . ' already exist');
             }
 
         }
+        $this->log('Finish adding ' . $counter . ' objects');
         $this->em->flush();
-        echo '<pre>';
-        //print_r($list);
-        echo '</pre>';
         exit();
 
     }
@@ -139,7 +139,7 @@ class LogBookBotController extends AbstractController
     protected function log(string $msg): void
     {
         $time = new \DateTime();
-        echo $time->format('Y-m-d H:i:s') . ' ' . $msg . "\n";
+        echo $time->format('Y-m-d H:i:s') . ' | ' . $msg . "\n";
     }
 
     /**
@@ -156,12 +156,16 @@ class LogBookBotController extends AbstractController
             ),
             null, $limit);
         $this->log("\n\n" . 'Found ' . count($list) . ' to clear,  Limit is ' . $limit);
+        $counter = 0;
         foreach ($list as $event) {
             if ($event->getStartedAt() > new \DateTime()) { //new \DateTime('+7 days')) {
                 $this->em->remove($event);
-                $this->em->flush();
+                $counter++;
             }
         }
+        $this->log('Removed ' . $counter . ' objects');
+        $this->em->flush();
+        $this->log('Exit');
         exit();
     }
 
@@ -175,7 +179,7 @@ class LogBookBotController extends AbstractController
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $limit = 50;
+        $limit = 20;
         $list = $events->findBy(
             array(
                 'eventType' => EventType::DELETE_CYCLE,
@@ -212,6 +216,9 @@ class LogBookBotController extends AbstractController
             }
         }
         $this->em->flush();
+        foreach ($list as $event) {
+            $this->em->detach($event);
+        }
         $this->clearSuccess($events);
         exit();
     }

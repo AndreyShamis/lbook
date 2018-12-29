@@ -206,7 +206,7 @@ class Event
         return $this;
     }
 
-    public function getStartedAt(): ?\DateTimeInterface
+    public function getStartedAt(): ?\DateTime
     {
         return $this->startedAt;
     }

@@ -158,13 +158,16 @@ class LogBookBotController extends AbstractController
         $this->log("\n\n" . 'Found ' . count($list) . ' to clear,  Limit is ' . $limit);
         $counter = 0;
         foreach ($list as $event) {
-            if ($event->getStartedAt() > new \DateTime()) { //new \DateTime('+7 days')) {
+            $cmp_date = new \DateTime('+10 minutes');
+            if ($event->getStartedAt()->format('U') < $cmp_date->format('U')) { //new \DateTime('+7 days')) {
                 $this->em->remove($event);
                 $counter++;
             }
         }
         $this->log('Removed ' . $counter . ' objects');
-        $this->em->flush();
+        if ($counter > 0) {
+            $this->em->flush();
+        }
         $this->log('Exit');
         exit();
     }

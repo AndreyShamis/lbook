@@ -84,7 +84,7 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
 
-        $list = $cycleRepo->findByDeleteAt(300
+        $list = $cycleRepo->findByDeleteAt(5000);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
@@ -174,7 +174,7 @@ class LogBookBotController extends AbstractController
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
-
+        $this->clearSuccess($events);
         $limit = 50;
         $list = $events->findBy(
             array(
@@ -211,7 +211,6 @@ class LogBookBotController extends AbstractController
             }
         }
         $this->em->flush();
-        $this->clearSuccess($events);
         exit();
     }
 

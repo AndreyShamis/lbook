@@ -394,8 +394,11 @@ class LogBookUploaderController extends AbstractController
             $fileSize = $new_file->getSize();
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
-            if ($fileSize > 0.3*1024*1024) {
+            if ($fileSize > 0.2*1024*1024) {
                 $this->addBlackListLevel('DEBUG');
+            }
+            if ($fileSize > 0.3*1024*1024) {
+                $this->addBlackListLevel('INFO');
             }
             $obj->setLogFile($fileName);
         } catch (\Throwable $ex) {
@@ -720,7 +723,9 @@ class LogBookUploaderController extends AbstractController
                         // In case this log LEVEL ignored for DB insert
                         continue;
                     }
-
+                    if (mb_strlen($msg_str) >= 2500) {
+                        continue;
+                    }
                     $ret_data[$counter] = array(
                         'logTime' => $this->getLogTime($logTime_str),
                         'message' => $msg_str,

@@ -248,6 +248,7 @@
                 <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
             {% endif %}
             <th data-sortable="true" data-field="verdict">Verdict</th>
+            <th data-sortable="true" data-field="fileSize" title="Test run time" data-visible="false">File Size</th>
             {#<th>Actions</th>#}
         </tr>
         </thead>
@@ -326,6 +327,7 @@
                     <td>{{ test.dutUpTimeEnd }}</td>
                 {% endif %}
                 <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                <td>{{ test.logFileSize }}</td>
                 {#<td>#}
                     {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                     {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}

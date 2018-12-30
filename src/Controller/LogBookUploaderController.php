@@ -394,8 +394,11 @@ class LogBookUploaderController extends AbstractController
             $fileSize = $new_file->getSize();
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
-            if ($fileSize > 0.3*1024*1024) {
+            if ($fileSize > 0.2*1024*1024) {
                 $this->addBlackListLevel('DEBUG');
+            }
+            if ($fileSize > 0.3*1024*1024) {
+                $this->addBlackListLevel('INFO');
             }
             $obj->setLogFile($fileName);
         } catch (\Throwable $ex) {

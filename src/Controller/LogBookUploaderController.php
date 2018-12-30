@@ -664,6 +664,7 @@ class LogBookUploaderController extends AbstractController
         } catch (Exception $e) {
         }
 
+        $skip_counter = 0;  // used for Not to skip first logs
         /**
          * If in previous FOR used "&" and use same array
          * Dont remove & from  &$value -> will cause to additional duplicated line
@@ -721,7 +722,10 @@ class LogBookUploaderController extends AbstractController
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
                         // In case this log LEVEL ignored for DB insert
-                        continue;
+                        if ($skip_counter > 15) {
+                            continue;
+                        }
+                        $skip_counter++;
                     }
                     if (mb_strlen($msg_str) >= 2500) {
                         continue;

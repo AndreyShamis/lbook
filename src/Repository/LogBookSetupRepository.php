@@ -5,19 +5,29 @@ namespace App\Repository;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Model\OsType;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookSetupRepository extends ServiceEntityRepository
 {
+    /** @var LoggerInterface  */
+    protected $logger;
     /**
      * @var array Keep hashed entity
      */
     protected static $hashedData = array();
 
-    public function __construct(RegistryInterface $registry)
+    /**
+     * LogBookSetupRepository constructor.
+     * @param RegistryInterface $registry
+     * @param LoggerInterface $logger
+     */
+    public function __construct(RegistryInterface $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookSetup::class);
+        $this->logger = $logger;
     }
 
     /**
@@ -63,6 +73,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
     /**
      * @param array $criteria
      * @return LogBookSetup
+     * @throws \Doctrine\ORM\ORMException
      */
     public function findOneOrCreate(array $criteria): LogBookSetup
     {
@@ -93,15 +104,36 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
     /**
      * @param LogBookSetup $setup
+     * @throws \Doctrine\ORM\ORMException
      */
     public function delete(LogBookSetup $setup): void
     {
+        /** @var LogBookCycleRepository $cycleRepo */
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
         //$cycles = $setup->getCycles();
         //echo "Cycles count :" . ($setup->getCycles()) . "\n";
         foreach ($setup->getCycles() as $cycle) {
             $cycleRepo->delete($cycle);
+        }
+        try {
+            $fileSystem = new Filesystem();
+            if ($fileSystem->exists($setup->getLogFilesPath())) {
+                //$this->logger->warning('[SETUP][DELETE]: Delete SETUP ID:' . $setup->getId());
+                $this->logger->warning('[SETUP][DELETE]: Delete SETUP ID:' . $setup->getId(),
+                    array(
+                        'getName' => $setup->getName(),
+                        'getOwner' => $setup->getOwner(),
+                        'getLogFilesPath' => $setup->getLogFilesPath(),
+                        'getRetentionPolicy' => $setup->getRetentionPolicy()));
+                $fileSystem->remove($setup->getLogFilesPath());
+            }
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[SETUP][DELETE]: Throwable SETUP ID:' . $setup->getId(),
+                array(
+                    $ex->getMessage(),
+                    $ex,
+                    $setup->getName()));
         }
         $this->_em->remove($setup);
         $this->_em->flush($setup);

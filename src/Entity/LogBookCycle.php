@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Controller\LogBookUploaderController;
 use App\Utils\RandomString;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -1086,5 +1087,20 @@ class LogBookCycle
         } else {
             $this->setDisabled(false);
         }
+    }
+
+    /**
+     * @param bool $realpath
+     * @return string
+     */
+    public function getLogFilesPath(bool $realpath=true): string
+    {
+        $setup_path = $this->getSetup()->getLogFilesPath();
+        if ($realpath) {
+            $setup_path = realpath($setup_path);
+        }
+
+        return $setup_path . '/' . $this->getId();
+
     }
 }

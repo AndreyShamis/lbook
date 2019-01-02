@@ -6,17 +6,23 @@ use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookCycleRepository extends ServiceEntityRepository
 {
+    /** @var LoggerInterface  */
+    protected $logger;
     /**
      * LogBookCycleRepository constructor.
      * @param RegistryInterface $registry
+     * @param LoggerInterface $logger
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookCycle::class);
+        $this->logger = $logger;
     }
 
     /**
@@ -104,10 +110,33 @@ class LogBookCycleRepository extends ServiceEntityRepository
      */
     public function delete(LogBookCycle $cycle): void
     {
-        //print "I'm here in Cycle Repo\n";
+        /** @var LogBookTestRepository $testRepo */
         $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
         $testRepo->deleteByCycle($cycle);
+        $logs = $setup_path = '';
+        try {
+            $fileSystem = new Filesystem();
+            $setup_path = $cycle->getSetup()->getLogFilesPath();
+            $logs = $cycle->getLogFilesPath();
+            /** This validation required in case that cycle path is /SOME_NUMBER only */
+            if ($setup_path !== '' && mb_strlen($logs) > mb_strlen($setup_path) && mb_strpos($logs, $setup_path) !== false) {
+                if ($fileSystem->exists($logs)) {
+                    $fileSystem->remove($logs);
+                }
+            }
+
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[CYCLE][DELETE]: Throwable CYCLE ID:' . $cycle->getId(),
+                array(
+                    $ex->getMessage(),
+                    $ex,
+                    $logs,
+                    $setup_path));
+        }
+        $this->logger->notice('[CYCLE][DELETE]: Removing CYCLE '. $cycle->getId());
         $this->_em->remove($cycle);
         $this->_em->flush($cycle);
     }
+
+
 }

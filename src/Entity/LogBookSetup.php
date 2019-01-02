@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Controller\LogBookUploaderController;
 use App\Model\OsType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
+use mysql_xdevapi\Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -195,6 +197,21 @@ class LogBookSetup
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogFilesPath(): string
+    {
+        $up_path = LogBookUploaderController::getUploadPath();
+        $path = $up_path . '/' . $this->getId();
+        $up_path_len = mb_strlen($up_path);
+        $path_len = mb_strlen($path);
+        if ($up_path !== '' && $up_path_len > 10 && $up_path_len + 1 < $path_len &&  mb_strpos($path, $up_path) !== false) {
+            return $path;
+        }
+        throw new \RuntimeException('Bad SETUP getLogFilesPath UP_PATH:' . $up_path . ' PATH:'. $path, 1);
     }
 
     /**

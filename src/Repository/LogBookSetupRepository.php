@@ -7,6 +7,7 @@ use App\Entity\LogBookCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use App\Model\OsType;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookSetupRepository extends ServiceEntityRepository
 {
@@ -63,6 +64,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
     /**
      * @param array $criteria
      * @return LogBookSetup
+     * @throws \Doctrine\ORM\ORMException
      */
     public function findOneOrCreate(array $criteria): LogBookSetup
     {
@@ -93,15 +95,26 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
     /**
      * @param LogBookSetup $setup
+     * @throws \Doctrine\ORM\ORMException
      */
     public function delete(LogBookSetup $setup): void
     {
+        /** @var LogBookCycleRepository $cycleRepo */
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
         //$cycles = $setup->getCycles();
         //echo "Cycles count :" . ($setup->getCycles()) . "\n";
         foreach ($setup->getCycles() as $cycle) {
             $cycleRepo->delete($cycle);
+        }
+        try {
+            $fileSystem = new Filesystem();
+            if ($fileSystem->exists($setup->getLogFilesPath())) {
+                //print ('Removing ' . $setup->getLogFilesPath() . "\n");
+                $fileSystem->remove($setup->getLogFilesPath());
+            }
+        } catch (\Throwable $ex) {
+
         }
         $this->_em->remove($setup);
         $this->_em->flush($setup);

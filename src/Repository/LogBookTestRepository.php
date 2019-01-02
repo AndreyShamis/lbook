@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookTestRepository extends ServiceEntityRepository
 {
@@ -21,6 +22,7 @@ class LogBookTestRepository extends ServiceEntityRepository
      * @param array $criteria
      * @param bool $flush
      * @return LogBookTest
+     * @throws ORMException
      */
     public function findOneOrCreate(array $criteria, $flush = false): LogBookTest
     {
@@ -93,9 +95,18 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     /**
      * @param LogBookTest $test
+     * @throws ORMException
      */
     public function delete(LogBookTest $test): void
     {
+        try {
+            $fileSystem = new Filesystem();
+            if ($fileSystem->exists($test->getLogFilesPath())) {
+                $fileSystem->remove($test->getLogFilesPath());
+            }
+        } catch (\Throwable $ex) {
+
+        }
         $this->_em->remove($test);
         $this->_em->flush($test);
     }

@@ -467,4 +467,9 @@ class LogBookTest
             $this->setDisabled(false);
         }
     }
+
+    public function getLogFilesPath()
+    {
+        return realpath($this->getCycle()->getLogFilesPath() . '/' . $this->getId());
+    }
 }

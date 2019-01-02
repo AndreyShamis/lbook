@@ -67,6 +67,7 @@ class LogBookUploaderController extends AbstractController
 
     protected $_MIN_LOG_STR_LEN = 10;
     protected $_MIN_CLEAN_LOG_STR_LEN = 1;
+    protected $MAX_SINGLE_LOG_SIZE = 2600;
     protected $_SHORT_TIME_LEN = 8;             // 12:48:45
     protected $_SHORT_MILISEC_TIME_LEN = 12;    // 02:44:38.820
     protected $_MEDIUM_TIME_LEN = 14;           // 02/22 11:36:56
@@ -576,8 +577,8 @@ class LogBookUploaderController extends AbstractController
         $newTempArr = array();
         $last_good_key = -1;
         foreach ($temp_arr as $key => $value) {
-
-            if (\strlen($value) < $this->_MIN_LOG_STR_LEN) {
+            $msg_len = mb_strlen($value);
+            if ($msg_len < $this->_MIN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
                 $value = null;
                 continue;
             }
@@ -683,7 +684,8 @@ class LogBookUploaderController extends AbstractController
                 }
                 /** **/
                 $msg_str = trim($oneLine[3][0]);
-                if (\strlen($msg_str) < $this->_MIN_CLEAN_LOG_STR_LEN) {
+                $msg_len = mb_strlen($msg_str);
+                if ($msg_len < $this->_MIN_CLEAN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
                     continue;
                 }
                 $msgType_str = $oneLine[2][0];
@@ -727,9 +729,7 @@ class LogBookUploaderController extends AbstractController
                         }
                         $skip_counter++;
                     }
-                    if (mb_strlen($msg_str) >= 2500) {
-                        continue;
-                    }
+
                     $ret_data[$counter] = array(
                         'logTime' => $this->getLogTime($logTime_str),
                         'message' => $msg_str,

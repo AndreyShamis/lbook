@@ -313,7 +313,7 @@ class LogBookUploaderController extends AbstractController
             if ($continue) {
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
 
-                $new_file = $this->fileHandler($file, $setup, $cycle, $obj);
+                $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger);
 
                 $testName = $file->getClientOriginalName();
                 $testVerdictDefault = $this->parseVerdict('ERROR');
@@ -378,14 +378,14 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookUpload $obj
      * @return File
      */
-    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj): File
+    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): File
     {
         /** @var UploadedFile $new_file */
         $new_file = null;
         try {
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
-
+            $logger->alert('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
             try {
                 $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
                 $new_file = $file->move($dir, $fileName);
@@ -403,7 +403,9 @@ class LogBookUploaderController extends AbstractController
             }
             $obj->setLogFile($fileName);
         } catch (\Throwable $ex) {
-            $obj->addMessage('Fail in fileHandler :' . $ex->getMessage());
+            $msg = 'Fail in fileHandler :' . $ex->getMessage();
+            $logger->alert($msg, $ex->getTrace());
+            $obj->addMessage($msg);
         }
         return $new_file;
     }

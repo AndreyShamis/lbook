@@ -7,6 +7,8 @@ use App\Entity\LogBookSetup;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 class LogBookCycleRepository extends ServiceEntityRepository
 {
@@ -104,10 +106,36 @@ class LogBookCycleRepository extends ServiceEntityRepository
      */
     public function delete(LogBookCycle $cycle): void
     {
-        //print "I'm here in Cycle Repo\n";
+        /** @var LogBookTestRepository $testRepo */
         $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
         $testRepo->deleteByCycle($cycle);
+        try {
+            $fileSystem = new Filesystem();
+            $logs = $cycle->getLogFilesPath();
+            if ($fileSystem->exists($logs)) {
+
+                print ('Removing . ' . $logs);
+                $fileSystem->remove($logs);
+//                $finder = new Finder();
+//                $finder->files()->in($logs);
+//                print('working with '. $logs . "\n");
+//                foreach ($finder as $file) {
+//                    if ($fileSystem->exists($file->getRealPath())) {
+//                        print ('Removing . ' . $file->getRealPath());
+//                        //exit();
+//                        //$fileSystem->remove($file->getRealPath());
+//                    }
+//                }
+            }
+
+
+        } catch (\Throwable $ex) {
+
+        }
+
         $this->_em->remove($cycle);
         $this->_em->flush($cycle);
     }
+
+
 }

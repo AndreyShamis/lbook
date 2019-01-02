@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Controller\LogBookUploaderController;
 use App\Model\OsType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -195,6 +196,14 @@ class LogBookSetup
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogFilesPath(): string
+    {
+        return realpath(LogBookUploaderController::$UPLOAD_PATH . '/' . $this->getId() );
     }
 
     /**

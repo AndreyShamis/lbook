@@ -386,7 +386,7 @@ class LogBookUploaderController extends AbstractController
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
 
             try {
-                $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
+                $dir = $cycle->getLogFilesPath();
                 $new_file = $file->move($dir, $fileName);
             } catch (\Throwable $ex) {
                 $obj->addMessage('Fail in fileHandler[move]:' . $ex->getMessage());

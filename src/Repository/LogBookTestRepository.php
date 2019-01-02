@@ -7,20 +7,31 @@ use App\Entity\LogBookTest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookTestRepository extends ServiceEntityRepository
 {
+    /** @var LoggerInterface  */
+    protected $logger;
 
-    public function __construct(RegistryInterface $registry)
+    /**
+     * LogBookTestRepository constructor.
+     * @param RegistryInterface $registry
+     * @param LoggerInterface $logger
+     */
+    public function __construct(RegistryInterface $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookTest::class);
+        $this->logger = $logger;
     }
 
     /**
      * @param array $criteria
      * @param bool $flush
      * @return LogBookTest
+     * @throws ORMException
      */
     public function findOneOrCreate(array $criteria, $flush = false): LogBookTest
     {
@@ -93,9 +104,18 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     /**
      * @param LogBookTest $test
+     * @throws ORMException
      */
     public function delete(LogBookTest $test): void
     {
+        try {
+            $fileSystem = new Filesystem();
+            if ($fileSystem->exists($test->getLogFilesPath())) {
+                $fileSystem->remove($test->getLogFilesPath());
+            }
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[TEST][DELETE]: Throwable TEST ID:' . $test->getId(), array($ex->getMessage(), $ex, $test->getName()));
+        }
         $this->_em->remove($test);
         $this->_em->flush($test);
     }

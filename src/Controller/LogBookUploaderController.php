@@ -313,7 +313,7 @@ class LogBookUploaderController extends AbstractController
             if ($continue) {
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
 
-                $new_file = $this->fileHandler($file, $setup, $cycle, $obj);
+                $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger);
 
                 $testName = $file->getClientOriginalName();
                 $testVerdictDefault = $this->parseVerdict('ERROR');
@@ -378,21 +378,25 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookUpload $obj
      * @return File
      */
-    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj): File
+    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): File
     {
         /** @var UploadedFile $new_file */
         $new_file = null;
         try {
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
-
             try {
                 $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
                 $new_file = $file->move($dir, $fileName);
             } catch (\Throwable $ex) {
-                $obj->addMessage('Fail in fileHandler[move]:' . $ex->getMessage());
+                $msg = 'Fail in fileHandler[move]:' . $ex->getMessage();
+                $obj->addMessage($msg);
+                $logger->critical('[' . $fileName . ']::ERROR :' . $msg);
             }
             $fileSize = $new_file->getSize();
+            if ($fileSize > 20*1024*1024) {
+                $logger->alert('BIG_SIZE: File name is :' . $new_file->getFilename() . '. File size : ' . $fileSize);
+            }
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
             if ($fileSize > 0.2*1024*1024) {
@@ -403,7 +407,9 @@ class LogBookUploaderController extends AbstractController
             }
             $obj->setLogFile($fileName);
         } catch (\Throwable $ex) {
-            $obj->addMessage('Fail in fileHandler :' . $ex->getMessage());
+            $msg = '[fileHandler]:FAIL:' . $ex->getMessage();
+            $logger->critical($msg, $ex->getTrace());
+            $obj->addMessage($msg);
         }
         return $new_file;
     }

@@ -113,8 +113,10 @@ class LogBookTestRepository extends ServiceEntityRepository
             $fileSystem = new Filesystem();
             $fileName = $test->getLogFilesPath();
             if ($fileSystem->exists($fileName) and is_file($fileName)) {
-                $this->logger->critical('[TEST][DELETE]: Remove log file [' . $fileName . '] for TEST ID:' . $test->getId());
+                $this->logger->info('[TEST][DELETE]: Remove log file [' . $fileName . '] for TEST ID:' . $test->getId());
                 $fileSystem->remove($fileName);
+            } else {
+                $this->logger->critical('[TEST][DELETE]: FILE_NOT_EXIST [' . $fileName . '] for TEST ID:' . $test->getId());
             }
         } catch (\Throwable $ex) {
             $this->logger->critical('[TEST][DELETE]: Throwable TEST ID:' . $test->getId(),

@@ -1,0 +1,344 @@
+02/19 02:46:01.745 INFO |          autoserv:0685| Results placed in /home/iil_jenkins/trunk/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40
+02/19 02:46:01.745 DEBUG|          autoserv:0693| autoserv is running in drone JEL00771.
+02/19 02:46:01.745 DEBUG|          autoserv:0694| autoserv command was: /home/iil_jenkins/trunk/src/third_party/autotest/files/server/autoserv -p -r /home/iil_jenkins/trunk/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40 -m 10.12.184.113 --no_console_prefix -u autotest_system -l ad_hoc_build/ad_hoc_suite/network_WiFi_Perf.ht40 -s --no_use_packaging /tmp/tmpdYUDaq --args router_addr=10.12.184.118
+02/19 02:46:01.745 INFO |           pidfile:0016| Logged pid 857 to /home/iil_jenkins/trunk/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40/.autoserv_execute
+02/19 02:46:01.747 DEBUG|          base_job:0357| Persistent state global_properties.test_retry now set to 0
+02/19 02:46:01.747 DEBUG|          base_job:0357| Persistent state global_properties.tag now set to ''
+02/19 02:46:01.749 DEBUG|          base_job:0357| Persistent state global_properties.fast now set to False
+02/19 02:46:01.749 DEBUG|          base_job:0357| Persistent state global_properties.max_result_size_KB now set to 20000
+02/19 02:46:01.783 DEBUG|    connectionpool:0387| "GET http://metadata.google.internal/computeMetadata/v1/instance/zone HTTP/1.1" 404 670
+02/19 02:46:01.784 INFO |            config:0024| Configuration file does not exist, ignoring: /etc/chrome-infra/ts-mon.json
+02/19 02:46:01.784 ERROR|            config:0244| ts_mon monitoring is disabled because the endpoint provided is invalid or not supported: 
+02/19 02:46:01.784 NOTIC|      cros_logging:0038| ts_mon was set up.
+02/19 02:46:01.789 INFO |        server_job:0793| I am PID 857
+02/19 02:46:01.795 DEBUG|         host_info:0264| Refreshing HostInfo using store InMemoryHostInfoStore[HostInfo[Labels: [], Attributes: {}]]
+02/19 02:46:01.796 DEBUG|         host_info:0265| Old host_info: None
+02/19 02:46:01.796 DEBUG|         host_info:0273| New host_info: HostInfo[Labels: [], Attributes: {}]
+02/19 02:46:01.828 DEBUG|          ssh_host:0301| Running (ssh) 'grep -q CHROMEOS /etc/lsb-release && ! test -f /mnt/stateful_partition/.android_tester && ! grep -q moblab /etc/lsb-release' from 'create_target_machine|create_host|_detect_host|check_host|run|run_very_slowly'
+02/19 02:46:01.830 INFO |     ssh_multiplex:0092| Starting master ssh connection '/usr/bin/ssh -a -x -N -o ControlMaster=yes -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -o Protocol=2 -l root -p 22 10.12.184.113'
+02/19 02:46:01.831 DEBUG|             utils:0214| Running '/usr/bin/ssh -a -x -N -o ControlMaster=yes -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -o Protocol=2 -l root -p 22 10.12.184.113'
+02/19 02:46:02.060 DEBUG|          ssh_host:0301| Running (ssh) 'grep CHROMEOS_RELEASE_BOARD /etc/lsb-release' from 'create_target_machine|create_host|_detect_host|check_host|run|run_very_slowly'
+02/19 02:46:02.107 DEBUG|             utils:0282| [stdout] CHROMEOS_RELEASE_BOARD=chell
+02/19 02:46:02.158 DEBUG|          ssh_host:0301| Running (ssh) 'test ! -e /var/log/messages || cp -f /var/log/messages /var/tmp/messages.autotest_start' from 'get_network_stats|create_target_machine|create_host|job_start|run|run_very_slowly'
+02/19 02:46:02.206 DEBUG|             utils:0214| Running 'ping '10.12.184.113' -c1'
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] PING 10.12.184.113 (10.12.184.113) 56(84) bytes of data.
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] 64 bytes from 10.12.184.113: icmp_seq=1 ttl=63 time=0.667 ms
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] 
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] --- 10.12.184.113 ping statistics ---
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+02/19 02:46:02.212 DEBUG|             utils:0282| [stdout] rtt min/avg/max/mdev = 0.667/0.667/0.667/0.000 ms
+02/19 02:46:02.217 DEBUG|          ssh_host:0301| Running (ssh) 'route; echo SEPARATOR; cat /proc/net/dev' from '<module>|parallel_simple|parallel_simple|get_network_stats|run|run_very_slowly'
+02/19 02:46:02.276 DEBUG|             utils:0282| [stdout] Kernel IP routing table
+02/19 02:46:02.277 DEBUG|             utils:0282| [stdout] Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+02/19 02:46:02.277 DEBUG|             utils:0282| [stdout] default         10.12.184.3     0.0.0.0         UG    1      0        0 eth0
+02/19 02:46:02.277 DEBUG|             utils:0282| [stdout] 10.12.184.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+02/19 02:46:02.277 DEBUG|             utils:0282| [stdout] 100.115.92.0    0.0.0.0         255.255.255.252 U     0      0        0 arcbr0
+02/19 02:46:02.315 DEBUG|             utils:0282| [stdout] SEPARATOR
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout] Inter-|   Receive                                                |  Transmit
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout]  face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout]   eth0: 36971627   28478    0    2    0     0          0         0  1813996    7346    0    0    0     0       0          0
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout]  wlan0:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout] arcbr0:       0       0    0    0    0     0          0         0     1450      16    0    0    0     0       0          0
+02/19 02:46:02.316 DEBUG|             utils:0282| [stdout]     lo: 36828507    7861    0    0    0     0          0         0 36828507    7861    0    0    0     0       0          0
+02/19 02:46:02.317 INFO | get_network_stats:0048| get_network_stats: at-start RXbytes 36971627 TXbytes 1813996
+02/19 02:46:02.317 WARNI|        server_job:0859| Not checking if job_repo_url contains autotest packages on ['10.12.184.113']
+02/19 02:46:02.317 INFO |        server_job:0882| Processing control file
+02/19 02:46:02.472 INFO |        server_job:0218| START	network_WiFi_Perf.ht40	network_WiFi_Perf.ht40	timestamp=1519029962	localtime=Feb 19 02:46:02
+02/19 02:46:04.673 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  "/tmp/tmpdHicZK" "root@10.12.184.113:"/tmp/sysinfo/autoserv-AiZV87/control.autoserv.init.state""'
+02/19 02:46:04.764 DEBUG|      abstract_ssh:0520| send_file. source: /tmp/autoserv-Nkvjwv/tmp1nMCx_, dest: /tmp/sysinfo/autoserv-AiZV87/control.autoserv, delete_dest: False,preserve_symlinks:False
+02/19 02:46:04.764 DEBUG|      abstract_ssh:0537| Using Rsync.
+02/19 02:46:04.764 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  "/tmp/autoserv-Nkvjwv/tmp1nMCx_" "root@10.12.184.113:"/tmp/sysinfo/autoserv-AiZV87/control.autoserv""'
+02/19 02:46:04.864 DEBUG|          ssh_host:0301| Running (ssh) 'if [ -f '/proc/sys/kernel/random/boot_id' ]; then cat '/proc/sys/kernel/random/boot_id'; else echo 'no boot_id available'; fi' from 'run|_do_run|execute_control|get_boot_id|run|run_very_slowly'
+02/19 02:46:04.914 DEBUG|             utils:0282| [stdout] 644396a8-1ff1-4ad8-9792-81a0dc0839fd
+02/19 02:46:04.952 INFO |          autotest:1003| Executing /tmp/sysinfo/autoserv-AiZV87/bin/autotest /tmp/sysinfo/autoserv-AiZV87/control phase 0
+02/19 02:46:04.956 DEBUG|          ssh_host:0301| Running (ssh) 'mkdir -p /tmp' from 'execute_control|execute_section|_execute_daemon|get_tmp_dir|run|run_very_slowly'
+02/19 02:46:05.009 DEBUG|          ssh_host:0301| Running (ssh) 'mktemp -d /tmp/autoserv-XXXXXX' from 'execute_control|execute_section|_execute_daemon|get_tmp_dir|run|run_very_slowly'
+02/19 02:46:05.316 INFO |          autotest:1369| Finished waiting on autotestd to start.
+02/19 02:46:05.682 DEBUG|          autotest:1310| AUTOTEST_STATUS::START	----	----	timestamp=1519029965	localtime=Feb 19 00:46:05	
+02/19 02:46:05.682 INFO |        server_job:0218| 	START	----	----	timestamp=1519029965	localtime=Feb 19 02:46:05	
+02/19 02:46:05.697 DEBUG|          autotest:1310| AUTOTEST_FETCH_PACKAGE:packages.checksum:/tmp/sysinfo/autoserv-AiZV87/packages.checksum:/tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_yIFNsmharness-fifo/autoserv.fifo
+02/19 02:46:05.701 DEBUG|          ssh_host:0301| Running (ssh) 'echo B > /tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_yIFNsmharness-fifo/autoserv.fifo' from '_wait_for_commands|process_output|write|_process_line|run|run_very_slowly'
+02/19 02:46:05.755 DEBUG|          autotest:1310| AUTOTEST_STATUS::	GOOD	----	sysinfo.before	timestamp=1519029965	localtime=Feb 19 00:46:05	
+02/19 02:46:05.755 INFO |        server_job:0218| 		GOOD	----	sysinfo.before	timestamp=1519029965	localtime=Feb 19 02:46:05	
+02/19 02:46:05.756 DEBUG|          autotest:1310| AUTOTEST_STATUS::END GOOD	----	----	timestamp=1519029965	localtime=Feb 19 00:46:05	
+02/19 02:46:05.756 INFO |        server_job:0218| 	END GOOD	----	----	timestamp=1519029965	localtime=Feb 19 02:46:05	
+02/19 02:46:05.768 DEBUG|          autotest:1310| Got lock of exit_code_file.
+02/19 02:46:05.768 INFO |          autotest:1369| Got lock of exit_code_file.
+02/19 02:46:05.769 DEBUG|          autotest:1310| Released lock of exit_code_file and closed it.
+02/19 02:46:05.769 INFO |          autotest:1369| Released lock of exit_code_file and closed it.
+02/19 02:46:07.783 DEBUG|          autotest:0985| Result exit status is 0.
+02/19 02:46:07.783 INFO |          autotest:1088| Client complete
+02/19 02:46:07.783 DEBUG|          autotest:1137| Autotest job finishes running. Below is the post-processing operations.
+02/19 02:46:07.788 DEBUG|          ssh_host:0301| Running (ssh) 'true' from 'collect_client_job_results|wait_up|is_up|ssh_ping|run|run_very_slowly'
+02/19 02:46:07.834 DEBUG|      abstract_ssh:0670| Host 10.12.184.113 is now up
+02/19 02:46:07.834 DEBUG|            runner:0053| Deploy result utilities to 10.12.184.113
+02/19 02:46:07.834 DEBUG|      abstract_ssh:0520| send_file. source: /mnt/host/source/src/third_party/autotest/files/client/bin/result_tools, dest: /usr/local/autotest, delete_dest: False,preserve_symlinks:False
+02/19 02:46:07.834 DEBUG|      abstract_ssh:0537| Using Rsync.
+02/19 02:46:11.239 DEBUG|             utils:0282| [stdout] Current wpa level: excessive
+02/19 02:46:11.246 DEBUG|          ssh_host:0301| Running (ssh) 'ff_debug --level -5' from 'warmup|__init__|__init__|_raise_logging_level|run|run_very_slowly'
+02/19 02:46:11.309 DEBUG|             utils:0282| [stdout] Old flimflam debug level: -5
+02/19 02:46:11.347 DEBUG|             utils:0282| [stdout] Current flimflam debug level: -5
+02/19 02:46:11.360 DEBUG|          ssh_host:0301| Running (ssh) 'ff_debug +wifi' from 'warmup|__init__|__init__|_raise_logging_level|run|run_very_slowly'
+02/19 02:46:11.440 DEBUG|             utils:0282| [stdout] Old flimflam tags: [wifi]
+02/19 02:46:11.479 DEBUG|             utils:0282| [stdout] Current flimflam tags: [wifi]
+02/19 02:46:11.494 DEBUG|          ssh_host:0301| Running (ssh) 'iw dev wlan0 info' from '__init__|__init__|device_description|is_wifi_device|run|run_very_slowly'
+02/19 02:46:11.541 DEBUG|             utils:0282| [stdout] Interface wlan0
+02/19 02:46:11.541 DEBUG|             utils:0282| [stdout] 	ifindex 2
+02/19 02:46:11.542 DEBUG|             utils:0282| [stdout] 	wdev 0x1
+02/19 02:46:11.542 DEBUG|             utils:0282| [stdout] 	addr 4c:80:93:c2:d1:66
+02/19 02:46:11.542 DEBUG|             utils:0282| [stdout] 	type managed
+02/19 02:46:11.542 DEBUG|             utils:0282| [stdout] 	wiphy 0
+02/19 02:46:11.594 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/sys/class/net/wlan0/device"' from '__init__|device_description|device_path|path_exists|run|run_very_slowly'
+02/19 02:46:11.634 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/sys/class/net/wlan0/device/vendor"' from '__init__|device_description|<lambda>|path_exists|run|run_very_slowly'
+02/19 02:46:11.682 DEBUG|          ssh_host:0301| Running (ssh) 'cat "/sys/class/net/wlan0/device/vendor"' from '__init__|__init__|device_description|<lambda>|run|run_very_slowly'
+02/19 02:46:11.729 DEBUG|             utils:0282| [stdout] 0x8086
+02/19 02:46:11.772 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/sys/class/net/wlan0/device/device"' from '__init__|device_description|<lambda>|path_exists|run|run_very_slowly'
+02/19 02:46:11.821 DEBUG|          ssh_host:0301| Running (ssh) 'cat "/sys/class/net/wlan0/device/device"' from '__init__|__init__|device_description|<lambda>|run|run_very_slowly'
+02/19 02:46:11.868 DEBUG|             utils:0282| [stdout] 0x095a
+02/19 02:46:11.913 DEBUG|          ssh_host:0301| Running (ssh) 'readlink "/sys/class/net/wlan0/device/driver/module"' from 'warmup|__init__|__init__|device_description|run|run_very_slowly'
+02/19 02:46:11.959 DEBUG|             utils:0282| [stdout] ../../../../module/iwlwifi
+02/19 02:46:12.012 DEBUG|          ssh_host:0301| Running (ssh) 'uname -r' from 'warmup|__init__|__init__|device_description|run|run_very_slowly'
+02/19 02:46:12.058 DEBUG|             utils:0282| [stdout] 3.18.0-jenkins-Core_build_core35-10
+02/19 02:46:12.102 DEBUG|          ssh_host:0301| Running (ssh) 'find /lib/modules/3.18.0-jenkins-Core_build_core35-10/kernel/drivers/net -name iwlwifi.ko -printf %P' from 'warmup|__init__|__init__|device_description|run|run_very_slowly'
+02/19 02:46:12.188 DEBUG|             utils:0301| [stdout] wireless/iwl7000/iwlwifi/iwlwifi.ko
+02/19 02:46:12.220 DEBUG|          ssh_host:0301| Running (ssh) 'ifconfig wlan0 up' from 'warmup|__init__|__init__|powersave_switch|run|run_very_slowly'
+02/19 02:46:12.260 DEBUG|          ssh_host:0301| Running (ssh) 'iw dev wlan0 set power_save off' from 'warmup|__init__|__init__|powersave_switch|run|run_very_slowly'
+02/19 02:46:12.307 INFO | site_linux_system:0054| client system capabilities: set(['vht', 'tdls', 'ibss_supported', '5ghz'])
+02/19 02:46:12.307 INFO | site_linux_router:0070| Connecting to router at 10.12.184.118
+02/19 02:46:12.307 DEBUG|             utils:0214| Running 'ping -c 3 -i 0.500000 10.12.184.118'
+02/19 02:46:13.314 DEBUG|         host_info:0264| Refreshing HostInfo using store InMemoryHostInfoStore[HostInfo[Labels: [], Attributes: {}]]
+02/19 02:46:13.315 DEBUG|         host_info:0265| Old host_info: None
+02/19 02:46:13.315 DEBUG|         host_info:0273| New host_info: HostInfo[Labels: [], Attributes: {}]
+02/19 02:46:13.330 DEBUG|          ssh_host:0301| Running (ssh) 'test ! -e /var/log/messages || cp -f /var/log/messages /var/tmp/messages.autotest_start' from 'setup|build_router_proxy|create_host|job_start|run|run_very_slowly'
+02/19 02:46:13.333 INFO |     ssh_multiplex:0092| Starting master ssh connection '/usr/bin/ssh -a -x -N -o ControlMaster=yes -o ControlPath=/tmp/_autotmp_XAywWissh-master/socket -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -o Protocol=2 -l root -p 22 10.12.184.118'
+02/19 02:46:16.332 DEBUG|      abstract_ssh:0520| send_file. source: /tmp/tmpjXC_FF, dest: /tmp/sysinfo/autoserv-AiZV87/global_config.ini, delete_dest: False,preserve_symlinks:False
+02/19 02:46:16.333 DEBUG|      abstract_ssh:0537| Using Rsync.
+02/19 02:46:16.333 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  "/tmp/tmpjXC_FF" "root@10.12.184.113:"/tmp/sysinfo/autoserv-AiZV87/global_config.ini""'
+02/19 02:46:16.428 DEBUG|          ssh_host:0301| Running (ssh) 'nohup /tmp/sysinfo/autoserv-AiZV87/bin/autotestd /tmp/autoserv-20O6hc -H autoserv --verbose --hostname=10.12.184.113 --user=autotest_system /tmp/sysinfo/autoserv-AiZV87/control.autoserv >/dev/null 2>/dev/null &' from '_do_run|execute_control|execute_section|_execute_daemon|run|run_very_slowly'
+02/19 02:46:16.515 DEBUG|          ssh_host:0301| Running (ssh) '/tmp/sysinfo/autoserv-AiZV87/bin/autotestd_monitor /tmp/autoserv-20O6hc 0 0' from '_do_run|execute_control|execute_section|_execute_daemon|run|run_very_slowly'
+02/19 02:46:16.582 DEBUG|          autotest:1310| Entered autotestd_monitor.
+02/19 02:46:16.582 INFO |          autotest:1369| Entered autotestd_monitor.
+02/19 02:46:16.582 DEBUG|          autotest:1310| Finished launching tail subprocesses.
+02/19 02:46:16.582 INFO |          autotest:1369| Finished launching tail subprocesses.
+02/19 02:46:16.582 DEBUG|          autotest:1310| Finished waiting on autotestd to start.
+02/19 02:46:16.582 INFO |          autotest:1369| Finished waiting on autotestd to start.
+02/19 02:46:16.901 DEBUG|          autotest:1310| AUTOTEST_STATUS::START	----	----	timestamp=1519029976	localtime=Feb 19 00:46:16	
+02/19 02:46:16.902 INFO |        server_job:0218| 	START	----	----	timestamp=1519029976	localtime=Feb 19 02:46:16	
+02/19 02:46:16.916 DEBUG|          autotest:1310| AUTOTEST_FETCH_PACKAGE:packages.checksum:/tmp/sysinfo/autoserv-AiZV87/packages.checksum:/tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_B57Fu5harness-fifo/autoserv.fifo
+02/19 02:46:16.920 DEBUG|          ssh_host:0301| Running (ssh) 'echo B > /tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_B57Fu5harness-fifo/autoserv.fifo' from '_wait_for_commands|process_output|write|_process_line|run|run_very_slowly'
+02/19 02:46:16.988 DEBUG|          autotest:1310| AUTOTEST_STATUS::	GOOD	----	sysinfo.iteration.before	timestamp=1519029976	localtime=Feb 19 00:46:16	
+02/19 02:46:16.989 INFO |        server_job:0218| 		GOOD	----	sysinfo.iteration.before	timestamp=1519029976	localtime=Feb 19 02:46:16	
+02/19 02:46:16.994 DEBUG|          autotest:1310| AUTOTEST_STATUS::END GOOD	----	----	timestamp=1519029976	localtime=Feb 19 00:46:16	
+02/19 02:46:16.994 INFO |        server_job:0218| 	END GOOD	----	----	timestamp=1519029976	localtime=Feb 19 02:46:16
+02/19 02:46:19.424 DEBUG|             utils:0282| [stdout] 	Interface managed0
+02/19 02:46:19.424 DEBUG|             utils:0282| [stdout] 		ifindex 7
+02/19 02:46:19.424 DEBUG|             utils:0282| [stdout] 		wdev 0x100000004
+02/19 02:46:19.424 DEBUG|             utils:0282| [stdout] 		addr 00:15:00:bf:3a:e2
+02/19 02:46:19.424 DEBUG|             utils:0282| [stdout] 		type managed
+02/19 02:46:19.425 WARNI|     hostap_config:0278| Not enforcing pure N mode because Snow does not seem to support it...
+02/19 02:46:19.425 DEBUG| site_linux_router:0274| hostapd parameters: OrderedDict([('hw_mode', 'g'), ('logger_syslog', '-1'), ('logger_syslog_level', '0'), ('rts_threshold', '2347'), ('fragm_threshold', '2346'), ('driver', 'nl80211'), ('ssid', 'Perf_a_uprvy_ch1'), ('channel', 1), ('ieee80211n', 1), ('ht_capab', '[HT40+]'), ('wmm_enabled', 1), ('interface', 'managed0'), ('ctrl_interface', '/tmp/hostapd-test-managed0.ctrl')])
+02/19 02:46:19.429 DEBUG|          ssh_host:0301| Running (ssh) 'cat <<EOF >/tmp/hostapd-test-managed0.conf
+hw_mode=g
+logger_syslog=-1
+logger_syslog_level=0
+rts_threshold=2347
+fragm_threshold=2346
+driver=nl80211
+ssid=Perf_a_uprvy_ch1
+channel=1
+ieee80211n=1
+ht_capab=[HT40+]
+wmm_enabled=1
+interface=managed0
+ctrl_interface=/tmp/hostapd-test-managed0.ctrl
+EOF
+' from 'run_once|configure|hostap_configure|start_hostapd|run|run_very_slowly'
+02/19 02:46:21.208 DEBUG|          ssh_host:0301| Running (ssh) '/usr/sbin/iw dev managed0 set txpower auto' from 'run_once|configure|hostap_configure|set_tx_power|run|run_very_slowly'
+02/19 02:46:21.228 DEBUG|          ssh_host:0301| Running (ssh) '/usr/sbin/iw dev' from 'hostap_configure|set_beacon_footer|get_interface|list_interfaces|run|run_very_slowly'
+02/19 02:46:21.244 DEBUG|             utils:0282| [stdout] phy#1
+02/19 02:46:21.244 DEBUG|             utils:0282| [stdout] 	Interface managed0
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		ifindex 7
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		wdev 0x100000004
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		addr 00:15:00:bf:3a:e2
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		ssid Perf_a_uprvy_ch1
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		type AP
+02/19 02:46:21.245 DEBUG|             utils:0282| [stdout] 		channel 1 (2412 MHz), width: 40 MHz, center1: 2422 MHz
+02/19 02:46:21.248 DEBUG|          ssh_host:0301| Running (ssh) 'test -e /sys/kernel/debug/ieee80211/phy1/beacon_footer' from 'run_once|configure|hostap_configure|set_beacon_footer|run|run_very_slowly'
+02/19 02:46:21.262 INFO | site_linux_router:1089| Beacon footer file does not exist.  Ignoring.
+02/19 02:46:21.263 INFO | site_linux_router:0561| Starting up local server...
+02/19 02:46:21.266 DEBUG|          ssh_host:0301| Running (ssh) '/bin/ip addr flush managed0' from 'run_once|configure|hostap_configure|start_local_server|run|run_very_slowly'
+02/19 02:46:21.285 DEBUG|          ssh_host:0301| Running (ssh) '/bin/ip addr add 192.168.0.254/24 broadcast 192.168.0.255 dev managed0' from 'run_once|configure|hostap_configure|start_local_server|run|run_very_slowly'
+02/19 02:46:21.304 DEBUG|          ssh_host:0301| Running (ssh) '/bin/ip link set managed0 up' from 'run_once|configure|hostap_configure|start_local_server|run|run_very_slowly'
+02/19 02:46:21.323 DEBUG|          ssh_host:0301| Running (ssh) 'cat <<EOF >/tmp/dhcpd.managed0.conf
+port=0
+bind-interfaces
+log-dhcp
+dhcp-range=192.168.0.1,192.168.0.128
+interface=managed0
+dhcp-leasefile=/tmp/dhcpd.leases
+EOF
+' from 'configure|hostap_configure|start_local_server|start_dhcp_server|run|run_very_slowly'
+02/19 02:46:21.342 DEBUG|          ssh_host:0301| Running (ssh) 'dnsmasq --conf-file=/tmp/dhcpd.managed0.conf' from 'configure|hostap_configure|start_local_server|start_dhcp_server|run|run_very_slowly'
+02/19 02:46:21.358 INFO | site_linux_router:0454| AP configured.
+02/19 02:46:21.359 INFO |wifi_test_context_:0255| Connecting to Perf_a_uprvy_ch1.
+02/19 02:46:26.478 DEBUG|      xmlrpc_types:0056| Constructing AssociationResult object with args=[], kwargs={'configuration_time': 3.6124379634857178, 'association_time': 0.20699405670166016, 'discovery_time': 1.2600131034851074, 'success': True, 'failure_reason': 'SUCCESS(Connection successful)'}
+02/19 02:46:26.478 INFO |wifi_test_context_:0263| Finished connection attempt to Perf_a_uprvy_ch1 with times: discovery=1.26, association=0.21, configuration=3.61.
+02/19 02:46:26.486 DEBUG|          ssh_host:0301| Running (ssh) 'iw dev wlan0 info' from 'assert_connect_wifi|wifi_signal_level|signal_level|is_wifi_device|run|run_very_slowly'
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] Interface wlan0
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	ifindex 2
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	wdev 0x1
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	addr 4c:80:93:c2:d1:66
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	ssid Perf_a_uprvy_ch1
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	type managed
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	wiphy 0
+02/19 02:46:26.511 DEBUG|             utils:0282| [stdout] 	channel 1 (2412 MHz), width: 40 MHz, center1: 2422 MHz
+02/19 02:46:26.556 DEBUG|          ssh_host:0301| Running (ssh) 'iw dev wlan0 link' from 'run_once|assert_connect_wifi|wifi_signal_level|signal_level|run|run_very_slowly'
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] Connected to 00:15:00:bf:3a:e2 (on wlan0)
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	SSID: Perf_a_uprvy_ch1
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	freq: 2412
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	RX: 2870 bytes (21 packets)
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	TX: 2293 bytes (16 packets)
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	signal: -32 dBm
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	tx bitrate: 270.0 MBit/s MCS 15 40MHz
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	bss flags:	short-slot-time
+02/19 02:46:26.603 DEBUG|             utils:0282| [stdout] 	dtim period:	2
+02/19 02:46:26.604 DEBUG|             utils:0282| [stdout] 	beacon int:	100
+02/19 02:46:26.644 INFO |wifi_test_context_:0282| Connected successfully to Perf_a_uprvy_ch1, signal level: -32.
+02/19 02:46:26.650 DEBUG|          ssh_host:0301| Running (ssh) 'mkdir -p /tmp' from 'assert_disconnect_count|get_event_logger|__init__|get_tmp_dir|run|run_very_slowly'
+02/19 02:46:26.700 DEBUG|          ssh_host:0301| Running (ssh) 'mktemp -d /tmp/autoserv-XXXXXX' from 'assert_disconnect_count|get_event_logger|__init__|get_tmp_dir|run|run_very_slowly'
+02/19 02:46:26.747 DEBUG|             utils:0282| [stdout] /tmp/autoserv-Jxw21f
+02/19 02:46:26.793 DEBUG|          ssh_host:0301| Running (ssh) 'nohup /usr/sbin/iw event -t </dev/null >/tmp/autoserv-Jxw21f/iw_event.log 2>&1 & echo $!;date +%s' from 'run_once|__enter__|assert_disconnect_count|start|run|run_very_slowly'
+02/19 02:47:33.494 DEBUG|          ssh_host:0301| Running (ssh) 'kill 5884' from '__exit__|assert_disconnect_count|__exit__|stop|run|run_very_slowly'
+02/19 02:47:33.515 DEBUG|      abstract_ssh:0413| get_file. source: /tmp/autoserv-Jxw21f/iw_event.log, dest: ./debug/iw_event_0.log, delete_dest: False,preserve_perm: True, preserve_symlinks:False
+02/19 02:47:33.515 DEBUG|      abstract_ssh:0425| Using Rsync.
+02/19 02:47:33.515 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  root@10.12.184.113:"/tmp/autoserv-Jxw21f/iw_event.log" "/mnt/host/source/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40/network_WiFi_Perf.ht40/debug/iw_event_0.log"'
+02/19 02:47:33.571 INFO |   iw_event_logger:0088| iw event log saved to ./debug/iw_event_0.log
+02/19 02:47:33.572 DEBUG|              test:0410| Test failed due to Timeout encountered: /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113 "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] -> ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866"
+* Command: 
+    /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket
+    -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+    -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o
+    ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113
+    "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then
+    logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] ->
+    ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l
+    2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t
+    TCP_STREAM -l 2 -- -P 0,12866"
+Exit status: 255
+Duration: 63.075772047
+. Exception log follows the after_iteration_hooks.
+02/19 02:47:33.572 DEBUG|              test:0415| Starting after_iteration_hooks for network_WiFi_Perf.ht40
+02/19 02:47:33.576 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/tmp/sysinfo/autoserv-AiZV87"' from 'decorated_func|wrapper|_install|path_exists|run|run_very_slowly'
+02/19 02:47:33.624 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/tmp/autoserv-0Y9ebG"' from 'decorated_func|wrapper|_install|path_exists|run|run_very_slowly'
+02/19 02:47:33.674 DEBUG|          ssh_host:0301| Running (ssh) 'find "/tmp/autoserv-0Y9ebG" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf' from '_call_run_once|decorated_func|wrapper|erase_dir_contents|run|run_very_slowly'
+02/19 02:47:33.727 DEBUG|      abstract_ssh:0520| send_file. source: /tmp/tmprkWJWj, dest: /tmp/autoserv-0Y9ebG/sysinfo.pickle, delete_dest: False,preserve_symlinks:False
+02/19 02:47:33.728 DEBUG|      abstract_ssh:0537| Using Rsync.
+02/19 02:47:33.728 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  "/tmp/tmprkWJWj" "root@10.12.184.113:"/tmp/autoserv-0Y9ebG/sysinfo.pickle""'
+02/19 02:47:33.830 DEBUG|          ssh_host:0301| Running (ssh) 'true' from '_get_host_and_setup|wait_up|is_up|ssh_ping|run|run_very_slowly'
+02/19 02:47:33.874 DEBUG|      abstract_ssh:0670| Host 10.12.184.113 is now up
+02/19 02:47:35.149 DEBUG|          autotest:1310| AUTOTEST_STATUS::START	----	----	timestamp=1519030055	localtime=Feb 19 00:47:35	
+02/19 02:47:35.149 INFO |        server_job:0218| 	START	----	----	timestamp=1519030055	localtime=Feb 19 02:47:35	
+02/19 02:47:35.164 DEBUG|          autotest:1310| AUTOTEST_FETCH_PACKAGE:packages.checksum:/tmp/sysinfo/autoserv-AiZV87/packages.checksum:/tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_uEuotBharness-fifo/autoserv.fifo
+02/19 02:47:35.172 DEBUG|          ssh_host:0301| Running (ssh) 'echo B > /tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_uEuotBharness-fifo/autoserv.fifo' from '_wait_for_commands|process_output|write|_process_line|run|run_very_slowly'
+02/19 02:47:35.245 DEBUG|          autotest:1310| AUTOTEST_STATUS::	GOOD	----	sysinfo.iteration.after	timestamp=1519030055	localtime=Feb 19 00:47:35	
+02/19 02:47:35.245 INFO |        server_job:0218| 		GOOD	----	sysinfo.iteration.after	timestamp=1519030055	localtime=Feb 19 02:47:35	
+02/19 02:47:35.250 DEBUG|          autotest:1310| AUTOTEST_STATUS::END GOOD	----	----	timestamp=1519030055	localtime=Feb 19 00:47:35	
+02/19 02:47:35.250 INFO |        server_job:0218| 	END GOOD	----	----	timestamp=1519030055	localtime=Feb 19 02:47:35	
+02/19 02:47:35.281 DEBUG|          autotest:1310| Got lock of exit_code_file.
+02/19 02:47:37.596 DEBUG|              test:0642| Running cleanup for test.
+02/19 02:47:37.596 INFO |       wifi_client:1368| ======= WiFi autotest complete. Cleaning up... =======
+02/19 02:47:37.602 DEBUG|          ssh_host:0301| Running (ssh) '/usr/bin/logger --tag shill --priority daemon.debug "======= WiFi autotest complete. Cleaning up... ======="' from '_exec|_cherry_pick_call|cleanup|shill_debug_log|run|run_very_slowly'
+02/19 02:47:37.645 DEBUG|wifi_test_context_:0232| Tearing down the test context.
+02/19 02:47:37.649 DEBUG|          ssh_host:0301| Running (ssh) 'ifconfig wlan0 up' from 'cleanup|teardown|close|powersave_switch|run|run_very_slowly'
+02/19 02:47:37.700 DEBUG|          ssh_host:0301| Running (ssh) 'iw dev wlan0 set power_save off' from 'cleanup|teardown|close|powersave_switch|run|run_very_slowly'
+02/19 02:47:37.812 DEBUG| site_linux_system:0254| Cleaning up host object for client
+02/19 02:47:39.819 DEBUG|          ssh_host:0301| Running (ssh) 'rm -rf "/tmp/autoserv-Jxw21f"' from 'close|close|close|close|run|run_very_slowly'
+02/19 02:47:44.390 INFO |              test:0924| Starting after_hook for network_WiFi_Perf.ht40
+02/19 02:47:44.394 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/tmp/sysinfo/autoserv-AiZV87"' from 'decorated_func|wrapper|_install|path_exists|run|run_very_slowly'
+02/19 02:47:44.415 DEBUG|          ssh_host:0301| Running (ssh) 'test -e "/tmp/autoserv-0Y9ebG"' from 'decorated_func|wrapper|_install|path_exists|run|run_very_slowly'
+02/19 02:47:44.461 DEBUG|          ssh_host:0301| Running (ssh) 'find "/tmp/autoserv-0Y9ebG" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf' from 'runtest|decorated_func|wrapper|erase_dir_contents|run|run_very_slowly'
+02/19 02:47:44.512 DEBUG|      abstract_ssh:0520| send_file. source: /tmp/tmpjFmGBO, dest: /tmp/autoserv-0Y9ebG/sysinfo.pickle, delete_dest: False,preserve_symlinks:False
+02/19 02:47:44.512 DEBUG|      abstract_ssh:0537| Using Rsync.
+02/19 02:47:44.512 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  "/tmp/tmpjFmGBO" "root@10.12.184.113:"/tmp/autoserv-0Y9ebG/sysinfo.pickle""'
+02/19 02:47:44.607 DEBUG|          ssh_host:0301| Running (ssh) 'true' from '_get_host_and_setup|wait_up|is_up|ssh_ping|run|run_very_slowly'
+02/19 02:47:44.654 DEBUG|      abstract_ssh:0670| Host 10.12.184.113 is now up
+02/19 02:47:44.654 DEBUG|          autotest:0498| Autotest job starts on remote host: 10.12.184.113
+02/19 02:47:44.654 DEBUG|          autotest:0133| Using existing host autodir: /tmp/sysinfo/autoserv-AiZV87
+02/19 02:47:44.657 DEBUG|          ssh_host:0301| Running (ssh) 'ls /tmp/sysinfo/autoserv-AiZV87/bin/autotest > /dev/null 2>&1' from 'after_hook|run|_do_run|verify_machine|run|run_very_slowly'
+02/19 02:47:44.716 DEBUG|          ssh_host:0301| Running (ssh) 'umount /tmp/sysinfo/autoserv-AiZV87/tmp' from 'after_hook|run|_do_run|verify_machine|run|run_very_slowly'
+02/19 02:47:44.769 DEBUG|             utils:0282| [stderr] umount: /tmp/sysinfo/autoserv-AiZV87/tmp: not mounted
+02/19 02:47:45.899 DEBUG|          autotest:1310| AUTOTEST_STATUS::START	----	----	timestamp=1519030065	localtime=Feb 19 00:47:45	
+02/19 02:47:45.900 INFO |        server_job:0218| 	START	----	----	timestamp=1519030065	localtime=Feb 19 02:47:45	
+02/19 02:47:45.914 DEBUG|          autotest:1310| AUTOTEST_FETCH_PACKAGE:packages.checksum:/tmp/sysinfo/autoserv-AiZV87/packages.checksum:/tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_mZvIIMharness-fifo/autoserv.fifo
+02/19 02:47:45.926 DEBUG|          ssh_host:0301| Running (ssh) 'echo B > /tmp/sysinfo/autoserv-AiZV87/tmp/_autotmp_mZvIIMharness-fifo/autoserv.fifo' from '_wait_for_commands|process_output|write|_process_line|run|run_very_slowly'
+02/19 02:47:46.244 DEBUG|          autotest:1310| AUTOTEST_STATUS::	GOOD	----	sysinfo.after	timestamp=1519030066	localtime=Feb 19 00:47:46	
+02/19 02:47:46.245 INFO |        server_job:0218| 		GOOD	----	sysinfo.after	timestamp=1519030066	localtime=Feb 19 02:47:46	
+02/19 02:47:46.249 DEBUG|          autotest:1310| AUTOTEST_STATUS::END GOOD	----	----	timestamp=1519030066	localtime=Feb 19 00:47:46	
+02/19 02:47:46.250 INFO |        server_job:0218| 	END GOOD	----	----	timestamp=1519030066	localtime=Feb 19 02:47:46	
+02/19 02:47:46.281 DEBUG|          autotest:1310| Got lock of exit_code_file.
+02/19 02:47:46.281 INFO |          autotest:1369| Got lock of exit_code_file.
+02/19 02:47:46.282 DEBUG|          autotest:1310| Released lock of exit_code_file and closed it.
+02/19 02:47:48.527 DEBUG|      abstract_ssh:0413| get_file. source: /tmp/autoserv-0Y9ebG/sysinfo, dest: /home/iil_jenkins/trunk/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40/network_WiFi_Perf.ht40, delete_dest: False,preserve_perm: True, preserve_symlinks:False
+02/19 02:47:48.527 DEBUG|      abstract_ssh:0425| Using Rsync.
+02/19 02:47:48.527 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  root@10.12.184.113:"/tmp/autoserv-0Y9ebG/sysinfo" "/home/iil_jenkins/trunk/wifi-matfunc-chell/results-03-network_WiFi_Perf.ht40/network_WiFi_Perf.ht40"'
+02/19 02:47:48.705 DEBUG|      abstract_ssh:0413| get_file. source: /tmp/autoserv-0Y9ebG/keyval, dest: /tmp/tmpgKBjjT, delete_dest: False,preserve_perm: True, preserve_symlinks:False
+02/19 02:47:48.706 DEBUG|      abstract_ssh:0425| Using Rsync.
+02/19 02:47:48.706 DEBUG|             utils:0214| Running 'rsync -L  --timeout=1800 --rsh='/usr/bin/ssh -a -x -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22' -az --no-o --no-g  root@10.12.184.113:"/tmp/autoserv-0Y9ebG/keyval" "/tmp/tmpgKBjjT"'
+02/19 02:47:48.762 INFO |              test:0928| after_hook completed
+02/19 02:47:48.766 DEBUG|          ssh_host:0301| Running (ssh) 'rm -rf /tmp/sysinfo/autoserv-AiZV87' from 'group_func|runtest|cleanup|uninstall|run|run_very_slowly'
+02/19 02:47:49.163 INFO |        server_job:0218| 	FAIL	network_WiFi_Perf.ht40	network_WiFi_Perf.ht40	timestamp=1519030069	localtime=Feb 19 02:47:49	Unhandled AutoservRunError: Timeout encountered: /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113 "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] -> ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866"
+  * Command: 
+      /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket
+      -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+      -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o
+      ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113
+      "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then
+      logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] ->
+      ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l
+      2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t
+      TCP_STREAM -l 2 -- -P 0,12866"
+  Exit status: 255
+  Duration: 63.075772047
+  
+  Traceback (most recent call last):
+    File "/mnt/host/source/src/third_party/autotest/files/client/common_lib/test.py", line 831, in _call_test_function
+      return func(*args, **dargs)
+    File "/mnt/host/source/src/third_party/autotest/files/client/common_lib/test.py", line 495, in execute
+      dargs)
+    File "/mnt/host/source/src/third_party/autotest/files/client/common_lib/test.py", line 362, in _call_run_once_with_retry
+      postprocess_profiled_run, args, dargs)
+    File "/mnt/host/source/src/third_party/autotest/files/client/common_lib/test.py", line 400, in _call_run_once
+      self.run_once(*args, **dargs)
+    File "/mnt/host/source/src/third_party/autotest/files/server/site_tests/network_WiFi_Perf/network_WiFi_Perf.py", line 98, in run_once
+      self.do_run(ap_config, session, power_save)
+    File "/mnt/host/source/src/third_party/autotest/files/server/site_tests/network_WiFi_Perf/network_WiFi_Perf.py", line 57, in do_run
+      session.warmup_stations()
+    File "/mnt/host/source/src/third_party/autotest/files/server/cros/network/netperf_session.py", line 95, in warmup_stations
+      self.warmup_wifi_part(warmup_client=True)
+    File "/mnt/host/source/src/third_party/autotest/files/server/cros/network/netperf_session.py", line 76, in warmup_wifi_part
+      warmup_history.append(runner.run())
+    File "/mnt/host/source/src/third_party/autotest/files/server/cros/network/netperf_runner.py", line 555, in run
+      timeout=timeout)
+    File "/mnt/host/source/src/third_party/autotest/files/server/hosts/ssh_host.py", line 323, in run
+      return self.run_very_slowly(*args, **kwargs)
+    File "/mnt/host/source/src/third_party/autotest/files/server/hosts/ssh_host.py", line 319, in run_very_slowly
+      raise error.AutoservRunError(timeout_message, cmderr.args[1])
+  AutoservRunError: Timeout encountered: /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113 "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] -> ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l 2 -- -P 0,12866"
+  * Command: 
+      /usr/bin/ssh -a -x  -o ControlPath=/tmp/_autotmp__D7Hpjssh-master/socket
+      -o Protocol=2 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+      -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=900 -o
+      ServerAliveCountMax=3 -o ConnectionAttempts=4 -l root -p 22 10.12.184.113
+      "export LIBC_FATAL_STDERR_=1; if type \"logger\" > /dev/null 2>&1; then
+      logger -tag \"autotest\" \"server[stack::warmup_wifi_part|run|run] ->
+      ssh_run(/usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t TCP_STREAM -l
+      2 -- -P 0,12866)\";fi; /usr/local/bin/netperf -H 192.168.0.254 -p 12865 -t
+      TCP_STREAM -l 2 -- -P 0,12866"
+  Exit status: 255
+  Duration: 63.075772047
+  
+02/19 02:47:49.163 INFO |        server_job:0218| END FAIL	network_WiFi_Perf.ht40	network_WiFi_Perf.ht40	timestamp=1519030069	localtime=Feb 19 02:47:49
+02/19 02:47:51.576 DEBUG|          ssh_host:0301| Running (ssh) 'route; echo SEPARATOR; cat /proc/net/dev' from '<module>|parallel_simple|parallel_simple|get_network_stats|run|run_very_slowly'
+02/19 02:47:51.788 INFO | get_network_stats:0048| get_network_stats: at-end RXbytes 55410387 TXbytes 2791782
+02/19 02:47:51.789 DEBUG|     ssh_multiplex:0118| Nuking ssh master_job

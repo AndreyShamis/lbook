@@ -468,8 +468,11 @@ class LogBookTest
         }
     }
 
-    public function getLogFilesPath()
+    /**
+     * @return string
+     */
+    public function getLogFilesPath(): string
     {
-        return realpath($this->getCycle()->getLogFilesPath() . '/' . $this->getId());
+        return $this->getCycle()->getLogFilesPath() . '/' . $this->getId();
     }
 }

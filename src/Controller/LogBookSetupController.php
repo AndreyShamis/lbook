@@ -41,7 +41,7 @@ class LogBookSetupController extends AbstractController
      * @param LogBookSetupRepository $setupRepo
      * @return JsonResponse
      */
-    public function indexJson(int $page = 1, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): JsonResponse
+    public function indexJson(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1): JsonResponse
     {
         $query = $setupRepo->createQueryBuilder('setups')
            // ->select(array('setups.id', 'setups.disabled', 'setups.updatedAt'))
@@ -93,7 +93,7 @@ class LogBookSetupController extends AbstractController
      * @param LogBookSetupRepository $setupRepo
      * @return array
      */
-    public function index(int $page = 1, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
+    public function index(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1): array
     {
         $query = $setupRepo->createQueryBuilder('setups')
             ->where('setups.disabled = 0')
@@ -129,7 +129,7 @@ class LogBookSetupController extends AbstractController
      */
     public function indexFirst(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
     {
-        return $this->index(1, $pagePaginator, $setupRepo);
+        return $this->index($pagePaginator, $setupRepo);
     }
 
     /**
@@ -161,6 +161,20 @@ class LogBookSetupController extends AbstractController
             'test' => $obj,
             'form' => $form->createView(),
         ));
+    }
+
+    /**
+     * Finds and displays a setup entity.
+     *
+     * @Route("/{id}", name="setup_show_first", methods={"GET"})
+     * @param LogBookSetup $setup
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    {
+        return $this->showFull($setup, 1, $pagePaginator, $cycleRepo);
     }
 
     /**
@@ -205,7 +219,7 @@ class LogBookSetupController extends AbstractController
                 'show_user'     => $show_user,
             ));
         } catch (\Throwable $ex) {
-            return $this->setupNotFound($setup, $ex);
+            return $this->setupNotFound($ex, $setup);
         }
     }
 
@@ -235,7 +249,6 @@ class LogBookSetupController extends AbstractController
                                     break;
                                 }
                             }
-
                         }
                     }
                     $iterator->next();
@@ -282,32 +295,18 @@ class LogBookSetupController extends AbstractController
     }
 
     /**
-     * Finds and displays a setup entity.
-     *
-     * @Route("/{id}", name="setup_show_first", methods={"GET"})
-     * @param LogBookSetup $setup
-     * @param PagePaginator $pagePaginator
-     * @param LogBookCycleRepository $cycleRepo
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): ?Response
-    {
-        return $this->showFull($setup, 1, $pagePaginator, $cycleRepo);
-    }
-
-    /**
-     * @param LogBookSetup|null $setup
      * @param \Throwable $ex
+     * @param LogBookSetup|null $setup
      * @return Response
      */
-    protected function setupNotFound(LogBookSetup $setup = null, \Throwable $ex): ?Response
+    protected function setupNotFound(\Throwable $ex, LogBookSetup $setup = null): ?Response
     {
         /** @var Request $request */
         $request= $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
         $response = $otherResponse = null;
         $short_msg = 'Unknown error';
-        try {;
+        try {
             $possibleId = $request->attributes->get('id');
             $response = new Response('', Response::HTTP_NOT_FOUND);
             if ( $ex->getCode() > 0 && Response::$statusTexts[$ex->getCode()] !== '') {
@@ -381,7 +380,7 @@ class LogBookSetupController extends AbstractController
             ));
 
         } catch (\Throwable $ex) {
-            return $this->setupNotFound($obj, $ex);
+            return $this->setupNotFound($ex, $obj);
         }
     }
 
@@ -409,15 +408,16 @@ class LogBookSetupController extends AbstractController
             $form = $this->createDeleteForm($obj);
             $form->handleRequest($request);
 
-            if (($form->isSubmitted() && $form->isValid()) || $env === 'test') {
+            if ($env === 'test' || ($form->isSubmitted() && $form->isValid())) {
                 $em = $this->getDoctrine()->getManager();
+                /** @var LogBookSetupRepository $setupRepo */
                 $setupRepo = $em->getRepository('App:LogBookSetup');
                 $setupRepo->delete($obj);
             }
 
             return $this->redirectToRoute('setup_index');
         } catch (\Throwable $ex) {
-            return $this->setupNotFound($obj, $ex);
+            return $this->setupNotFound($ex, $obj);
         }
     }
 

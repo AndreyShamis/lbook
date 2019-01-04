@@ -75,7 +75,6 @@ class LogBookTestRepository extends ServiceEntityRepository
         if ($flush === true) {
             $this->_em->flush();
         }
-
         return $entity;
     }
 
@@ -109,17 +108,19 @@ class LogBookTestRepository extends ServiceEntityRepository
     public function delete(LogBookTest $test): void
     {
         $fileName = '';
+        $pre = '[TEST][DELETE]: ';
+        $post = ' for TEST_ID:[' . $test->getId() . ']';
         try {
             $fileSystem = new Filesystem();
             $fileName = $test->getLogFilesPath();
-            if ($fileSystem->exists($fileName) and is_file($fileName)) {
-                $this->logger->info('[TEST][DELETE]: Remove log file [' . $fileName . '] for TEST ID:' . $test->getId());
+            if ($fileSystem->exists($fileName) && is_file($fileName)) {
+                $this->logger->notice($pre . 'Remove log file [' . $fileName . ']'. $post);
                 $fileSystem->remove($fileName);
             } else {
-                $this->logger->critical('[TEST][DELETE]: FILE_NOT_EXIST [' . $fileName . '] for TEST ID:' . $test->getId());
+                $this->logger->critical($pre . 'FILE_NOT_EXIST [' . $fileName . ']'. $post);
             }
         } catch (\Throwable $ex) {
-            $this->logger->critical('[TEST][DELETE]: Throwable TEST ID:' . $test->getId(),
+            $this->logger->critical($pre . 'Throwable for'. $post,
                 array(
                     $ex->getMessage(),
                     $ex, $test->getName(),

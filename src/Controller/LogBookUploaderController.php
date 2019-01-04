@@ -376,6 +376,7 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookSetup $setup
      * @param LogBookCycle $cycle
      * @param LogBookUpload $obj
+     * @param LoggerInterface $logger
      * @return File
      */
     protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): File
@@ -395,7 +396,7 @@ class LogBookUploaderController extends AbstractController
             }
             $fileSize = $new_file->getSize();
             if ($fileSize > 20*1024*1024) {
-                $logger->alert('BIG_SIZE: File name is :' . $new_file->getFilename() . '. File size : ' . $fileSize);
+                $logger->critical('BIG_SIZE: File name is :' . $new_file->getFilename() . '. File size : ' . $fileSize);
             }
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
@@ -556,7 +557,7 @@ class LogBookUploaderController extends AbstractController
                 'test_criteria' => $test_criteria,
                 'cycle' => $cycle,
             ));
-            throw new \Exception($msg);
+            throw new \RuntimeException($msg);
         }
         return $test;
     }

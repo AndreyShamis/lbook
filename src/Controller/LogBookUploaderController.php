@@ -834,11 +834,24 @@ class LogBookUploaderController extends AbstractController
 //                }
 //            }
         }
-        $test->addMetaData(array(
+        $mt_data = array(
             'TEST_FILENAME' => $controlFile,
             'TEST_VERSION_SHOW_OPT' => $testVersion,
             'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
-        ));
+        );
+        if ($controlFile === '') {
+            unset($mt_data['TEST_FILENAME']);
+        }
+        if ($testVersion === '') {
+            unset($mt_data['TEST_VERSION_SHOW_OPT']);
+        }
+        if ($controlVersion === '') {
+            unset($mt_data['CONTROL_VERSION_SHOW_OPT']);
+        }
+        if (count($mt_data)) {
+            $test->addMetaData($mt_data);
+        }
+
         //$test->setTestFileName($controlFile);
         //$test->setTestFileVersion($controlVersion);
         //$test->setTestVersion($testVersion);

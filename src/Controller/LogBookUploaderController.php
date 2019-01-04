@@ -384,11 +384,19 @@ class LogBookUploaderController extends AbstractController
         /** @var UploadedFile $new_file */
         $new_file = null;
         try {
+
             $fileName = $this->generateUniqueFileName(). '_' . $file->getClientOriginalName(). '.txt'; //.$file->guessExtension();
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
             try {
                 $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
                 $new_file = $file->move($dir, $fileName);
+                $logger->notice('PARSE_FILE:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
+                    array(
+                        'setup_id' => $setup->getId(),
+                        'setup_name' => $setup->getName(),
+                        'cycle_id' => $cycle->getId(),
+                        'cycle_name' => $cycle->getName()
+                    ));
             } catch (\Throwable $ex) {
                 $msg = 'Fail in fileHandler[move]:' . $ex->getMessage();
                 $obj->addMessage($msg);
@@ -587,6 +595,7 @@ class LogBookUploaderController extends AbstractController
             $msg_len = mb_strlen($value);
             if ($msg_len < $this->_MIN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
                 $value = null;
+                unset($temp_arr[$key]);
                 continue;
             }
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/', $value,$oneLine);

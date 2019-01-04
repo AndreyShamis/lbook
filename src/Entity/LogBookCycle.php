@@ -411,6 +411,23 @@ class LogBookCycle
     }
 
     /**
+     * @PreFlush()
+     */
+    public function setDefaultRetentionPolicy(): void
+    {
+
+        try {
+            $setup = $this->getSetup();
+            if ($setup !== null) {
+                $new_delete = new \DateTime(sprintf('+%d days', $setup->getRetentionPolicy()));
+                $this->setDeleteAt($new_delete);
+            }
+        } catch (\Exception $ex) {
+
+        }
+    }
+
+    /**
      * @PreFlush
      * @throws \Exception
      */
@@ -440,16 +457,6 @@ class LogBookCycle
         $this->setTimeEnd($max_time);
         $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
         $this->setTestsTimeSum($testsTimeSum);
-
-        try {
-            $setup = $this->getSetup();
-            if ($setup !== null) {
-                $new_delete = new \DateTime(sprintf('+%d days', $setup->getRetentionPolicy()));
-                //$this->setDeleteAt($new_delete); // TODO
-            }
-        } catch (\Exception $ex) {
-            print $ex->getMessage();
-        }
     }
 
     /**

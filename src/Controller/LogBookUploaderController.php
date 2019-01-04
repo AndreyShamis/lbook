@@ -989,7 +989,7 @@ class LogBookUploaderController extends AbstractController
     {
         $ret = null;
         [$dirty, $testName, $testVersion] = array('', '', '');
-        preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)]*)\]\s*(?>\(ver\.\s*(\d+\.?\d*))?/', $log->getMessage(), $matches);
+        preg_match('/\=*Running Sub-test\: \[([\w\s\_\-\.\;\#\!\$\@\%\^\&\*\(\)\/]*)\]\s*(?>\(ver\.\s*(\d+\.?\d*))?/', $log->getMessage(), $matches);
         if (\count($matches) >= 2) {
             if (\count($matches) === 3) {
                 [$dirty, $testName, $testVersion] = $matches;

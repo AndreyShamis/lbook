@@ -26,10 +26,12 @@ monolog:
             type:    group
             members: [streamed, deduplicated]
         streamed:
-            type: stream
+            type: rotating_file
             path: "%kernel.logs_dir%/%kernel.environment%.log"
-            level: notice
-            channels: ["!event", "!doctrine"]
+            level: debug
+            channels: ["!event", "!doctrine", "!security", "!php"]
+            # max number of log files to keep, defaults to zero, which means infinite files
+            max_files: 20
         console:
             type:   console
             process_psr_3_messages: false

@@ -109,5 +109,5 @@ success "Finish - ${STEP}"
 restore_proxy
 ./bin/console ca:cl
 info "Start unittests"
-./vendor/bin/simple-phpunit --verbose --debug --colors=always --strict-coverage --strict-global-state --testdox-text artifacts/phpunit.txt
+./vendor/bin/simple-phpunit --verbose --debug --colors=always --strict-coverage --strict-global-state  --enforce-time-limit --testdox-text artifacts/phpunit.txt --configuration phpunit.xml.dist
 success "Finish unittests"

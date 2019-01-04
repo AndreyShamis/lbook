@@ -4,10 +4,12 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2",
         "ext-iconv": "*",
+        "ext-json": "*",
         "ext-zip": "^1.15",
         "knplabs/knp-time-bundle": "^1.8",
+        "phpunit/php-invoker": "^2.0",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/asset": "^4.0",
         "symfony/console": "^4.0",
@@ -29,8 +31,7 @@
         "symfony/validator": "^4.0",
         "symfony/web-link": "^4.0",
         "symfony/webpack-encore-pack": "*",
-        "twig/extensions": "^1.5",
-        "ext-json": "*"
+        "twig/extensions": "^1.5"
     },
     "require-dev": {
         "symfony/browser-kit": "^4.0",

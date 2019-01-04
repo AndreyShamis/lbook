@@ -15,6 +15,10 @@ use App\Utils\RandomString;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class UploaderTest
+ * @package App\Tests\Controller
+ */
 class UploaderTest extends LogBookApplicationTestCase
 {
     /**
@@ -32,7 +36,6 @@ class UploaderTest extends LogBookApplicationTestCase
 
     /**
      * Check that Upload CLI works without token
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     public function testUploadCliEmptyRequest():void
@@ -94,13 +97,12 @@ class UploaderTest extends LogBookApplicationTestCase
     }
 
     /**
+     * @large
      * Check that Upload CLI works without token
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     public function testUploadCliNoToken():void
     {
-        $token = RandomString::generateRandomString(20);
         $setupName = 'UPLOAD_TOKEN_NOT_PROVIDED';
         $postParams = array(
             'setup' => $setupName,
@@ -160,10 +162,11 @@ class UploaderTest extends LogBookApplicationTestCase
      * Check that Upload CLI works with Auto setup name generator
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Exception
      */
     public function testUploadCliTokenExp():void
     {
-        $token = RandomString::generateRandomString(20);
+        $token = RandomString::generateRandomString();
         $setupName = 'UPLOAD_TOKEN_EXPIRED';
         $postParams = array(
             'setup' => $setupName,
@@ -232,7 +235,7 @@ class UploaderTest extends LogBookApplicationTestCase
      */
     public function testUploadCliNoSetup():void
     {
-        $token = RandomString::generateRandomString(20);
+        $token = RandomString::generateRandomString();
         $postParams = array(
             'token' => $token,
             'debug' => 'true',
@@ -288,13 +291,12 @@ class UploaderTest extends LogBookApplicationTestCase
      */
     public function testUploadCli():void
     {
-        $token = RandomString::generateRandomString(20);
+        $token = RandomString::generateRandomString();
         $setupName = 'SETUP_PROVIDED___' . $token;
         $postParams = array(
             'token' => $token,
             'setup' => $setupName,
             'debug' => 'true',
-            //'cycle' => 'asdasdasdasd',
         );
         $postHeader = array('HTTP_REFERER' => '/upload/new_cli',);
         $testRepo = self::$entityManager->getRepository(LogBookTest::class);
@@ -391,7 +393,6 @@ class UploaderTest extends LogBookApplicationTestCase
 
     /**
      * @param string $stringResponse
-     * @param string $setupName
      * @param string $token
      * @param string $fileName
      * @param null $cycleName

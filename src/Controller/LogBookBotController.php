@@ -140,11 +140,13 @@ class LogBookBotController extends AbstractController
      * @param string $msg
      * @throws \Exception
      */
-    protected function log(string $msg): void
+    protected function log(string $msg, bool $monolog = true): void
     {
         $time = new \DateTime();
         echo $time->format('Y-m-d H:i:s') . ' | ' . $msg . "\n";
-        $this->logger->notice($msg);
+        if ($monolog === true) {
+            $this->logger->notice($msg);
+        }
     }
 
     /**
@@ -155,13 +157,18 @@ class LogBookBotController extends AbstractController
     protected function clearSuccess(EventRepository $events): Response
     {
         $limit = 1000;
-        $this->log('-----------------------------------------------------------------');
+        $this->log('-----------------------------------------------------------------', false);
         $list = $events->findBy(
             array(
                 'status' => EventStatus::FINISH,
             ),
             null, $limit);
-        $this->log('Found clearSuccess:' . count($list) . ' to clear,  Limit is ' . $limit);
+        $monolog = false;
+        $found = count($list);
+        if ($found > 0) {
+            $monolog = true;
+        }
+        $this->log('Found clearSuccess:' . count($list) . ' to clear,  Limit is ' . $limit, $monolog);
         $counter = 0;
         foreach ($list as $event) {
             $cmp_date = new \DateTime('+10 minutes');
@@ -170,11 +177,11 @@ class LogBookBotController extends AbstractController
                 $counter++;
             }
         }
-        $this->log('Removed ' . $counter . ' objects');
+        $this->log('Removed ' . $counter . ' objects', $monolog);
         if ($counter > 0) {
             $this->em->flush();
         }
-        $this->log('Exit');
+        $this->log('Exit', $monolog);
         exit();
     }
 
@@ -187,7 +194,7 @@ class LogBookBotController extends AbstractController
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
-        $this->log('-----------------------------------------------------------------');
+
         $limit = 15;
         $list = $events->findBy(
             array(
@@ -195,14 +202,20 @@ class LogBookBotController extends AbstractController
                 'status' => EventStatus::CREATED,
             ),
             null, $limit);
-        $this->log("\n\n" . 'Found ' . count($list) . ' for PROGRESS, Limit is ' . $limit);
+        $monolog = false;
+        $found = count($list);
+        if ($found > 0) {
+            $monolog = true;
+        }
+        $this->log('-----------------------------------------------------------------', $monolog);
+        $this->log("\n\n" . 'Found ' . count($list) . ' for PROGRESS, Limit is ' . $limit, $monolog);
         foreach ($list as $event) {
             $event->setStatus(EventStatus::PROGRESS);
             $event->setStartedAt(new \DateTime());
             $this->em->persist($event);
         }
         $this->em->flush();
-        $this->log('Start loop: ');
+        $this->log('Start loop: ', $monolog);
         foreach ($list as $event) {
 
             $this->em->persist($event);
@@ -234,7 +247,7 @@ class LogBookBotController extends AbstractController
         foreach ($list as $event) {
             $this->em->detach($event);
         }
-        $this->log('===================================================================');
+        $this->log('===================================================================', $monolog);
         $this->clearSuccess($events);
         exit();
     }

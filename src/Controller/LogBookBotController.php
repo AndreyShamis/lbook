@@ -11,6 +11,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,16 +27,19 @@ class LogBookBotController extends AbstractController
 {
     /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em;
+
+    /** @var LoggerInterface */
+    protected $logger;
     /**
      * LogBookUploaderController constructor.
      * @param Container $container
-     * @throws \LogicException
+     * @param LoggerInterface $logger
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->em = $this->getDoctrine()->getManager();
-
+        $this->logger = $logger;
     }
     /**
      * @Route("/delete_cycles", name="bot_delete_cycles")
@@ -140,6 +144,7 @@ class LogBookBotController extends AbstractController
     {
         $time = new \DateTime();
         echo $time->format('Y-m-d H:i:s') . ' | ' . $msg . "\n";
+        $this->logger->notice($msg);
     }
 
     /**
@@ -218,7 +223,9 @@ class LogBookBotController extends AbstractController
                 }
             } catch (\Throwable $ex) {
                 $msg = EventStatus::getStatusName(EventStatus::ERROR) . ':' . $ex->getMessage();
-                $this->log('Failed to delete ' . $event. ' ['.$msg.']');
+                $print_msg = 'Failed to delete ' . $event. ' ['.$msg.']';
+                $this->log($print_msg);
+                $this->logger->critical($print_msg, array($ex));
                 $event->addMetaData(array('message' => $msg));
                 $event->setStatus(EventStatus::ERROR);
             }

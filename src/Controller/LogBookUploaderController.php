@@ -72,6 +72,7 @@ class LogBookUploaderController extends AbstractController
     protected $_SHORT_MILISEC_TIME_LEN = 12;    // 02:44:38.820
     protected $_MEDIUM_TIME_LEN = 14;           // 02/22 11:36:56
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
+    protected $RANDOM_FILE_NAME_LEN = 4;
     protected $log_first_lines = array();
     public static $MAX_EXEC_ORDER_SEARCH_COUNTER = 50;
     public static $UPLOAD_PATH = __DIR__ . '/../../uploads/';
@@ -312,8 +313,8 @@ class LogBookUploaderController extends AbstractController
 //            }
             if ($continue) {
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
-
-                $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger);
+                $remote_ip = $request->getClientIp();
+                $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger, $remote_ip);
 
                 $testName = $file->getClientOriginalName();
                 $testVerdictDefault = $this->parseVerdict('ERROR');
@@ -338,7 +339,7 @@ class LogBookUploaderController extends AbstractController
                 $this->parseFile($new_file, $test, $obj, $logger);
                 $this->em->refresh($cycle);
                 $this->calculateAndSetBuild($build_name, $cycle);
-                $remote_ip = $request->getClientIp();
+
                 $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
                 $dut = $this->targetRepo->findOneOrCreate(array('name' => $test_dut));
 
@@ -377,19 +378,21 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookCycle $cycle
      * @param LogBookUpload $obj
      * @param LoggerInterface $logger
+     * @param string $remote_ip
      * @return File
      */
-    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): File
+    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger, string $remote_ip): File
     {
         /** @var UploadedFile $new_file */
         $new_file = null;
         try {
             $orig_name = $file->getClientOriginalName();
             if ($orig_name === 'autoserv.DEBUG') {
-                $fileName = $this->generateUniqueFileName(8). '_' . $cycle->getTestsCount() . '.txt';
+                $fileName = $this->generateUniqueFileName($this->RANDOM_FILE_NAME_LEN);
             } else {
-                $fileName = $this->generateUniqueFileName(10). '_' . $orig_name. '.txt'; //.$file->guessExtension();
+                $fileName = $this->generateUniqueFileName($this->RANDOM_FILE_NAME_LEN *2). '_' . $orig_name;
             }
+            $fileName .= '_' . $cycle->getTestsCount() . '.txt';
 
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
             try {
@@ -397,10 +400,11 @@ class LogBookUploaderController extends AbstractController
                 $new_file = $file->move($dir, $fileName);
                 $logger->notice('PARSE_FILE:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
                     array(
-                        'setup_id' => $setup->getId(),
-                        'setup_name' => $setup->getName(),
-                        'cycle_id' => $cycle->getId(),
-                        'cycle_name' => $cycle->getName()
+                        'sid' => $setup->getId(),
+                        'sname' => $setup->getName(),
+                        'cid' => $cycle->getId(),
+                        'cname' => $cycle->getName(),
+                        'ip' => $remote_ip
                     ));
             } catch (\Throwable $ex) {
                 $msg = 'Fail in fileHandler[move]:' . $ex->getMessage();

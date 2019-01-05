@@ -88,10 +88,15 @@
                                     <th>Updated</th>
                                     <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
                                     <th></th>
-                                    <td colspan="3"></td>
+                                    <td colspan="2"></td>
+                                    <td colspan="1">
+                                        <span class="font10" title="Planned date for delete {{ cycle.deleteAt|date('Y-m-d H:i') }}">
+                                            <i class="ace-icon fa fa-fire"></i>
+                                            Delete {{ cycle.deleteAt|time_diff}}
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr>
-
                                     <td colspan="8">{% include 'lbook/cycle/infobox.html.twig' %}</td>
                                 </tr>
                                 {#<tr>#}

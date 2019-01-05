@@ -117,13 +117,15 @@
             {%  if show_user %}
             <th class="setup_cycle_user" data-sortable="true">User</th>
             {% endif %}
-            <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate">Pass %</th>
+            <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-visible="true">Pass Rate</th>
+            <th class="setup_cycle_failrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Fail Rate" data-visible="false">Fail Rate</th>
             <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
             <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="The total summary time of all tests in this cycle">Test time</th>
             <th class="setup_cycle_updated_column" data-sorter="htmlSorter" data-sortable="true">Updated</th>
             {#<th data-sortable="true" data-visible="false">Controller</th>#}
             {#<th data-sortable="true" data-visible="false">DUT</th>#}
             <th class="setup_cycle_uploader_column" data-sortable="true" data-visible="false">Uploader</th>
+            <th class="setup_cycle_delete_at_column" data-sortable="true" data-visible="false">Retention Policy</th>
             <th class="setup_cycle_options_column" data-switchable="false">Options</th>
         </tr>
         </thead>
@@ -165,6 +167,7 @@
                 <td title="{{ cycle.user.FullName }}">{{ cycle.user.UserNameMedium }}</td>
                 {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                <td><span class="{{ failRateToColor(cycle.failRate) }}" data-percent="{{ cycle.failRate }}">{{ cycle.failRate }}%</span></td>
                 <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>
                 <td><span data-title="{{ cycle.testsTimeSum  }}">{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</span></td>
                 <td>
@@ -175,9 +178,10 @@
                 {#<td>{{ cycle.controller }}</td>#}
                 {#<td>{{ cycle.dut }}</td>#}
                 <td>{{ cycle.targetUploader }}</td>
+                <td>{{ cycle.deleteAt|time_diff }}</td>
                 <td>
                     <div class="hidden-sm hidden-xs action-buttons">
-                        <a class="blue" href="{{ path('cycle_show', { 'id': cycle.id }) }}" title="Show">
+                        <a class="blue" href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" title="Show">
                             <i class="ace-icon fa fa-search-plus bigger-130"></i>
                         </a>
                         {% if is_granted('edit', setup) %}

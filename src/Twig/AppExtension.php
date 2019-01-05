@@ -47,6 +47,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
             new TwigFunction('relativeTime', array($this, 'relativeTime')),
             new TwigFunction('passRateToColor', [$this, 'passRateToColor']),
+            new TwigFunction('failRateToColor', [$this, 'failRateToColor']),
             new TwigFunction('shortString', [$this, 'shortString']),
             new TwigFunction('verdictToBadge', [$this, 'verdictToBadge']),
             new TwigFunction('isUrl', [$this, 'isUrl']),
@@ -181,6 +182,16 @@ class AppExtension extends AbstractExtension
             $ret = 'text-danger';
         }
         return $ret;
+    }
+
+    /**
+     * Return classes in percentage range
+     * @param $failRate - percentage
+     * @return string
+     */
+    public function failRateToColor($failRate): string
+    {
+        return $this->passRateToColor(100 - $failRate);
     }
 
     /**

@@ -621,7 +621,7 @@ class LogBookUploaderController extends AbstractController
                 if ($tmp_size > $this->MAX_SINGLE_LOG_SIZE*2) {
                     $last_good_key = 0;
                     $firstLines = false;
-                    $logger->critical('Reset $last_good_key due big size: ' . $tmp_size);
+                    $logger->warning('Reset $last_good_key due big size: ' . $tmp_size);
                 }
 
             } else if ($firstLines && $this->RECOVER_FIRST_LINES) {

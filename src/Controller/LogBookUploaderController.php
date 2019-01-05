@@ -34,6 +34,7 @@ use App\Utils\RandomName;
 use App\Form\LogBookUploadType;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Uploader controller.
@@ -74,6 +75,7 @@ class LogBookUploaderController extends AbstractController
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
     protected $RANDOM_FILE_NAME_LEN = 4;
     protected $log_first_lines = array();
+    protected $RECOVER_FIRST_LINES = false;
     public static $MAX_EXEC_ORDER_SEARCH_COUNTER = 50;
     public static $UPLOAD_PATH = __DIR__ . '/../../uploads/';
 
@@ -224,6 +226,7 @@ class LogBookUploaderController extends AbstractController
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
         //curl --noproxy "127.0.0.1" --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
         $obj = new LogBookUpload();
+        $stopwatch = new Stopwatch();
         $p_data = $request->request;
         /** @var LogBookTest $test */
         $test = null;
@@ -336,7 +339,10 @@ class LogBookUploaderController extends AbstractController
                     }
                 }
                 $this->em->flush();
+                $stopwatch->start('parseFile');
                 $this->parseFile($new_file, $test, $obj, $logger);
+                $events = $stopwatch->stop('parseFile');
+                $logger->notice('StopWatch ' . $events->getDuration() / 1000 . ' duration');
                 $this->em->refresh($cycle);
                 $this->calculateAndSetBuild($build_name, $cycle);
 
@@ -398,7 +404,7 @@ class LogBookUploaderController extends AbstractController
             try {
                 $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
                 $new_file = $file->move($dir, $fileName);
-                $logger->notice('PARSE_FILE:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
+                $logger->notice('F_HANDLER:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
                     array(
                         'sid' => $setup->getId(),
                         'sname' => $setup->getName(),
@@ -594,12 +600,14 @@ class LogBookUploaderController extends AbstractController
 
     /**
      * @param array $temp_arr
+     * @param LoggerInterface $logger
      * @return array
      */
-    final protected function prepareLogArray(array &$temp_arr): array
+    final protected function prepareLogArray(array &$temp_arr, LoggerInterface $logger): array
     {
         $newTempArr = array();
         $last_good_key = -1;
+        $firstLines = true;
         foreach ($temp_arr as $key => $value) {
             $msg_len = mb_strlen($value);
             if ($msg_len < $this->_MIN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
@@ -611,15 +619,19 @@ class LogBookUploaderController extends AbstractController
             if (\count($oneLine[2]) > 0) {
                 $last_good_key = $key;
                 $newTempArr[$key] = $this->cleanString($value);
-            } else {
-                if ($last_good_key > 0) {
-                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
-                } else {
-                    // add first lines without time to array
-                    $this->log_first_lines[] = $this->cleanString($value);
-                    // or
-                    // Skip first lines
+            } else if ($last_good_key > 0) {
+                $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
+                $tmp_size = mb_strlen($newTempArr[$last_good_key]);
+                if ($tmp_size > $this->MAX_SINGLE_LOG_SIZE*2) {
+                    $last_good_key = 0;
+                    $firstLines = false;
+                    $logger->critical('Reset $last_good_key due big size: ' . $tmp_size);
                 }
+
+            } else if ($firstLines && $this->RECOVER_FIRST_LINES) {
+                // add first lines without time to array
+                $this->log_first_lines[] = $this->cleanString($value);
+                // or Skip first lines
             }
             unset($temp_arr[$key]);
         }
@@ -658,7 +670,7 @@ class LogBookUploaderController extends AbstractController
         $ret_data = array();
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
         $tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data);
-        $newTempArr = $this->prepareLogArray($tmp_log_arr);
+        $newTempArr = $this->prepareLogArray($tmp_log_arr, $logger);
 
         unset($file_data);
 

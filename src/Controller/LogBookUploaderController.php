@@ -74,6 +74,7 @@ class LogBookUploaderController extends AbstractController
     protected $_MEDIUM_MILISEC_TIME_LEN = 18;   // 02/19 02:44:39.177
     protected $RANDOM_FILE_NAME_LEN = 4;
     protected $log_first_lines = array();
+    protected $RECOVER_FIRST_LINES = false;
     public static $MAX_EXEC_ORDER_SEARCH_COUNTER = 50;
     public static $UPLOAD_PATH = __DIR__ . '/../../uploads/';
 
@@ -175,6 +176,7 @@ class LogBookUploaderController extends AbstractController
      * @param string $setupName
      * @param int $setupId
      * @return LogBookSetup
+     * @throws ORMException
      */
     final protected function bringSetup(LogBookUpload $obj, string $setupName = '', int $setupId = -1): LogBookSetup
     {
@@ -398,7 +400,7 @@ class LogBookUploaderController extends AbstractController
             try {
                 $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
                 $new_file = $file->move($dir, $fileName);
-                $logger->notice('PARSE_FILE:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
+                $logger->notice('F_HANDLER:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
                     array(
                         'sid' => $setup->getId(),
                         'sname' => $setup->getName(),
@@ -594,12 +596,14 @@ class LogBookUploaderController extends AbstractController
 
     /**
      * @param array $temp_arr
+     * @param LoggerInterface $logger
      * @return array
      */
-    final protected function prepareLogArray(array &$temp_arr): array
+    final protected function prepareLogArray(array &$temp_arr, LoggerInterface $logger): array
     {
         $newTempArr = array();
         $last_good_key = -1;
+        $firstLines = true;
         foreach ($temp_arr as $key => $value) {
             $msg_len = mb_strlen($value);
             if ($msg_len < $this->_MIN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
@@ -611,15 +615,19 @@ class LogBookUploaderController extends AbstractController
             if (\count($oneLine[2]) > 0) {
                 $last_good_key = $key;
                 $newTempArr[$key] = $this->cleanString($value);
-            } else {
-                if ($last_good_key > 0) {
-                    $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
-                } else {
-                    // add first lines without time to array
-                    $this->log_first_lines[] = $this->cleanString($value);
-                    // or
-                    // Skip first lines
+            } else if ($last_good_key > 0) {
+                $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
+                $tmp_size = mb_strlen($newTempArr[$last_good_key]);
+                if ($tmp_size > $this->MAX_SINGLE_LOG_SIZE*2) {
+                    $last_good_key = 0;
+                    $firstLines = false;
+                    $logger->critical('Reset $last_good_key due big size: ' . $tmp_size);
                 }
+
+            } else if ($firstLines && $this->RECOVER_FIRST_LINES) {
+                // add first lines without time to array
+                $this->log_first_lines[] = $this->cleanString($value);
+                // or Skip first lines
             }
             unset($temp_arr[$key]);
         }
@@ -658,7 +666,7 @@ class LogBookUploaderController extends AbstractController
         $ret_data = array();
         $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
         $tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data);
-        $newTempArr = $this->prepareLogArray($tmp_log_arr);
+        $newTempArr = $this->prepareLogArray($tmp_log_arr, $logger);
 
         unset($file_data);
 

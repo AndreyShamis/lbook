@@ -108,7 +108,7 @@
         <thead>
         <tr>
             <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
-            <th class="setup_cycle_id_column" data-sorter="htmlSorter" data-sortable="true">Id</th>
+            <th data-sorter="dataTitleIntSorter" class="setup_cycle_id_column" data-sortable="true">Id</th>
             <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column" data-switchable="false">Name</th>
             <th class="setup_cycle_tests_column" data-sortable="true">Tests</th>
             {%  if show_build %}
@@ -150,7 +150,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a>
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" data-title="{{ cycle.id }}">{{ cycle.id }}</a>
                 </td>
                 <td title="{{ cycle.name }}">
                     <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a>

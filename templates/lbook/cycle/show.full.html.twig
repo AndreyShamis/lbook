@@ -228,7 +228,7 @@
             {% endif %}
             <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name" data-footer-formatter="totalFormatter">Test Name</th>
-            <th data-sortable="true" data-field="timeRun" title="Test run time" data-footer-formatter="timeSumFormatter">Runtime</th>
+            <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="timeRun" title="Test run time" data-footer-formatter="timeSumFormatter">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
                 <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
             {% endif %}

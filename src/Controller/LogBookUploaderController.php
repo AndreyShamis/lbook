@@ -415,7 +415,21 @@ class LogBookUploaderController extends AbstractController
             }
             $fileSize = $new_file->getSize();
             if ($fileSize > 20*1024*1024) {
-                $logger->critical('BIG_SIZE: File name is :' . $new_file->getFilename() . '. File size : ' . $fileSize);
+                $msg = array();
+                try {
+                    $msg = array(
+                        'sname' => $setup->getName(),
+                        'sid' => $setup->getId(),
+                        'cid' => $cycle->getId(),
+                        'cname' => $cycle->getName(),
+                        'tests_count' => $cycle->getTestsCount(),
+                        'build' => $cycle->getBuild()->getName(),
+                        'remote_ip' => $remote_ip,
+                    );
+                } catch (\Throwable $ex) {
+                    $logger->critical($ex->getMessage(), $ex);
+                }
+                $logger->critical('BIG_SIZE: File name is :' . $new_file->getFilename() . '. File size : ' . $fileSize, $msg);
             }
             $obj->addMessage('File copy info :' . $new_file . ' File size is :' . $fileSize);
 
@@ -616,14 +630,15 @@ class LogBookUploaderController extends AbstractController
                 $last_good_key = $key;
                 $newTempArr[$key] = $this->cleanString($value);
             } else if ($last_good_key > 0) {
-                $newTempArr[$last_good_key] = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
-                $tmp_size = mb_strlen($newTempArr[$last_good_key]);
-                if ($tmp_size > $this->MAX_SINGLE_LOG_SIZE*2) {
+                $new_value = $newTempArr[$last_good_key] . "\n" . $this->cleanString($value);
+                $tmp_size = mb_strlen($new_value);
+                if ($tmp_size >= $this->MAX_SINGLE_LOG_SIZE) {
                     $last_good_key = 0;
                     $firstLines = false;
                     $logger->warning('Reset $last_good_key due big size: ' . $tmp_size);
+                } else {
+                    $newTempArr[$last_good_key] = $new_value;
                 }
-
             } else if ($firstLines && $this->RECOVER_FIRST_LINES) {
                 // add first lines without time to array
                 $this->log_first_lines[] = $this->cleanString($value);

@@ -4,9 +4,9 @@
     <div class="row">
         <div class="col-xs-10">
             <h3 class="test_title">
-                <a href="{{ path('setup_show', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a>
+                <a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}"><< {{ test.cycle.setup}}</a>
                 /
-                <a href="{{ path('cycle_show', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a>
+                <a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">< {{ test.cycle.name}}</a>
                 /
                 Test [{{ test.id }}] : {{ test.name }}
             </h3>

@@ -104,7 +104,8 @@ class LogBookCycleController extends AbstractController
             foreach ($cycle->getTests() as $test) {
                 $log_path = $path . $test->getLogFile();
                 if ($fileSystem->exists($log_path)) {
-                    $newFileName = $test->getExecutionOrder() . '__' . $test->getName() . '.txt';
+                    $fixedFileName = str_replace(array('/', '\\'), '_', $test->getName());
+                    $newFileName = $test->getExecutionOrder() . '__' . $fixedFileName . '.txt';
                     $zip->addFromString(basename($newFileName),  file_get_contents($log_path));
                 }
             }

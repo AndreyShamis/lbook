@@ -4,10 +4,8 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
-use App\Entity\LogBookVerdict;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,7 +20,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-
 
 /**
  * Cycle controller.
@@ -104,7 +101,8 @@ class LogBookCycleController extends AbstractController
             foreach ($cycle->getTests() as $test) {
                 $log_path = $path . $test->getLogFile();
                 if ($fileSystem->exists($log_path)) {
-                    $newFileName = $test->getExecutionOrder() . '__' . $test->getName() . '.txt';
+                    $fixedFileName = str_replace(array('/', '\\'), '_', $test->getName());
+                    $newFileName = $test->getExecutionOrder() . '__' . $fixedFileName . '.txt';
                     $zip->addFromString(basename($newFileName),  file_get_contents($log_path));
                 }
             }
@@ -149,6 +147,7 @@ class LogBookCycleController extends AbstractController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
+     * @throws \Exception
      */
     public function newAction(Request $request)
     {
@@ -611,6 +610,7 @@ class LogBookCycleController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $em = $this->getDoctrine()->getManager();
 
+                /** @var LogBookCycleRepository $cycleRepo */
                 $cycleRepo = $em->getRepository('App:LogBookCycle');
                 $cycleRepo->delete($obj);
             }

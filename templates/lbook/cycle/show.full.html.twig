@@ -183,6 +183,8 @@
     {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
     {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
     {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
+    {% set cycle_show_test_control_file = false %}
+
     {% set show_metadata = app.user.settings.cycleShowTestMetaDataShow | default(true) %}
     {% set show_metadata_opt = app.user.settings.cycleShowTestMetaDataOptShow | default(true) %}
     {% set show_uptime = app.user.settings.cycleShowTestUptime | default(true) %}
@@ -245,7 +247,10 @@
             {% endif %}
             {% if show_metadata_opt == true %}
                 {% for key, item in additional_opt_cols %}
+                    {% if cycle_show_test_control_file == false and (item == 'CONTROL_FILE_SHOW_OPT' or 'TEST_VERSION_SHOW_OPT' or 'CONTROL_VERSION_SHOW_OPT') %}
+                    {% else %}
                     <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column" data-visible="false">{{ shortString(item|replace({'_SHOW_OPT': '' }) , 30) }}</th>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             {% if disabled_uptime == false and show_uptime == true %}
@@ -313,6 +318,8 @@
                 {% endif %}
                 {% if show_metadata_opt == true %}
                     {% for key, item in additional_opt_cols %}
+                        {% if cycle_show_test_control_file == false and (item == 'CONTROL_FILE_SHOW_OPT' or 'TEST_VERSION_SHOW_OPT' or 'CONTROL_VERSION_SHOW_OPT') %}
+                        {% else %}
                         <td title="{{ item }}">
                             {% if item in test.metaData|keys %}
                                 {% if isUrl(test.metaData[item]) %}
@@ -325,6 +332,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
+                        {% endif %}
                     {% endfor %}
                 {% endif %}
                 {% if disabled_uptime == false and show_uptime == true %}

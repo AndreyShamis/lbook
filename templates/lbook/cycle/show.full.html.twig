@@ -253,10 +253,10 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
-            {% if disabled_uptime == false and show_uptime == true %}
-                <th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>
-                <th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>
-            {% endif %}
+            {#{% if disabled_uptime == false and show_uptime == true %}#}
+                {#<th data-sortable="true" data-field="uptime_start" title="Uptime on test start">Uptime</th>#}
+                {#<th data-sortable="true" data-field="uptime_end" title="Uptime on test end">Uptime</th>#}
+            {#{% endif %}#}
             <th data-sortable="true" data-field="verdict">Verdict</th>
             <th data-sortable="true" data-field="fileSize" title="Test run time" data-visible="false">File Size</th>
             {#<th>Actions</th>#}
@@ -335,10 +335,10 @@
                         {% endif %}
                     {% endfor %}
                 {% endif %}
-                {% if disabled_uptime == false and show_uptime == true %}
-                    <td>{{ test.dutUpTimeStart }}</td>
-                    <td>{{ test.dutUpTimeEnd }}</td>
-                {% endif %}
+                {#{% if disabled_uptime == false and show_uptime == true %}#}
+                    {#<td>{{ test.dutUpTimeStart }}</td>#}
+                    {#<td>{{ test.dutUpTimeEnd }}</td>#}
+                {#{% endif %}#}
                 <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
                 <td>{{ test.logFileSize }}</td>
                 {#<td>#}

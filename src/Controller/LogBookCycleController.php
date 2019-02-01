@@ -170,15 +170,16 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="cycle_show_first", methods={"GET"})
-     * @param LogBookCycle $cycle
+     * @Route("/{id}/{maxSize}", name="cycle_show_first", methods={"GET"}, defaults={"maxSize"=2000})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param int $maxSize
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): ?Response
+    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $maxSize=2000): ?Response
     {
-        return $this->show($pagePaginator, $testRepo, $cycle, 1);
+        return $this->show($pagePaginator, $testRepo, $cycle, 1, false, $maxSize);
     }
 
     /**
@@ -304,7 +305,7 @@ class LogBookCycleController extends AbstractController
     /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}/page/{page}/use_json/{forJson}", name="cycle_show", methods={"GET"})
+     * @Route("/{id}/page/{page}/use_json/{forJson}/max_size/{maxSize}", name="cycle_show", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
@@ -312,7 +313,7 @@ class LogBookCycleController extends AbstractController
      * @param bool $forJson if True the JSON table for tests will be used
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false, $maxSize=2000): ?Response
     {
         try {
             if (!$cycle) {
@@ -325,11 +326,11 @@ class LogBookCycleController extends AbstractController
                 ->orderBy('t.executionOrder', 'ASC')
                 //->setParameter('cycle', $cycle->getId());
                 ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
-            $paginator = $pagePaginator->paginate($qb, $page, $this->show_tests_size);
+            $paginator = $pagePaginator->paginate($qb, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
-            $maxPages = ceil($totalPosts / $this->show_tests_size);
+            $maxPages = ceil($totalPosts / $maxSize); //$this->show_tests_size);
             $thisPage = $page;
             $disable_uptime = false;
             $deleteForm = $this->createDeleteForm($cycle);

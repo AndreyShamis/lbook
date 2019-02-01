@@ -284,7 +284,7 @@
                     {% else %}
                         {%  set column =  test.verdict %}
                     {% endif %}
-                {%  set builder = builder ~ '[\'' ~ column ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
+                {%  set builder = builder ~ '[\'' ~ column ~ '\',\'' ~  test.name ~ '\',new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'),new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\')],' %}
                 {#{% endif %}#}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
@@ -307,10 +307,7 @@
                             {% if isUrl(test.metaData[item]) %}
                                 <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                             {% else %}
-                                <span title="{{ test.metaData[item] }}">
-                                    {{ test.metaData[item] }}
-                                    {#{{ shortString(test.metaData[item], 35) }}#}
-                                </span>
+                                <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                         {% endif %}
                         {% endif %}
                         </td>
@@ -325,10 +322,7 @@
                                 {% if isUrl(test.metaData[item]) %}
                                     <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
                                 {% else %}
-                                    <span title="{{ test.metaData[item] }}">
-                                        {{ test.metaData[item] }}
-                                        {#{{ shortString(test.metaData[item], 50) }}#}
-                                    </span>
+                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                                 {% endif %}
                             {% endif %}
                         </td>

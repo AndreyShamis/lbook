@@ -278,14 +278,14 @@
                 {% set test_disabled = 'test-disabled' %}
             {% endif %}
             <tr class="{{ test_disabled }}">
-                {% if is_granted('edit', cycle.setup) %}
+                {#{% if is_granted('edit', cycle.setup) %}#}
                     {% if 'SUITE_SHOW' in test.metaData|keys %}
                         {%  set column =  test.metaData['SUITE_SHOW'] %}
                     {% else %}
                         {%  set column =  test.verdict %}
                     {% endif %}
                 {%  set builder = builder ~ '[\'' ~ column ~ '\', \'' ~  test.name ~ '\', new Date(\''~ test.timeStart|date('Y-m-d H:i:s') ~'\'), new Date(\''~ test.timeEnd|date('Y-m-d H:i:s') ~'\') ],\n' %}
-                {% endif %}
+                {#{% endif %}#}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
                 <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
@@ -399,113 +399,113 @@
             // });
         });
     </script>
-    {% if is_granted('edit', cycle.setup) %}
+    {#{% if is_granted('edit', cycle.setup) %}#}
     <script type="text/javascript">
-    google.charts.load("current", {packages:["timeline"]});
+        google.charts.load("current", {packages:["timeline"]});
 
-    function drawChart(jsonData) {
-        var dataTable = new google.visualization.DataTable();
-        dataTable.addColumn({ type: 'string', id: 'Selector' });
-        dataTable.addColumn({ type: 'string', id: 'Test Name' });
-        dataTable.addColumn({ type: 'date', id: 'Start' });
-        dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
-        {% if tests_in_json == true %}
-            $.each(jsonData['rows'], function (i, row) {
-                dataTable.addRow([
-                    row.verdict,
-                    row.name,
-                    new Date(row.timeStart),
-                    new Date(row.timeEnd)
+        function drawChart(jsonData) {
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn({ type: 'string', id: 'Selector' });
+            dataTable.addColumn({ type: 'string', id: 'Test Name' });
+            dataTable.addColumn({ type: 'date', id: 'Start' });
+            dataTable.addColumn({ type: 'date', id: 'End', p:{html: true}  });
+            {% if tests_in_json == true %}
+                $.each(jsonData['rows'], function (i, row) {
+                    dataTable.addRow([
+                        row.verdict,
+                        row.name,
+                        new Date(row.timeStart),
+                        new Date(row.timeEnd)
+                    ]);
+                });
+            {% endif %}
+
+            {% if tests_in_json == true %}
+                // "tests_in_json=true
+            {% else %}
+                // "tests_in_json=false
+                dataTable.addRows([
+                    {{builder|raw}}
                 ]);
-            });
-        {% endif %}
+            {% endif %}
 
-        {% if tests_in_json == true %}
-            // "tests_in_json=true
-        {% else %}
-            // "tests_in_json=false
-            dataTable.addRows([
-                {{builder|raw}}
-            ]);
-        {% endif %}
+            var options = {
+              tooltip: {isHtml: true},
+              height: '100%',
+              timeline: {
+                  //singleColor: '#8d8',
+                  groupByRowLabel: true,
+                  colorByRowLabel: true,
+              },
+              // hAxis: {
+              //     format: 'M/d/yy',
+              //     gridlines: {count: 15}
+              // }
+            };
 
-        var options = {
-          tooltip: {isHtml: true},
-          height: '100%',
-          timeline: {
-              //singleColor: '#8d8',
-              groupByRowLabel: true,
-              colorByRowLabel: true,
-          },
-          // hAxis: {
-          //     format: 'M/d/yy',
-          //     gridlines: {count: 15}
-          // }
-        };
+            function chartSelectHandler(e) {
+                var selection = chart.getSelection();
+                var message = '';
+                var yRange = dataTable.getColumnRange(1);
+                var xRange = dataTable.getColumnRange(0);
 
-        function chartSelectHandler(e) {
-            var selection = chart.getSelection();
-            var message = '';
-            var yRange = dataTable.getColumnRange(1);
-            var xRange = dataTable.getColumnRange(0);
-
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                var str;
-                if (item.row != null && item.column != null) {
-                    str = dataTable.getFormattedValue(item.row, item.column);
-                    message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
-                } else if (item.row != null) {
-                    str = dataTable.getFormattedValue(item.row, 0);
-                    message += '{row:' + item.row + '};value= ' + str + '\n';
-                } else if (item.column != null) {
-                    str = dataTable.getFormattedValue(0, item.column);
-                    message += '{column:' + item.column + '};value= ' + str + '\n';
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    var str;
+                    if (item.row != null && item.column != null) {
+                        str = dataTable.getFormattedValue(item.row, item.column);
+                        message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+                    } else if (item.row != null) {
+                        str = dataTable.getFormattedValue(item.row, 0);
+                        message += '{row:' + item.row + '};value= ' + str + '\n';
+                    } else if (item.column != null) {
+                        str = dataTable.getFormattedValue(0, item.column);
+                        message += '{column:' + item.column + '};value= ' + str + '\n';
+                    }
                 }
+                try {
+                    console.log('selected ' + message);
+                } catch (e) {}
             }
+
+            var chart = new google.visualization.Timeline($('#graphResults')[0]);
+            google.visualization.events.addListener(chart, 'select', chartSelectHandler);
+
+            chart.draw(dataTable, options);
             try {
-                console.log('selected ' + message);
+                console.log('Draw graph finish')
             } catch (e) {}
+
         }
 
-        var chart = new google.visualization.Timeline($('#graphResults')[0]);
-        google.visualization.events.addListener(chart, 'select', chartSelectHandler);
 
-        chart.draw(dataTable, options);
-        try {
-            console.log('Draw graph finish')
-        } catch (e) {}
+        $(document).ready(function() {
 
-    }
+            $("#view_graph").on("click", function(event){
+                try {
+                    console.log("precallback - draw graph ");
+                } catch (e) {}
 
-
-    $(document).ready(function() {
-
-        $("#view_graph").on("click", function(event){
+                setTimeout(function(){
+                    {% if tests_in_json == true %}
+                    google.charts.setOnLoadCallback(loadDataAndDrawChart);
+                    function loadDataAndDrawChart() {
+                        $.ajax({
+                            dataType: "json",
+                            url: "/cycle/json/{{ objId }}",
+                            success: drawChart
+                        });
+                    }
+                    {% else %}
+                    drawChart();
+                    {% endif %}
+                }, 50); // small delay for give time to exporer build html
+            });
             try {
-                console.log("precallback - draw graph ");
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
-
-            setTimeout(function(){
-                {% if tests_in_json == true %}
-                google.charts.setOnLoadCallback(loadDataAndDrawChart);
-                function loadDataAndDrawChart() {
-                    $.ajax({
-                        dataType: "json",
-                        url: "/cycle/json/{{ objId }}",
-                        success: drawChart
-                    });
-                }
-                {% else %}
-                drawChart();
-                {% endif %}
-            }, 50); // small delay for give time to exporer build html
         });
-        try {
-            ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
-            ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
-        } catch (e) {}
-    });
-</script>
-{% endif %}
+    </script>
+    {#{% endif %}#}
 {% endblock %}

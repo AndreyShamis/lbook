@@ -787,6 +787,10 @@ class LogBookCycle
      */
     public function setTestsTimeSum(int $testsTimeSum): void
     {
+        $big = 1000000000;
+        if ($testsTimeSum > $big) {
+            $testsTimeSum = $big;
+        }
         $this->testsTimeSum = $testsTimeSum;
     }
 

@@ -122,7 +122,7 @@ class LogBookCycleController extends AbstractController
             }
             return $response;
         } catch (\Throwable $ex) {
-            return $this->cycleNotFound($cycle, $ex);
+            return $this->cycleNotFound($ex, $cycle);
         }
     }
 
@@ -170,19 +170,20 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="cycle_show_first", methods={"GET"})
-     * @param LogBookCycle $cycle
+     * @Route("/{id}/{maxSize<\d+>?1}", name="cycle_show_first", methods={"GET"}, defaults={"maxSize"=2000})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param int $maxSize
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): ?Response
+    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $maxSize=2000): ?Response
     {
-        return $this->show($pagePaginator, $testRepo, $cycle, 1);
+        return $this->show($pagePaginator, $testRepo, $cycle, 1, false, $maxSize);
     }
 
     /**
-     * @Route("/{id}/page/{page}", name="cycle_show_page", methods={"GET"})
+     * @Route("/{id}/page/{page<\d+>?1}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
@@ -304,7 +305,7 @@ class LogBookCycleController extends AbstractController
     /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}/page/{page}/use_json/{forJson}", name="cycle_show", methods={"GET"})
+     * @Route("/{id}/page/{page<\d+>?1}/use_json/{forJson}/max_size/{maxSize<\d+>?1}", name="cycle_show", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
@@ -312,7 +313,7 @@ class LogBookCycleController extends AbstractController
      * @param bool $forJson if True the JSON table for tests will be used
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false, $maxSize=2000): ?Response
     {
         try {
             if (!$cycle) {
@@ -325,11 +326,11 @@ class LogBookCycleController extends AbstractController
                 ->orderBy('t.executionOrder', 'ASC')
                 //->setParameter('cycle', $cycle->getId());
                 ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
-            $paginator = $pagePaginator->paginate($qb, $page, $this->show_tests_size);
+            $paginator = $pagePaginator->paginate($qb, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
 
-            $maxPages = ceil($totalPosts / $this->show_tests_size);
+            $maxPages = ceil($totalPosts / $maxSize); //$this->show_tests_size);
             $thisPage = $page;
             $disable_uptime = false;
             $deleteForm = $this->createDeleteForm($cycle);
@@ -396,7 +397,7 @@ class LogBookCycleController extends AbstractController
             return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);
 
         } catch (\Throwable $ex) {
-            return $this->cycleNotFound($cycle, $ex);
+            return $this->cycleNotFound($ex, $cycle);
         }
     }
 
@@ -484,11 +485,15 @@ class LogBookCycleController extends AbstractController
             return $this->render('lbook/cycle/show.ajax.html.twig', $ret_arr);
 
         } catch (\Throwable $ex) {
-            return $this->cycleNotFound($cycle, $ex);
+            return $this->cycleNotFound($ex, $cycle);
         }
     }
 
-
+    /**
+     * @param $haystack
+     * @param $needle
+     * @return bool
+     */
     private function endsWith($haystack, $needle): bool
     {
         $length = mb_strlen($needle);
@@ -497,25 +502,11 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
-     * Finds and displays a cycle entity.
-     *
-     * @Route("/{id}", name="cycle_show_default", methods={"GET"})
-     * @param LogBookCycle $obj
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function showAction(LogBookCycle $obj): Response
-    {
-        return $this->render('lbook/cycle/show.html.twig', array(
-            'cycle' => $obj,
-        ));
-    }
-
-    /**
-     * @param LogBookCycle|null $cycle
      * @param \Throwable $ex
+     * @param LogBookCycle|null $cycle
      * @return Response
      */
-    protected function cycleNotFound(LogBookCycle $cycle = null, \Throwable $ex): ?Response
+    protected function cycleNotFound(\Throwable $ex, LogBookCycle $cycle = null): ?Response
     {
         /** @var Request $request */
         $request= $this->get('request_stack')->getCurrentRequest();
@@ -582,7 +573,7 @@ class LogBookCycleController extends AbstractController
                 'delete_form' => $deleteForm->createView(),
             ));
         } catch (\Throwable $ex) {
-            return $this->cycleNotFound($obj, $ex);
+            return $this->cycleNotFound($ex, $obj);
         }
     }
 
@@ -617,7 +608,7 @@ class LogBookCycleController extends AbstractController
 
             return $this->redirectToRoute('cycle_index_first');
         } catch (\Throwable $ex) {
-            return $this->cycleNotFound($obj, $ex);
+            return $this->cycleNotFound($ex, $obj);
         }
     }
 

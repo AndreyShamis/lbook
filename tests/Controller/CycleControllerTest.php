@@ -72,6 +72,8 @@ class CycleControllerTest extends LogBookApplicationTestCase
      * @param LogBookSetup|null $setup
      * @param EntityManager|null $em
      * @return LogBookCycle
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public static function createCycle($cycleName = '', LogBookSetup $setup = null, EntityManager $em = null): LogBookCycle
     {

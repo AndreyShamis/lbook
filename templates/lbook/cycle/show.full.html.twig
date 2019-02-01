@@ -279,8 +279,8 @@
             {% endif %}
             <tr class="{{ test_disabled }}">
                 {% if is_granted('edit', cycle.setup) %}
-                    {% if 'CLUSTER_SHOW' in test.metaData|keys %}
-                        {%  set column =  test.metaData['CLUSTER_SHOW'] %}
+                    {% if 'SUITE_SHOW' in test.metaData|keys %}
+                        {%  set column =  test.metaData['SUITE_SHOW'] %}
                     {% else %}
                         {%  set column =  test.verdict %}
                     {% endif %}

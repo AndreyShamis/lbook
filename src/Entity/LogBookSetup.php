@@ -124,7 +124,7 @@ class LogBookSetup
         $this->setCreatedAt();
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
-        $this->setRetentionPolicy(90);
+        $this->setRetentionPolicy(10);
     }
 
     /**

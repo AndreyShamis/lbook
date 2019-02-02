@@ -9,6 +9,12 @@
         </div>
         <div class="col-xs-2">
             <span style="float: right;">
+                {% if maxPages > 1 %}
+                <button class="btn btn-white btn-info btn-bold" id="load_all_tests">
+                    <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
+                    Load all Tests ({{ testsCount }})
+                </button>
+                {% endif %}
                 <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
                     <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
                     Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
@@ -385,6 +391,9 @@
             drawEasyPieChart();
             $( "#saveCycleAsArchive" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
+            });
+            $( "#load_all_tests" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_show_size', { 'id': cycle.id, 'maxSize': testsCount }) }}";
             });
             // var testTable = $('#cycleTestsTable');
             // testTable.bootstrapTable({

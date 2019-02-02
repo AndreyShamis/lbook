@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Serializer;
 class LogBookCycleController extends AbstractController
 {
     protected $index_size = 1000;
-    protected $show_tests_size = 2000;
+    protected $show_tests_size = 200;
 
     /**
      * Lists all cycle entities.
@@ -170,32 +170,6 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/{maxSize<\d+>?1}", name="cycle_show_first", methods={"GET"}, defaults={"maxSize"=2000})
-     * @param PagePaginator $pagePaginator
-     * @param LogBookTestRepository $testRepo
-     * @param LogBookCycle $cycle
-     * @param int $maxSize
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $maxSize=2000): ?Response
-    {
-        return $this->show($pagePaginator, $testRepo, $cycle, 1, false, $maxSize);
-    }
-
-    /**
-     * @Route("/{id}/page/{page<\d+>?1}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1})
-     * @param PagePaginator $pagePaginator
-     * @param LogBookTestRepository $testRepo
-     * @param LogBookCycle $cycle
-     * @param int $page
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function show_page(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1) : ?Response
-    {
-        return $this->show($pagePaginator, $testRepo, $cycle, $page);
-    }
-
-    /**
      * Finds and displays a cycle entity with paginator.
      *
      * @Route("/json/{id}", name="cycle_tests_json", methods={"GET"})
@@ -303,9 +277,52 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/{id}", name="cycle_show_first", methods={"GET"})
+     * @Route("/{id}/{maxSize}", name="cycle_show_size", methods={"GET"}, defaults={"maxSize"=""})
+     * @Route("/{id}/{maxSize}/{page}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=200})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param int $maxSize
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $maxSize = null): ?Response
+    {
+        if ($page === null) {
+            $page = 1;
+        }
+        if ($maxSize === null || $maxSize == "" || $maxSize == "1") {
+            $maxSize = $this->show_tests_size;
+        }
+        $page = (int)$page;
+        $maxSize = (int)$maxSize;
+        return $this->show($pagePaginator, $testRepo, $cycle, $page, false, $maxSize);
+    }
+
+//    /**
+//     * @Route("/{id}/{maxSize<\d+>?1}/{page<\d+>?1}", name="cycle_show_page", methods={"GET"}, defaults={"page"="", "maxSize"=2000})
+//     * @Route("/{id}/{maxSize<\d+>?1}", name="cycle_show_page_2", methods={"GET"}, defaults={"page"="", "maxSize"=""})
+//     * @param PagePaginator $pagePaginator
+//     * @param LogBookTestRepository $testRepo
+//     * @param LogBookCycle $cycle
+//     * @param int $page
+//     * @return \Symfony\Component\HttpFoundation\Response
+//     */
+//    public function show_page(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $maxSize = null) : ?Response
+//    {
+//        if ($page === null) {
+//            $page = 1;
+//        }
+//        if ($maxSize === null) {
+//            $maxSize = $this->show_tests_size;
+//        }
+//        return $this->show($pagePaginator, $testRepo, $cycle, $page, false, $maxSize);
+//    }
+
+    /**
      * Finds and displays a cycle entity with paginator.
      *
-     * @Route("/{id}/page/{page<\d+>?1}/use_json/{forJson}/max_size/{maxSize<\d+>?1}", name="cycle_show", methods={"GET"})
+     * @Route("/{id}/{maxSize<\d+>?1}/{page<\d+>?1}/use_json/{forJson}", name="cycle_show", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
@@ -313,8 +330,14 @@ class LogBookCycleController extends AbstractController
      * @param bool $forJson if True the JSON table for tests will be used
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = 1, $forJson=false, $maxSize=2000): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $forJson=false, $maxSize=null): ?Response
     {
+        if ($page === null) {
+            $page = 1;
+        }
+        if ($maxSize === null) {
+            $maxSize = $this->show_tests_size;
+        }
         try {
             if (!$cycle) {
                 throw new \RuntimeException('');

@@ -127,7 +127,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
     protected function checkCycleExist(LogBookCycle $cycle): void
     {
         // self::$entityManager->refresh($cycle);
-        $crawler = $this->getClient()->request('GET', '/cycle/'. $cycle->getId() . '/page');
+        $crawler = $this->getClient()->request('GET', '/cycle/'. $cycle->getId());
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
         $searchString = 'h3:contains("Cycle [' . $cycle->getId() . '] : ' . $cycle->getName() . '")';
         $count = $crawler->filter($searchString)->count();

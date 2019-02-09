@@ -15,7 +15,10 @@ abstract class EventType
     public const UNDEFINED = 0;
     public const DELETE_CYCLE = 1;
     public const DELETE_SETUP = 2;
-    protected const FINISH = 3;
+    public const FINISH = 3;
+    public const CLEAR_LOG_DEBUG = 4;
+    public const CLEAR_LOG_INFO = 5;
+    public const CLEAR_LOG_ALL = 6;
 
     /** @var array friendly named Event Types */
     protected static $event_types_list = [
@@ -23,6 +26,9 @@ abstract class EventType
         self::DELETE_CYCLE => 'DELETE_CYCLE',
         self::DELETE_SETUP => 'DELETE_SETUP',
         self::FINISH => 'FINISH',
+        self::CLEAR_LOG_DEBUG => 'CLEAR_LOG_DEBUG',
+        self::CLEAR_LOG_INFO => 'CLEAR_LOG_INFO',
+        self::CLEAR_LOG_ALL => 'CLEAR_LOG_ALL',
     ];
 
     /**
@@ -47,6 +53,9 @@ abstract class EventType
             self::DELETE_CYCLE,
             self::DELETE_SETUP,
             self::FINISH,
+            self::CLEAR_LOG_DEBUG,
+            self::CLEAR_LOG_INFO,
+            self::CLEAR_LOG_ALL,
         ];
     }
 

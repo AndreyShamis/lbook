@@ -112,6 +112,27 @@ class LogBookSetup
      */
     protected $retentionPolicy = 400;
 
+    /**
+     * @var integer
+     * Value in days used for delete test Logs from DB
+     * @ORM\Column(name="test_keep_logs_days", type="smallint", options={"unsigned"=true, "default"="50"})
+     */
+    protected $testKeepLogsDays = 50;
+
+    /**
+     * @var integer
+     * Value in days used for delete test Logs from DB
+     * @ORM\Column(name="test_keep_debug_logs_days", type="smallint", options={"unsigned"=true, "default"="300"})
+     */
+    protected $testKeepDebugLogsDays = 300;
+
+    /**
+     * @var integer
+     * Value in days used for delete test Logs from DB
+     * @ORM\Column(name="test_keep_info_logs_days", type="smallint", options={"unsigned"=true, "default"="600"})
+     */
+    protected $testKeepInfoLogsDays = 600;
+
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
 
@@ -125,6 +146,57 @@ class LogBookSetup
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
         $this->setRetentionPolicy(10);
+        $this->setTestKeepLogsDays(90);
+        $this->setTestKeepInfoLogsDays(15);
+        $this->setTestKeepDebugLogsDays(10);
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestKeepLogsDays(): int
+    {
+        return $this->testKeepLogsDays;
+    }
+
+    /**
+     * @param int $testKeepLogsDays
+     */
+    public function setTestKeepLogsDays(int $testKeepLogsDays): void
+    {
+        $this->testKeepLogsDays = $testKeepLogsDays;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestKeepDebugLogsDays(): int
+    {
+        return $this->testKeepDebugLogsDays;
+    }
+
+    /**
+     * @param int $testKeepDebugLogsDays
+     */
+    public function setTestKeepDebugLogsDays(int $testKeepDebugLogsDays): void
+    {
+        $this->testKeepDebugLogsDays = $testKeepDebugLogsDays;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestKeepInfoLogsDays(): int
+    {
+        return $this->testKeepInfoLogsDays;
+    }
+
+    /**
+     * @param int $testKeepInfoLogsDays
+     */
+    public function setTestKeepInfoLogsDays(int $testKeepInfoLogsDays): void
+    {
+        $this->testKeepInfoLogsDays = $testKeepInfoLogsDays;
     }
 
     /**

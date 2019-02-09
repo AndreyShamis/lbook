@@ -78,6 +78,117 @@ class LogBookBotController extends AbstractController
         return new Response($responseContent);
     }
 
+
+    /**
+     * @Route("/random_cycles", name="random_cycles")
+     * @param LogBookCycleRepository $cycleRepo
+     * @param EventRepository $events
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     */
+    public function findRandomCycles(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
+    {
+
+        $list = $cycleRepo->getRandomCycles(50);
+        $this->log("\n\n" . 'Found ' . count($list));
+        /** @var LogBookCycle $cycle */
+        $now = new \DateTime('now');
+        $counter = $skip = 0;
+        foreach ($list as $cycle) {
+            try {
+                $setup = $cycle->getSetup();
+                /** @var \DateTime $cycle_created */
+                $cycle_created = $cycle->getCreatedAt();
+                $test_del_debug = $setup->getTestKeepDebugLogsDays();
+                $test_del_debug_date = clone $cycle_created;
+                $test_del_debug_date = $test_del_debug_date->modify('+'. $test_del_debug .' days') ;
+
+
+                if ($test_del_debug_date <= $now) {
+                    print ($cycle->getId());
+                    //print ('  added ' . $test_del_debug . ' days');
+                    print(" - need modify test_del_ [DEBUG] debug_date");
+                    print ($cycle->getCreatedAt()->format('Y-m-d H:i:s'));
+                    print (" - - ");
+                    print ($test_del_debug_date->format('Y-m-d H:i:s'));
+                    print ("\n");
+                }
+
+                $test_del_info = $setup->getTestKeepInfoLogsDays();
+                $test_del_info_date = clone $cycle_created;
+                $test_del_info_date = $test_del_info_date->modify('+'. $test_del_info .' days') ;
+
+
+                if ($test_del_info_date <= $now) {
+                    print ($cycle->getId());
+                    print(" - need modify  test_del_ [INFO] info_date");
+                    print ($cycle->getCreatedAt()->format('Y-m-d H:i:s'));
+                    print (" - - ");
+                    print ($test_del_info_date->format('Y-m-d H:i:s'));
+                    print ("\n");
+                }
+
+                $test_del_all_logs = $setup->getTestKeepLogsDays();
+                $test_del_all_logs_date = clone $cycle_created;
+                $test_del_all_logs_date = $test_del_all_logs_date->modify('+'. $test_del_all_logs .' days') ;
+
+
+                if ($test_del_all_logs_date <= $now) {
+                    print ($cycle->getId());
+                    print(" - need modify [ALL_LOGS] test_del_all_logs_date");
+                    print ($cycle->getCreatedAt()->format('Y-m-d H:i:s'));
+                    print (" - - ");
+                    print ($test_del_all_logs_date->format('Y-m-d H:i:s'));
+                    print ("\n");
+                }
+            } catch (\Throwable $ex) {
+                print($ex->getMessage());
+            }
+
+        }
+//        foreach ($list as $cycle) {
+//
+//            $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
+//            $type = EventType::DELETE_CYCLE;
+//            $new_event = new Event($type);
+//            $name = EventType::getTypeName($type) . '_' . $cycle->getId();
+//            $new_event->setName($name);
+//            $new_event->setObjectClass(LogBookCycle::class);
+//            $new_event->setObjectId($cycle->getId());
+//
+//            $res = $events->findOneBy(
+//                array(
+//                    'name' => $new_event ->getName(),
+//                    'eventType' => $new_event->getEventType(),
+//                    'objectId' => $new_event->getObjectId(),
+//                    'objectClass' => $new_event->getObjectClass()
+//                ));
+//
+//            if ($res === null) {
+//                $new_event->setMessage($name. ' - ' . $msg);
+//                $new_event->addMetaData(
+//                    array(
+//                        'id' => $new_event->getObjectId(),
+//                        'class' => $new_event->getObjectClass(),
+//                        'delete_time' => $cycle->getDeleteAt()->format('Y-m-d H:i:s'),
+//                        'tests' => $cycle->getTestsCount(),
+//                        'pass_rate' => $cycle->getPassRate()
+//                    ));
+//                $this->em->persist($new_event);
+//                $counter++;
+//
+//            } else {
+//                $skip++;
+//                //$this->log($new_event . ' already exist');
+//            }
+//
+//        }
+//        $this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
+//        $this->em->flush();
+        exit();
+
+    }
+
     /**
      * @Route("/find_cycles_for_delete", name="find_cycles_for_delete")
      * @param LogBookCycleRepository $cycleRepo

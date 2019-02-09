@@ -43,6 +43,26 @@ class LogBookCycleRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param int $max_results
+     * @return mixed
+     */
+    public function getRandomCycles(int $max_results=100)
+    {
+        try {
+            $directions = array('ASC', 'DESC');
+            $fields = array('c.id', 'c.name', 'c.passRate', 'c.failRate');
+            $direction = $directions[array_rand($directions, 1)];
+            $field = $fields[array_rand($fields, 1)];
+            $qb = $this->createQueryBuilder('c')
+                ->where('c.keepForever = 0')
+                ->orderBy($field, $direction)
+                ->setMaxResults($max_results);
+        } catch (\Exception $e) {
+        }
+        return $qb->getQuery()->execute();
+    }
+
+    /**
      * @param array $criteria
      * @param bool $find
      * @return LogBookCycle

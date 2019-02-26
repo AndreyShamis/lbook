@@ -31,6 +31,50 @@ class LogBookCycleController extends AbstractController
     protected $index_size = 1000;
     protected $show_tests_size = 1000;
 
+
+    /**
+     *
+     * @Route("/jira/{testExecutionKey}", name="jira", methods={"GET"})
+     * @param string $testExecutionKey
+     * @param LogBookTestRepository $testRepo
+     * @return JsonResponse
+     */
+    public function jira(string $testExecutionKey, LogBookTestRepository $testRepo): ?JsonResponse
+    {
+        try {
+            $key_len = mb_strlen($testExecutionKey);
+            $metadata_1 = '%s:14:"EXECUTION_SHOW";s:'. $key_len . ':"' .$testExecutionKey. '";%';
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.timeEnd > :period')
+                ->andWhere('t.meta_data LIKE :metadata_1')
+                ->orderBy('t.executionOrder', 'ASC')
+                ->setParameter('metadata_1', $metadata_1)
+                ->setParameter('period', new \DateTime('-7 days'));
+            $q = $qb->getQuery();
+            $tests = $q->execute();
+            $final = array();
+            /** @var LogBookTest $test */
+            foreach ($tests as $test) {
+
+                $test_dict['testKey'] = $test->getMetaData()['TEST_CASE_SHOW'];
+                $test_dict['start'] = $test->getTimeStart()->format(\DateTime::ATOM);
+                $test_dict['finish'] = $test->getTimeEnd()->format(\DateTime::ATOM);
+                $test_dict['comment'] = '';
+                $test_dict['status'] = $test->getVerdict()->getName();
+                $final[] = $test_dict;
+            }
+            $fin_res['testExecutionKey'] = $testExecutionKey;
+            $fin_res['tests'] = $final;
+            return new JsonResponse($fin_res);
+        } catch (\Throwable $ex) {
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
     /**
      * Lists all cycle entities.
      *

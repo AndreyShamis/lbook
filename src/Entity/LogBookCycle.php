@@ -281,6 +281,11 @@ class LogBookCycle
     public static $MAX_NAME_LEN = 250;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\SuiteExecution", mappedBy="cycle")
+     */
+    private $suiteExecution;
+
+    /**
      * LogBookCycle constructor.
      * @throws \Exception
      */
@@ -299,6 +304,7 @@ class LogBookCycle
 
         /**  Other stuff */
         $this->tests = new ArrayCollection();
+        $this->suiteExecution = new ArrayCollection();
     }
 
     /**
@@ -1113,5 +1119,36 @@ class LogBookCycle
 
         return $setup_path . '/' . $this->getId();
 
+    }
+
+    /**
+     * @return Collection|SuiteExecution[]
+     */
+    public function getSuiteExecution(): Collection
+    {
+        return $this->suiteExecution;
+    }
+
+    public function addSuiteExecution(SuiteExecution $suiteExecution): self
+    {
+        if (!$this->suiteExecution->contains($suiteExecution)) {
+            $this->suiteExecution[] = $suiteExecution;
+            $suiteExecution->setCycle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSuiteExecution(SuiteExecution $suiteExecution): self
+    {
+        if ($this->suiteExecution->contains($suiteExecution)) {
+            $this->suiteExecution->removeElement($suiteExecution);
+            // set the owning side to null (unless already changed)
+            if ($suiteExecution->getCycle() === $this) {
+                $suiteExecution->setCycle(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -21,6 +21,8 @@ class LogBookVerdictRepository extends ServiceEntityRepository
     /**
      * @param array $criteria
      * @return LogBookVerdict
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function findOneOrCreate(array $criteria): LogBookVerdict
     {

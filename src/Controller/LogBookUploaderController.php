@@ -222,8 +222,10 @@ class LogBookUploaderController extends AbstractController
     {
         $created = false;
         $all_data = $request->request->all();
+        print_r($all_data);
         return $this->render('lbook/suite/add_execution.html.twig', array(
-            'created' => $created
+            'created' => $created,
+            'all_data' => $all_data
         ));
     }
 

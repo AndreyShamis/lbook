@@ -213,6 +213,21 @@ class LogBookUploaderController extends AbstractController
     }
 
     /**
+     * @Route("/suite_execution", name="add_new_suite_execution", methods={"GET|POST"})
+     * @param Request $request
+     * @param LoggerInterface $logger
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function createSuiteExecution(Request $request, LoggerInterface $logger)
+    {
+        $created = false;
+        $all_data = $request->request->all();
+        return $this->render('lbook/suite/add_execution.html.twig', array(
+            'created' => $created
+        ));
+    }
+
+    /**
      * Creates a new Upload entity.
      *
      * @Route("/new_cli", name="upload_new_cli", methods={"GET|POST"})

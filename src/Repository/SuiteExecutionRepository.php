@@ -34,6 +34,8 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         }
         if (array_key_exists('publish', $criteria) && $criteria['publish'] === true) {
             $publish = true;
+        } else {
+            $criteria['description'] = '';
         }
         $entity = null;
 

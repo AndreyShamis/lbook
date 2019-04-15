@@ -374,6 +374,7 @@ class LogBookUploaderController extends AbstractController
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
                     if ($suite_execution !== null) {
                         $test->setSuiteExecution($suite_execution);
+                        $cycle->addSuiteExecution($suite_execution);
                     }
                 }
                 $this->em->flush();

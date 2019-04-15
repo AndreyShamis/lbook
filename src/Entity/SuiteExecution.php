@@ -32,7 +32,7 @@ class SuiteExecution
     private $cycle;
 
     /**
-     * @ORM\Column(type="string", length=250)
+     * @ORM\Column(type="string", length=191)
      */
     private $summary = '';
 

@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     uniqueConstraints={@ORM\UniqueConstraint(
  *     name="uniq_suite_execution",
  *     columns={
- *      "summary",
+ *      "datetime",
  *      "testing_level",
  *      "product_version"}
  *     )})
@@ -120,6 +120,11 @@ class SuiteExecution
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $publish;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $datetime;
 
     public function __construct()
     {
@@ -416,6 +421,18 @@ class SuiteExecution
     public function setPublish(?bool $publish): self
     {
         $this->publish = $publish;
+
+        return $this;
+    }
+
+    public function getDatetime(): ?string
+    {
+        return $this->datetime;
+    }
+
+    public function setDatetime(?string $datetime): self
+    {
+        $this->datetime = $datetime;
 
         return $this;
     }

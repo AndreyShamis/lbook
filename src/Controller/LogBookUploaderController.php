@@ -17,9 +17,11 @@ use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
+use App\Repository\SuiteExecutionRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -62,6 +64,8 @@ class LogBookUploaderController extends AbstractController
     protected $targetRepo;
     /** @var LogBookUserRepository $targetRepo */
     protected $userRepo;
+    /** @var SuiteExecutionRepository $suiteExecutionRepo */
+    protected $suiteExecutionRepo;
 
     private $blackListLevels = array();
 
@@ -225,6 +229,12 @@ class LogBookUploaderController extends AbstractController
         print_r($all_data);
         $data = json_decode($request->getContent(), true);
         print_r($data);
+        try {
+            $this->suiteExecutionRepo->findOneOrCreate($data);
+        } catch (OptimisticLockException $e) {
+        } catch (ORMException $e) {
+        }
+
         return $this->render('lbook/suite/add_execution.html.twig', array(
             'created' => $created,
             'all_data' => $all_data

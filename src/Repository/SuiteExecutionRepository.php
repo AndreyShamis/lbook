@@ -27,8 +27,11 @@ class SuiteExecutionRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): SuiteExecution
     {
-        $criteria['name'] = strtoupper($criteria['name']);
-        $entity = $this->findOneBy($criteria);
+        $entity = $this->findOneBy(
+            array(
+                $criteria['summary'],
+                $criteria['testing_level'],
+                $criteria['product_version']));
         if (null === $entity) {
             $entity = new SuiteExecution();
             $entity->setSummary($criteria['summary']);

@@ -6,6 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SuiteExecutionRepository")
+ * @ORM\Table(name="suite_execution",
+ *     uniqueConstraints={@ORM\UniqueConstraint(
+ *     name="uniq_suite_execution",
+ *     columns={
+ *      "summary",
+ *      "testing_level",
+ *      "product_version"}
+ *     )})
  */
 class SuiteExecution
 {

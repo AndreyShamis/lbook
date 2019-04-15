@@ -27,21 +27,55 @@ class SuiteExecutionRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): SuiteExecution
     {
-        $criteria['name'] = strtoupper($criteria['name']);
-        $entity = $this->findOneBy($criteria);
+        $entity = $this->findOneBy(
+            array(
+                'summary' => $criteria['summary'],
+                'testingLevel' => $criteria['testing_level'],
+                'productVersion' => $criteria['product_version'],
+                'platform' => $criteria['platform'],
+                'chip' => $criteria['chip']
+            ));
         if (null === $entity) {
             $entity = new SuiteExecution();
             $entity->setSummary($criteria['summary']);
-            $entity->setDescription($criteria['description']);
-            $entity->setProductVersion($criteria['product_version']);
-            $entity->setJobName($criteria['job_name']);
-            $entity->setBuildTag($criteria['build_tag']);
-            $entity->setTargetArch($criteria['target_arch']);
-            $entity->setArch($criteria['arch']);
             $entity->setTestingLevel($criteria['testing_level']);
+            $entity->setProductVersion($criteria['product_version']);
+            $entity->setPlatform($criteria['platform']);
+            $entity->setChip($criteria['chip']);
 
-            $entity->setTestEnvironments(explode(';', $criteria['test_environments']));
-            $entity->setComponents(explode(';', $criteria['components']));
+            if (array_key_exists('description', $criteria)) {
+                $entity->setDescription($criteria['description']);
+            }
+            if (array_key_exists('job_name', $criteria)) {
+                $entity->setJobName($criteria['job_name']);
+            }
+            if (array_key_exists('build_tag', $criteria)) {
+                $entity->setBuildTag($criteria['build_tag']);
+            }
+            if (array_key_exists('target_arch', $criteria)) {
+                $entity->setTargetArch($criteria['target_arch']);
+            }
+            if (array_key_exists('arch', $criteria)) {
+                $entity->setArch($criteria['arch']);
+            }
+            if (array_key_exists('test_plan_url', $criteria)) {
+                $entity->setTestPlanUrl($criteria['test_plan_url']);
+            }
+            if (array_key_exists('ci_url', $criteria)) {
+                $entity->setCiUrl($criteria['ci_url']);
+            }
+            if (array_key_exists('test_set_url', $criteria)) {
+                $entity->setTestSetUrl($criteria['test_set_url']);
+            }
+            if (array_key_exists('test_environments', $criteria)) {
+                $entity->setTestEnvironments($criteria['test_environments']);
+            }
+            if (array_key_exists('components', $criteria)) {
+                $entity->setComponents($criteria['components']);
+            }
+            if (array_key_exists('jira_key', $criteria) && mb_strlen($criteria['jira_key']) > 5) {
+                $entity->setJiraKey($criteria['jira_key']);
+            }
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }

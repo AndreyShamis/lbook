@@ -17,9 +17,11 @@ use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
+use App\Repository\SuiteExecutionRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -62,6 +64,8 @@ class LogBookUploaderController extends AbstractController
     protected $targetRepo;
     /** @var LogBookUserRepository $targetRepo */
     protected $userRepo;
+    /** @var SuiteExecutionRepository $suiteExecutionRepo */
+    protected $suiteExecutionRepo;
 
     private $blackListLevels = array();
 
@@ -97,6 +101,7 @@ class LogBookUploaderController extends AbstractController
         $this->buildRepo = $this->em->getRepository('App:LogBookBuild');
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
         $this->userRepo = $this->em->getRepository('App:LogBookUser');
+        $this->suiteExecutionRepo = $this->em->getRepository('App:SuiteExecution');
     }
 
     /**
@@ -221,13 +226,22 @@ class LogBookUploaderController extends AbstractController
     public function createSuiteExecution(Request $request, LoggerInterface $logger)
     {
         $created = false;
-        $all_data = $request->request->all();
-        print_r($all_data);
+        $suiteExecution = null;
         $data = json_decode($request->getContent(), true);
-        print_r($data);
+        $data['components'] = array_filter($data['components']);
+        $data['test_environments'] = array_filter($data['test_environments']);
+        try {
+            $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
+            $created = true;
+        } catch (OptimisticLockException $e) {
+            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage());
+        } catch (ORMException $e) {
+            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage());
+        }
+
         return $this->render('lbook/suite/add_execution.html.twig', array(
-            'created' => $created,
-            'all_data' => $all_data
+            'suiteExecution' => $suiteExecution,
+            'created' => $created
         ));
     }
 
@@ -270,7 +284,7 @@ class LogBookUploaderController extends AbstractController
             $test_dut = $request->request->get('dut', '');
             $test_metadata = $request->request->get('test_metadata', '');
             $cycle_metadata = $request->request->get('cycle_metadata', '');
-
+            $suite_execution_id = $request->request->get('suite_execution_id', 0);
             if ($cycle_token !== '') {
                 $obj->addMessage('INFO: -1- Token provided [' . $cycle_token . ']');
             }
@@ -354,6 +368,12 @@ class LogBookUploaderController extends AbstractController
                         $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                     } finally {
                         $lock->release();
+                    }
+                }
+                if ($suite_execution_id > 0) {
+                    $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
+                    if ($suite_execution !== null) {
+                        $test->setSuiteExecution($suite_execution);
                     }
                 }
                 $this->em->flush();

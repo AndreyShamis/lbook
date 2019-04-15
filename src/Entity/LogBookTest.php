@@ -131,7 +131,13 @@ class LogBookTest
     protected $meta_data = [];
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\SuiteExecution", inversedBy="tests")
+     */
+    private $suite_execution;
+
+    /**
      * LogBookTest constructor.
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -474,5 +480,17 @@ class LogBookTest
     public function getLogFilesPath(): string
     {
         return $this->getCycle()->getLogFilesPath() . '/' . $this->getLogFile();
+    }
+
+    public function getSuiteExecution(): ?SuiteExecution
+    {
+        return $this->suite_execution;
+    }
+
+    public function setSuiteExecution(?SuiteExecution $suite_execution): self
+    {
+        $this->suite_execution = $suite_execution;
+
+        return $this;
     }
 }

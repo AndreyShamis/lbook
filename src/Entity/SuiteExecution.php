@@ -2,10 +2,21 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SuiteExecutionRepository")
+ * @ORM\Table(name="suite_execution",
+ *     uniqueConstraints={@ORM\UniqueConstraint(
+ *     name="uniq_suite_execution",
+ *     columns={
+ *      "summary",
+ *      "testing_level",
+ *      "product_version",
+ *      "chip"}
+ *     )})
  */
 class SuiteExecution
 {
@@ -57,22 +68,22 @@ class SuiteExecution
     private $arch = '';
 
     /**
-     * @ORM\Column(name="testing_level", type="string", length=255)
+     * @ORM\Column(name="testing_level", type="string", length=50)
      */
     private $testingLevel = 'integration';
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=50)
      */
     private $platform;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=50)
      */
     private $chip;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="simple_array")
      */
     private $components = [];
 
@@ -95,6 +106,21 @@ class SuiteExecution
      * @ORM\Column(name="test_set_url", type="string", length=255, nullable=true)
      */
     private $testSetUrl;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="suite_execution")
+     */
+    private $tests;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $jira_key;
+
+    public function __construct()
+    {
+        $this->tests = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -333,5 +359,48 @@ class SuiteExecution
     public function __toString(): string
     {
         return $this->getSummary();
+    }
+
+    /**
+     * @return Collection|LogBookTest[]
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(LogBookTest $test): self
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests[] = $test;
+            $test->setSuiteExecution($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(LogBookTest $test): self
+    {
+        if ($this->tests->contains($test)) {
+            $this->tests->removeElement($test);
+            // set the owning side to null (unless already changed)
+            if ($test->getSuiteExecution() === $this) {
+                $test->setSuiteExecution(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getJiraKey(): ?string
+    {
+        return $this->jira_key;
+    }
+
+    public function setJiraKey(?string $jira_key): self
+    {
+        $this->jira_key = $jira_key;
+
+        return $this;
     }
 }

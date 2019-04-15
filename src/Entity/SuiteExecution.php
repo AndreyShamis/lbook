@@ -43,7 +43,7 @@ class SuiteExecution
     private $description = '';
 
     /**
-     * @ORM\Column(name="product_version", type="string", length=255)
+     * @ORM\Column(name="product_version", type="string", length=150)
      */
     private $productVersion = '';
 
@@ -68,17 +68,17 @@ class SuiteExecution
     private $arch = '';
 
     /**
-     * @ORM\Column(name="testing_level", type="string", length=50)
+     * @ORM\Column(name="testing_level", type="string", length=20)
      */
     private $testingLevel = 'integration';
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=40)
      */
     private $platform;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=40)
      */
     private $chip;
 

@@ -116,6 +116,11 @@ class SuiteExecution
      */
     private $jira_key;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $publish;
+
     public function __construct()
     {
         $this->tests = new ArrayCollection();
@@ -399,6 +404,18 @@ class SuiteExecution
     public function setJiraKey(?string $jira_key): self
     {
         $this->jira_key = $jira_key;
+
+        return $this;
+    }
+
+    public function getPublish(): ?bool
+    {
+        return $this->publish;
+    }
+
+    public function setPublish(?bool $publish): self
+    {
+        $this->publish = $publish;
 
         return $this;
     }

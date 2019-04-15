@@ -43,6 +43,10 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setPlatform($criteria['platform']);
             $entity->setChip($criteria['chip']);
 
+            if (array_key_exists('publish', $criteria) && $criteria['publish'] === true) {
+                $entity->setPublish($criteria['publish']);
+            }
+
             if (array_key_exists('description', $criteria)) {
                 $entity->setDescription($criteria['description']);
             }

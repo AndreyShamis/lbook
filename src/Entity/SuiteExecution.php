@@ -14,8 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     columns={
  *      "summary",
  *      "testing_level",
- *      "product_version",
- *      "chip"}
+ *      "product_version"}
  *     )})
  */
 class SuiteExecution
@@ -33,7 +32,7 @@ class SuiteExecution
     private $cycle;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=250)
      */
     private $summary = '';
 

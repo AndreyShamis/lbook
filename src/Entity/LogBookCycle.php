@@ -281,7 +281,7 @@ class LogBookCycle
     public static $MAX_NAME_LEN = 250;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\SuiteExecution", mappedBy="cycle")
+     * @ORM\OneToMany(targetEntity="App\Entity\SuiteExecution", mappedBy="cycle", cascade={"remove"})
      */
     private $suiteExecution;
 

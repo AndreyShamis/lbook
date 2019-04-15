@@ -31,6 +31,42 @@ class LogBookCycleController extends AbstractController
     protected $index_size = 1000;
     protected $show_tests_size = 1000;
 
+    /**
+     * Displays a form to edit an existing cycle entity.
+     *
+     * @Route("/{id}/edit", name="cycle_edit", methods={"GET|POST"})
+     * @param Request $request
+     * @param LogBookCycle $obj
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \LogicException
+     */
+    public function editAction(Request $request, LogBookCycle $obj = null)
+    {
+        try {
+            if (!$obj) {
+                throw new \RuntimeException('');
+            }
+            $this->denyAccessUnlessGranted('edit', $obj->getSetup());
+            $deleteForm = $this->createDeleteForm($obj);
+            $editForm = $this->createForm(LogBookCycleType::class, $obj);
+            $editForm->handleRequest($request);
+
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
+                return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
+            }
+
+            return $this->render('lbook/cycle/edit.html.twig', array(
+                'cycle' => $obj,
+                'edit_form' => $editForm->createView(),
+                'delete_form' => $deleteForm->createView(),
+            ));
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($ex, $obj);
+        }
+    }
 
     /**
      *
@@ -605,43 +641,6 @@ class LogBookCycleController extends AbstractController
             'message' => $ex->getMessage(),
             'ex' => $ex,
         ), $otherResponse);
-    }
-
-    /**
-     * Displays a form to edit an existing cycle entity.
-     *
-     * @Route("/{id}/edit", name="cycle_edit", methods={"GET|POST"})
-     * @param Request $request
-     * @param LogBookCycle $obj
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @throws \LogicException
-     */
-    public function editAction(Request $request, LogBookCycle $obj = null)
-    {
-        try {
-            if (!$obj) {
-                throw new \RuntimeException('');
-            }
-            $this->denyAccessUnlessGranted('edit', $obj->getSetup());
-            $deleteForm = $this->createDeleteForm($obj);
-            $editForm = $this->createForm(LogBookCycleType::class, $obj);
-            $editForm->handleRequest($request);
-
-            if ($editForm->isSubmitted() && $editForm->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
-                return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
-            }
-
-            return $this->render('lbook/cycle/edit.html.twig', array(
-                'cycle' => $obj,
-                'edit_form' => $editForm->createView(),
-                'delete_form' => $deleteForm->createView(),
-            ));
-        } catch (\Throwable $ex) {
-            return $this->cycleNotFound($ex, $obj);
-        }
     }
 
     /**

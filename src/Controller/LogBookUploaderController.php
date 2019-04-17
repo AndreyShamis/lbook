@@ -223,20 +223,38 @@ class LogBookUploaderController extends AbstractController
      * @param LoggerInterface $logger
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function createSuiteExecution(Request $request, LoggerInterface $logger)
+    public function createSuiteExecution(Request $request, LoggerInterface $logger): \Symfony\Component\HttpFoundation\Response
     {
         $created = false;
         $suiteExecution = null;
         $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            $data = array();
+        }
+        if (!array_key_exists('components', $data)) {
+            $data['components'] = array();
+        }
+        if (!array_key_exists('summary', $data)) {
+            $data['summary'] = '';
+        }
+        if (!array_key_exists('name', $data)) {
+            $data['name'] = '';
+        }
+        if (!array_key_exists('test_environments', $data)) {
+            $data['test_environments'] = array();
+        }
         $data['components'] = array_filter($data['components']);
         $data['test_environments'] = array_filter($data['test_environments']);
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
         } catch (OptimisticLockException $e) {
-            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage());
+            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
         } catch (ORMException $e) {
-            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage());
+            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
+        } catch (\Throwable $e) {
+            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
+            return new \Symfony\Component\HttpFoundation\Response($e->getMessage());
         }
 
         return $this->render('lbook/suite/add_execution.html.twig', array(

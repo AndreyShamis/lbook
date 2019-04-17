@@ -50,9 +50,20 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         if (array_key_exists('arch', $criteria)) {
             $arch = $criteria['arch'];
         }
+        if (!array_key_exists('tests_count', $criteria)) {
+            $criteria['tests_count'] = 0;
+        } else {
+            $criteria['tests_count'] = (int)$criteria['tests_count'];
+        }
+        if (!array_key_exists('tests_count_enabled', $criteria)) {
+            $criteria['tests_count_enabled'] = 0;
+        } else {
+            $criteria['tests_count_enabled'] = (int)$criteria['tests_count_enabled'];
+        }
         try {
             $entity = $this->findOneBy(
                 array(
+                    'name' => $criteria['name'],
                     'summary' => $criteria['summary'],
                     'testingLevel' => $criteria['testing_level'],
                     'productVersion' => $criteria['product_version'],
@@ -64,12 +75,15 @@ class SuiteExecutionRepository extends ServiceEntityRepository
                     'targetArch' => $target_arch,
                     'arch' => $arch,
                     'datetime' => $criteria['datetime'],
+                    'testsCount' => $criteria['tests_count'],
+                    'testsCountEnabled' => $criteria['tests_count_enabled'],
                     'cycle' => null
                 ));
         } catch (\Exception $ex) {}
 
         if (null === $entity) {
             $entity = new SuiteExecution();
+            $entity->setName($criteria['name']);
             $entity->setSummary($criteria['summary']);
             $entity->setTestingLevel($criteria['testing_level']);
             $entity->setProductVersion($criteria['product_version']);
@@ -81,6 +95,9 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setTargetArch($criteria['target_arch']);
             $entity->setArch($criteria['arch']);
             $entity->setDatetime($criteria['datetime']);
+            $entity->setTestsCount($criteria['tests_count']);
+            $entity->setTestsCountEnabled($criteria['tests_count_enabled']);
+
             if (array_key_exists('description', $criteria)) {
                 $entity->setDescription($criteria['description']);
             }

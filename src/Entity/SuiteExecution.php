@@ -126,6 +126,21 @@ class SuiteExecution
      */
     private $datetime;
 
+    /**
+     * @ORM\Column(name="tests_count", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsCount = 0;
+
+    /**
+     * @ORM\Column(name="tests_count_enabled", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsCountEnabled = 0;
+
+    /**
+     * @ORM\Column(name="name", type="string", length=250, options={"default"=""})
+     */
+    private $name = '';
+
     public function __construct()
     {
         $this->tests = new ArrayCollection();
@@ -433,6 +448,51 @@ class SuiteExecution
     public function setDatetime(?string $datetime): self
     {
         $this->datetime = $datetime;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsCount(): int
+    {
+        return $this->testsCount;
+    }
+
+    public function setTestsCount(int $testsCount): self
+    {
+        $this->testsCount = $testsCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsCountEnabled(): int
+    {
+        return $this->testsCountEnabled;
+    }
+
+    public function setTestsCountEnabled(int $testsCountEnabled): self
+    {
+        $this->testsCountEnabled = $testsCountEnabled;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

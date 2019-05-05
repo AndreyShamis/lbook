@@ -32,6 +32,9 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         if (!array_key_exists('datetime', $criteria)) {
             $criteria['datetime'] = RandomString::generateRandomStringMd5(40);
         }
+        if (!array_key_exists('uuid', $criteria)) {
+            $criteria['uuid'] = '';
+        }
         if (array_key_exists('publish', $criteria) && $criteria['publish'] === true) {
             $publish = true;
         }
@@ -65,6 +68,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
                 array(
                     'name' => $criteria['name'],
                     'summary' => $criteria['summary'],
+                    'uuid' => $criteria['uuid'],
                     'testingLevel' => $criteria['testing_level'],
                     'productVersion' => $criteria['product_version'],
                     'platform' => $criteria['platform'],
@@ -97,6 +101,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setDatetime($criteria['datetime']);
             $entity->setTestsCount($criteria['tests_count']);
             $entity->setTestsCountEnabled($criteria['tests_count_enabled']);
+            $entity->setUuid($criteria['uuid']);
 
             if (array_key_exists('description', $criteria)) {
                 $entity->setDescription($criteria['description']);

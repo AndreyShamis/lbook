@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\PreFlush;
+use Doctrine\ORM\Mapping\PrePersist;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SuiteExecutionRepository")
@@ -141,6 +143,29 @@ class SuiteExecution
      */
     private $name = '';
 
+    /**
+     * @ORM\Column(type="string", length=38, options={"default"=""})
+     */
+    private $uuid = '';
+
+    /**
+     * @ORM\Column(type="smallint", options={"default"="0"})
+     */
+    private $state = 0;
+
+    /**
+     * @ORM\Column(name="created_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(name="updated_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $updatedAt;
+
+    /**
+     * SuiteExecution constructor.
+     */
     public function __construct()
     {
         $this->tests = new ArrayCollection();
@@ -496,4 +521,70 @@ class SuiteExecution
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getState(): int
+    {
+        return $this->state;
+    }
+
+    public function setState(int $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @PrePersist
+     * @throws \Exception
+     */
+    public function setCreatedAt(): void
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @PreFlush
+     * @PrePersist
+     * @throws \Exception
+     */
+    public function setUpdatedAt(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
 }

@@ -493,4 +493,20 @@ class LogBookTest
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return array(
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'verdict' => $this->getVerdict()->getName(),
+            'meta_data' => $this->getMetaData(),
+            'suite_execution' => $this->getSuiteExecution(),
+            'cycle' => $this->getCycle()->getId(),
+            'setup' => $this->getSetup()->getId(),
+            'time_start' => $this->getTimeStart()->getTimestamp(),
+            'time_end' => $this->getTimeEnd()->getTimestamp(),
+            'time_run' => $this->getTimeRun(),
+        );
+    }
 }

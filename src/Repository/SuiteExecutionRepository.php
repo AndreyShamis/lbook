@@ -130,6 +130,24 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         }
         return $entity;
     }
+
+    /**
+     * @param int $state
+     * @return SuiteExecution|null
+     */
+    public function findOneBySate(int $state=0)
+    {
+        $entity = $this->findOneBy(
+            array(
+                'publish' => true,
+                'jira_key' => null,
+                'state' => $state
+            ));
+        if ($entity !== null) {
+            return $entity;
+        }
+        return null;
+    }
     // /**
     //  * @return SuiteExecution[] Returns an array of SuiteExecution objects
     //  */

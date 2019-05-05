@@ -168,6 +168,8 @@ class SuiteExecution
      */
     public function __construct()
     {
+        $this->setUpdatedAt();
+        $this->setCreatedAt();
         $this->tests = new ArrayCollection();
     }
 

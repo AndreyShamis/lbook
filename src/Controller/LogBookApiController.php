@@ -51,6 +51,7 @@ class LogBookApiController extends AbstractController
     {
         return $this->render('log_book_api/execution.index.html.twig', [
             'controller_name' => 'LogBookApiController_executionIndex',
+            'functions' => get_class_methods($this)
         ]);
     }
 
@@ -72,6 +73,13 @@ class LogBookApiController extends AbstractController
                 $js = json_encode(self::toArray($suite));
                 $response->setJson($js);
                 $response->setEncodingOptions(JSON_PRETTY_PRINT);
+
+                if ($suite->getState() === 0) {
+                    // TODO Enable it
+                    //$suite->setState(1);
+                    $this->em->flush();
+                }
+
                 return $response;
             }
             $fin_res['message'] = 'Suites not found';
@@ -166,7 +174,43 @@ class LogBookApiController extends AbstractController
                     $fin_res['message'] = 'cannot covnert state from ' . $suite->getState() . ' to 2';
                 }
             } else {
-                $fin_res['message'] = 'Suites not found';
+                $fin_res['message'] = 'Suite not found';
+            }
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            $logger->critical('ERROR :' . $ex->getMessage());
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+    /**
+     *
+     * @Route("/execution/publisher/move_to_4/{suite}", name="publisher_move_to_4", methods={"GET", "POST"})
+     * @param SuiteExecution $suite
+     * @param LoggerInterface $logger
+     * @return JsonResponse
+     */
+    public function moveTo4(SuiteExecution $suite, LoggerInterface $logger): ?JsonResponse
+    {
+        try {
+            if ($suite !== null) {
+                // TODO Remove  || $suite->getState() === 3
+                if ($suite->getState() === 3) {
+                    $suite->setState(4);
+                    $this->em->flush();
+                    $fin_res['message'] = 'success';
+                } elseif ($suite->getState() === 4) {
+                    $fin_res['message'] = 'already in state 4';
+                } else {
+                    $fin_res['message'] = 'cannot covnert state from ' . $suite->getState() . ' to 2';
+                }
+            } else {
+                $fin_res['message'] = 'Suite not found';
             }
             return new JsonResponse($fin_res);
 

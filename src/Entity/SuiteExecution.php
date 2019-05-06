@@ -448,6 +448,10 @@ class SuiteExecution
         return $this->jira_key;
     }
 
+    /**
+     * @param string|null $jira_key
+     * @return SuiteExecution
+     */
     public function setJiraKey(?string $jira_key): self
     {
         $this->jira_key = $jira_key;

@@ -3,6 +3,7 @@
 {% block content %}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
+    {% set suitesCount = suites|length  %}
     <div class="row">
         <div class="col-xs-9">
             <h3 class="generic_title cycle_title"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
@@ -33,6 +34,9 @@
                         <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ cycle.metaData | length }})</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
+                    {% if suitesCount > 0 %}
+                    <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
+                    {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -158,7 +162,52 @@
                             <div id="graphResults"  class="chart" style="width: 100%;height: 100%;min-height: 700px;"></div>
                         </div>
                     </div>
+                    <div id="suites" class="tab-pane">
+                        {#<div class="container" style="width: 100%;height: 100%;min-height: 700px;">#}
 
+                        {% if suitesCount > 0 %}
+                            <table class="records_list table table-striped table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Summary</th>
+                                    <th title="All Tests/Enabled Tests">Tests</th>
+                                    <th title="Testing Level">TL</th>
+                                    <th>Chip</th>
+                                    <th>Platform</th>
+                                    <th>Component</th>
+                                    <th title="Test Environments">ENV</th>
+                                    <th title="JIRA KEY">JIRA</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                            {% set builder = '' %}
+                            {% set break = false %}
+                            {% set counter = 0 %}
+                            {% for suite in suites if not break %}
+                                {% if counter == 200 %}
+                                    {% set break = true %}
+                                {% endif %}
+                                {% set counter = counter+1 %}
+                                <tr>
+                                    <td>{{ suite.id }}</td>
+                                    <td>{{ suite.name }}</td>
+                                    <td>{{ suite.summary }}</td>
+                                    <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
+                                    <td>{{ suite.testingLevel }}</td>
+                                    <td>{{ suite.chip }}</td>
+                                    <td>{{ suite.platform }}</td>
+                                    <td>{{ suite.components |join(', ')}}</td>
+                                    <td>{{ suite.testEnvironments |join(', ')}}</td>
+                                    <td>{{ suite.jiraKey }}</td>
+                                </tr>
+                            {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                        {#</div>#}
+                    </div>
                     <div id="other" class="tab-pane">
                         <table class="records_list table table-striped table-condensed">
                             <tr>

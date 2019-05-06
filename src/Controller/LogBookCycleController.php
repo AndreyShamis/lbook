@@ -442,6 +442,7 @@ class LogBookCycleController extends AbstractController
             $additional_cols = array();
             $additional_opt_cols = array();
             $iterator->rewind();
+            $suites = array();
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
@@ -451,6 +452,11 @@ class LogBookCycleController extends AbstractController
                          * Search for metadata with _SHOW postfix, if exist that column will be shown
                          * @var array $md
                          */
+                        $suite = $test->getSuiteExecution();
+                        if ($suite !== null && !in_array($suite, $suites, true)) {
+                            $suites[] = $suite;
+                        }
+
                         $md = $test->getMetaData();
                         if (\count($md) > 0) {
                             foreach ($md as $key => $value) {
@@ -495,6 +501,7 @@ class LogBookCycleController extends AbstractController
                 'additional_cols'       => $additional_cols,
                 'additional_opt_cols'   => $additional_opt_cols,
                 'tests_in_json'         => $forJson,
+                'suites'                => $suites,
             );
 
             return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);

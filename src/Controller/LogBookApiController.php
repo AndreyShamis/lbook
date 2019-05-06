@@ -224,11 +224,82 @@ class LogBookApiController extends AbstractController
         }
     }
 
-    private static function toArray($object) {
+    /**
+     *
+     * @Route("/execution/publisher/execution/{suite}", name="suiteExecutionApi", methods={"GET", "POST"})
+     * @param SuiteExecution $suite
+     * @param LoggerInterface $logger
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function suiteExecution(SuiteExecution $suite, LoggerInterface $logger, Request $request): ?JsonResponse
+    {
+        $status = 200;
+        try {
+            if ($suite !== null) {
+                $data = json_decode($request->getContent(), true);
+                if ($data === null) {
+                    $data = $request->query->all();
+                }
+                if ($data === null) {
+                    $data = array();
+                }
+                if (!array_key_exists('operation', $data)) {
+                    $data['operation'] = 'info';
+                }
+
+                $op = $data['operation'];
+                if ($op === 'info') {
+                    $fin_res = self::toArray($suite);
+                }
+                if ($op === 'update_state') {
+                    if (!array_key_exists('state', $data)) {
+                        $fin_res['message'] = 'state not provided use state={0,1,2,3,4}';
+                        $status = 400;
+                    } else {
+                        $state = (int)$data['state'];
+                        if ($state < 0 || $state > 4) {
+                            $fin_res['message'] = 'state cannot be ' . $state . '.';
+                            $status = 400;
+                        } else {
+                            $suite->setState($state);
+                            $this->em->flush();
+                            $fin_res = self::toArray($suite);
+                        }
+                    }
+                }
+                if (!array_key_exists('test_execution_key', $data)) {
+                    $data['test_execution_key'] = '';
+                }
+                if (!array_key_exists('test_set_url', $data)) {
+                    $data['test_set_url'] = '';
+                }
+            } else {
+                $fin_res['message'] = 'Suite not found';
+            }
+            $response =  new JsonResponse($fin_res, $status);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+
+        } catch (\Throwable $ex) {
+            $logger->critical('ERROR :' . $ex->getMessage());
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+    /**
+     * @param $object
+     * @return array
+     * @throws \ReflectionException
+     */
+    private static function toArray($object): array
+    {
         $reflectionClass = new \ReflectionClass($object);
-
         $properties = $reflectionClass->getProperties();
-
         $array = [];
         foreach ($properties as $property) {
             $property->setAccessible(true);
@@ -238,29 +309,14 @@ class LogBookApiController extends AbstractController
             if (is_object($value)) {
                 if (strpos($pName, '__') !== false) {
                     continue;
-                } else {
-                    if ($pName === 'cycle') {
-                        $array['cycle_id'] = $value->getId();
-                        $array[$pName] = self::toArray($value);
-                    }
-//                    if ($pName === 'tests') {
-//                        $array[$pName] = self::toArray($value);
-//                    }
-                    continue; //$array[$pName] = self::toArray($value);
                 }
+                if ($pName === 'cycle') {
+                    $array['cycle_id'] = $value->getId();
+                    $array[$pName] = self::toArray($value);
+                }
+                continue;
             }
-//            else if (is_array($value)) {
-//                if ($pName === 'snapshot') {
-//                    //$array[$pName] = self::toArray($value);
-//                    // }
-//                    foreach ($value as $key => $val) {
-//                        $array[$pName][$key] = self::toArray($val);
-//                    }
-//                }
-//            }
-            else {
-                $array[$pName] = $value;
-            }
+            $array[$pName] = $value;
         }
         return $array;
     }

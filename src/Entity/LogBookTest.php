@@ -5,13 +5,18 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use Doctrine\ORM\Mapping\PreFlush;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookTestRepository")
- * @ORM\Table(name="lbook_tests")
+ * @ORM\Table(name="lbook_tests", indexes={
+ *     @Index(name="i_test_key", columns={"test_key"}),
+ *     @Index(name="i_disabled", columns={"disabled"}),
+ *     @Index(name="i_cycle_disabled", columns={"cycle", "disabled"}),
+ *     @Index(name="i_executionOrder", columns={"execution_order"})})
  * // , uniqueConstraints={@ORM\UniqueConstraint(name="test_uniq_cycle_execution_order", columns={"execution_order", "cycle"})}
  * @ORM\HasLifecycleCallbacks()
  */
@@ -136,6 +141,11 @@ class LogBookTest
     private $suite_execution;
 
     /**
+     * @ORM\Column(name="test_key", type="string", length=25, options={"default"=""})
+     */
+    private $testKey = '';
+
+    /**
      * LogBookTest constructor.
      * @throws \Exception
      */
@@ -163,6 +173,12 @@ class LogBookTest
      */
     public function addMetaData(array $meta_data): void
     {
+        foreach ($meta_data as $key => $val) {
+            if ($key === 'TEST_CASE_SHOW' && mb_strlen($val) > 2) {
+                $this->setTestKey($val);
+                break;
+            }
+        }
         $this->meta_data = array_merge($this->meta_data, $meta_data);
     }
 
@@ -508,5 +524,24 @@ class LogBookTest
             'time_end' => $this->getTimeEnd()->getTimestamp(),
             'time_run' => $this->getTimeRun(),
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestKey(): string
+    {
+        return $this->testKey;
+    }
+
+    /**
+     * @param string $testKey
+     * @return LogBookTest
+     */
+    public function setTestKey(string $testKey): self
+    {
+        $this->testKey = $testKey;
+
+        return $this;
     }
 }

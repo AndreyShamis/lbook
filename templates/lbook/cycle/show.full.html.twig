@@ -192,7 +192,7 @@
                                 {% set counter = counter+1 %}
                                 <tr>
                                     <td>{{ suite.id }}</td>
-                                    <td>{{ suite.name }}</td>
+                                    <td ondblclick="set_filter(this)">{{ suite.name }}</td>
                                     <td>{{ suite.summary }}</td>
                                     <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
                                     <td>{{ suite.testingLevel }}</td>
@@ -433,10 +433,16 @@
             });
         }
 
+        function set_filter(value) {
+            var textObj = $( "#cycleShowToolbar, input[type = 'text']" )
+            textObj.val(value.innerText);
+            textObj.keyup.apply(textObj);
+        }
         $(document).ready(function() {
             $( "#cycleShowToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
             });
+
             drawEasyPieChart();
             $( "#saveCycleAsArchive" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";

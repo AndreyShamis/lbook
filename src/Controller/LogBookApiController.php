@@ -105,30 +105,50 @@ class LogBookApiController extends AbstractController
     public function moveTo2(SuiteExecution $suite, Request $request, LoggerInterface $logger): ?JsonResponse
     {
         try {
+            $status = 200;
+            $fin_res = array();
+            
             $data = json_decode($request->getContent(), true);
             if ($data === null) {
                 $data = array();
             }
             if (!array_key_exists('test_execution_key', $data)) {
                 $data['test_execution_key'] = '';
+                $fin_res = ['message'] = 'test_execution_key not provided';
+                $status = 400;
+            } else if (mb_strlen($data['test_execution_key']) < 15) {
+                $fin_res = ['message'] = 'Bad test_execution_key provided';
+                $status = 400;
             }
+
             if (!array_key_exists('test_set_url', $data)) {
                 $data['test_set_url'] = '';
+                $fin_res = ['message'] = 'test_set_url not provided';
+                $status = 400;
+            } else if (mb_strlen($data['test_set_url']) < 5) {
+                $fin_res = ['message'] = 'Bad test_set_url provided';
+                $status = 400;
             }
-            if ($suite !== null) {
-                if ($suite->getState() === 1) {
-                    $suite->setState(2);
-                    $suite->setTestSetUrl($data['test_set_url']);
-                    $suite->setJiraKey($data['test_execution_key']);
-                    $this->em->flush();
-                    $fin_res['message'] = 'success';
+            if ($status !== 200) {
+                if ($suite !== null) {
+                    if ($suite->getState() === 1) {
+                        $suite->setState(2);
+                        $suite->setTestSetUrl($data['test_set_url']);
+                        $suite->setJiraKey($data['test_execution_key']);
+                        $this->em->flush();
+                        $fin_res['message'] = 'success';
+                    } else {
+                        $fin_res['message'] = 'cannot convert state from ' . $suite->getState() . ' to 2';
+                        $status = 400;
+                    }
                 } else {
-                    $fin_res['message'] = 'cannot covnert state from ' . $suite->getState() . ' to 2';
+                    $fin_res['message'] = 'Suites not found';
+                    $status = 400;
                 }
-            } else {
-                $fin_res['message'] = 'Suites not found';
             }
-            return new JsonResponse($fin_res);
+            $response =  new JsonResponse($fin_res, $status);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
 
         } catch (\Throwable $ex) {
             $logger->critical('ERROR :' . $ex->getMessage());

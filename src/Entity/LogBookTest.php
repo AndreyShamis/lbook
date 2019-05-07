@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *     @Index(name="i_test_key", columns={"test_key"}),
  *     @Index(name="i_disabled", columns={"disabled"}),
  *     @Index(name="i_cycle_disabled", columns={"cycle", "disabled"}),
+ *     @Index(name="full_text_metadata", columns={"meta_data"}, flags={"fulltext"}),
  *     @Index(name="i_executionOrder", columns={"execution_order"})})
  * // , uniqueConstraints={@ORM\UniqueConstraint(name="test_uniq_cycle_execution_order", columns={"execution_order", "cycle"})}
  * @ORM\HasLifecycleCallbacks()

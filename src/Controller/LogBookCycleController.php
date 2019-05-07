@@ -77,9 +77,11 @@ class LogBookCycleController extends AbstractController
      */
     public function jira(string $testExecutionKey, LogBookTestRepository $testRepo): ?JsonResponse
     {
+        // PUBLISHER
         try {
             $key_len = mb_strlen($testExecutionKey);
-            $metadata_1 = '%s:14:"EXECUTION_SHOW";s:'. $key_len . ':"' .$testExecutionKey. '";%';
+            //$metadata_1 = '%s:14:"EXECUTION_SHOW";s:'. $key_len . ':"' .$testExecutionKey. '";%';
+            $metadata_1 = 's:'. $key_len . ':"' .$testExecutionKey. '"%';
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.timeEnd > :period')
                 ->andWhere('t.meta_data LIKE :metadata_1')

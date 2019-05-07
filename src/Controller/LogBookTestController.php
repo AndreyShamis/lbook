@@ -149,14 +149,22 @@ class LogBookTestController extends AbstractController
             }
 
             if ($test_name !== null && \mb_strlen($test_name) >= 2) {
+//                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
+//                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
+//                        ->setParameter('test_id', (int)$test_name);
+//                } else {
+//                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata');
+//                }
+//                $qb->setParameter('test_name', '%'.$test_name.'%')
+//                    ->setParameter('metadata', $test_name.'%');
                 if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
-                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) = 0 OR t.id = :test_id')
                         ->setParameter('test_id', (int)$test_name);
                 } else {
-                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata');
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) = 0');
                 }
-                $qb->setParameter('test_name', '%'.$test_name.'%')
-                    ->setParameter('metadata', $test_name.'%');
+                $qb->setParameter('search_str', $test_name);
+
                 $enableSearch = True;
             }
             if ($enableSearch) {
@@ -164,7 +172,6 @@ class LogBookTestController extends AbstractController
                 $sql = $query->getSQL();
                 $tests = $query->execute();
             }
-            $a = 1;
         }
 
         return $this->render('lbook/test/search.html.twig', array(

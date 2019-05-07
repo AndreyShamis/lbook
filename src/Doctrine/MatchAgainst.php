@@ -5,87 +5,27 @@
  * Time: 13:49
  */
 
-
-/**
- * MatchAgainst
- *
- * Definition for MATCH AGAINST MySQL instruction to be used in DQL Queries
- *
- * Usage: MATCH_AGAINST(column, :text)
- * Config: $config->addCustomStringFunction("MATCH_AGAINST",
-"\DqlFunctions\MatchAgainst");
- *
- * @author gbrunacci at _ gmail _ dot c o m
- */
 namespace App\Doctrine;
 
 use Doctrine\ORM\Query\Lexer;
-use Doctrine\Orm\Query\AST\Literal;
+use Doctrine\ORM\Query\AST\InputParameter;
+use Doctrine\ORM\Query\AST\Literal;
+use Doctrine\ORM\Query\SqlWalker;
 
-class MatchAgainst extends \Doctrine\ORM\Query\AST\Functions\FunctionNode {
-
-//    public $columns = array();
-//    public $needle;
-//    public function parse(\Doctrine\ORM\Query\Parser $parser)
-//    {
-//        $parser->match(Lexer::T_IDENTIFIER);
-//        $parser->match(Lexer::T_OPEN_PARENTHESIS);
-//
-//        do {
-//            $this->columns[] = $parser->StateFieldPathExpression();
-//            $parser->match(Lexer::T_COMMA);
-//        }
-//        while (!$parser->getLexer()->isNextToken(Lexer::T_INPUT_PARAMETER));
-//
-//        // Got an input parameter
-//        $this->needle = $parser->InputParameter();
-//
-//        $parser->match(Lexer::T_CLOSE_PARENTHESIS);
-//    }
-//    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
-//    {
-//        $haystack = null;
-//        $first = true;
-//        foreach ($this->columns as $column) {
-//            $first ? $first = false : $haystack .= ', ';
-//            $haystack .= $column->dispatch($sqlWalker);
-//        }
-//        return "MATCH(" .
-//            $haystack .
-//            ") AGAINST (" .
-//            $this->needle->dispatch($sqlWalker) .
-//            " IN NATURAL LANGUAGE MODE )";
-//    }
-
-
-
-//    public $_ma_column = null;
-//    public $_ma_value = null;
-//
-//    public function parse(\Doctrine\ORM\Query\Parser $parser)
-//    {
-//        $parser->match(Lexer::T_IDENTIFIER);
-//        $parser->match(Lexer::T_OPEN_PARENTHESIS);
-//        $this->_ma_column = $parser->StringPrimary();
-//        $parser->match(Lexer::T_COMMA);
-//        $this->_ma_value = $parser->StringPrimary();
-//        $parser->match(Lexer::T_CLOSE_PARENTHESIS);
-//    }
-//
-//    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
-//    {
-//        return "MATCH(" .
-//            $this->_ma_column->dispatch($sqlWalker) .
-//            ") AGAINST ('" .
-//            $this->_ma_value->value .
-//            "')";
-//    }
-
-
+class MatchAgainst extends \Doctrine\ORM\Query\AST\Functions\FunctionNode
+{
+    /** @var array $columns */
     public $columns = array();
+    /** @var InputParameter $needle */
     public $needle;
+    /** @var Literal $mode */
     public $mode;
-    public function parse(\Doctrine\ORM\Query\Parser $parser)
+
+    /**
+     * @param \Doctrine\ORM\Query\Parser $parser
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function parse(\Doctrine\ORM\Query\Parser $parser): void
     {
         $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
@@ -100,7 +40,13 @@ class MatchAgainst extends \Doctrine\ORM\Query\AST\Functions\FunctionNode {
         }
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
-    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
+
+    /**
+     * @param SqlWalker $sqlWalker
+     * @return string
+     * @throws \Doctrine\ORM\Query\AST\ASTException
+     */
+    public function getSql(SqlWalker $sqlWalker): string
     {
         $haystack = null;
         $first = true;
@@ -109,7 +55,7 @@ class MatchAgainst extends \Doctrine\ORM\Query\AST\Functions\FunctionNode {
             $haystack .= $column->dispatch($sqlWalker);
         }
         $query = 'MATCH(' . $haystack . ') AGAINST (' . $this->needle->dispatch($sqlWalker);
-        if($this->mode) {
+        if ($this->mode) {
             $query .= ' ' . $this->mode->dispatch($sqlWalker) . ' )';
         } else {
             $query .= ' )';

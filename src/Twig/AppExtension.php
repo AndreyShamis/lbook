@@ -9,8 +9,6 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
 
 class AppExtension extends AbstractExtension
 {
@@ -23,15 +21,15 @@ class AppExtension extends AbstractExtension
     public function getFilters(): array
     {
         return array(
-            new Twig_SimpleFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
-            new Twig_SimpleFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
-            new Twig_SimpleFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
-            new Twig_SimpleFilter('TimeToHour', array($this, 'TimeToHour')),
-            new Twig_SimpleFilter('getPercentage', array($this, 'getPercentage')),
-            new Twig_SimpleFilter('cast_to_array', array($this, 'cast_to_array')),
-            new Twig_SimpleFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
-            new Twig_SimpleFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
-            new Twig_SimpleFilter('time_ago', function ($time) { return $this->ExecutionTimeInHours(time() - $time);}),
+            new TwigFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
+            new TwigFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
+            new TwigFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
+            new TwigFilter('TimeToHour', array($this, 'TimeToHour')),
+            new TwigFilter('getPercentage', array($this, 'getPercentage')),
+            new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
+            new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
+            new TwigFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
+            new TwigFilter('time_ago', function ($time) { return $this->ExecutionTimeInHours(time() - $time);}),
             new TwigFilter('filter_name', [$this, 'doSomething'], ['is_safe' => ['html']]),
         );
     }
@@ -54,7 +52,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('formatBytes', [$this, 'formatBytes']),
             new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
-            new Twig_SimpleFunction('inarray', array($this, 'inArray')),
+            new TwigFunction('inarray', array($this, 'inArray')),
         ];
     }
 

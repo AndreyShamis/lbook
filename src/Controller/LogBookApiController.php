@@ -129,7 +129,7 @@ class LogBookApiController extends AbstractController
                 $fin_res['message'] = 'Bad test_set_url provided';
                 $status = 400;
             }
-            if ($status !== 200) {
+            if ($status === 200) {
                 if ($suite !== null) {
                     if ($suite->getState() === 1) {
                         $suite->setState(2);

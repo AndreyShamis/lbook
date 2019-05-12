@@ -10,7 +10,10 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ContainerInterface as Container;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +31,19 @@ class LogBookTestController extends AbstractController
     protected $index_size = 500;
 
     protected $log_size = 3000;
+    /** @var \Doctrine\Common\Persistence\ObjectManager  */
+    protected $em;
+
+    /**
+     * @param Container $container
+     * @throws \LogicException
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+        $this->em = $this->getDoctrine()->getManager();
+
+    }
 
     /**
      * Lists all Tests entities.
@@ -62,6 +78,66 @@ class LogBookTestController extends AbstractController
         );
     }
 
+    /**
+     * @Route("/update/{test}", name="update", methods={"GET", "POST"})
+     * @param LogBookTest $test
+     * @param Request $request
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function update(LogBookTest $test, Request $request, LoggerInterface $logger): Response
+    {
+        try {
+            $status = 200;
+            $fin_res = array();
+
+            $data = json_decode($request->getContent(), true);
+            if ($data === null) {
+                $data = array();
+            }
+            if (!array_key_exists('test_execution_key', $data)) {
+                $data['test_execution_key'] = '';
+                $fin_res['message'] = 'test_execution_key not provided';
+                $status = 400;
+            } else if (mb_strlen($data['test_execution_key']) < 15) {
+                $fin_res['message'] = 'Bad test_execution_key provided';
+                $status = 400;
+            }
+
+            if (!array_key_exists('test_key', $data)) {
+                $data['test_key'] = '';
+                $fin_res['message'] = 'test_key not provided';
+                $status = 400;
+            } else if (mb_strlen($data['test_key']) < 5) {
+                $fin_res['message'] = 'Bad test_key provided';
+                $status = 400;
+            }
+            if ($status === 200) {
+                if ($test !== null) {
+                    $test->addMetaData(array(
+                        'EXECUTION_SHOW' => $data['test_execution_key'],
+                        'TEST_CASE_SHOW' => $data['test_key']
+                        ));
+                    $this->em->flush();
+                    $fin_res['message'] = 'success';
+                } else {
+                    $fin_res['message'] = 'Suites not found';
+                    $status = 400;
+                }
+            }
+            $response =  new JsonResponse($fin_res, $status);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+
+        } catch (\Throwable $ex) {
+            $logger->critical('ERROR :' . $ex->getMessage());
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
     /**
      * @Route("/search", name="test_search", methods={"GET|POST"})
      * @param Request $request

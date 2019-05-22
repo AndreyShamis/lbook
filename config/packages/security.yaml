@@ -74,6 +74,7 @@ security:
         - { path: ^/cycle/te/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/bot/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/test/update/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

@@ -58,6 +58,37 @@ class LogBookApiController extends AbstractController
 
     /**
      *
+     * @Route("/execution/publisher/count", name="count_suites_for_publisher", methods={"GET", "POST"})
+     * @param LoggerInterface $logger
+     * @param SuiteExecutionRepository $suitesRepo
+     * @param int $state
+     * @return JsonResponse
+     */
+    public function suitesNotPublishedCount(LoggerInterface $logger, SuiteExecutionRepository $suitesRepo, int $state=0): ?JsonResponse
+    {
+        try {
+            $suites = $suitesRepo->findAllNotPublished($state);
+            $fin_res['state'] = $state;
+            $fin_res['count'] = count($suites);
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            $logger->critical('ERROR :' . $ex->getMessage());
+            $response = $this->json([]);
+            $arr[] = $ex->getMessage();
+            $prev = $ex->getPrevious();
+            if ($prev !== null) {
+                $arr[] = $prev->getMessage();
+            }
+            $js = json_encode($arr);
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+    /**
+     *
      * @Route("/execution/publisher/state/{state}", name="publisher_by_state", methods={"GET", "POST"})
      * @param LoggerInterface $logger
      * @param SuiteExecutionRepository $suitesRepo

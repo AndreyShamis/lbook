@@ -137,17 +137,54 @@ class SuiteExecutionRepository extends ServiceEntityRepository
      */
     public function findOneBySate(int $state=0)
     {
-        $entity = $this->findOneBy(
-            array(
-                'publish' => true,
-                'jira_key' => null,
-                'state' => $state
-            ));
-        if ($entity !== null) {
-            return $entity;
+        $ret = $this->createQueryBuilder('s')
+            ->andWhere('s.publish = 1')
+            ->andWhere('s.jira_key IS NULL')
+            ->andWhere('s.state = :state')
+            ->andWhere('s.uuid != :uuid')
+            ->setParameter('state', $state)
+            ->setParameter('uuid', '')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+        if ($this->count($ret) > 0) {
+            return $ret[0];
         }
         return null;
+//        $entity = $this->findOneBy(
+//            array(
+//                'publish' => true,
+//                'jira_key' => null,
+//                'state' => $state
+//            ));
+//        if ($entity !== null) {
+//            return $entity;
+//        }
+//        return null;
     }
+
+    /**
+     * @param int $state
+     * @param $max_results
+     * @return mixed
+     */
+    public function findAllNotPublished(int $state=0, $max_results=100)
+    {
+        $ret = $this->createQueryBuilder('s')
+            ->andWhere('s.publish = 1')
+            ->andWhere('s.jira_key IS NULL')
+            ->andWhere('s.state = :state')
+            ->andWhere('s.uuid != :uuid')
+            ->setParameter('state', $state)
+            ->setParameter('uuid', '')
+            ->setMaxResults($max_results)
+            ->getQuery()
+            ->getResult()
+        ;
+        return $ret;
+    }
+
     // /**
     //  * @return SuiteExecution[] Returns an array of SuiteExecution objects
     //  */

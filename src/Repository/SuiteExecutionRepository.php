@@ -148,7 +148,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-        if ($this->count($ret) > 0) {
+        if (count($ret) > 0) {
             return $ret[0];
         }
         return null;

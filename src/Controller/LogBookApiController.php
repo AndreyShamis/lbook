@@ -118,7 +118,12 @@ class LogBookApiController extends AbstractController
         } catch (\Throwable $ex) {
             $logger->critical('ERROR :' . $ex->getMessage());
             $response = $this->json([]);
-            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $arr[] = $ex->getMessage();
+            $prev = $ex->getPrevious();
+            if ($prev !== null) {
+                $arr[] = $prev->getMessage();
+            }
+            $js = json_encode($arr);
             $response->setJson($js);
             $response->setEncodingOptions(JSON_PRETTY_PRINT);
             return $response;

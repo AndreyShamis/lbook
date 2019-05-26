@@ -99,7 +99,7 @@ class LogBookTestController extends AbstractController
                 $data['test_execution_key'] = '';
                 $fin_res['message'] = 'test_execution_key not provided';
                 $status = 400;
-            } else if (mb_strlen($data['test_execution_key']) < 15) {
+            } else if (mb_strlen($data['test_execution_key']) < 5) {
                 $fin_res['message'] = 'Bad test_execution_key provided';
                 $status = 400;
             }

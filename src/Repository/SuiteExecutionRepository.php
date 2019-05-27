@@ -139,13 +139,16 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.publish = 1')
-            //->andWhere('s.jira_key IS NULL')
+
             ->andWhere('s.state = :state')
             ->andWhere('s.uuid != :uuid')
             ->setParameter('state', $state)
             ->setParameter('uuid', '')
-            ->setMaxResults(1)
-            ->getQuery()
+            ->setMaxResults(1);
+        if ($state >= 0 && $state <=1) {
+            $ret = $ret->andWhere('s.jira_key IS NULL');
+        }
+        $ret = $ret->getQuery()
             ->getResult()
         ;
         if (count($ret) > 0) {
@@ -173,12 +176,14 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.publish = 1')
-            //->andWhere('s.jira_key IS NULL')
             ->andWhere('s.state = :state')
             ->andWhere('s.uuid != :uuid')
             ->setParameter('state', $state)
-            ->setParameter('uuid', '')
-            ->setMaxResults($max_results)
+            ->setParameter('uuid', '');
+        if ($state >= 0 && $state <=1) {
+            $ret = $ret->andWhere('s.jira_key IS NULL');
+        }
+        $ret = $ret->setMaxResults($max_results)
             ->getQuery()
             ->getResult()
         ;

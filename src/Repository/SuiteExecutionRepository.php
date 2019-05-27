@@ -139,7 +139,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.publish = 1')
-            ->andWhere('s.jira_key IS NULL')
+            //->andWhere('s.jira_key IS NULL')
             ->andWhere('s.state = :state')
             ->andWhere('s.uuid != :uuid')
             ->setParameter('state', $state)
@@ -173,7 +173,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.publish = 1')
-            ->andWhere('s.jira_key IS NULL')
+            //->andWhere('s.jira_key IS NULL')
             ->andWhere('s.state = :state')
             ->andWhere('s.uuid != :uuid')
             ->setParameter('state', $state)

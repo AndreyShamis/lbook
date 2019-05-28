@@ -129,7 +129,7 @@ class CycleControllerTest extends LogBookApplicationTestCase
         // self::$entityManager->refresh($cycle);
         $crawler = $this->getClient()->request('GET', '/cycle/'. $cycle->getId());
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
-        $searchString = 'h3:contains("Cycle [' . $cycle->getId() . '] : ' . $cycle->getName() . '")';
+        $searchString = 'h4:contains("Cycle [' . $cycle->getId() . '] : ' . $cycle->getName() . '")';
         $count = $crawler->filter($searchString)->count();
         $this->assertGreaterThan(0, $count, 'Search string is :[' . $searchString. '] Count : '. $count);
     }

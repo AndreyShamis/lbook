@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\SuiteExecution;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Doctrine\ORM\Query;
@@ -42,7 +43,7 @@ class LogBookCycleController extends AbstractController
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \LogicException
      */
-    public function editAction(Request $request, LogBookCycle $obj = null)
+    public function edit(Request $request, LogBookCycle $obj = null)
     {
         try {
             if (!$obj) {
@@ -231,7 +232,7 @@ class LogBookCycleController extends AbstractController
      * @throws \LogicException
      * @throws \Exception
      */
-    public function newAction(Request $request)
+    public function new(Request $request)
     {
         $obj = new LogBookCycle();
         $form = $this->createForm(LogBookCycleType::class, $obj);
@@ -359,6 +360,31 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/suite/{cycle}/{suite}", name="cycle_suite_show_first", methods={"GET"})
+     * @Route("/suite/{cycle}/{suite}/{maxSize}", name="cycle_suite_show_size", methods={"GET"}, defaults={"maxSize"=""})
+     * @Route("/suite/{cycle}/{suite}/{maxSize}/{page}", name="cycle_suite_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=1000})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param SuiteExecution|null $suite
+     * @param null $page
+     * @param int $maxSize
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showSuiteFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
+    {
+        if ($page === null) {
+            $page = 1;
+        }
+        if ($maxSize === null || $maxSize == "" || $maxSize == "1") {
+            $maxSize = $this->show_tests_size;
+        }
+        $page = (int)$page;
+        $maxSize = (int)$maxSize;
+        return $this->show($pagePaginator, $testRepo, $cycle, $suite, $page, false, $maxSize);
+    }
+
+    /**
      * @Route("/{id}", name="cycle_show_first", methods={"GET"})
      * @Route("/{id}/{maxSize}", name="cycle_show_size", methods={"GET"}, defaults={"maxSize"=""})
      * @Route("/{id}/{maxSize}/{page}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=1000})
@@ -378,7 +404,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($pagePaginator, $testRepo, $cycle, $page, false, $maxSize);
+        return $this->show($pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
     }
 
 //    /**
@@ -412,8 +438,9 @@ class LogBookCycleController extends AbstractController
      * @param bool $forJson if True the JSON table for tests will be used
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $forJson=false, $maxSize=null): ?Response
+    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $forJson=false, $maxSize=null): ?Response
     {
+        $suiteMode = false;
         if ($page === null) {
             $page = 1;
         }
@@ -431,6 +458,11 @@ class LogBookCycleController extends AbstractController
                 ->orderBy('t.executionOrder', 'ASC')
                 //->setParameter('cycle', $cycle->getId());
                 ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+            if ($suite !== null) {
+                $qb->andWhere('t.suite_execution = :suite')
+                    ->setParameter('suite', $suite->getId());
+                $suiteMode = true;
+            }
             $paginator = $pagePaginator->paginate($qb, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
@@ -504,6 +536,8 @@ class LogBookCycleController extends AbstractController
                 'additional_opt_cols'   => $additional_opt_cols,
                 'tests_in_json'         => $forJson,
                 'suites'                => $suites,
+                'suiteMode'             => $suiteMode,
+                'suite'                 => $suite,
             );
 
             return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);
@@ -663,7 +697,7 @@ class LogBookCycleController extends AbstractController
      * @throws \LogicException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteAction(Request $request, LogBookCycle $obj = null)
+    public function delete(Request $request, LogBookCycle $obj = null)
     {
         try {
             if (!$obj) {

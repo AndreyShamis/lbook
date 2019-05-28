@@ -1,12 +1,19 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}Cycle [{{ cycle.id }}:{{ cycle.name }}] {% endblock %}
+{% block title %}
+{% if suiteMode %}
+Suite of Cycle [{{ cycle.id }}:{{ cycle.name }}]
+{% else %}
+Cycle [{{ cycle.id }}:{{ cycle.name }}]
+{% endif %}
+{% endblock %}
+
 {% block content %}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
     {% set suitesCount = suites|length  %}
     <div class="row">
         <div class="col-xs-9">
-            <h3 class="generic_title cycle_title"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / Cycle [{{ cycle.id }}] : {{ cycle.name }}</h3>
+            <h4 class="generic_title cycle_title"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}"><<< {{ cycle.setup}}</a> / {% if suiteMode %}Suite [{{ suite.id }}:{{ suite.name }}] in Cycle {% else %}Cycle {% endif %}[{{ cycle.id }}] : {{ cycle.name }}</h4>
         </div>
         <div class="col-xs-3">
             <span style="float: right;">
@@ -191,9 +198,9 @@
                                 {% endif %}
                                 {% set counter = counter+1 %}
                                 <tr>
-                                    <td>{{ suite.id }}</td>
+                                    <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td ondblclick="set_filter(this)">{{ suite.name }}</td>
-                                    <td>{{ suite.summary }}</td>
+                                    <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
                                     <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
                                     <td>{{ suite.testingLevel }}</td>
                                     <td>{{ suite.chip }}</td>

@@ -1,6 +1,6 @@
 security:
     encoders:
-        App\Entity\LogBookUser: bcrypt
+        App\Entity\LogBookUser: auto
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         our_db_provider:

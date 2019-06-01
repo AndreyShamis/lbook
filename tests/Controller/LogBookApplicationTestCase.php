@@ -8,7 +8,7 @@
 
 namespace App\Tests\Controller;
 
-use Doctrine\ORM\EntityManager;
+use     Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DomCrawler\Crawler;
@@ -35,7 +35,7 @@ class LogBookApplicationTestCase extends WebTestCase
 
     protected static $setupPass = false;
 
-    public function getClient(): Client
+    public static function getClient()
     {
         return self::$client;
     }

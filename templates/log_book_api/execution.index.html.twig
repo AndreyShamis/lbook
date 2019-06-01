@@ -13,12 +13,7 @@
 
     <ul>
         <li>controller at <code><a href="{{ '/var/www/lbook/src/Controller/LogBookApiController.php'|file_link(0) }}">src/Controller/LogBookApiController.php</a></code></li>
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for func in functions if not break %}
-            {% if counter == 10000 %}
-                {% set break = true %}
-            {% endif %}
+        {% for func in functions | slice(0, 10000) %}
             <li>{{ func }}</li>
 
             {% set counter = counter+1 %}

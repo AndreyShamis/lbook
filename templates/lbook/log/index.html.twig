@@ -19,13 +19,7 @@
         </tr>
         </thead>
         <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for log in iterator if not break %}
-            {% if counter == 10000 %}
-                {% set break = true %}
-            {% endif %}
-            {% set counter = counter+1 %}
+        {% for log in iterator | slice(0, 10000) %}
             <tr>
                 <td><a href="{{ path('log_show', { 'id': log.id }) }}">{{ log.id }}</a></td>
                 <td>{{ log.logTime|date('Y-m-d H:i:s') }}</td>

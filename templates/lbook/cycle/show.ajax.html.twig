@@ -33,7 +33,7 @@
                 <div class="tab-content">
                     <div id="main" class="tab-pane active">
 
-                        {% spaceless %}
+                        {% apply spaceless %}
                             <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
                                 <tbody>
                                 {#<tr>#}
@@ -120,7 +120,7 @@
                                 {#{% endfor %}#}
                                 </tbody>
                             </table>
-                        {% endspaceless %}
+                        {% endapply %}
 
 
                     </div>
@@ -192,7 +192,7 @@
     {#{% include "lbook/search.html.twig" %}#}
     <div id="cycleShowToolbar">
     </div>
-    {% spaceless %}
+    {% apply spaceless %}
         <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
                id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
                data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 'ALL']" data-sort-order="desc"
@@ -254,13 +254,7 @@
             <tbody class="searchable">
             {% if tests_in_json != true %}
                 {% set builder = '' %}
-                {% set break = false %}
-                {% set counter = 0 %}
-                {% for test in iterator if not break %}
-                    {% if counter == 10000 %}
-                        {% set break = true %}
-                    {% endif %}
-                    {% set counter = counter+1 %}
+                {% for test in iterator | slice(0, 10000) %}
                     {% set test_disabled = '' %}
                     {% if test.isDisabled == 1 %}
                         {% set test_disabled = 'test-disabled' %}
@@ -335,7 +329,7 @@
             </tbody>
 
         </table>
-    {% endspaceless %}
+    {% endapply %}
     <ul>
         {% if is_granted('edit', cycle.setup) %}
             <li><a href="{{ path('cycle_edit', { 'id': cycle.id }) }}">Edit</a></li>

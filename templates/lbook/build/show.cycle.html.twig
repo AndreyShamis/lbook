@@ -31,13 +31,7 @@
         </tr>
         </thead>
         <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for cycle in iterator if not break %}
-            {% if counter == 10000 %}
-                {% set break = true %}
-            {% endif %}
-            {% set counter = counter+1 %}
+        {% for cycle in iterator | slice(0, 10000) %}
             <tr>
                 <td>
                     {% if date(cycle.updatedAt) > date('-60minutes') %}

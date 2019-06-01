@@ -189,13 +189,7 @@
                             </tr>
                             </thead>
                             <tbody class="searchable">
-                            {% set break = false %}
-                            {% set counter = 0 %}
-                            {% for test in iterator if not break %}
-                                {% if counter == 10000 %}
-                                    {% set break = true %}
-                                {% endif %}
-                                {% set counter = counter+1 %}
+                            {% for test in iterator | slice(0, 10000) %}
                                 <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                                     <td>{{ test.id }}</td>
                                     <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>

@@ -50,7 +50,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 <div class="tab-content">
                     <div id="main" class="tab-pane active">
 
-                        {% spaceless %}
+                        {% apply spaceless %}
                             <table class="records_list table table-striped table-condensed" id="cycleFullShowInfoTable">
                                 <tbody>
                                 {#<tr>#}
@@ -142,7 +142,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 {#{% endfor %}#}
                                 </tbody>
                             </table>
-                        {% endspaceless %}
+                        {% endapply %}
 
 
                     </div>
@@ -190,13 +190,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </thead>
                                 <tbody>
                             {% set builder = '' %}
-                            {% set break = false %}
-                            {% set counter = 0 %}
-                            {% for suite in suites if not break %}
-                                {% if counter == 200 %}
-                                    {% set break = true %}
-                                {% endif %}
-                                {% set counter = counter+1 %}
+                            {% for suite in suites | slice(0, 200) %}
                                 <tr>
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td ondblclick="set_filter(this)">{{ suite.name }}</td>
@@ -261,7 +255,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
     {#{% include "lbook/search.html.twig" %}#}
     <div id="cycleShowToolbar">
     </div>
-    {% spaceless %}
+    {% apply spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
            data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 50000, 'ALL']" data-sort-order="desc"
@@ -328,13 +322,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
         <tbody class="searchable">
         {% if tests_in_json != true %}
         {% set builder = '' %}
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for test in iterator if not break %}
-            {% if counter == 20000 %}
-                {% set break = true %}
-            {% endif %}
-            {% set counter = counter+1 %}
+        {% for test in iterator | slice(0, 20000) %}
             {% set test_disabled = '' %}
             {% if test.isDisabled == 1 %}
                 {% set test_disabled = 'test-disabled' %}
@@ -407,7 +395,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
         </tbody>
 
     </table>
-    {% endspaceless %}
+    {% endapply %}
     <ul>
         <li><a href="{{ path('cycle_index') }}">Back to the list</a></li>
         {% if is_granted('edit', cycle.setup) %}

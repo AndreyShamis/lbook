@@ -20,13 +20,7 @@
             </tr>
         </thead>
         <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for log_book_build in iterator if not break %}
-            {% if counter == 10000 %}
-                {% set break = true %}
-            {% endif %}
-            {% set counter = counter+1 %}
+        {% for log_book_build in iterator | slice(0, 10000) %}
             <tr>
                 <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
                 <td><a href="{{ path('build_show_cycles_first', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>

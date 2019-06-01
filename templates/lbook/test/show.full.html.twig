@@ -173,7 +173,7 @@
             <div class="widget-body" style="display: block;">
                 <div class="widget-main no-padding testLog">
                     {% include "lbook/search.html.twig" %}
-                    {% spaceless %}
+                    {% apply spaceless %}
                     <table class="table table-bordered table-hover table-condensed">
                         <thead class="thin-border-bottom">
                         <tr>
@@ -186,13 +186,7 @@
                         </tr>
                         </thead>
                         <tbody class="searchable">
-                        {% set break = false %}
-                        {% set counter = 0 %}
-                        {% for log in iterator if not break %}
-                            {% if counter == 10000 %}
-                                {% set break = true %}
-                            {% endif %}
-                            {% set counter = counter+1 %}
+                        {% for log in iterator | slice(0, 10000) %}
                                 <tr class="{{ logTypeToTableColor(log.msgType) }}">
                                     <td title="ID:{{ log.id }}, Order:{{ log.chain }}" class="logType">{{ log.logTime | date('H:i:s') }}</td>
                                     <td class="logType">{{ relativeTime(test.timeStart, log.logTime) }}</td>
@@ -208,7 +202,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    {% endspaceless %}
+                    {% endapply %}
                 </div><!-- /.widget-main -->
                 <div class="widget-toolbox padding-8 text-center">
                     <div>{% include "lbook/double.paginator.html.twig" %}</div>

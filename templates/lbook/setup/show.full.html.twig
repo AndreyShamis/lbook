@@ -2,7 +2,7 @@
 {% block title %}Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
     <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
-    {% spaceless %}
+    {% apply spaceless %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
         <tr>
@@ -87,7 +87,7 @@
         {% endfor %}
         </tbody>
     </table>
-    {% endspaceless %}
+    {% endapply %}
     {% set pagePath = "setup_show" %}
     {% set objId = setup.id %}
     {% include "lbook/double.paginator.html.twig" %}
@@ -96,7 +96,7 @@
     {% include "lbook/search.html.twig" %}
     <div id="toolbarSetupsList">
     </div>
-    {% spaceless %}
+    {% apply spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="setupCycleList"
            data-pagination="true" data-search="true" data-toggle="table"
            data-show-columns="true" data-show-refresh="true"
@@ -130,13 +130,7 @@
         </tr>
         </thead>
         <tbody class="searchable">
-        {% set break = false %}
-        {% set counter = 0 %}
-        {% for cycle in iterator if not break %}
-            {% if counter == 10000 %}
-                {% set break = true %}
-            {% endif %}
-            {% set counter = counter+1 %}
+        {% for cycle in iterator | slice(0, 10000) %}
             <tr>
                 <td title="Updated {{ cycle.updatedAt|time_diff }}">
                     {% if date(cycle.updatedAt) > date('-5 minutes') %}
@@ -198,8 +192,8 @@
         {% endfor %}
         </tbody>
     </table>
-    {% endspaceless %}
-    {% spaceless %}
+    {% endapply %}
+    {% apply spaceless %}
     <ul>
         <li>
             <a href="{{ path('setup_index') }}">Back to setup list</a>
@@ -241,5 +235,5 @@
             } catch (e) {}
         });
     </script>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}

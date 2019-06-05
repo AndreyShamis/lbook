@@ -208,7 +208,7 @@ class LogBookApiController extends AbstractController
     {
         try {
             if ($suite !== null) {
-                if ($suite->getState() === 2) {
+                if ($suite->getState() === 2 || $suite->getState() === 3) {
                     $suite->setState(3);
                     $this->em->flush();
                     $response = $this->json([]);
@@ -225,7 +225,7 @@ class LogBookApiController extends AbstractController
                     return $response;
                 }
 
-                $fin_res['message'] = 'cannot convert state from ' . $suite->getState() . ' to 2';
+                $fin_res['message'] = 'cannot convert state from ' . $suite->getState() . ' to 3';
             } else {
                 $fin_res['message'] = 'Suite not found';
             }
@@ -259,7 +259,7 @@ class LogBookApiController extends AbstractController
                 } elseif ($suite->getState() === 4) {
                     $fin_res['message'] = 'already in state 4';
                 } else {
-                    $fin_res['message'] = 'cannot covnert state from ' . $suite->getState() . ' to 2';
+                    $fin_res['message'] = 'cannot covnert state from ' . $suite->getState() . ' to 4';
                 }
             } else {
                 $fin_res['message'] = 'Suite not found';

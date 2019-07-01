@@ -234,10 +234,10 @@ class LogBookTestController extends AbstractController
 //                $qb->setParameter('test_name', '%'.$test_name.'%')
 //                    ->setParameter('metadata', $test_name.'%');
                 if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
-                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) = 0 OR t.id = :test_id')
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) != 0 OR t.id = :test_id')
                         ->setParameter('test_id', (int)$test_name);
                 } else {
-                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) = 0');
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) != 0');
                 }
                 $qb->setParameter('search_str', $test_name);
 

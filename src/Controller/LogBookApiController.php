@@ -217,7 +217,12 @@ class LogBookApiController extends AbstractController
                     $tests = $cycle->getTests();
                     $tests_arr = array();
                     foreach ($tests as $test) {
-                        $tests_arr[$test->getId()] = $test->toArray();
+                        try {
+                            if ($suite->getId() === $test->getSuiteExecution()->getId()) {
+                                $tests_arr[$test->getId()] = $test->toArray();
+                            }
+                        } catch (\Throwable $ex) { }
+
                     }
                     $js = json_encode($tests_arr);
                     $response->setJson($js);

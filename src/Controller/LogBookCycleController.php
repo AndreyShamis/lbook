@@ -104,6 +104,7 @@ class LogBookCycleController extends AbstractController
             }
             $fin_res['testExecutionKey'] = $testExecutionKey;
             $fin_res['tests'] = $final;
+            $fin_res['query'] = $q->getSQL();
             return new JsonResponse($fin_res);
         } catch (\Throwable $ex) {
             $response = $this->json([]);

@@ -58,7 +58,7 @@ class LogBookApiController extends AbstractController
 
     /**
      *
-     * @Route("/execution/publisher/count", name="count_suites_for_publisher", methods={"GET", "POST"})
+     * @Route("/execution/publisher/count/{state}", name="count_suites_for_publisher", methods={"GET", "POST"})
      * @param LoggerInterface $logger
      * @param SuiteExecutionRepository $suitesRepo
      * @param int $state

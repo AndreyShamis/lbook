@@ -82,7 +82,7 @@ class LogBookCycleController extends AbstractController
         try {
             $key_len = mb_strlen($testExecutionKey);
             //$metadata_1 = '%s:14:"EXECUTION_SHOW";s:'. $key_len . ':"' .$testExecutionKey. '";%';
-            $metadata_1 = 's:'. $key_len . ':"' .$testExecutionKey. '"%';
+            $metadata_1 = '%s:'. $key_len . ':"' .$testExecutionKey. '"%';
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.timeEnd > :period')
                 ->andWhere('t.meta_data LIKE :metadata_1')
@@ -104,7 +104,19 @@ class LogBookCycleController extends AbstractController
             }
             $fin_res['testExecutionKey'] = $testExecutionKey;
             $fin_res['tests'] = $final;
-            $fin_res['query'] = $q->getSQL();
+            try{
+                $fin_res['query_dql'] = $q->getDQL();
+                $fin_res['query_sql'] = $q->getSQL();
+                $tmp_arr = $q->getParameters()->toArray();
+                $fin_res['query_params'] = [];
+                /**
+                 * @var  $key
+                 * @var \Doctrine\ORM\Query\Parameter $val
+                 */
+                foreach ($tmp_arr as $key => $val) {
+                    $fin_res['query_params'][$val->getName()] = $val->getValue();
+                }
+            } catch (\Throwable $ex) {}
             return new JsonResponse($fin_res);
         } catch (\Throwable $ex) {
             $response = $this->json([]);

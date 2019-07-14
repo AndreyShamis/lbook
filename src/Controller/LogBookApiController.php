@@ -214,6 +214,10 @@ class LogBookApiController extends AbstractController
                     $response = $this->json([]);
                     /** @var LogBookCycle $cycle */
                     $cycle = $suite->getCycle();
+                    if ($cycle === null) {
+                        return new JsonResponse(['message'=> 'Cycle not found'], 406);
+
+                    }
                     $tests = $cycle->getTests();
                     $tests_arr = array();
                     foreach ($tests as $test) {
@@ -257,7 +261,7 @@ class LogBookApiController extends AbstractController
     {
         try {
             if ($suite !== null) {
-                if ($suite->getState() === 3) {
+                if ($suite->getState() === 3 || $suite->getState() === 1) {
                     $suite->setState(4);
                     $this->em->flush();
                     $fin_res['message'] = 'success';

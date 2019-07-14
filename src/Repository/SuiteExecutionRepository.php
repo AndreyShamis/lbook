@@ -172,7 +172,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
      * @param $max_results
      * @return mixed
      */
-    public function findAllNotPublished(int $state=0, $max_results=1000)
+    public function findAllNotPublished(int $state=0, $max_results=200000)
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.cycle is not null')

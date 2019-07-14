@@ -175,6 +175,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     public function findAllNotPublished(int $state=0, $max_results=1000)
     {
         $ret = $this->createQueryBuilder('s')
+            ->andWhere('s.cycle is not null')
             ->andWhere('s.publish = 1')
             ->andWhere('s.state = :state')
             ->andWhere('s.uuid != :uuid')

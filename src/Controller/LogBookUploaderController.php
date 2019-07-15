@@ -248,12 +248,15 @@ class LogBookUploaderController extends AbstractController
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
-        } catch (OptimisticLockException $e) {
-            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
-        } catch (ORMException $e) {
-            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
         } catch (\Throwable $e) {
-            $logger->critical('[' . $data['summary'] . ']::ERROR :' . $e->getMessage(), $data);
+            $method = $request->getMethod();
+            $ip = $request->getClientIp();
+            $data['ip'] = $ip;
+            $data['method'] = $method;
+            $data['request'] = $request->request->all();
+            $data['query'] = $request->query->all();
+            $data['trace'] = $e->getTraceAsString();
+            $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
             return new \Symfony\Component\HttpFoundation\Response($e->getMessage());
         }
 

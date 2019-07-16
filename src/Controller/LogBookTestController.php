@@ -59,8 +59,8 @@ class LogBookTestController extends AbstractController
     {
         set_time_limit(10);
         $query = $testRepo->createQueryBuilder('t')
-            ->orderBy('t.id', 'DESC')
-            ->setMaxResults($this->index_size * 10);
+           // ->orderBy('t.id', 'DESC')
+            ->setMaxResults($this->index_size);
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
         // You can also call the count methods (check PHPDoc for `paginate()`)

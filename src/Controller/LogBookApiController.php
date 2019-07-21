@@ -208,7 +208,7 @@ class LogBookApiController extends AbstractController
     {
         try {
             if ($suite !== null) {
-                if ($suite->getState() === 2 || $suite->getState() === 3) {
+                if ($suite->getState() === 1 || $suite->getState() === 2 || $suite->getState() === 3) {
                     $suite->setState(3);
                     $this->em->flush();
                     $response = $this->json([]);

@@ -135,7 +135,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
      * @param int $state
      * @return SuiteExecution|null
      */
-    public function findOneBySate(int $state=0)
+    public function findOneBySate(int $state=0): ?SuiteExecution
     {
         $ret = $this->createQueryBuilder('s')
             ->andWhere('s.publish = 1')
@@ -145,7 +145,8 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             ->setParameter('state', $state)
             ->setParameter('uuid', '')
             ->setMaxResults(1);
-        if ($state >= 0 && $state <=1) {
+        //if ($state >= 0 && $state <=1) {
+        if ($state === 0) {
             $ret = $ret->andWhere('s.jira_key IS NULL');
         }
         $ret = $ret->getQuery()

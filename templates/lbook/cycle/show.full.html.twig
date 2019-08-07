@@ -177,7 +177,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Name</th>
+                                    <th title="Name/UUID">Name</th>
                                     <th>Summary</th>
                                     <th title="All Tests/Enabled Tests">Tests</th>
                                     <th title="Testing Level">TL</th>
@@ -185,7 +185,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th>Platform</th>
                                     <th>Component</th>
                                     <th title="Test Environments">ENV</th>
-                                    <th title="JIRA KEY">JIRA</th>
+                                    <th title="JIRA KEY/Publish">JIRA</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -193,7 +193,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                             {% for suite in suites | slice(0, 200) %}
                                 <tr>
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
-                                    <td ondblclick="set_filter(this)">{{ suite.name }}</td>
+                                    <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
                                     <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
                                     <td>{{ suite.testingLevel }}</td>
@@ -201,7 +201,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
-                                    <td>{{ suite.jiraKey }}</td>
+                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}{{ suite.jiraKey }}{% endif %}</td>
                                 </tr>
                             {% endfor %}
                                 </tbody>

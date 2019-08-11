@@ -190,7 +190,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </thead>
                                 <tbody>
                             {% set builder = '' %}
-                            {% for suite in suites | slice(0, 200) %}
+                            {% for suite in suites | slice(0, 300) %}
                                 <tr>
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
@@ -201,11 +201,13 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
-                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}{{ suite.jiraKey }}{% endif %}</td>
+                                    <td>{% if suite.jiraKey is not null and | suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}{{ suite.jiraKey }}{% endif %}</td>
                                 </tr>
                             {% endfor %}
                                 </tbody>
                             </table>
+                        {% else %}
+                            Suites not found ({{ suitesCount }})
                         {% endif %}
                         {#</div>#}
                     </div>

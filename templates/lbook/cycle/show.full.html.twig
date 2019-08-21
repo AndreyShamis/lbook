@@ -368,7 +368,10 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     {% set jira_domain = parseDomain(test.suiteExecution.testSetUrl) %}
                                     {% if jira_domain | length > 0 %}
                                         {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ test.metaData[item] %}
+                                        <a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ test.metaData[item] }}</a>
                                     {% endif %}
+                                {% else %}
+                                    <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                                 {% endif %}
                             {% else %}
                                 <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>

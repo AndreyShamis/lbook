@@ -191,6 +191,13 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 <tbody>
                             {% set builder = '' %}
                             {% for suite in suites | slice(0, 200) %}
+                                {% set jira_test_set_url = '' %}
+                                {% if suite.publish and suite.jiraKey | length > 3 %}
+                                    {% set jira_domain = parseDomain(suite.testSetUrl) %}
+                                    {% if jira_domain | length > 0 %}
+                                    {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ suite.jiraKey %}
+                                    {% endif %}
+                                {% endif %}
                                 <tr>
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
@@ -201,7 +208,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
-                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}{{ suite.jiraKey }}{% endif %}</td>
+                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
                                 </tr>
                             {% endfor %}
                                 </tbody>
@@ -356,6 +363,13 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         {% if item in test.metaData|keys %}
                             {% if isUrl(test.metaData[item]) %}
                                 <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                            {% elseif item == 'EXECUTION_SHOW' %}
+                                {% if test.testKey is defined and test.testKey | length > 3 %}
+                                    {% set jira_domain = parseDomain(test.suiteExecution.testSetUrl) %}
+                                    {% if jira_domain | length > 0 %}
+                                        {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ test.metaData[item] %}
+                                    {% endif %}
+                                {% endif %}
                             {% else %}
                                 <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                         {% endif %}

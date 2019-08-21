@@ -53,7 +53,16 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new TwigFunction('inarray', array($this, 'inArray')),
+            new TwigFunction('parseDomain', array($this, 'parseDomain')),
         ];
+    }
+
+    public function parseDomain(string $input= null): string
+    {
+        if ($input !== null && strlen($input) > 5) {
+            return parse_url($input, PHP_URL_HOST);
+        }
+        return '';
     }
 
     /**

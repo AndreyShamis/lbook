@@ -8,6 +8,7 @@ use App\Entity\LogBookTest;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
+use App\Entity\SuiteExecution;
 use App\Repository\LogBookBuildRepository;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
@@ -280,6 +281,8 @@ class LogBookUploaderController extends AbstractController
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
         //curl --noproxy "127.0.0.1" --max-time 120 --form file=@autoserv.DEBUG --form token=$(date '+%d%m%H%M%S')$(((RANDOM % 99999)+1)) --form setup=TestSetupRandomToken  http://127.0.0.1:8080/upload/new_cli
         $obj = new LogBookUpload();
+        /** @var SuiteExecution $suite_execution */
+        $suite_execution = null;
         $p_data = $request->request;
         /** @var LogBookTest $test */
         $test = null;
@@ -413,6 +416,19 @@ class LogBookUploaderController extends AbstractController
                 $cycle->setDut($dut);
                 // Set token exparation after each test +1 hour
                 $cycle->setTokenExpiration(new \DateTime('+2 hours'));
+                if ($suite_execution !== null && $suite_execution->getPublish()) {
+                    $daysToAdd = $setup->getRetentionPolicy();
+                    if ($suite_execution->getTestingLevel() === 'weekly') {
+                        $cycle->setRetentionPolicy(max($daysToAdd, 370));
+                    } else if ($suite_execution->getTestingLevel() === 'nightly') {
+                        $cycle->setRetentionPolicy(max($daysToAdd, 200));
+                    } else {
+                        $cycle->setRetentionPolicy(max($daysToAdd, 93));
+                    }
+
+                } else {
+                    $cycle->setDefaultRetentionPolicy();
+                }
                 $setup->setUpdatedAt();
                 $this->em->flush();
                 $obj->addMessage('TestID is ' . $test->getId() . '.');

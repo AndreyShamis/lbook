@@ -417,7 +417,7 @@ class LogBookCycle
     }
 
     /**
-     * @PreFlush()
+     *
      */
     public function setDefaultRetentionPolicy(): void
     {
@@ -426,6 +426,23 @@ class LogBookCycle
             $setup = $this->getSetup();
             if ($setup !== null) {
                 $new_delete = new \DateTime(sprintf('+%d days', $setup->getRetentionPolicy()));
+                $this->setDeleteAt($new_delete);
+            }
+        } catch (\Exception $ex) {
+
+        }
+    }
+
+    /**
+     * @param int $daysToAdd
+     */
+    public function setRetentionPolicy($daysToAdd=10): void
+    {
+
+        try {
+            $setup = $this->getSetup();
+            if ($setup !== null) {
+                $new_delete = new \DateTime(sprintf('+%d days', $daysToAdd));
                 $this->setDeleteAt($new_delete);
             }
         } catch (\Exception $ex) {

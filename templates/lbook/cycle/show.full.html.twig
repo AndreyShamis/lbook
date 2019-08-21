@@ -8,6 +8,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
 {% endblock %}
 
 {% block content %}
+    {{ parseDomain("http://jira.mobileye.com/browse/MESW-102102") }}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
     {% set suitesCount = suites|length  %}

@@ -363,7 +363,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         {% if item in test.metaData|keys %}
                             {% if isUrl(test.metaData[item]) %}
                                 <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
-                            {% elseif item == 'EXECUTION_SHOW' %}
+                            {% elseif item == 'EXECUTION_SHOW' or item == 'TEST_CASE_SHOW' %}
                                 {% if test.testKey is defined and test.testKey | length > 3 %}
                                     {% set jira_domain = parseDomain(test.suiteExecution.testSetUrl) %}
                                     {% if jira_domain | length > 0 %}

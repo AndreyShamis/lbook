@@ -423,7 +423,11 @@ class LogBookUploaderController extends AbstractController
                     } else if ($suite_execution->getTestingLevel() === 'nightly') {
                         $cycle->setRetentionPolicy(max($daysToAdd, 200));
                     } else {
-                        $cycle->setRetentionPolicy(max($daysToAdd, 93));
+                        if (strpos($suite_execution->getJobName(), 'build_and_promote') !== false) {
+                            $cycle->setRetentionPolicy(max($daysToAdd, 7));
+                        } else {
+                            $cycle->setRetentionPolicy(max($daysToAdd, 93));
+                        }
                     }
 
                 } else {

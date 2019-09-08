@@ -415,13 +415,15 @@ class LogBookUploaderController extends AbstractController
                 $cycle->setController($uploader);
                 $cycle->setDut($dut);
                 // Set token exparation after each test +1 hour
-                $cycle->setTokenExpiration(new \DateTime('+2 hours'));
+                $cycle->setTokenExpiration(new \DateTime('+3 hours'));
                 if ($suite_execution !== null && $suite_execution->getPublish()) {
                     $daysToAdd = $setup->getRetentionPolicy();
                     if ($suite_execution->getTestingLevel() === 'weekly') {
                         $cycle->setRetentionPolicy(max($daysToAdd, 370));
+                        $cycle->setTokenExpiration(new \DateTime('+30 hours'));
                     } else if ($suite_execution->getTestingLevel() === 'nightly') {
                         $cycle->setRetentionPolicy(max($daysToAdd, 200));
+                        $cycle->setTokenExpiration(new \DateTime('+10 hours'));
                     } else {
                         if (strpos($suite_execution->getJobName(), 'build_and_promote') !== false) {
                             $cycle->setRetentionPolicy(max($daysToAdd, 7));

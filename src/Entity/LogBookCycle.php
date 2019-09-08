@@ -296,7 +296,7 @@ class LogBookCycle
          */
         $this->setUpdatedAt();
         $this->setCreatedAt();
-        $this->setTokenExpiration(new \DateTime('+1 hours'));
+        $this->setTokenExpiration(new \DateTime('+2 hours'));
         $this->setDeleteAt(new \DateTime('+100 days'));
         $this->setUploadToken(RandomString::generateRandomString(50));
         $this->meta_data = [];

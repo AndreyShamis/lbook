@@ -331,10 +331,16 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
         {% set builder = '' %}
         {% for test in iterator | slice(0, 20000) %}
             {% set test_disabled = '' %}
+            {% set testType = '' %}
             {% if test.isDisabled == 1 %}
-                {% set test_disabled = 'test-disabled' %}
+                {% set test_disabled = ' test-disabled ' %}
             {% endif %}
-            <tr class="{{ test_disabled }}">
+            {% if test.testType == 'PRE_CYCLE' %}
+                {% set testType = ' test-pre-cycle ' %}
+            {% elseif test.testType == 'POST_CYCLE' %}
+                {% set testType = ' test-post-cycle ' %}
+            {% endif %}
+            <tr class='{{ test_disabled }}{{ testType }}'>
                 {#{% if is_granted('edit', cycle.setup) %}#}
                     {% if 'SUITE_SHOW' in test.metaData|keys %}
                         {%  set column =  test.metaData['SUITE_SHOW'] %}
@@ -345,7 +351,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {#{% endif %}#}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
-                <td class="cycleName"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td class="cycleName" title="{{ test.testType }}"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td><span data-title="{{ test.timeRun }}">{{ test.timeRun | ExecutionTimeGeneric}}</span></td>
                 {% if cycle_show_test_time_start_show == true %}
                     {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}

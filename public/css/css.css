@@ -38,6 +38,16 @@
     color: #728088 !important;
 }
 
+.test-pre-cycle{
+    background-color: #d7f5d6 !important;
+    border-color: #6a858e !important;
+    color: #728088 !important;
+}
+.test-post-cycle{
+    background-color: #bad0ec !important;
+    border-color: #6a858e !important;
+    color: #728088 !important;
+}
 
 .log-debug hr{border-top-color:#a6e1ec;}
 .pagination{

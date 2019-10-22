@@ -42,7 +42,10 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
                     {% if suitesCount > 0 %}
-                    <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
+                        <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
+                    {% endif %}
+                    {% if errors | length > 0%}
+                        <li class=""><a data-toggle="tab" href="#failures">Failures</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
@@ -214,8 +217,28 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </tbody>
                             </table>
                         {% endif %}
-                        {#</div>#}
+                        {#
+                        </div>#}
                     </div>
+
+                    {% if errors | length > 0%}
+                        <div id="failures" class="tab-pane">
+                            <h6>Found {{ errors | length }} issues with description</h6>
+                            <table class="records_list table table-striped table-condensed">
+                                <tr>
+                                    <th style="width: 10%;">ExecutionOrder-Name</th>
+                                    <td style="width: 90%;">Description</td>
+                                </tr>
+                                {% for key, value in errors | slice(0, 20000) %}
+                                <tr>
+                                    <th>{{ key }}</th>
+                                    <td style="width: 90%;">{{ cleanAutotestFinalMessage(value) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endif %}
+
                     <div id="other" class="tab-pane">
                         <table class="records_list table table-striped table-condensed">
                             <tr>
@@ -237,6 +260,8 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         </table>
 
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -427,12 +452,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
 
     </table>
     {% endapply %}
-    {#{% if errors | length > 0%}#}
-        {#<h6>Found {{ errors | length }} issues with description</h6>#}
-        {#{% for key, value in errors | slice(0, 20000) %}#}
-            {#<strong>{{ key }}</strong> - {{ cleanAutotestFinalMessage(value) }} <br/>#}
-        {#{% endfor %}#}
-    {#{% endif %}#}
+
     <ul>
         <li><a href="{{ path('cycle_index') }}">Back to the list</a></li>
         {% if is_granted('edit', cycle.setup) %}

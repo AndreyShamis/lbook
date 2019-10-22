@@ -486,35 +486,36 @@ class LogBookCycleController extends AbstractController
             $deleteForm = $this->createDeleteForm($cycle);
             $nul_found = 0;
 
-            $additional_cols = array();
-            $additional_opt_cols = array();
+            $additional_cols = $additional_opt_cols = $suites = $failed_tests = $errors = array();
             $iterator->rewind();
-            $suites = array();
-            $errors = array();
+
+            $errors_found = false;
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $test = $iterator->current();
                     if ($test->getVerdict()->getName() !== 'PASS') {
-                        $logs = $test->getLogs();
-                        $err_key = $test->getExecutionOrder() . '-' . $test->getName();
-                        foreach ($logs as $log) {
-                            if ($log->getMsgType()->getName() === 'FAIL') {
-                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
-                                    $errors[$err_key] = $log->getMessage();
-                                }
-                            }
-                            if ($log->getMsgType()->getName() === 'ERROR') {
-                                if (strpos($log->getMessage(), 'ERROR ') === 0) {
-                                    $errors[$err_key] = $log->getMessage();
-                                }
-                            }
-                            if ($log->getMsgType()->getName() === 'UNKNOWN') {
-                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
-                                    $errors[$err_key] = $log->getMessage();
-                                }
-                            }
-                        }
+                        $errors_found = true;
+                        $failed_tests[] = $test;
+//                        $logs = $test->getLogs();
+//                        $err_key = $test->getExecutionOrder() . '-' . $test->getName();
+//                        foreach ($logs as $log) {
+//                            if ($log->getMsgType()->getName() === 'FAIL') {
+//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                            if ($log->getMsgType()->getName() === 'ERROR') {
+//                                if (strpos($log->getMessage(), 'ERROR ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                            if ($log->getMsgType()->getName() === 'UNKNOWN') {
+//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                        }
                     }
 
                     if ($test !== null) {
@@ -573,7 +574,9 @@ class LogBookCycleController extends AbstractController
                 'suites'                => $suites,
                 'suiteMode'             => $suiteMode,
                 'suite'                 => $suite,
-                'errors'                => $errors,
+                'errors_found'          => $errors_found,
+                'failed_tests'          => $failed_tests,
+//                'errors'                => $errors,
             );
 
             return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);

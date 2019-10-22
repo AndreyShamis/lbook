@@ -44,7 +44,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     {% if suitesCount > 0 %}
                         <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
                     {% endif %}
-                    {% if errors | length > 0%}
+                    {% if errors_found %}
                         <li class=""><a data-toggle="tab" href="#failures">Failures</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
@@ -221,20 +221,27 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         </div>#}
                     </div>
 
-                    {% if errors | length > 0%}
+                    {% if errors_found%}
                         <div id="failures" class="tab-pane">
-                            <h6>Found {{ errors | length }} issues with description</h6>
+                            {#<h6>Found {{ errors | length }} issues with description</h6>#}
                             <table class="records_list table table-striped table-condensed">
                                 <tr>
                                     <th style="width: 10%;">ExecutionOrder-Name</th>
                                     <td style="width: 90%;">Description</td>
                                 </tr>
-                                {% for key, value in errors | slice(0, 20000) %}
+                                {#{% for key, value in errors | slice(0, 20000) %}#}
+                                {#<tr>#}
+                                    {#<th>{{ key }}</th>#}
+                                    {#<td style="width: 90%;">{{ cleanAutotestFinalMessage(value) }}</td>#}
+                                {#</tr>#}
+                                {#{% endfor %}#}
+                                {% for f_test in failed_tests | slice(0, 500) %}
                                 <tr>
-                                    <th>{{ key }}</th>
-                                    <td style="width: 90%;">{{ cleanAutotestFinalMessage(value) }}</td>
+                                <th>{{ f_test.name }}</th>
+                                <td style="width: 90%;">{{ f_test.failDescription }}</td>
                                 </tr>
                                 {% endfor %}
+
                             </table>
                         </div>
                     {% endif %}

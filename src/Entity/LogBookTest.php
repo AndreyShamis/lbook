@@ -149,6 +149,9 @@ class LogBookTest
      */
     private $testKey = '';
 
+    /** @var string  */
+    protected $failDescription = '';
+
     public function getTestType(): string
     {
         $ret = 'TEST';
@@ -206,25 +209,39 @@ class LogBookTest
         return $ret_val;
     }
 
+    /**
+     * @return string
+     */
     public function getFailDescription(): string
     {
-        $ret_val = '';
-        if ($this->getVerdict()->getName() !== 'PASS') {
-            $errors = '';
-            $logs = $this->getLogs();
-            foreach ($logs as $log) {
-                if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
-                    $errors = $log->getMessage();
-                }
-                if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
-                    $errors = $log->getMessage();
-                }
-                if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
-                    $errors = $log->getMessage();
-                }
-            }
-            $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
+        // In cycle show we check twice what is the fail description,
+        // in second time we will get saved value
+        if ($this->failDescription !== null && $this->failDescription !== '') {
+            return $this->failDescription;
         }
+
+        $ret_val = '';
+        try {
+
+            if ($this->getVerdict()->getName() !== 'PASS') {
+                $errors = '';
+                $logs = $this->getLogs();
+                foreach ($logs as $log) {
+                    if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                        $errors = $log->getMessage();
+                    }
+                    if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                        $errors = $log->getMessage();
+                    }
+                    if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                        $errors = $log->getMessage();
+                    }
+                }
+                $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
+            }
+            $this->failDescription = $ret_val;
+        } catch (\Throwable $ex) {}
+
         return $ret_val;
     }
 
@@ -242,7 +259,6 @@ class LogBookTest
     {
         return $this->getFromMetaData('PLATFORM', '');
     }
-
 
     /**
      * @param array $meta_data

@@ -1,6 +1,4 @@
 {
-    "name": "andrey-shamis/logbook",
-    "description": "LogBook is a tool which allows easy store logs and then show them on the web",
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -86,5 +84,8 @@
             "allow-contrib": false,
             "require": "4.3.*"
         }
+    },
+    "repositories": {
+        "packagist": { "url": "https://packagist.org", "type": "composer" }
     }
 }

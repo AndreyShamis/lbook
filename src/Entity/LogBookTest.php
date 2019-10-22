@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Twig\AppExtension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -171,6 +172,65 @@ class LogBookTest
         return $this->meta_data;
     }
 
+    public function getFromMetaData(string $key, string $default=null): string
+    {
+        $ret_val = '';
+        try {
+            $metadata = $this->getMetaData();
+            if (array_key_exists($key, $metadata)) {
+                $ret_val = $metadata[$key];
+            } else {
+                if ($default !== null) {
+                    $ret_val = $default;
+                }
+            }
+        } catch (\Throwable $ex) {
+
+        }
+        return $ret_val;
+    }
+
+    public function getFailDescription(): string
+    {
+        $ret_val = '';
+        if ($this->getVerdict()->getName() !== 'PASS') {
+            $errors = '';
+            $logs = $this->getLogs();
+            foreach ($logs as $log) {
+                if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                    $errors = $log->getMessage();
+                }
+                if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                    $errors = $log->getMessage();
+                }
+                if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                    $errors = $log->getMessage();
+                }
+            }
+            $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
+        }
+        return $ret_val;
+    }
+
+    public function getSuiteName(): string
+    {
+        return $this->getFromMetaData('SUITE_SHOW', '');
+    }
+
+    public function getChip(): string
+    {
+        return $this->getFromMetaData('CHIP', '');
+    }
+
+    public function getPlatform(): string
+    {
+        return $this->getFromMetaData('PLATFORM', '');
+    }
+
+    public function getTestType(): string
+    {
+        return $this->getFromMetaData('TEST_TYPE_SHOW_OPT', '');
+    }
     /**
      * @param array $meta_data
      */

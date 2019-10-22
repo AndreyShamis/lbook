@@ -490,10 +490,33 @@ class LogBookCycleController extends AbstractController
             $additional_opt_cols = array();
             $iterator->rewind();
             $suites = array();
+            $errors = array();
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $test = $iterator->current();
+//                    if ($test->getVerdict()->getName() !== 'PASS') {
+//                        $logs = $test->getLogs();
+//                        $err_key = $test->getExecutionOrder() . '-' . $test->getName();
+//                        foreach ($logs as $log) {
+//                            if ($log->getMsgType()->getName() === 'FAIL') {
+//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                            if ($log->getMsgType()->getName() === 'ERROR') {
+//                                if (strpos($log->getMessage(), 'ERROR ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                            if ($log->getMsgType()->getName() === 'UNKNOWN') {
+//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
+//                                    $errors[$err_key] = $log->getMessage();
+//                                }
+//                            }
+//                        }
+//                    }
+
                     if ($test !== null) {
                         /**
                          * Search for metadata with _SHOW postfix, if exist that column will be shown
@@ -526,7 +549,6 @@ class LogBookCycleController extends AbstractController
                             $nul_found++;
                         }
                     }
-
                     $iterator->next();
                 }
             }
@@ -551,6 +573,7 @@ class LogBookCycleController extends AbstractController
                 'suites'                => $suites,
                 'suiteMode'             => $suiteMode,
                 'suite'                 => $suite,
+//                'errors'                => $errors,
             );
 
             return $this->render('lbook/cycle/show.full.html.twig', $ret_arr);

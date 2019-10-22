@@ -54,6 +54,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new TwigFunction('inarray', array($this, 'inArray')),
             new TwigFunction('parseDomain', array($this, 'parseDomain')),
+            new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
         ];
     }
 
@@ -189,6 +190,26 @@ class AppExtension extends AbstractExtension
             $ret = 'text-danger';
         }
         return $ret;
+    }
+
+    /**
+     * @param string|null $input
+     * @return string
+     */
+    public static function cleanAutotestFinalMessage(string $input=null): string
+    {
+        $ret_val = $input;
+        try {
+            preg_match_all("/(FAIL|ERROR) .*\d\d\:\d\d\:\d\d\s+(.*)/", $input, $out, PREG_PATTERN_ORDER);
+
+            if (count($out) > 1 && count($out[2]) >= 1) {
+                $ret_val = $out[2][0];
+            }
+        } catch (\Throwable $ex) {
+
+        }
+
+        return $ret_val;
     }
 
     /**

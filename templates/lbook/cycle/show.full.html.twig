@@ -406,7 +406,15 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     {#<td>{{ test.dutUpTimeStart }}</td>#}
                     {#<td>{{ test.dutUpTimeEnd }}</td>#}
                 {#{% endif %}#}
-                <td><span class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                {% set title = '' %}
+                {% if test.verdict != 'PASS' %}
+                    {#{% set ar_key = test.executionOrder ~ '-' ~ test.name %}#}
+                    {#{% if ar_key in errors | keys %}#}
+                        {% set title = test.failDescription %}
+                        {#{% set title = cleanAutotestFinalMessage(errors[ar_key]) %}#}
+                    {#{% endif %}#}
+                {% endif %}
+                <td><span class="badge {{verdictToBadge(test.verdict)}}" title="{{ title }}">{{ test.verdict }}</span></td>
                 <td>{{ test.logFileSize }}</td>
                 {#<td>#}
                     {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
@@ -419,6 +427,12 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
 
     </table>
     {% endapply %}
+    {#{% if errors | length > 0%}#}
+        {#<h6>Found {{ errors | length }} issues with description</h6>#}
+        {#{% for key, value in errors | slice(0, 20000) %}#}
+            {#<strong>{{ key }}</strong> - {{ cleanAutotestFinalMessage(value) }} <br/>#}
+        {#{% endfor %}#}
+    {#{% endif %}#}
     <ul>
         <li><a href="{{ path('cycle_index') }}">Back to the list</a></li>
         {% if is_granted('edit', cycle.setup) %}

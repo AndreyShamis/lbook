@@ -38,6 +38,13 @@
                         <table class="records_list table table-striped table-condensed">
                             <tbody>
                             <tr>
+                                <th>Setup / Cycle info</th>
+                                <td>
+                                    <span class="blue">{{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}</span>
+                                    /
+                                    <span class="blue">{{ test.cycle.id }} : {{ test.cycle.name }}</span>
+                                </td>
+
                                 <th>Order</th>
                                 <td>{{ test.executionOrder }}</td>
                                 <th>
@@ -58,16 +65,16 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Setup / Cycle info</th>
-                                <td>
-                                    <span class="blue">{{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}</span>
-                                    /
-                                    <span class="blue">{{ test.cycle.id }} : {{ test.cycle.name }}</span>
-                                </td>
+                                <th>Suite</th>
+                                <td>{{ test.suiteName }}</td>
+                                <th>Type</th>
+                                <td>{{ test.testType }}</td>
                                 <th>File Size</th>
                                 <td>{{ formatBytes(test.logFileSize) }} ( {{ test.logFileSize }} )</td>
                             </tr>
                             <tr>
+                                <th>Chip</th>
+                                <td>{{ test.chip }}</td>
                                 <th>Time start / Time end</th>
                                 <td>
                                     <i class="ace-icon fa fa-calendar"></i>
@@ -92,6 +99,8 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th>Platform</th>
+                                <td>{{ test.platform }}</td>
                                 <th>Verdict</th>
                                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
                                 <th></th>

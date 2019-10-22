@@ -243,10 +243,7 @@ class LogBookTest
         return $this->getFromMetaData('PLATFORM', '');
     }
 
-    public function getTestType(): string
-    {
-        return $this->getFromMetaData('TEST_TYPE_SHOW_OPT', '');
-    }
+
     /**
      * @param array $meta_data
      */

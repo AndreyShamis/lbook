@@ -41,7 +41,7 @@ class LogBookBuildController extends AbstractController
             /** @var LogBookBuild $build */
             foreach ($builds as $build) {
                 if ($build !== null) {
-                    $add_to_view = true;
+                    $add_to_view = false;
                     $build_id = $build->getId();
                     $prev_count = $build->getCycles();
                     $current_counter = $build->getDeleteCounter();
@@ -51,14 +51,13 @@ class LogBookBuildController extends AbstractController
                         $build->setDeleteCounter(0);
                         $em->persist($build);
                         $updated++;
-                        if ($cycles_found_in_build > 0) {
-                            $add_to_view = false;
+                        if ($cycles_found_in_build === 0 || $prev_count === 0 ) {
+                            $add_to_view = true;
                         }
                     }
                     if ($current_counter > 10) {
                         $em->remove($build);
                         $removed++;
-                        $add_to_view = false;
                     }
                     else if ($build->getCycles() === 0 && $prev_count === 0) {
                         $add_to_view = true;

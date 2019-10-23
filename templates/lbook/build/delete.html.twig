@@ -6,6 +6,7 @@
     <h1>List of builds</h1>
     <div>Updated cycle cizes for {{ updated }} builds.</div>
     <div>Counter for builds increased for delete is {{ counterIncreased }}.</div>
+    <div>Removed {{ removed }}.</div>
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
@@ -16,6 +17,7 @@
             <th data-sorter="htmlSorter" data-sortable="true">Id</th>
             <th data-sorter="htmlSorter" data-sortable="true">Name</th>
             <th data-sortable="true" title="Total cycles count in this build">Cycles</th>
+            <th data-sortable="true" title="Delete counter on 10 it will be removed">Delete Counter</th>
             <th>actions</th>
         </tr>
         </thead>
@@ -26,6 +28,7 @@
                 <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
                 <td><a href="{{ path('build_show_cycles_first', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>
                 <td>{{ log_book_build.cycles }}</td>
+                <td>{{ log_book_build.deleteCounter }}</td>
                 <td>
                     {% if log_book_build.cycles == 0 %}
                         DELETE

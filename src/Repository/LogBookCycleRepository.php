@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
+use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Log\LoggerInterface;
@@ -112,8 +113,26 @@ class LogBookCycleRepository extends ServiceEntityRepository
     {
         /** @var LogBookTestRepository $testRepo */
         $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
+        /** @var SuiteExecutionRepository $suiteRepo */
+        $suiteRepo = $this->getEntityManager()->getRepository('App:SuiteExecution');
         $testRepo->deleteByCycle($cycle);
         $logs = $setup_path = '';
+        try {
+            $suiteRepo->find(['cycle' => $cycle]);
+            /** @var SuiteExecution $suite */
+            foreach ($suiteRepo as $suite) {
+                $suite->setCycle(null);
+                $this->_em->persist($suite);
+            }
+
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[CYCLE][DELETE]: $suiteRepo Throwable CYCLE ID:' . $cycle->getId(),
+                array(
+                    $ex->getMessage(),
+                    $ex,
+                    $logs,
+                    $setup_path));
+        }
         try {
             $fileSystem = new Filesystem();
             $setup_path = $cycle->getSetup()->getLogFilesPath();

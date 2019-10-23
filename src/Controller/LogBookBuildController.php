@@ -75,7 +75,7 @@ class LogBookBuildController extends AbstractController
 
         return array(
             'removed'           => $removed,
-            'iterator'          => $add_to_view,
+            'iterator'          => $builds_to_show,
             'counterIncreased'  => $counterIncreased,
             'updated'           => $updated,
         );

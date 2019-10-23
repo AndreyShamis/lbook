@@ -1,10 +1,11 @@
 {% extends 'lbook/default/index.html.twig' %}
 
-{% block title %}LogBookBuild index{% endblock %}
+{% block title %}LogBook Build index{% endblock %}
 
 {% block content %}
     <h1>List of builds</h1>
     <div>Count : {{ size }}</div>
+    <a href="{{ path('log_book_build_clean_not_used') }}">Clean builds table (tool for Administrative usage)</a>
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "log_book_build_index" %}
     {% include "lbook/paginator.html.twig" %}
@@ -16,6 +17,7 @@
                 <th data-sorter="htmlSorter" data-sortable="true">Id</th>
                 <th data-sorter="htmlSorter" data-sortable="true">Name</th>
                 <th data-sortable="true" title="Total cycles count in this build">Cycles</th>
+                <th data-sortable="true" title="Total cycles count in this build">Delete progress</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -25,6 +27,7 @@
                 <td><a href="{{ path('log_book_build_show', {'id': log_book_build.id}) }}">{{ log_book_build.id }}</a></td>
                 <td><a href="{{ path('build_show_cycles_first', {'id': log_book_build.id}) }}">{{ log_book_build.name }}</a></td>
                 <td>{{ log_book_build.cycles }}</td>
+                <td>{% if log_book_build.cycles == 0 %}{{ log_book_build.deleteCounter }}{% endif %}</td>
                 <td>
                     {% if is_granted('edit', log_book_build) %}
                         <a href="{{ path('log_book_build_edit', {'id': log_book_build.id}) }}">edit</a>

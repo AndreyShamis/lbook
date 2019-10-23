@@ -236,6 +236,9 @@ class LogBookTest
                     if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
                     }
+                    if ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
+                        $errors = $log->getMessage();
+                    }
                 }
                 $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
             }

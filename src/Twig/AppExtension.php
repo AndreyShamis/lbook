@@ -200,7 +200,7 @@ class AppExtension extends AbstractExtension
     {
         $ret_val = $input;
         try {
-            preg_match_all("/(FAIL|ERROR) .*\d\d\:\d\d\:\d\d\s+(.*)/", $input, $out, PREG_PATTERN_ORDER);
+            preg_match_all("/(FAIL|ERROR|TEST_NA) .*\d\d\:\d\d\:\d\d\s+(.*)/", $input, $out, PREG_PATTERN_ORDER);
 
             if (count($out) > 1 && count($out[2]) >= 1) {
                 $ret_val = $out[2][0];

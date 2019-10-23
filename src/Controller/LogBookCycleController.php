@@ -494,7 +494,7 @@ class LogBookCycleController extends AbstractController
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $test = $iterator->current();
-                    if ($test->getVerdict()->getName() !== 'PASS') {
+                    if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
                         $errors_found = true;
                         $failed_tests[] = $test;
 //                        $logs = $test->getLogs();

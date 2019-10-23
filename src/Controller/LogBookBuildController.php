@@ -34,7 +34,7 @@ class LogBookBuildController extends AbstractController
         $builds = $logBookBuildRepository->findAll();
         $em = $this->getDoctrine()->getManager();
         $updated = 0;
-        $em->flush();
+
         try {
             /** @var LogBookBuild $build */
             foreach ($builds as $build) {
@@ -53,7 +53,7 @@ class LogBookBuildController extends AbstractController
                 }
             }
         } catch (\Throwable $ex) { }
-
+        $em->flush();
         return array(
             'iterator'  => $builds,
             'updated'   => $updated,

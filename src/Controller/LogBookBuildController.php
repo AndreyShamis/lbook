@@ -66,7 +66,9 @@ class LogBookBuildController extends AbstractController
                         $em->persist($build);
                         $counterIncreased++;
                     }
-                    $builds_to_show[] = $build;
+                    if ($add_to_view) {
+                        $builds_to_show[] = $build;
+                    }
                 }
             }
         } catch (\Throwable $ex) { }

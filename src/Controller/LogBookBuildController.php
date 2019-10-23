@@ -21,6 +21,45 @@ class LogBookBuildController extends AbstractController
     protected $index_size = 500;
     protected $show_cycle_size = 1000;
 
+
+    /**
+     * @Route("/clean_not_used", name="log_book_build_clean_not_used", methods="GET")
+     * @Template(template="lbook/build/delete.html.twig")
+     * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookBuildRepository $logBookBuildRepository
+     * @return array
+     */
+    public function cleanNotUsed(LogBookCycleRepository $cycleRepo, LogBookBuildRepository $logBookBuildRepository): array
+    {
+        $builds = $logBookBuildRepository->findAll();
+        $em = $this->getDoctrine()->getManager();
+        $updated = 0;
+        $em->flush();
+        try {
+            /** @var LogBookBuild $build */
+            foreach ($builds as $build) {
+                if ($build !== null) {
+                    $build_id = $build->getId();
+                    $cycles_found_in_build = $cycleRepo->count(array('build' => $build_id));
+                    if ($cycles_found_in_build !== $build->getCycles()) {
+                        $build->setCycles($cycles_found_in_build);
+                        $build->setDeleteCounter(0);
+                        $em->persist($build);
+                        $updated++;
+                    } elseif ($build->getCycles() === 0) {
+                        $build->increaseDeleteCounter();
+                        $em->persist($build);
+                    }
+                }
+            }
+        } catch (\Throwable $ex) { }
+
+        return array(
+            'iterator'  => $builds,
+            'updated'   => $updated,
+        );
+    }
+
     /**
      * @Route("/page/{page}", name="log_book_build_index", methods="GET")
      * @Template(template="lbook/build/index.html.twig")

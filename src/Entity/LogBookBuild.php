@@ -28,7 +28,19 @@ class LogBookBuild
      */
     protected $name = '';
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="cycles_found", type="integer", options={"unsigned"=true, "default"="0"})
+     */
     protected $cycles = 0;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="delete_counter", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    protected $deleteCounter = 0;
 
     /**
      * @return mixed
@@ -85,6 +97,32 @@ class LogBookBuild
     public function setName(string $name): void
     {
         $this->name = self::validateName($name);
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeleteCounter(): int
+    {
+        return $this->deleteCounter;
+    }
+
+    /**
+     * @param int $deleteCounter
+     * @return LogBookBuild
+     */
+    public function setDeleteCounter(int $deleteCounter): self
+    {
+        $this->deleteCounter = $deleteCounter;
+        return $this;
+    }
+
+    /**
+     * @return LogBookBuild
+     */
+    public function increaseDeleteCounter(): self
+    {
+        return $this->setDeleteCounter($this->getDeleteCounter() + 1);
     }
 
     /**

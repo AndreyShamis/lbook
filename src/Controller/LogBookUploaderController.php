@@ -711,7 +711,7 @@ class LogBookUploaderController extends AbstractController
                 || strpos($value, 'EQACC:')  !== false
                 || strpos($value, 'Post login')  !== false
                 || strpos($value, '==> Pre Test')  !== false
-                || strpos($value, '==========') !== false) {
+                || (strpos($value, '==========') !== false) && strpos($value, '==================== ') === false) {
                 $value = null;
                 unset($temp_arr[$key]);
                 continue;

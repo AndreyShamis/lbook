@@ -703,11 +703,20 @@ class LogBookUploaderController extends AbstractController
         $firstLines = true;
         foreach ($temp_arr as $key => $value) {
             $msg_len = mb_strlen($value);
-            if ($msg_len < $this->_MIN_LOG_STR_LEN || $msg_len > $this->MAX_SINGLE_LOG_SIZE) {
+            if ($msg_len < $this->_MIN_LOG_STR_LEN
+                || $msg_len > $this->MAX_SINGLE_LOG_SIZE
+                || strpos($value, '##############################') !== false
+                || strpos($value, '*************************') !== false
+                || strpos($value, ' LOGBOOK ')  !== false
+                || strpos($value, 'EQACC:')  !== false
+                || strpos($value, 'Post login')  !== false
+                || strpos($value, '==> Pre Test')  !== false
+                || strpos($value, '==========') !== false) {
                 $value = null;
                 unset($temp_arr[$key]);
                 continue;
             }
+
             preg_match_all('/(\d{2,}.*\d{1,1})\s*([A-Z]+)\s*\|\s*(.*)/', $value,$oneLine);
             if (\count($oneLine[2]) > 0) {
                 $last_good_key = $key;

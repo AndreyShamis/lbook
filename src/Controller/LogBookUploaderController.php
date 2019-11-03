@@ -1090,6 +1090,9 @@ class LogBookUploaderController extends AbstractController
             case 'warning':
                 $ret = $this->verdictRepo->findOneOrCreate($criteria);
                 break;
+            case 'abort':
+                $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'ABORT'));
+                break;
             default:
                 //$ret = $this->verdictRepo->findOneOrCreate($criteria);
                 $ret = $this->verdictRepo->findOneOrCreate(array('name' => 'UNKNOWN'));

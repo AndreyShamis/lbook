@@ -1,0 +1,69 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Suite Execution</h1>
+
+    <table class="records_list table table-striped table-condensed">
+        <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ suite.id }}
+
+                {% if suite.cycle.id is defined %}
+                    Cycle :
+                    {{ suite.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a>
+                {% endif %}
+            </td>
+            <th>Testing Level</th>
+            <td>{{ suite.testingLevel }}</td>
+            <th>UUID</th>
+            <td>{{ suite.uuid }}</td>
+            <th>Components</th>
+            <td>{{ suite.components|join(', ') }}</td>
+            <th>Runtime</th>
+            <td>{{ suite.runTime | ExecutionTimeGeneric }}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ suite.name }}</td>
+            <th>Platform</th>
+            <td>{{ suite.platform }}</td>
+            <th>Build Tag</th>
+            <td>{{ suite.buildTag }}</td>
+            <th>CI TAGET ARCH</th>
+            <td>{{ suite.targetArch }}</td>
+            <th>Time Started</th>
+            <td>{{ suite.startedAt|time_diff }} {{ suite.startedAt|date('d/m/Y H:i:s') }} </td>
+        </tr>
+        <tr>
+            <th>Summary</th>
+            <td>{{ suite.summary }}</td>
+            <th>Chip</th>
+            <td>{{ suite.chip }}</td>
+            <th>CI URL</th>
+            <td><a href="{{ suite.ciUrl }}" target="_blank">{{ suite.ciUrl }}</a></td>
+            <th>CI ARCH</th>
+            <td>{{ suite.arch }}</td>
+            <th>Time Finished</th>
+            <td>{{ suite.finishedAt|time_diff }}  {{ suite.finishedAt|date('d/m/Y H:i:s') }} </td>
+        </tr>
+        </tbody>
+    </table>
+    <pre style="font-size: 10px;">
+        {{ suite.description }}
+    </pre>
+
+    <div class="row">
+        <div id="suiteExecutionToolBar">
+        </div>
+        {% include "lbook/suite/list.html.twig" %}
+
+    </div>
+
+    {#    <ul>#}
+{#        <li><a href="{{ path('user_index') }}">Back to the list</a></li>#}
+{#        {% if is_granted('edit', user) %}#}
+{#            <li><a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a></li>#}
+{#        {% endif %}#}
+{#    </ul>#}
+{% endblock %}

@@ -164,13 +164,136 @@ class SuiteExecution
     private $updatedAt;
 
     /**
+     * @ORM\Column(name="started_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $startedAt;
+
+    /**
+     * @ORM\Column(name="finished_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $finishedAt;
+    /**
+     * @ORM\Column(type="integer", options={"default"="0"})
+     */
+    private $totalExecutedTests = 0;
+
+    /**
+     * @ORM\Column(type="float", options={"default"="0"})
+     */
+    private $passRate = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $passCount = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $failCount = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $errorCount = 0;
+
+    /**
      * SuiteExecution constructor.
      */
     public function __construct()
     {
-        $this->setUpdatedAt();
-        $this->setCreatedAt();
+        try {
+            $this->setUpdatedAt();
+        } catch (\Exception $e) {
+        }
+        try {
+            $this->setCreatedAt();
+        } catch (\Exception $e) {
+        }
         $this->tests = new ArrayCollection();
+    }
+
+    public function getRunTime(): int
+    {
+        $ret = 0;
+        try {
+            $ret = $this->getFinishedAt()->getTimestamp() - $this->getStartedAt()->getTimestamp();
+            if ($ret < 0) {
+                $ret = 0;
+            }
+        } catch (\Throwable $ex) {}
+        return $ret;
+    }
+
+    /**
+     *
+     */
+    public function calculateStatistic()
+    {
+        $passCount = 0;
+        $failCount = 0;
+        $errorCount = 0;
+        $total_test_time = 0;
+        $startTime = new \DateTime('+100 years');
+        $endTime = new \DateTime('-100 years');
+        $totoal_real_tests_found = 0;
+        /** @var LogBookTest[] $tests */
+        $tests = $this->getTests();
+        /** @var LogBookTest $test */
+        foreach ($tests as $test) {
+            $type = $test->getTestType();
+            if ($type === 'TEST') {
+                $totoal_real_tests_found += 1;
+                if ($test->isPass()) {
+                    $passCount += 1;
+                }
+                if ($test->isFail()) {
+                    $failCount += 1;
+                }
+                if ($test->isError()) {
+                    $errorCount += 1;
+                }
+            }
+            $startTime = min($startTime, $test->getTimeStart());
+            $endTime = max($endTime, $test->getTimeEnd());
+
+            $total_test_time += $test->getTimeRun();
+        }
+
+        $suite_tests_count = $this->getTestsCount();
+        if ($totoal_real_tests_found > $suite_tests_count) {
+            $cof = $totoal_real_tests_found;
+
+        } else {
+            $cof = $suite_tests_count;
+        }
+        $sof = 0;
+        if ($cof > 0) {
+            $sof = 100 / $cof;
+        }
+        $this->setTotalExecutedTests($totoal_real_tests_found);
+        $this->setPassRate(round($sof * $passCount, 2));
+        $this->setPassCount($passCount);
+        $this->setFailCount($failCount);
+        $this->setErrorCount($errorCount);
+        $this->setStartedAt($startTime);
+        $this->setFinishedAt($endTime);
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalExecutedTests(): int
+    {
+        return $this->totalExecutedTests;
+    }
+
+    /**
+     * @param int $totalExecutedTests
+     */
+    public function setTotalExecutedTests(int $totalExecutedTests): void
+    {
+        $this->totalExecutedTests = $totalExecutedTests;
     }
 
     /**
@@ -591,6 +714,78 @@ class SuiteExecution
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    public function getPassRate(): ?float
+    {
+        return $this->passRate;
+    }
+
+    public function setPassRate(float $passRate): self
+    {
+        $this->passRate = $passRate;
+
+        return $this;
+    }
+
+    public function getStartedAt(): ?\DateTimeInterface
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(\DateTimeInterface $startedAt): self
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
+
+    public function getFinishedAt(): ?\DateTimeInterface
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(\DateTimeInterface $finishedAt): self
+    {
+        $this->finishedAt = $finishedAt;
+
+        return $this;
+    }
+
+    public function getPassCount(): ?int
+    {
+        return $this->passCount;
+    }
+
+    public function setPassCount(int $passCount): self
+    {
+        $this->passCount = $passCount;
+
+        return $this;
+    }
+
+    public function getFailCount(): ?int
+    {
+        return $this->failCount;
+    }
+
+    public function setFailCount(int $failCount): self
+    {
+        $this->failCount = $failCount;
+
+        return $this;
+    }
+
+    public function getErrorCount(): ?int
+    {
+        return $this->errorCount;
+    }
+
+    public function setErrorCount(int $errorCount): self
+    {
+        $this->errorCount = $errorCount;
+
+        return $this;
     }
 
 }

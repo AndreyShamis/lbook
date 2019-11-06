@@ -56,6 +56,11 @@
     width:70px !important;
     text-align: right !important;
 }
+.suite_list_options_column{
+    max-width:90px !important;
+    width:70px !important;
+    text-align: center !important;
+}
 .setup_list_options_column{
     max-width:90px !important;
     width:70px !important;
@@ -179,4 +184,17 @@ th.meta_data_column{
 
 .testLog tr:hover{
     border: 1px solid rgba(0, 0, 255, 0.25);
+}
+
+.passClass {
+    color: #82af6f;
+    text-align: right;
+}
+.failClass {
+    color: #d15b47;
+    text-align: right;
+}
+.errorClass {
+    color: #f89405;
+    text-align: right;
 }

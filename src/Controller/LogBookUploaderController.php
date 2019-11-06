@@ -436,6 +436,12 @@ class LogBookUploaderController extends AbstractController
                     $cycle->setDefaultRetentionPolicy();
                 }
                 $setup->setUpdatedAt();
+                try {
+                    /** @var SuiteExecution $current_cuite_execution */
+                    $current_cuite_execution = $test->getSuiteExecution();
+                    $current_cuite_execution->calculateStatistic();
+                    $this->em->persist($current_cuite_execution);
+                } catch (\Throwable $ex) {}
                 $this->em->flush();
                 $obj->addMessage('TestID is ' . $test->getId() . '.');
             }

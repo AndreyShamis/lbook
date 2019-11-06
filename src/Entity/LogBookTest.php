@@ -396,6 +396,48 @@ class LogBookTest
     }
 
     /**
+     * @return bool
+     */
+    public function isPass(): bool
+    {
+        try {
+            $verdict = strtolower($this->getVerdict()->getName());
+            if ($verdict === 'pass' || $verdict === 'success') {
+                return true;
+            }
+        } catch (\Throwable $ex) {}
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFail(): bool
+    {
+        try {
+            $verdict = strtolower($this->getVerdict()->getName());
+            if ($verdict === 'fail' || $verdict === 'failed' || $verdict === 'failure') {
+                return true;
+            }
+        } catch (\Throwable $ex) {}
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        try {
+            $verdict = strtolower($this->getVerdict()->getName());
+            if ($verdict === 'error') {
+                return true;
+            }
+        } catch (\Throwable $ex) {}
+        return false;
+    }
+
+    /**
      * @param LogBookVerdict $verdict
      */
     public function setVerdict(LogBookVerdict $verdict): void
@@ -598,6 +640,10 @@ class LogBookTest
         return $this->suite_execution;
     }
 
+    /**
+     * @param SuiteExecution|null $suite_execution
+     * @return LogBookTest
+     */
     public function setSuiteExecution(?SuiteExecution $suite_execution): self
     {
         $this->suite_execution = $suite_execution;

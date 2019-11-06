@@ -183,6 +183,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th title="Name/UUID">Name</th>
                                     <th>Summary</th>
                                     <th title="All Tests/Enabled Tests">Tests</th>
+                                    <th title="Pass Rate">Pass Rate</th>
                                     <th title="Testing Level">TL</th>
                                     <th>Chip</th>
                                     <th>Platform</th>
@@ -206,6 +207,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
                                     <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
                                     <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
+                                    <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
                                     <td>{{ suite.testingLevel }}</td>
                                     <td>{{ suite.chip }}</td>
                                     <td>{{ suite.platform }}</td>

@@ -26,6 +26,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
             new TwigFilter('TimeToHour', array($this, 'TimeToHour')),
             new TwigFilter('getPercentage', array($this, 'getPercentage')),
+            new TwigFilter('jiraKey', array($this, 'jiraKey')),
             new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
             new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
             new TwigFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
@@ -55,6 +56,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('inarray', array($this, 'inArray')),
             new TwigFunction('parseDomain', array($this, 'parseDomain')),
             new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
+            new TwigFunction('jiraKey', array($this, 'jiraKey')),
         ];
     }
 
@@ -161,6 +163,24 @@ class AppExtension extends AbstractExtension
         return $ret;
     }
 
+    public function jiraKey(string $jiraUrl = null): string
+    {
+        $ret = '';
+        try {
+            $tmp = explode('/', $jiraUrl);
+            foreach ($tmp as $key => $val) {
+                if ($val === 'browse') {
+                    if (array_key_exists($key+1, $tmp)){
+                        $ret = $tmp[$key + 1];
+                    } else {
+                        $ret = '';
+                    }
+                    break;
+                }
+            }
+        } catch (\Throwable $ex) {}
+        return $ret;
+    }
     /**
      * Return classes in percentage range
      * @param $passRate - percentage

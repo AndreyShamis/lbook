@@ -1,0 +1,42 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Suite Execution list{% endblock %}
+{% block content %}
+    <h1 style="margin-top: 0 !important;">Suite Execution list</h1>
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    {% set pagePath = "suite_index" %}
+    <div class="row">
+        <div class="col-sm-12 text-center">{% include "lbook/paginator.html.twig" %}</div>
+    </div>
+    <div class="row">
+        <div id="suiteExecutionToolBar">
+        </div>
+        {% include "lbook/suite/list.html.twig" %}
+
+    </div>
+{#    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}#}
+{#        <div class="row">#}
+{#            <ul>#}
+{#                <li>#}
+{#                    <a href="{{ path('suite_new') }}">Create a new suite</a>#}
+{#                </li>#}
+{#            </ul>#}
+{#            <div class="well">#}
+{#                <h4 class="green smaller lighter">suite information</h4>#}
+{#                Only ROLE_SUPER_ADMIN can add new suite#}
+{#            </div>#}
+{#        </div>#}
+{#    {% endif %}#}
+    <script>
+        $(document).ready(function() {
+            $( "#suiteExecutionToolBar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                location.reload();
+            });
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
+            } catch (e) {}
+        });
+
+    </script>
+{% endblock %}

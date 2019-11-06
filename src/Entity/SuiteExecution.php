@@ -211,7 +211,7 @@ class SuiteExecution
         } catch (\Exception $e) {
         }
         $this->startedAt = new \DateTime();
-        $this->createdAt = new \DateTime();
+        $this->finishedAt = new \DateTime();
         $this->tests = new ArrayCollection();
     }
 

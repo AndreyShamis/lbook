@@ -210,6 +210,8 @@ class SuiteExecution
             $this->setCreatedAt();
         } catch (\Exception $e) {
         }
+        $this->startedAt = new \DateTime();
+        $this->createdAt = new \DateTime();
         $this->tests = new ArrayCollection();
     }
 

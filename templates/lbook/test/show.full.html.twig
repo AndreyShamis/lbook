@@ -14,14 +14,17 @@
 
         <div class="col-xs-2">
             {#<span style="float: right;">#}
-                {#<button class="btn btn-white btn-info btn-bold" id="saveTestAsText">#}
-                    {#<i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>#}
-                    {#Download#}
-                {#</button>#}
+            {#<button class="btn btn-white btn-info btn-bold" id="saveTestAsText">#}
+            {#<i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>#}
+            {#Download#}
+            {#</button>#}
             {#</span>#}
         </div>
     </div>
-
+    {% set suite = '' %}
+    {% if test.suiteExecution %}
+    {% set suite = test.suiteExecution %}
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
             <div class="tabbable">
@@ -29,6 +32,9 @@
                     <li class="active"><a data-toggle="tab" href="#main">Main</a></li>
                     {% if test.metaData %}
                         <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ test.metaData | length }})</a></li>
+                    {% endif %}
+                    {% if suite %}
+                        <li class="" title="Suite {{ suite.summary }}"><a data-toggle="tab" href="#suiteExecution">{{ suite.id }} - {{ suite.name }} - {{ suite.passRate }}%</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
@@ -52,16 +58,16 @@
                                     /
                                     <span title="Click on 'Show' to view log in row format">Show</span></th>
                                 <td>
-                                {% if file_exist %}
-                                    <span class="ace-icon fa fa-cloud-download light-green" title="Click on download for download log file to your computer"> </span>
-                                    <a href="{{ path('download_log', {'id': test.id }) }}">Download</a>
-                                    /
-                                    <span class="ace-icon fa fa-eye green" title="Click on 'Show' to view log in row format"> </span>
-                                    <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
-                                {% else %}
-                                    <span class="ace-icon fa fa-exclamation-circle red"> </span>
-                                    Log file not found
-                                {% endif %}
+                                    {% if file_exist %}
+                                        <span class="ace-icon fa fa-cloud-download light-green" title="Click on download for download log file to your computer"> </span>
+                                        <a href="{{ path('download_log', {'id': test.id }) }}">Download</a>
+                                        /
+                                        <span class="ace-icon fa fa-eye green" title="Click on 'Show' to view log in row format"> </span>
+                                        <a href="{{ path('show_log', {'id': test.id }) }}">Show</a>
+                                    {% else %}
+                                        <span class="ace-icon fa fa-exclamation-circle red"> </span>
+                                        Log file not found
+                                    {% endif %}
                                 </td>
                             </tr>
                             <tr>
@@ -79,23 +85,23 @@
                                 <td>
                                     <i class="ace-icon fa fa-calendar"></i>
                                     <span class="blue" title="Start time">
-                                        {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
-                                    </span>
+ {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
+ </span>
                                     /
                                     <i class="ace-icon fa fa-calendar"></i>
                                     <span class="blue" title="End time">
-                                        {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
-                                    </span>
+ {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
+ </span>
                                 </td>
                                 <th>Run time / % of cycle time</th>
                                 <td>
                                     <i class="ace-icon fa fa-info-circle" title="Show test run time"></i>
-                                    <span title="{{ test.timeRun }} seconds">{{ test.timeRun |  ExecutionTimeGeneric }}</span>
+                                    <span title="{{ test.timeRun }} seconds">{{ test.timeRun | ExecutionTimeGeneric }}</span>
                                     / &nbsp;&nbsp;
                                     <i class="ace-icon fa fa-info-circle" title="Show this test run time percentage in whole cycle"></i>
                                     <span class="orange">
-                                        {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
-                                    </span>
+ {{ getPercentage(test.timeRun, test.cycle.testsTimeSum) }}%
+ </span>
                                 </td>
                             </tr>
                             <tr>
@@ -110,19 +116,60 @@
                         </table>
                     </div>
 
+                    {% if suite %}
+                        <div id="suiteExecution" class="tab-pane">
+                            <table class="table table-bordered table-hover table-condensed">
+{#                                {% if suite.ciUrl | length > 0 %}#}
+                                <tr>
+                                    <th>Tests Total/Enabled</th>
+                                    <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</span></td>
+                                    <th>Total Test Executed</th>
+                                    <td>{{ suite.testsCount }}</td>
+                                    <th>Tests only executed/Pass Rate</th>
+                                    <td>{{ suite.totalExecutedTests }} / {{ suite.passRate }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Suite Name</th>
+                                    <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
+                                    <th>Summary</th>
+                                    <td><span>{{ shortString(suite.summary, 500) }}</span></td>
+                                    <th>Chip</th>
+                                    <td><span class="label label-purple label-white middle">{{ suite.chip }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Job Name</th>
+                                    <td><span title="{{ suite.jobName }}">{{ shortString(suite.jobName, 500) }}</span></td>
+                                    <th>Build Tag</th>
+                                    <td><span title="{{ suite.buildTag }}">{{ shortString(suite.buildTag, 500) }}</span></td>
+                                    <th>Platform</th>
+                                    <td><span class="label label-danger label-white middle">{{ suite.platform }}</span></td>
+                                </tr>
+
+                                <tr>
+                                    <th>CI Url</th>
+                                    <td><a target="_blank" href="{{ suite.ciUrl }}" >{{ shortString(suite.buildTag, 500) }}</a></td>
+                                    <th></th>
+                                    <td></td>
+                                    <th>Suite ID</th>
+                                    <td><span title="{{ suite.id }}">{{ suite.id}}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    {% endif %}
+
                     {% if test.metaData %}
                         <div id="metadata" class="tab-pane">
                             <ul>
-                            {% for key, item in test.metaData %}
-                                <li>
-                                    {{ key }} =
-                                    {% if isUrl(item) %}
-                                        {{ item }} <a target="_blank" href="{{item }}" >Link_to_{{ key }}</a>
-                                    {% else %}
-                                        <span title="{{ item }}">{{ shortString(item, 500) }}</span>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
+                                {% for key, item in test.metaData %}
+                                    <li>
+                                        {{ key }} =
+                                        {% if isUrl(item) %}
+                                            {{ item }} <a target="_blank" href="{{item }}" >Link_to_{{ key }}</a>
+                                        {% else %}
+                                            <span title="{{ item }}">{{ shortString(item, 500) }}</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
@@ -133,8 +180,8 @@
                             <li>File Name={{ test.logFile }}</li>
                             <li>DUT uptime on start={{ test.dutUpTimeStart }}</li>
                             <li>DUT uptime on end={{ test.dutUpTimeEnd }}</li>
-                            <li>ForDelete={{ test.forDelete ? 'Yes' : 'No'  }}</li>
-                            <li>Disabled={{ test.disabled ? 'Yes' : 'No'  }}</li>
+                            <li>ForDelete={{ test.forDelete ? 'Yes' : 'No' }}</li>
+                            <li>Disabled={{ test.disabled ? 'Yes' : 'No' }}</li>
                         </ul>
                     </div>
                 </div>
@@ -142,7 +189,7 @@
         </div>
     </div>
     {#{% if test.verdict != null and test.verdict.name in ['ERROR', 'FAIL'] %}#}
-        {#{% set search_value = test.verdict.name %}#}
+    {#{% set search_value = test.verdict.name %}#}
     {#{% endif %}#}
     <ul class="pager" style="margin: 5px 0;">
         <li class="previous">
@@ -183,19 +230,19 @@
                 <div class="widget-main no-padding testLog">
                     {% include "lbook/search.html.twig" %}
                     {% apply spaceless %}
-                    <table class="table table-bordered table-hover table-condensed">
-                        <thead class="thin-border-bottom">
-                        <tr>
-                            <th class="test_show_full_time"><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
-                            <th class="test_show_full_offset" title="[Offset] Relative time"><i class="ace-icon fa fa-caret-right blue"></i>R</th>
-                            {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
-                            {#<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>#}
-                            <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
-                            <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Type</th>
-                        </tr>
-                        </thead>
-                        <tbody class="searchable">
-                        {% for log in iterator | slice(0, 10000) %}
+                        <table class="table table-bordered table-hover table-condensed">
+                            <thead class="thin-border-bottom">
+                            <tr>
+                                <th class="test_show_full_time"><i class="ace-icon fa fa-caret-right blue"></i>Time</th>
+                                <th class="test_show_full_offset" title="[Offset] Relative time"><i class="ace-icon fa fa-caret-right blue"></i>R</th>
+                                {#<th><i class="ace-icon fa fa-caret-right blue"></i>Id</th>#}
+                                {#<th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Order</th>#}
+                                <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Log</th>
+                                <th class="hidden-480"><i class="ace-icon fa fa-caret-right blue"></i>Type</th>
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+                            {% for log in iterator | slice(0, 10000) %}
                                 <tr class="{{ logTypeToTableColor(log.msgType) }}">
                                     <td title="ID:{{ log.id }}, Order:{{ log.chain }}" class="logType">{{ log.logTime | date('H:i:s') }}</td>
                                     <td class="logType">{{ relativeTime(test.timeStart, log.logTime) }}</td>
@@ -208,9 +255,9 @@
                                     <td class="log_text{{ link_class }}">{{ log.message | nl2br }}</td>
                                     <td class="logType">{{ log.msgType }}</td>
                                 </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     {% endapply %}
                 </div><!-- /.widget-main -->
                 <div class="widget-toolbox padding-8 text-center">
@@ -222,15 +269,15 @@
     <div class="row">
         <ul>
             {% if is_granted('edit', test.cycle.setup) %}
-            <li>
-                <a href="{{ path('test_edit', { 'id': test.id }) }}">Edit</a>
-            </li>
+                <li>
+                    <a href="{{ path('test_edit', { 'id': test.id }) }}">Edit</a>
+                </li>
             {% endif %}
             {#{% if is_granted('delete', test.cycle.setup) %}#}
             {#<li>#}
-                {#{{ form_start(delete_form) }}#}
-                {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
-                {#{{ form_end(delete_form) }}#}
+            {#{{ form_start(delete_form) }}#}
+            {#<input type="submit" value="Delete" onclick="return confirm('are u sure?')">#}
+            {#{{ form_end(delete_form) }}#}
             {#</li>#}
             {#{% endif %}#}
         </ul>

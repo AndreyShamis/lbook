@@ -208,7 +208,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
 //            ->andWhere('s.uuid != :uuid')
 //            ->setParameter('uuid', '')
             ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
-            ->orderBy('s.id')
+//            ->orderBy('s.id')
         ;
         if ($level !== '') {
             $ret = $ret->andWhere('s.testingLevel = :level')

@@ -21,13 +21,22 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="uuid_index", columns={"uuid"}),
  *     @Index(name="jira_key_index", columns={"jira_key"}),
  *     @Index(name="testing_level_index", columns={"testing_level"}),
+ *     @Index(name="tests_count_index", columns={"tests_count"}),
  *     @Index(name="tests_count_enabled_index", columns={"tests_count_enabled"}),
+ *     @Index(name="total_executed_tests_index", columns={"total_executed_tests"}),
  *     @Index(name="state_index", columns={"state"}),
+ *     @Index(name="created_at_index", columns={"created_at"}),
+ *     @Index(name="updated_at_index", columns={"updated_at"}),
  *     @Index(name="started_at_index", columns={"started_at"}),
+ *     @Index(name="finished_at_index", columns={"finished_at"}),
  *     @Index(name="platform_index", columns={"platform"}),
  *     @Index(name="chip_index", columns={"chip"}),
+ *     @Index(name="job_name_index", columns={"job_name"}),
+ *     @Index(name="build_tag_index", columns={"build_tag"}),
  *     @Index(name="product_version_index", columns={"product_version"}),
- *     @Index(name="fulltext_custom", columns={"name", "product_version", "uuid", "platform", "chip", "summary"}),
+ *     @Index(name="pass_rate_index", columns={"pass_rate"}),
+ *     @Index(name="pass_count_index", columns={"pass_count"}),
+ *     @Index(name="fulltext_custom", columns={"name", "product_version", "uuid", "platform", "chip", "summary", "job_name", "build_tag"}, flags={"fulltext"}),
  *  }
  * )
  */

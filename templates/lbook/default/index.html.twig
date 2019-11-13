@@ -114,7 +114,110 @@
                                             {#{{ dump(value) }}#}
                                         {#{% endfor %}#}
                                         <hr />
+                                        Last Day Statistic for suites in progress.
+                                        <table class="table table-striped table-condensed">
+                                            <tbody>
+                                            <tr>
+                                                <td rowspan="4"><strong>Total suites in progress</strong></td>
+                                                <td rowspan="4"><strong>{{ suites | length }}</strong></td>
+                                                <td>Sanity</td>
+                                                <td> {{ sanity | length }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Integration</td>
+                                                <td>{{ integration | length }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nightly</td>
+                                                <td>{{ nightly | length }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Weekly</td>
+                                                <td>{{ weekly | length }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+{#                                        <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"#}
+{#                                               id="suiteTable" data-pagination="true" data-search="true" data-toggle="table"#}
+{#                                               data-toolbar="#suiteExecutionToolBar"#}
+{#                                               data-show-refresh="true"#}
+{#                                               data-key-events="true"#}
+{#                                                #}{#data-show-toggle="true"#}
+{#                                               data-show-export="true"#}
+{#                                               data-show-columns="true"#}
+{#                                               data-advanced-search="true"#}
+{#                                                #}{#data-id-table="advancedTable"#}
+{#                                               data-page-size="100" data-page-list="[10, 15, 20, 50, 100, 500]" data-sort-order="desc">#}
+{#                                            <thead>#}
+{#                                            <tr>#}
+{#                                                <th data-sortable="true" data-switchable="false">ID</th>#}
+{#                                                <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false">Name</th>#}
+{#                                                <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>#}
+{#                                                <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>#}
+{#                                                <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>#}
+{#                                                <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true">Executed</th>#}
+{#                                                <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
+{#                                                <th data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true">PR</th>#}
+{#                                                <th data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true">P</th>#}
+{#                                                <th data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true">F</th>#}
+{#                                                <th data-sortable="true" title="Error Count" data-switchable="true" data-visible="true">E</th>#}
+{#                                                <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>#}
+{#                                                <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>#}
+{#                                                <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>#}
+{#                                                <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>#}
+{#                                                <th data-sortable="true" title="Chip" data-switchable="true">Components</th>#}
+{#                                                <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>>#}
+{#                                                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>#}
+{#                                                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>#}
+{#                                                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="True">Started</th>#}
+{#                                                <th data-sortable="true" title="Publish" data-switchable="true">Pub</th>#}
+{#                                                <th class="suite_list_options_column">Options</th>#}
+{#                                            </tr>#}
+{#                                            </thead>#}
+{#                                            <tbody class="searchable">#}
+{#                                            {% for suiteExecution in suites | slice(0, 4000) %}#}
+{#                                                <tr>#}
+{#                                                    <td>{{ suiteExecution.id }}</td>#}
+{#                                                    <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>#}
+{#                                                    <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime |  executionTimeGenericShort}}</span></td>#}
+{#                                                    <td>{{ suiteExecution.testsCount }}</td>#}
+{#                                                    <td>{{ suiteExecution.testsCountEnabled }}</td>#}
+{#                                                    <td>{{ suiteExecution.totalExecutedTests}}</td>#}
+{#                                                    <td>{{ suiteExecution.tests | length}}</td>#}
+{#                                                    <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</td>#}
 
+{#                                                    <td class="passClass">{{ suiteExecution.passCount }}</td>#}
+{#                                                    <td class="failClass">{{ suiteExecution.failCount }}</td>#}
+{#                                                    <td class="errorClass">{{ suiteExecution.errorCount }}</td>#}
+{#                                                    <td>{{ suiteExecution.summary }}</td>#}
+{#                                                    <td>{{ suiteExecution.uuid }}</td>#}
+{#                                                    <td>{{ suiteExecution.Platform }}</td>#}
+{#                                                    <td>{{ suiteExecution.chip }}</td>#}
+{#                                                    <td>{{ suiteExecution.components|join(', ') }}</td>#}
+{#                                                    <td>{{ suiteExecution.testingLevel }}</td>#}
+{#                                                    <td><span data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>#}
+{#                                                    <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>#}
+{#                                                    <td><span data-title="{{ suiteExecution.startedAt|date('ymdHis') }}" title="Started at {{ suiteExecution.startedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.startedAt|time_diff}}</span></td>#}
+{#                                                    <td>{{ suiteExecution.publish }}</td>#}
+{#                                                    <td>#}
+{#                                                        <div class="hidden-sm hidden-xs action-buttons">#}
+{#                                                            <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">#}
+{#                                                                <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
+{#                                                            </a>#}
+{#                                                            #}{#                                {% if is_granted('edit', suiteExecution) %}#}
+{#                                                            #}{#                                    <a class="green" href="{{ path('suite_edit', { 'id': suiteExecution.id }) }}" title="Edit">#}
+{#                                                            <i class="ace-icon fa fa-pencil bigger-130"></i>#}
+{#                                                            #}{#                                    </a>#}
+{#                                                            #}{#                                {% endif %}#}
+{#                                                            #}{#<a class="red" href="#" title="Delete">#}
+{#                                                            #}{#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+{#                                                            #}{#</a>#}
+{#                                                        </div>#}
+{#                                                    </td>#}
+{#                                                </tr>#}
+{#                                            {% endfor %}#}
+{#                                            </tbody>#}
+{#                                        </table>#}
 
                                         <div>
                                             {#<form class="form-search">#}

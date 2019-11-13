@@ -7,17 +7,29 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SuiteExecutionRepository")
- * @ORM\Table(name="suite_execution",
- *     uniqueConstraints={@ORM\UniqueConstraint(
- *     name="uniq_suite_execution",
- *     columns={
- *      "datetime",
- *      "testing_level",
- *      "product_version"}
- *     )})
+ * @ORM\Table(name="suite_execution", uniqueConstraints={@ORM\UniqueConstraint(
+ *          name="uniq_suite_execution",
+ *          columns={"datetime","testing_level","product_version"}
+ *      )
+ *  },
+ *  indexes={
+ *     @Index(name="name_index", columns={"name"}),
+ *     @Index(name="uuid_index", columns={"uuid"}),
+ *     @Index(name="jira_key_index", columns={"jira_key"}),
+ *     @Index(name="testing_level_index", columns={"testing_level"}),
+ *     @Index(name="tests_count_enabled_index", columns={"tests_count_enabled"}),
+ *     @Index(name="state_index", columns={"state"}),
+ *     @Index(name="started_at_index", columns={"started_at"}),
+ *     @Index(name="platform_index", columns={"platform"}),
+ *     @Index(name="chip_index", columns={"chip"}),
+ *     @Index(name="product_version_index", columns={"product_version"}),
+ *     @Index(name="fulltext_custom", columns={"name", "product_version", "uuid", "platform", "chip", "summary"}),
+ *  }
+ * )
  */
 class SuiteExecution
 {

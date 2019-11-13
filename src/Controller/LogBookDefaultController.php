@@ -8,6 +8,7 @@
 
 namespace App\Controller;
 
+use App\Repository\SuiteExecutionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,19 +20,31 @@ class LogBookDefaultController extends AbstractController
      * Lists all test entities.
      *
      * @Route("/", name="home_index", methods={"GET"})
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \LogicException
+     * @param SuiteExecutionRepository $suites
+     * @return Response
      */
-    public function index(): Response
+    public function index(SuiteExecutionRepository $suites): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        return $this->render('lbook/default/index.html.twig', array());
+        $my_suites = $suites->findSuitesInProgress();
+        $sanity = $suites->findSanitySuitesInProgress();
+        $integration = $suites->findIntegrationSuitesInProgress();
+        $nightly = $suites->findNightlySuitesInProgress();
+        $weekly = $suites->findWeeklySuitesInProgress();
+
+        return $this->render('lbook/default/index.html.twig',
+            [
+                'suites' => $my_suites,
+                'sanity' => $sanity,
+                'integration' => $integration,
+                'nightly' => $nightly,
+                'weekly' => $weekly,
+            ]);
     }
 
     /**
      * @Route("/send_email", name="send_email_example")
      * @param \Swift_Mailer $mailer
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws \LogicException
      */
     public function emailExample(\Swift_Mailer $mailer): Response

@@ -191,6 +191,77 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         return $ret;
     }
 
+    public function findSuitesInProgress(int $max_results=30000, int $days=1)
+    {
+        return $this->findSuitesInProgressByLevel('', $max_results, $days);
+    }
+
+    public function findSuitesInProgressByLevel(string $level = 'sanity', int $max_results=30000, int $days=1)
+    {
+        if ($days < 0 || $days > 365){
+            $days = 1;
+        }
+        $ret = $this->createQueryBuilder('s')
+            ->andWhere('s.cycle is not null')
+            ->andWhere('s.startedAt >= :started')
+            ->andWhere('s.testsCountEnabled > s.totalExecutedTests')
+//            ->andWhere('s.uuid != :uuid')
+//            ->setParameter('uuid', '')
+            ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->orderBy('s.id')
+        ;
+        if ($level !== '') {
+            $ret = $ret->andWhere('s.testingLevel = :level')
+                ->setParameter('level', $level);
+        }
+
+        $ret = $ret->setMaxResults($max_results)
+            ->getQuery()
+            ->getResult()
+        ;
+        return $ret;
+    }
+
+    /**
+     * @param int $max_results
+     * @param int $days
+     * @return \Doctrine\ORM\QueryBuilder|mixed
+     */
+    public function findSanitySuitesInProgress(int $max_results=30000, int $days=1)
+    {
+        return $this->findSuitesInProgressByLevel('sanity', $max_results, $days);
+    }
+
+    /**
+     * @param int $max_results
+     * @param int $days
+     * @return \Doctrine\ORM\QueryBuilder|mixed
+     */
+    public function findIntegrationSuitesInProgress(int $max_results=30000, int $days=1)
+    {
+        return $this->findSuitesInProgressByLevel('integration', $max_results, $days);
+    }
+
+    /**
+     * @param int $max_results
+     * @param int $days
+     * @return \Doctrine\ORM\QueryBuilder|mixed
+     */
+    public function findNightlySuitesInProgress(int $max_results=30000, int $days=1)
+    {
+        return $this->findSuitesInProgressByLevel('nightly', $max_results, $days);
+    }
+
+    /**
+     * @param int $max_results
+     * @param int $days
+     * @return \Doctrine\ORM\QueryBuilder|mixed
+     */
+    public function findWeeklySuitesInProgress(int $max_results=30000, int $days=1)
+    {
+        return $this->findSuitesInProgressByLevel('weekly', $max_results, $days);
+    }
+
     // /**
     //  * @return SuiteExecution[] Returns an array of SuiteExecution objects
     //  */

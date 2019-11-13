@@ -36,7 +36,7 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="product_version_index", columns={"product_version"}),
  *     @Index(name="pass_rate_index", columns={"pass_rate"}),
  *     @Index(name="pass_count_index", columns={"pass_count"}),
- *     @Index(name="fulltext_custom", columns={"name", "product_version", "uuid", "platform", "chip", "summary", "job_name", "build_tag"}, flags={"fulltext"}),
+ *     @Index(name="fulltext_custom", columns={"name", "product_version", "platform", "chip", "summary", "job_name", "build_tag"}, flags={"fulltext"}),
  *  }
  * )
  */

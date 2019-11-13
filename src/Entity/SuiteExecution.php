@@ -36,6 +36,9 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="product_version_index", columns={"product_version"}),
  *     @Index(name="pass_rate_index", columns={"pass_rate"}),
  *     @Index(name="pass_count_index", columns={"pass_count"}),
+ *     @Index(name="publish_index", columns={"publish"}),
+ *     @Index(name="find_one_by_index", columns={"publish", "state", "uuid"}),
+ *     @Index(name="find_one_by_cycled_index", columns={"cycle_id", "publish", "state", "uuid"}),
  *     @Index(name="fulltext_custom", columns={"name", "product_version", "platform", "chip", "summary", "job_name", "build_tag"}, flags={"fulltext"}),
  *  }
  * )

@@ -238,26 +238,27 @@ class LogBookUploaderController extends AbstractController
         if ($data === null) {
             $data = array();
         }
-        $debug = 0;
-        $logger->critical($ip . '::IP  :' , $data);
-        if ($ip === '10.185.75.27'){
-            $debug = 1;
-        }
+//        $debug = 0;
+//        $logger->critical($ip . '::IP  :' , $data);
+//        if ($ip === '10.185.75.27'){
+//            $debug = 1;
+//        }
 
         if (!array_key_exists('hostname', $data)) {
-            if ($debug) {
-                $debug_msg .= ' host name not proivded | ';
-            }
+//            if ($debug) {
+//                $debug_msg .= ' host name not proivded | ';
+//            }
             $data['hostname'] = '';
-        } else {
-            if ($debug) {
-                $debug_msg .= ' host name  proivded ' . $data['hostname'] . ' | ';
-            }
         }
-        $suiteHost = $hosts->findOneOrCreate(['hostname' => $data['hostname'], 'ip' => $ip]);
+//        else {
+//            if ($debug) {
+//                $debug_msg .= ' host name  proivded ' . $data['hostname'] . ' | ';
+//            }
+//        }
+        $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
         unset($data['hostname']);
         $data['host'] = $suiteHost;
-        $logger->critical($ip . '::IP  :' , $data);
+//        $logger->critical($ip . '::IP  :' , $data);
 
         if (!array_key_exists('components', $data)) {
             $data['components'] = array();

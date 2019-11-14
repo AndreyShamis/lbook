@@ -9,6 +9,7 @@ use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
 use App\Entity\SuiteExecution;
+use App\Repository\HostRepository;
 use App\Repository\LogBookBuildRepository;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
@@ -222,16 +223,26 @@ class LogBookUploaderController extends AbstractController
      * @Route("/suite_execution", name="add_new_suite_execution", methods={"GET|POST"})
      * @param Request $request
      * @param LoggerInterface $logger
+     * @param HostRepository $hosts
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function createSuiteExecution(Request $request, LoggerInterface $logger): \Symfony\Component\HttpFoundation\Response
+    public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts): \Symfony\Component\HttpFoundation\Response
     {
         $created = false;
+        $ip = $request->getClientIp();
         $suiteExecution = null;
         $data = json_decode($request->getContent(), true);
         if ($data === null) {
             $data = array();
         }
+        if (!array_key_exists('hostname', $data)) {
+            $data['hostname'] = '';
+        }
+        $host = $hosts->findOneOrCreate(['hostname' => $data['hostname'], 'ip' => $ip]);
+        unset($data['hostname']);
+        $data['host'] = $host;
         if (!array_key_exists('components', $data)) {
             $data['components'] = array();
         }
@@ -251,7 +262,6 @@ class LogBookUploaderController extends AbstractController
             $created = true;
         } catch (\Throwable $e) {
             $method = $request->getMethod();
-            $ip = $request->getClientIp();
             $data['ip'] = $ip;
             $data['method'] = $method;
             $data['request'] = $request->request->all();

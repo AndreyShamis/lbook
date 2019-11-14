@@ -102,6 +102,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setTestsCount($criteria['tests_count']);
             $entity->setTestsCountEnabled($criteria['tests_count_enabled']);
             $entity->setUuid($criteria['uuid']);
+            $entity->setHost($criteria['host']);
 
             if (array_key_exists('description', $criteria)) {
                 $entity->setDescription($criteria['description']);

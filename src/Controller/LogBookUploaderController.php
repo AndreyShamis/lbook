@@ -233,16 +233,29 @@ class LogBookUploaderController extends AbstractController
         $created = false;
         $ip = $request->getClientIp();
         $suiteExecution = null;
+        $debug_msg = '';
         $data = json_decode($request->getContent(), true);
         if ($data === null) {
             $data = array();
         }
-        if (!array_key_exists('hostname', $data)) {
-            $data['hostname'] = '';
+        $debug = 0;
+        if ($ip === '10.185.75.27'){
+            $debug = 1;
         }
-        $host = $hosts->findOneOrCreate(['hostname' => $data['hostname'], 'ip' => $ip]);
+
+        if (!array_key_exists('hostname', $data)) {
+            if ($debug) {
+                $debug_msg .= ' host name not proivded | ';
+            }
+            $data['hostname'] = '';
+        } else {
+            if ($debug) {
+                $debug_msg .= ' host name  proivded ' . $data['hostname'] . ' | ';
+            }
+        }
+        $suiteHost = $hosts->findOneOrCreate(['hostname' => $data['hostname'], 'ip' => $ip]);
         unset($data['hostname']);
-        $data['host'] = $host;
+        $data['host'] = $suiteHost;
         if (!array_key_exists('components', $data)) {
             $data['components'] = array();
         }
@@ -273,7 +286,8 @@ class LogBookUploaderController extends AbstractController
 
         return $this->render('lbook/suite/add_execution.html.twig', array(
             'suiteExecution' => $suiteExecution,
-            'created' => $created
+            'created' => $created,
+            'debug' => $debug_msg
         ));
     }
 

@@ -92,6 +92,16 @@ class LogBookSuiteExecutionController extends AbstractController
     }
 
     /**
+     * @Route("/cycle/{id}", name="suite_cycle_show", methods="GET")
+     * @param SuiteExecution $suite
+     * @return Response
+     */
+    public function show_cycle(SuiteExecution $suite): Response
+    {
+        return $this->redirectToRoute('cycle_suite_show_first', ['id' => $suite->getId()]);
+    }
+
+    /**
      * @Route("/close/{id}", name="suite_close", methods="GET|POST")
      * @param SuiteExecution $suite
      * @param SuiteExecutionRepository $suites

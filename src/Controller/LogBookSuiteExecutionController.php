@@ -37,14 +37,10 @@ class LogBookSuiteExecutionController extends AbstractController
             ->setParameter('name', 'Nightly_Driver_EPM5_EQ5')
 //            ->addOrderBy('suite_execution.cycle', 'DESC')
         ;
-
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
-        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
-        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
-
+        $totalPosts = $paginator->count();
+        /** @var \ArrayIterator $iterator */
+        $iterator = $paginator->getIterator();
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
@@ -56,7 +52,6 @@ class LogBookSuiteExecutionController extends AbstractController
         );
     }
 
-
     /**
      * @Route("/show/{id}", name="suite_show", methods="GET")
      * @param SuiteExecution $suite
@@ -67,7 +62,6 @@ class LogBookSuiteExecutionController extends AbstractController
     public function show(SuiteExecution $suite, PagePaginator $pagePaginator, SuiteExecutionRepository $suites): Response
     {
 //        $this->denyAccessUnlessGranted('view', $suite);
-
         $query = $suites->createQueryBuilder('suite_execution')
 //            ->where('suite_execution.disabled = 0')
             ->orderBy('suite_execution.updatedAt', 'DESC')
@@ -79,21 +73,12 @@ class LogBookSuiteExecutionController extends AbstractController
         ;
 
         $paginator = $pagePaginator->paginate($query, 1, $this->index_size);
-        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
-        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
+        $totalPosts = $paginator->count();
+        /** @var \ArrayIterator $iterator */
+        $iterator = $paginator->getIterator();
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = 1;
-//        return array(
-//            'size'      => $totalPosts,
-//            'maxPages'  => $maxPages,
-//            'thisPage'  => $thisPage,
-//            'iterator'  => $iterator,
-//            'paginator' => $paginator,
-//        );
         $suite->calculateStatistic();
         return $this->render('lbook/suite/show.html.twig',
             [
@@ -103,6 +88,20 @@ class LogBookSuiteExecutionController extends AbstractController
                 'thisPage'  => $thisPage,
                 'iterator'  => $iterator,
                 'paginator' => $paginator,
+            ]);
+    }
+
+    public function close(SuiteExecution $suite, SuiteExecutionRepository $suites): Response
+    {
+//        $this->denyAccessUnlessGranted('view', $suite);
+        $suite->calculateStatistic();
+        $suite->setClosed(true);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($suite);
+        $em->flush();
+        return $this->render('lbook/suite/close.html.twig',
+            [
+                'suite' => $suite
             ]);
     }
 }

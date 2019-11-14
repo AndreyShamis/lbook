@@ -189,7 +189,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th>Platform</th>
                                     <th>Component</th>
                                     <th title="Test Environments">ENV</th>
+                                    <th title="Suite Host Name">Host</th>
                                     <th title="JIRA KEY/Publish">JIRA</th>
+                                    <th title="Closed : X= Closed; O= Open">X</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -213,7 +215,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
+                                    <td>{{ suite.host }}</td>
                                     <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
+                                    <td>{{ suite.closed ? 'X':'O' }}</td>
                                 </tr>
                             {% endfor %}
                                 </tbody>

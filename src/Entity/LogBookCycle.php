@@ -282,6 +282,7 @@ class LogBookCycle
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\SuiteExecution", mappedBy="cycle", cascade={"remove"})
+     * @ORM\OrderBy({"name" = "ASC"})
      */
     private $suiteExecution;
 

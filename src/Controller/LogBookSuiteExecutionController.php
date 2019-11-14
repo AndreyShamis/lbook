@@ -91,6 +91,12 @@ class LogBookSuiteExecutionController extends AbstractController
             ]);
     }
 
+    /**
+     * @Route("/close/{id}", name="suite_close", methods="GET|POST")
+     * @param SuiteExecution $suite
+     * @param SuiteExecutionRepository $suites
+     * @return Response
+     */
     public function close(SuiteExecution $suite, SuiteExecutionRepository $suites): Response
     {
 //        $this->denyAccessUnlessGranted('view', $suite);

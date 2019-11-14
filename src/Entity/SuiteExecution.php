@@ -222,10 +222,21 @@ class SuiteExecution
     private $errorCount = 0;
 
     /**
+     * @ORM\Column(type="boolean", options={"unsigned"=true, "default"="1"})
+     */
+    private $closed = 0;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Host", inversedBy="suiteExecutions", fetch="EXTRA_LAZY")
+     */
+    private $host;
+
+    /**
      * SuiteExecution constructor.
      */
     public function __construct()
     {
+
         try {
             $this->setUpdatedAt();
         } catch (\Exception $e) {
@@ -237,6 +248,7 @@ class SuiteExecution
         $this->startedAt = new \DateTime();
         $this->finishedAt = new \DateTime();
         $this->tests = new ArrayCollection();
+        $this->setClosed(false);
     }
 
     public function getRunTime(): int
@@ -742,7 +754,10 @@ class SuiteExecution
         $this->updatedAt = new \DateTime();
     }
 
-    public function getPassRate(): ?float
+    /**
+     * @return float
+     */
+    public function getPassRate(): float
     {
         return $this->passRate;
     }
@@ -778,11 +793,18 @@ class SuiteExecution
         return $this;
     }
 
-    public function getPassCount(): ?int
+    /**
+     * @return int
+     */
+    public function getPassCount(): int
     {
         return $this->passCount;
     }
 
+    /**
+     * @param int $passCount
+     * @return SuiteExecution
+     */
     public function setPassCount(int $passCount): self
     {
         $this->passCount = $passCount;
@@ -790,11 +812,18 @@ class SuiteExecution
         return $this;
     }
 
-    public function getFailCount(): ?int
+    /**
+     * @return int
+     */
+    public function getFailCount(): int
     {
         return $this->failCount;
     }
 
+    /**
+     * @param int $failCount
+     * @return SuiteExecution
+     */
     public function setFailCount(int $failCount): self
     {
         $this->failCount = $failCount;
@@ -802,7 +831,10 @@ class SuiteExecution
         return $this;
     }
 
-    public function getErrorCount(): ?int
+    /**
+     * @return int
+     */
+    public function getErrorCount(): int
     {
         return $this->errorCount;
     }
@@ -810,6 +842,37 @@ class SuiteExecution
     public function setErrorCount(int $errorCount): self
     {
         $this->errorCount = $errorCount;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getClosed(): bool
+    {
+        return $this->closed;
+    }
+
+    /**
+     * @param bool $closed
+     * @return SuiteExecution
+     */
+    public function setClosed(bool $closed): self
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    public function getHost(): ?Host
+    {
+        return $this->host;
+    }
+
+    public function setHost(?Host $host): self
+    {
+        $this->host = $host;
 
         return $this;
     }

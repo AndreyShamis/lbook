@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Serializer;
 class LogBookCycleController extends AbstractController
 {
     protected $index_size = 1000;
-    protected $show_tests_size = 1000;
+    protected $show_tests_size = 2000;
 
     /**
      * Displays a form to edit an existing cycle entity.
@@ -488,7 +488,7 @@ class LogBookCycleController extends AbstractController
 
             $additional_cols = $additional_opt_cols = $suites = $failed_tests = $errors = array();
             $iterator->rewind();
-
+            $suites = $cycle->getSuiteExecution();
             $errors_found = false;
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
@@ -523,10 +523,10 @@ class LogBookCycleController extends AbstractController
                          * Search for metadata with _SHOW postfix, if exist that column will be shown
                          * @var array $md
                          */
-                        $suite = $test->getSuiteExecution();
-                        if ($suite !== null && !in_array($suite, $suites, true)) {
-                            $suites[] = $suite;
-                        }
+//                        $suite = $test->getSuiteExecution();
+//                        if ($suite !== null && !in_array($suite, $suites, true)) {
+//                            $suites[] = $suite;
+//                        }
 
                         $md = $test->getMetaData();
                         if (\count($md) > 0) {

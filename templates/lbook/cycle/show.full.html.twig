@@ -183,7 +183,8 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th>ID</th>
                                     <th title="Name/UUID">Name</th>
                                     <th>Summary</th>
-                                    <th title="All Tests/Enabled Tests">Tests</th>
+                                    <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled]">Tests</th>
+                                    <th title="Pass">Pass</th>
                                     <th title="Pass Rate">Pass Rate</th>
                                     <th title="Testing Level">TL</th>
                                     <th>Chip</th>
@@ -205,11 +206,16 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ suite.jiraKey %}
                                     {% endif %}
                                 {% endif %}
-                                <tr>
+                                {% set suite_css = '' %}
+                                {% if suite.closed %}
+                                    {% set suite_css = 'suite_wip' %}
+                                {% endif %}
+                                <tr class="{{ suite_css }}">
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
                                     <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
-                                    <td>{{ suite.testsCount }}/{{ suite.testsCountEnabled }}</td>
+                                    <td title="Tests count in suite {{ suite.testsCount }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
+                                    <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
                                     <td>{{ suite.testingLevel }}</td>
                                     <td>{{ suite.chip }}</td>

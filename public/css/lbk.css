@@ -198,3 +198,7 @@ th.meta_data_column{
     color: #f89405;
     text-align: right;
 }
+
+.suite_wip{
+    background-color: #fdfbca !important;
+}

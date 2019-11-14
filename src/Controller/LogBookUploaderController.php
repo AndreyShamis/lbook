@@ -239,6 +239,7 @@ class LogBookUploaderController extends AbstractController
             $data = array();
         }
         $debug = 0;
+        $logger->critical($ip . '::IP  :' , $data);
         if ($ip === '10.185.75.27'){
             $debug = 1;
         }
@@ -256,6 +257,8 @@ class LogBookUploaderController extends AbstractController
         $suiteHost = $hosts->findOneOrCreate(['hostname' => $data['hostname'], 'ip' => $ip]);
         unset($data['hostname']);
         $data['host'] = $suiteHost;
+        $logger->critical($ip . '::IP  :' , $data);
+
         if (!array_key_exists('components', $data)) {
             $data['components'] = array();
         }

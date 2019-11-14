@@ -29,9 +29,6 @@ class HostRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): Host
     {
-        if (!array_key_exists('ip', $criteria)) {
-            $criteria['ip'] = '';
-        }
         $criteria['name'] = trim($criteria['name']);
         $entity = $this->findOneBy(['name' => $criteria['name']]);
         if (null === $entity) {

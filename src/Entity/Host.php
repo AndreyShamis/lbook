@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\Index;
  *      )
  *  },
  *  indexes={
- *     @Index(name="h_hostname_index", columns={"name"}),
  *     @Index(name="h_ip_index", columns={"ip"}),
  *     @Index(name="h_updated_at_index", columns={"updated_at"}),
  *     @Index(name="h_last_seen_at_index", columns={"last_seen_at"}),
@@ -37,12 +36,12 @@ class Host
     /**
      * @ORM\Column(name="name", type="string", length=150)
      */
-    private $name = '';
+    private $name;
 
     /**
      * @ORM\Column(name="ip", type="string", length=30)
      */
-    private $ip = '';
+    private $ip;
 
     /**
      * @ORM\Column(name="updated_at", type="datetime")

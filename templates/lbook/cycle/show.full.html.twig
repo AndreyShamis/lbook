@@ -215,7 +215,11 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
-                                    <td>{{ suite.host }}</td>
+                                    <td>
+                                        {% if suite.host and suite.host.ip is defined %}
+                                        <span title="{{ suite.host.ip }}">{{ suite.host.name }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
                                     <td>{{ suite.closed ? 'X':'O' }}</td>
                                 </tr>

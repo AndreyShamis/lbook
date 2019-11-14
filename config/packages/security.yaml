@@ -77,6 +77,7 @@ security:
         - { path: ^/build/clean_not_used, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/update/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/suites/close/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/suites/cycle/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

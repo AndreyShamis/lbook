@@ -98,7 +98,7 @@ class LogBookSuiteExecutionController extends AbstractController
      */
     public function show_cycle(SuiteExecution $suite): Response
     {
-        return $this->redirectToRoute('cycle_suite_show_first', ['id' => $suite->getCycle()->getId()]);
+        return $this->redirectToRoute('cycle_show_first', ['id' => $suite->getCycle()->getId()]);
     }
 
     /**

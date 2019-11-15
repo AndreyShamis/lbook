@@ -111,7 +111,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
 
     /**
-     * @Route("/close/{days}", name="close_unclosed_suites_api", methods="GET|POST")
+     * @Route("/close_unclosed/{days}", name="close_unclosed_suites_api", methods="GET|POST")
      * @Template(template="lbook/suite/close_unclosed.html.twig")
      * @param PagePaginator $pagePaginator
      * @param SuiteExecutionRepository $suites

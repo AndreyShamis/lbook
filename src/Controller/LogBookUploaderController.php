@@ -268,7 +268,7 @@ class LogBookUploaderController extends AbstractController
                     $suiteHost->setLastSeenAt(new DateTime());
                     try {
                         if (array_key_exists('host_uptime', $data)) {
-                            $suiteHost->setUptime($data['host_uptime']);
+                            $suiteHost->setUptime(new DateTime($data['host_uptime']));
                         }
                     } catch (\Throwable $ex) {}
 

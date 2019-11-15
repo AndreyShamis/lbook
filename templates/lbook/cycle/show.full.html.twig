@@ -183,7 +183,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th>ID</th>
                                     <th title="Name/UUID">Name</th>
                                     <th>Summary</th>
-                                    <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled]">Tests</th>
+                                    <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]">Tests</th>
                                     <th title="Pass">Pass</th>
                                     <th title="Pass Rate">Pass Rate</th>
                                     <th title="Testing Level">TL</th>
@@ -198,7 +198,24 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </thead>
                                 <tbody>
                             {% set builder = '' %}
+                            {% set tests_enabled = 0 %}
+                            {% set tests_disabled = 0 %}
+                            {% set tests_executed = 0 %}
+                            {% set tests_pass = 0 %}
+                            {% set suite_progress = 0 %}
+                            {% set suite_done = 0 %}
                             {% for suite in suites | slice(0, 200) %}
+                                {% set suite_css = '' %}
+                                {% set tests_enabled = tests_enabled + suite.testsCountEnabled %}
+                                {% set tests_disabled = tests_disabled + suite.testsCountDisabled  %}
+                                {% set tests_executed = tests_executed + suite.totalExecutedTests  %}
+                                {% set tests_pass = tests_pass + suite.passCount  %}
+                                {% if not suite.closed %}
+                                    {% set suite_css = 'suite_wip' %}
+                                    {% set suite_progress = suite_progress + 1  %}
+                                {% else %}
+                                    {% set suite_done = suite_done + 1  %}
+                                {% endif %}
                                 {% set jira_test_set_url = '' %}
                                 {% if suite.publish and suite.jiraKey | length > 3 %}
                                     {% set jira_domain = parseDomain(suite.testSetUrl) %}
@@ -206,15 +223,11 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ suite.jiraKey %}
                                     {% endif %}
                                 {% endif %}
-                                {% set suite_css = '' %}
-                                {% if not suite.closed %}
-                                    {% set suite_css = 'suite_wip' %}
-                                {% endif %}
                                 <tr class="{{ suite_css }}">
                                     <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
                                     <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
                                     <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
-                                    <td title="Tests count in suite {{ suite.testsCount }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
+                                    <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
                                     <td>{{ suite.testingLevel }}</td>
@@ -232,6 +245,24 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </tr>
                             {% endfor %}
                                 </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>{{ tests_enabled }}/ {{ tests_disabled }} / {{ tests_executed }}</th>
+                                    <th>{{ tests_pass }}</th>
+                                    <th></th>
+                                    <th>L</th>
+                                    <th>C</th>
+                                    <th>P</th>
+                                    <th>C</th>
+                                    <th></th>
+                                    <th>Host</th>
+                                    <th>JIRA</th>
+                                    <th>{{ suite_progress }}/{{ suite_done }}</th>
+                                </tr>
+                                </tfoot>
                             </table>
                         {% endif %}
                         {#

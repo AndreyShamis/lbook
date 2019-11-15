@@ -662,6 +662,14 @@ class SuiteExecution
     /**
      * @return int
      */
+    public function getTestsCountDisabled(): int
+    {
+        return $this->getTestsCount() - $this->getTestsCountEnabled();
+    }
+
+    /**
+     * @return int
+     */
     public function getTestsCountEnabled(): int
     {
         return $this->testsCountEnabled;

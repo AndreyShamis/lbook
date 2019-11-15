@@ -31,6 +31,10 @@ class HostRepository extends ServiceEntityRepository
     {
         $criteria['name'] = trim($criteria['name']);
         $entity = $this->findOneBy(['name' => $criteria['name']]);
+        if (null === $entity && $criteria['name'] === '') {
+            // In case host not found and host == '' , so we will check if we know about this host something
+            $entity = $this->findOneBy(['ip' => $criteria['ip']]);
+        }
         if (null === $entity) {
             $entity = new Host();
             $entity->setName($criteria['name']);

@@ -243,6 +243,12 @@ class LogBookUploaderController extends AbstractController
         }
         $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
         unset($data['hostname']);
+        try {
+            if ($suiteHost !== null) {
+                $suiteHost->setLastSeenAt(new DateTime());
+            }
+        } catch (\Throwable $ex) {}
+
         $data['host'] = $suiteHost;
 //        $logger->critical($ip . '::IP  :' , $data);
 

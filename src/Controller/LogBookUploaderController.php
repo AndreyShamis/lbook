@@ -246,6 +246,36 @@ class LogBookUploaderController extends AbstractController
         try {
             if ($suiteHost !== null) {
                 $suiteHost->setLastSeenAt(new DateTime());
+                if (array_key_exists('host_uptime', $data)) {
+                    $suiteHost->setUptime($data['host_uptime']);
+                }
+                if (array_key_exists('host_memory_total', $data)) {
+                    $suiteHost->setMemoryTotal($data['host_memory_total']);
+                }
+                if (array_key_exists('host_memory_free', $data)) {
+                    $suiteHost->setMemoryFree($data['host_memory_free']);
+                }
+                if (array_key_exists('host_system', $data)) {
+                    $suiteHost->setSystem($data['host_system']);
+                }
+                if (array_key_exists('host_release', $data)) {
+                    $suiteHost->setSystemRelease($data['host_release']);
+                }
+                if (array_key_exists('host_version', $data)) {
+                    $suiteHost->setSystemVersion($data['host_version']);
+                }
+                if (array_key_exists('host_python_version', $data)) {
+                    $suiteHost->setPythonVersion($data['host_python_version']);
+                }
+                if (array_key_exists('host_user', $data)) {
+                    $suiteHost->setUserName($data['host_user']);
+                }
+                if (array_key_exists('host_cpu_count', $data)) {
+                    $suiteHost->setCpuCount($data['host_cpu_count']);
+                }
+                if (array_key_exists('host_cpu_usage', $data)) {
+                    $suiteHost->setCpuUsage($data['host_cpu_usage']);
+                }
             }
         } catch (\Throwable $ex) {}
 

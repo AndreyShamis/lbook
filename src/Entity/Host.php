@@ -23,9 +23,9 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="system_index", columns={"system"}),
  *     @Index(name="uptime_index", columns={"uptime"}),
  *     @Index(name="user_name_index", columns={"user_name"}),
- *     @Index(name="memory_total_index", columns={"memoryTotal"}),
+ *     @Index(name="memory_total_index", columns={"memory_total"}),
  *     @Index(name="fulltext_custom", columns={"name", "ip"}, flags={"fulltext"}),
- *     @Index(name="fulltext_custom", columns={"system", "systemRelease", "systemVersion"}, flags={"fulltext"}),
+ *     @Index(name="fulltext_custom", columns={"system", "system_release", "system_version"}, flags={"fulltext"}),
  *  }
  * )
  */
@@ -49,12 +49,12 @@ class Host
     protected $ip;
 
     /**
-     * @ORM\Column(name="updated_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="updated_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $updatedAt;
 
     /**
-     * @ORM\Column(name="last_seen_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="last_seen_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $lastSeenAt;
 
@@ -124,49 +124,54 @@ class Host
     protected $targetLabels = [];
 
     /**
-     * @ORM\Column(type="datetime", options={"unsigned"=true, "default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="uptime", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $uptime;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="memory_total", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $memoryTotal;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="memory_free", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $memoryFree;
 
     /**
-     * @ORM\Column(type="string", length=50, options={"default"=""})
+     * @ORM\Column(name="system", type="string", length=50, options={"default"=""})
      */
     protected $system;
 
     /**
-     * @ORM\Column(type="string", length=50, options={"default"=""})
+     * @ORM\Column(name="system_release", type="string", length=50, options={"default"=""})
      */
     protected $systemRelease;
 
     /**
-     * @ORM\Column(type="string", length=50, options={"default"=""})
+     * @ORM\Column(name="system_version", type="string", length=80, options={"default"=""})
      */
     protected $systemVersion;
 
     /**
-     * @ORM\Column(type="string", length=10, options={"default"=""})
+     * @ORM\Column(type="string", length=20, options={"default"=""})
      */
     protected $pythonVersion;
 
     /**
-     * @ORM\Column(type="string", length=150, options={"default"=""})
+     * @ORM\Column(name="user_name", type="string", length=150, options={"default"=""})
      */
     protected $user_name;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="cpu_count", type="smallint", options={"unsigned"=true, "default"="0"})
      */
     protected $cpuCount;
+
+    /**
+     * @ORM\Column(name="cpu_usage", type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $cpuUsage;
 
     public function __construct()
     {
@@ -571,6 +576,18 @@ class Host
     public function setCpuCount(int $cpuCount): self
     {
         $this->cpuCount = $cpuCount;
+
+        return $this;
+    }
+
+    public function getCpuUsage(): ?int
+    {
+        return $this->cpuUsage;
+    }
+
+    public function setCpuUsage(int $cpuUsage): self
+    {
+        $this->cpuUsage = $cpuUsage;
 
         return $this;
     }

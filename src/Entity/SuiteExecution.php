@@ -298,8 +298,8 @@ class SuiteExecution
             $total_test_time += $test->getTimeRun();
         }
 
-        $suite_tests_count = $this->getTestsCount();
-        if ($totoal_real_tests_found > $suite_tests_count) {
+        $suite_tests_count = $this->getTestsCountEnabled();
+        if ($totoal_real_tests_found >= $suite_tests_count) {
             $cof = $totoal_real_tests_found;
 
         } else {

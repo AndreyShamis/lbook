@@ -123,6 +123,7 @@ class Host
         $this->updatedAt = new \DateTime();
         $this->lastSeenAt = new \DateTime();
         $this->suiteExecutions = new ArrayCollection();
+        $this->targetLabels = [];
     }
 
     public function getId(): ?int
@@ -374,15 +375,21 @@ class Host
         return $this;
     }
 
-    public function addTargetLabel(string $newLabel): self
+    public function addTargetLabel(string $newLabel = null): self
     {
         if ($this->targetLabels === null) {
             $this->targetLabels = [];
         }
+        if ($newLabel === null) {
+            return $this;
+        }
+        if (strlen($newLabel) < 2 || strlen($newLabel) > 50) {
+            return $this;
+        }
         if (!in_array($newLabel, $this->targetLabels, true)) {
             array_unshift($this->targetLabels, $newLabel);
         }
-        if (count($this->targetLabels) > 10) {
+        if (count($this->targetLabels) > 20) {
             array_pop($this->targetLabels);
         }
         return $this;

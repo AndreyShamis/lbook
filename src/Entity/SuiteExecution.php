@@ -299,7 +299,7 @@ class SuiteExecution
         }
 
         $suite_tests_count = $this->getTestsCount();
-        if ($totoal_real_tests_found > $suite_tests_count) {
+        if ($totoal_real_tests_found >= $suite_tests_count) {
             $cof = $totoal_real_tests_found;
 
         } else {

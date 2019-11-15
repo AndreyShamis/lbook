@@ -358,11 +358,17 @@ class Host
      */
     public function getTargetLabels(): array
     {
+        if ($this->targetLabels === null) {
+            $this->targetLabels = [];
+        }
         return $this->targetLabels;
     }
 
     public function setTargetLabels(array $targetLabels): self
     {
+        if ($this->targetLabels === null) {
+            $this->targetLabels = [];
+        }
         $this->targetLabels = $targetLabels;
 
         return $this;
@@ -370,7 +376,10 @@ class Host
 
     public function addTargetLabel(string $newLabel): self
     {
-        if (!in_array($newLabel, $this->targetLabels)) {
+        if ($this->targetLabels === null) {
+            $this->targetLabels = [];
+        }
+        if (!in_array($newLabel, $this->targetLabels, true)) {
             array_unshift($this->targetLabels, $newLabel);
         }
         if (count($this->targetLabels) > 10) {

@@ -41,13 +41,38 @@ class HostRepository extends ServiceEntityRepository
             $entity->setIp($criteria['ip']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);
-        } else {
-            if ($entity->getIp() !== $criteria['ip']) {
-                $entity->setIp($criteria['ip']);
-                $this->_em->persist($entity);
-                $this->_em->flush($entity);
-            }
         }
+        $entity->setIp($criteria['ip']);
+        if (array_key_exists('host_uptime', $criteria)) {
+            $entity->setUptime($criteria['host_uptime']);
+        }
+        if (array_key_exists('host_memory_total', $criteria)) {
+            $entity->setMemoryTotal($criteria['host_memory_total']);
+        }
+        if (array_key_exists('host_memory_free', $criteria)) {
+            $entity->setMemoryFree($criteria['host_memory_free']);
+        }
+        if (array_key_exists('host_system', $criteria)) {
+            $entity->setSystem($criteria['host_system']);
+        }
+        if (array_key_exists('host_release', $criteria)) {
+            $entity->setSystemRelease($criteria['host_release']);
+        }
+        if (array_key_exists('host_version', $criteria)) {
+            $entity->setSystemVersion($criteria['host_version']);
+        }
+        if (array_key_exists('host_python_version', $criteria)) {
+            $entity->setPythonVersion($criteria['host_python_version']);
+        }
+        if (array_key_exists('host_user', $criteria)) {
+            $entity->setUserName($criteria['host_user']);
+        }
+        if (array_key_exists('host_cpu_count', $criteria)) {
+            $entity->setCpuCount($criteria['host_cpu_count']);
+        }
+        $this->_em->persist($entity);
+        $this->_em->flush($entity);
+
         return $entity;
     }
 //    /**

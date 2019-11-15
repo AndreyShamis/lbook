@@ -49,12 +49,12 @@ class Host
     protected $ip;
 
     /**
-     * @ORM\Column(name="updated_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="updated_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $updatedAt;
 
     /**
-     * @ORM\Column(name="last_seen_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="last_seen_at", type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     protected $lastSeenAt;
 
@@ -149,12 +149,12 @@ class Host
     protected $systemRelease;
 
     /**
-     * @ORM\Column(type="string", length=50, options={"default"=""})
+     * @ORM\Column(type="string", length=80, options={"default"=""})
      */
     protected $systemVersion;
 
     /**
-     * @ORM\Column(type="string", length=10, options={"default"=""})
+     * @ORM\Column(type="string", length=20, options={"default"=""})
      */
     protected $pythonVersion;
 
@@ -164,9 +164,14 @@ class Host
     protected $user_name;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(type="smallint", options={"unsigned"=true, "default"="0"})
      */
     protected $cpuCount;
+
+    /**
+     * @ORM\Column(type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $cpuUsage;
 
     public function __construct()
     {
@@ -571,6 +576,18 @@ class Host
     public function setCpuCount(int $cpuCount): self
     {
         $this->cpuCount = $cpuCount;
+
+        return $this;
+    }
+
+    public function getCpuUsage(): ?int
+    {
+        return $this->cpuUsage;
+    }
+
+    public function setCpuUsage(int $cpuUsage): self
+    {
+        $this->cpuUsage = $cpuUsage;
 
         return $this;
     }

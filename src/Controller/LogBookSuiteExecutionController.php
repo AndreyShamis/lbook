@@ -60,9 +60,10 @@ class LogBookSuiteExecutionController extends AbstractController
      */
     public function calculate_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
     {
+        if ($days > 30) {
+            $days = 1;
+        }
         $orders = ['ASC', 'DESC'];
-        $order = rand(0, 5);
-        $o_s = 'suite_execution.id';
         $rows = ['id', 'testsCount', 'chip', 'testingLevel', 'publish', 'failCount', 'closed', 'passRate'];
         $needed_row = 'suite_execution.'. $rows[array_rand($rows)];
         $query = $suites->createQueryBuilder('suite_execution')
@@ -70,7 +71,7 @@ class LogBookSuiteExecutionController extends AbstractController
             ->andWhere('suite_execution.startedAt >= :started')
         ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME);
 
-        $paginator = $pagePaginator->paginate($query, 1, 1000);
+        $paginator = $pagePaginator->paginate($query, 1, 3000);
         $totalPosts = $paginator->count();
         /** @var \ArrayIterator $iterator */
         $iterator = $paginator->getIterator();
@@ -107,6 +108,73 @@ class LogBookSuiteExecutionController extends AbstractController
         );
     }
 
+
+
+    /**
+     * @Route("/close/{days}", name="close_unclosed_suites_api", methods="GET|POST")
+     * @Template(template="lbook/suite/close_unclosed.html.twig")
+     * @param PagePaginator $pagePaginator
+     * @param SuiteExecutionRepository $suites
+     * @param int $days
+     * @return array
+     * @throws \Exception
+     */
+    public function close_unclosed_suites_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
+    {
+        if ($days > 100) {
+            $days = 100;
+        }
+
+        if ($days < 3) {
+            $days = 3;
+        }
+        $orders = ['ASC', 'DESC'];
+        $query = $suites->createQueryBuilder('suite_execution')
+            ->orderBy('suite_execution.id' , $orders[array_rand($orders)])
+            ->andWhere('suite_execution.finishedAt <= :finishedAt')
+            ->andWhere('suite_execution.closed = :state')
+            ->setParameter('finishedAt', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->setParameter('state', false);
+
+        $paginator = $pagePaginator->paginate($query, 1, 1000);
+        $totalPosts = $paginator->count();
+        /** @var \ArrayIterator $iterator */
+        $iterator = $paginator->getIterator();
+
+        $iterator->rewind();
+        $em = $this->getDoctrine()->getManager();
+        $output = [];
+        $start = microtime(true);
+        $closed = 0;
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var SuiteExecution $suite */
+                    $suite = $iterator->current();
+                    if ($suite !== null) {
+                        $suite->calculateStatistic();
+                        $suite->setClosed(true);
+                        $closed++;
+                        $em->persist($suite);
+                        //$output[] = 'ID: ' . $suite->getId() . ' calculated';
+                    }
+                    $iterator->next();
+                }
+            }
+        } catch (\Throwable $ex) { }
+        $time_elapsed_secs = microtime(true) - $start;
+        $start = microtime(true);
+        $em->flush();
+        $flush_time_elapsed_secs = microtime(true) - $start;
+        return array(
+            'output'    => $output,
+            'size'      => $totalPosts,
+            'iterator'      => $iterator,
+            'time_elapsed_secs'      => $time_elapsed_secs,
+            'flush_time_elapsed_secs'      => $flush_time_elapsed_secs,
+            'closed'      => $closed,
+        );
+    }
     /**
      * @Route("/show/{id}", name="suite_show", methods="GET")
      * @param SuiteExecution $suite

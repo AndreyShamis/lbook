@@ -1,0 +1,10 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK hosts{% endblock %}
+{% block content %}
+    <h1>Suite closer</h1>
+    Total count {{ size }}: <br/>
+    Closed  {{ closed }} from {{ iterator | length }} in  {{ time_elapsed_secs }}( flush {{ flush_time_elapsed_secs }}) sec [ETA: 1-4 suites in 1 sec]<br/>
+    {#    {% for line in output | slice(0, 10000)%}#}
+    {#    {{ line }}<br/>#}
+    {#    {% endfor %}#}
+{% endblock %}

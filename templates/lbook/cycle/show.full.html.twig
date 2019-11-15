@@ -176,7 +176,6 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         {#<div class="container" style="width: 100%;height: 100%;min-height: 700px;">#}
 
                         {% if suitesCount > 0 %}
-                            Count {{ suitesCount }} suites
                             <table class="records_list table table-striped table-condensed font9">
                                 <thead>
                                 <tr>
@@ -192,8 +191,8 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th>Component</th>
                                     <th title="Test Environments">ENV</th>
                                     <th title="Suite Host Name">Host</th>
-                                    <th title="JIRA KEY/Publish">JIRA</th>
                                     <th title="Closed : X= Closed; O= Open">X</th>
+                                    <th title="JIRA KEY/Publish">JIRA</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -247,20 +246,26 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </tbody>
                                 <tfoot>
                                 <tr>
+                                    <th title="Total suites count"><strong>{{ suitesCount }}</strong></th>
                                     <th></th>
                                     <th></th>
-                                    <th></th>
-                                    <th>{{ tests_enabled }}/ {{ tests_disabled }} / {{ tests_executed }}</th>
+                                    <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>
                                     <th>{{ tests_pass }}</th>
                                     <th></th>
-                                    <th>L</th>
-                                    <th>C</th>
-                                    <th>P</th>
-                                    <th>C</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                     <th></th>
                                     <th>Host</th>
-                                    <th>JIRA</th>
-                                    <th>{{ suite_progress }}/{{ suite_done }}</th>
+                                    <th title="Suites Done/WIP">{{ suite_done }}/
+                                        {% if suite_progress > 0 %}
+                                            <strong>{{ suite_progress }}</strong>
+                                        {% else %}
+                                            {{ suite_progress }}
+                                        {% endif %}
+                                    </th>
+                                    <th></th>
                                 </tr>
                                 </tfoot>
                             </table>

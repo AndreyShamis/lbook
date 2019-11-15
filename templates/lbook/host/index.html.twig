@@ -82,9 +82,9 @@
                         <td><a title="{{ host }}" href="{{ path('home_index', { 'id': host.id }) }}">{{ host.name }}&nbsp;</a></td>
                         <td>{{ host.ip }}</td>
                         <td>{{ host.cpuCount }}</td>
-                        <td>{{ host.cpuUsage }}</td>
-                        <td>{{ host.host.memoryFree/1024 }}G</td>
-                        <td>{{ getPercentage(host.memoryFree, host.memoryTotal) }}</td>
+                        <td>{{ host.cpuUsage }}%</td>
+                        <td>{{ host.host.memoryTotal/1024 }}G</td>
+                        <td title="{{ host.memoryFree }}">{{ getPercentage(host.memoryFree, host.memoryTotal) }}%</td>
                         <td>{{ host.system }}/{{ host.systemRelease }}/{{ host.systemVersion }}</td>
                         <td><span data-title="{{ host.uptime|date('ymdHis') }}" title="Uptime at {{ host.lastSeenAt|date('d/m/Y H:i:s') }}">{{ host.uptime|time_diff}}</span></td>
                         <td>{{ host.pythonVersion }}</td>

@@ -35,7 +35,13 @@
 
         <b class="arrow"></b>
     </li>
-
+    <li class="{% if route starts with 'suites_' %}active{% endif %}">
+        <a href="{{asset(path('suite_index'))}}">
+            <i class="menu-icon fa fa-list-alt"></i>
+            <span class="menu-text bigger-120"> Suites </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
     <li class="{% if route starts with 'log_book_build_' %}active{% endif %}">
         <a href="{{asset(path('log_book_build_index'))}}" >
             <i class="menu-icon fa fa-pencil-square-o"></i>
@@ -51,6 +57,7 @@
         </a>
         <b class="arrow"></b>
     </li>
+
 
 {#    <li class="{% if route starts with 'test_' %}active{% endif %}">#}
 {#        <a href="{{asset(path('test_index_first'))}}">#}

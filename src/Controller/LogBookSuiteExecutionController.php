@@ -32,11 +32,7 @@ class LogBookSuiteExecutionController extends AbstractController
     {
         $query = $suites->createQueryBuilder('suite_execution')
 //            ->where('suite_execution.disabled = 0')
-            ->orderBy('suite_execution.updatedAt', 'DESC')
-            ->where('suite_execution.name = :name')
-            ->setParameter('name', 'Nightly_Driver_EPM5_EQ5')
-//            ->addOrderBy('suite_execution.cycle', 'DESC')
-        ;
+            ->orderBy('suite_execution.updatedAt', 'DESC');
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         $totalPosts = $paginator->count();
         /** @var \ArrayIterator $iterator */
@@ -49,6 +45,65 @@ class LogBookSuiteExecutionController extends AbstractController
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,
             'paginator' => $paginator,
+        );
+    }
+
+
+    /**
+     * @Route("/calculate/{days}", name="suite_calculate_api", methods="GET|POST")
+     * @Template(template="lbook/suite/calculate.html.twig")
+     * @param PagePaginator $pagePaginator
+     * @param SuiteExecutionRepository $suites
+     * @param int $days
+     * @return array
+     * @throws \Exception
+     */
+    public function calculate_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
+    {
+        $orders = ['ASC', 'DESC'];
+        $order = rand(0, 5);
+        $o_s = 'suite_execution.id';
+        $rows = ['id', 'testsCount', 'chip', 'testingLevel', 'publish', 'failCount', 'closed', 'passRate'];
+        $needed_row = 'suite_execution.'. $rows[array_rand($rows)];
+        $query = $suites->createQueryBuilder('suite_execution')
+            ->orderBy($needed_row , $orders[array_rand($orders)])
+            ->andWhere('suite_execution.startedAt >= :started')
+        ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME);
+
+        $paginator = $pagePaginator->paginate($query, 1, 1000);
+        $totalPosts = $paginator->count();
+        /** @var \ArrayIterator $iterator */
+        $iterator = $paginator->getIterator();
+
+        $iterator->rewind();
+        $em = $this->getDoctrine()->getManager();
+        $output = [];
+        $start = microtime(true);
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var SuiteExecution $suite */
+                    $suite = $iterator->current();
+                    if ($suite !== null) {
+                        $suite->calculateStatistic();
+                        $em->persist($suite);
+                        //$output[] = 'ID: ' . $suite->getId() . ' calculated';
+                    }
+                    $iterator->next();
+                }
+            }
+        } catch (\Throwable $ex) { }
+        $time_elapsed_secs = microtime(true) - $start;
+        $start = microtime(true);
+        $em->flush();
+        $flush_time_elapsed_secs = microtime(true) - $start;
+        return array(
+            'output'    => $output,
+            'size'      => $totalPosts,
+            'iterator'      => $iterator,
+            'time_elapsed_secs'      => $time_elapsed_secs,
+            'flush_time_elapsed_secs'      => $flush_time_elapsed_secs,
+            'needed_row'      => $needed_row,
         );
     }
 

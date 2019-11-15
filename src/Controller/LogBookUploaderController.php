@@ -266,15 +266,21 @@ class LogBookUploaderController extends AbstractController
             try {
                 if ($suiteHost !== null) {
                     $suiteHost->setLastSeenAt(new DateTime());
-                    if (array_key_exists('host_uptime', $data)) {
-                        $suiteHost->setUptime($data['host_uptime']);
-                    }
-                    if (array_key_exists('host_memory_total', $data)) {
-                        $suiteHost->setMemoryTotal($data['host_memory_total']);
-                    }
-                    if (array_key_exists('host_memory_free', $data)) {
-                        $suiteHost->setMemoryFree($data['host_memory_free']);
-                    }
+                    try {
+                        if (array_key_exists('host_uptime', $data)) {
+                            $suiteHost->setUptime($data['host_uptime']);
+                        }
+                    } catch (\Throwable $ex) {}
+
+                    try {
+                        if (array_key_exists('host_memory_total', $data)) {
+                            $suiteHost->setMemoryTotal($data['host_memory_total']);
+                        }
+                        if (array_key_exists('host_memory_free', $data)) {
+                            $suiteHost->setMemoryFree($data['host_memory_free']);
+                        }
+                    } catch (\Throwable $ex) {}
+
                     try {
                         if (array_key_exists('host_system', $data)) {
                             $suiteHost->setSystem($data['host_system']);

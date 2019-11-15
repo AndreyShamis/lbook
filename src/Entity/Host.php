@@ -20,7 +20,12 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="h_ip_index", columns={"ip"}),
  *     @Index(name="h_updated_at_index", columns={"updated_at"}),
  *     @Index(name="h_last_seen_at_index", columns={"last_seen_at"}),
+ *     @Index(name="system_index", columns={"system"}),
+ *     @Index(name="uptime_index", columns={"uptime"}),
+ *     @Index(name="user_name_index", columns={"user_name"}),
+ *     @Index(name="memory_total_index", columns={"memoryTotal"}),
  *     @Index(name="fulltext_custom", columns={"name", "ip"}, flags={"fulltext"}),
+ *     @Index(name="fulltext_custom", columns={"system", "systemRelease", "systemVersion"}, flags={"fulltext"}),
  *  }
  * )
  */
@@ -31,92 +36,137 @@ class Host
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer", options={"unsigned"=true})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(name="name", type="string", length=150)
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(name="ip", type="string", length=30)
      */
-    private $ip;
+    protected $ip;
 
     /**
-     * @ORM\Column(name="updated_at", type="datetime")
+     * @ORM\Column(name="updated_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
      */
-    private $updatedAt;
+    protected $updatedAt;
 
     /**
-     * @ORM\Column(name="last_seen_at", type="datetime")
+     * @ORM\Column(name="last_seen_at", type="datetime", "default"="CURRENT_TIMESTAMP"})
      */
-    private $lastSeenAt;
+    protected $lastSeenAt;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\SuiteExecution", mappedBy="host")
      */
-    private $suiteExecutions;
+    protected $suiteExecutions;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\SuiteExecution", cascade={"persist"})
      */
-    private $lastSuite;
+    protected $lastSuite;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $suitesCount;
+    protected $suitesCount;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $suitesPass;
+    protected $suitesPass;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsCount;
+    protected $testsCount;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsFailed;
+    protected $testsFailed;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsError;
+    protected $testsError;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsExecuted;
+    protected $testsExecuted;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsAndFlowsCount;
+    protected $testsAndFlowsCount;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsAborted;
+    protected $testsAborted;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsNa;
+    protected $testsNa;
 
     /**
      * @ORM\Column(name="target_label", type="string", length=50)
      */
-    private $targetLabel;
+    protected $targetLabel;
 
     /**
      * @ORM\Column(name="target_labels", type="array")
      */
-    private $targetLabels = [];
+    protected $targetLabels = [];
+
+    /**
+     * @ORM\Column(type="datetime", options={"unsigned"=true, "default"="CURRENT_TIMESTAMP"})
+     */
+    protected $uptime;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    protected $memoryTotal;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    protected $memoryFree;
+
+    /**
+     * @ORM\Column(type="string", length=50, options={"default"=""})
+     */
+    protected $system;
+
+    /**
+     * @ORM\Column(type="string", length=50, options={"default"=""})
+     */
+    protected $systemRelease;
+
+    /**
+     * @ORM\Column(type="string", length=50, options={"default"=""})
+     */
+    protected $systemVersion;
+
+    /**
+     * @ORM\Column(type="string", length=10, options={"default"=""})
+     */
+    protected $pythonVersion;
+
+    /**
+     * @ORM\Column(type="string", length=150, options={"default"=""})
+     */
+    protected $user_name;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    protected $cpuCount;
 
     public function __construct()
     {
@@ -415,5 +465,113 @@ class Host
         foreach ($newLabels as $newLabel) {
             $this->addTargetLabel($newLabel);
         }
+    }
+
+    public function getUptime(): ?\DateTimeInterface
+    {
+        return $this->uptime;
+    }
+
+    public function setUptime(\DateTimeInterface $uptime): self
+    {
+        $this->uptime = $uptime;
+
+        return $this;
+    }
+
+    public function getMemoryTotal(): ?int
+    {
+        return $this->memoryTotal;
+    }
+
+    public function setMemoryTotal(int $memoryTotal): self
+    {
+        $this->memoryTotal = $memoryTotal;
+
+        return $this;
+    }
+
+    public function getMemoryFree(): ?int
+    {
+        return $this->memoryFree;
+    }
+
+    public function setMemoryFree(int $memoryFree): self
+    {
+        $this->memoryFree = $memoryFree;
+
+        return $this;
+    }
+
+    public function getSystem(): ?string
+    {
+        return $this->system;
+    }
+
+    public function setSystem(string $system): self
+    {
+        $this->system = $system;
+
+        return $this;
+    }
+
+    public function getSystemRelease(): ?string
+    {
+        return $this->systemRelease;
+    }
+
+    public function setSystemRelease(string $systemRelease): self
+    {
+        $this->systemRelease = $systemRelease;
+
+        return $this;
+    }
+
+    public function getSystemVersion(): ?string
+    {
+        return $this->systemVersion;
+    }
+
+    public function setSystemVersion(string $systemVersion): self
+    {
+        $this->systemVersion = $systemVersion;
+
+        return $this;
+    }
+
+    public function getPythonVersion(): ?string
+    {
+        return $this->pythonVersion;
+    }
+
+    public function setPythonVersion(string $pythonVersion): self
+    {
+        $this->pythonVersion = $pythonVersion;
+
+        return $this;
+    }
+
+    public function getUserName(): ?string
+    {
+        return $this->user_name;
+    }
+
+    public function setUserName(string $user_name): self
+    {
+        $this->user_name = $user_name;
+
+        return $this;
+    }
+
+    public function getCpuCount(): ?int
+    {
+        return $this->cpuCount;
+    }
+
+    public function setCpuCount(int $cpuCount): self
+    {
+        $this->cpuCount = $cpuCount;
+
+        return $this;
     }
 }

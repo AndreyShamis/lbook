@@ -377,6 +377,9 @@ class Host
             if ($this->targetLabels === null || \count($this->targetLabels) === 0) {
                 $this->targetLabels = [];
             }
+            if (gettype($this->targetLabels) === 'boolean') {
+                $this->targetLabels = [];
+            }
         } catch (\Throwable $ex) {
             $this->targetLabels = [];
         }

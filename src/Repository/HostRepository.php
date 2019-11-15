@@ -70,6 +70,9 @@ class HostRepository extends ServiceEntityRepository
         if (array_key_exists('host_cpu_count', $criteria)) {
             $entity->setCpuCount($criteria['host_cpu_count']);
         }
+        if (array_key_exists('host_cpu_usage', $criteria)) {
+            $entity->setCpuUsage($criteria['host_cpu_usage']);
+        }
         $this->_em->persist($entity);
         $this->_em->flush($entity);
 

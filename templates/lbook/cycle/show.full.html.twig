@@ -239,8 +239,8 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                         <span title="{{ suite.host.ip }}">{{ suite.host.name }}</span>
                                         {% endif %}
                                     </td>
-                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
                                     <td>{{ suite.closed ? 'X':'O' }}</td>
+                                    <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
                                 </tr>
                             {% endfor %}
                                 </tbody>

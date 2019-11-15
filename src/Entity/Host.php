@@ -71,47 +71,47 @@ class Host
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $suitesCount;
+    protected $suitesCount = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $suitesPass;
+    protected $suitesPass = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsCount;
+    protected $testsCount = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsFailed;
+    protected $testsFailed = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsError;
+    protected $testsError = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsExecuted;
+    protected $testsExecuted = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsAndFlowsCount;
+    protected $testsAndFlowsCount = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsAborted;
+    protected $testsAborted = 0;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $testsNa;
+    protected $testsNa = 0;
 
     /**
      * @ORM\Column(name="target_label", type="string", length=50)
@@ -166,12 +166,12 @@ class Host
     /**
      * @ORM\Column(name="cpu_count", type="smallint", options={"unsigned"=true, "default"="0"})
      */
-    protected $cpuCount;
+    protected $cpuCount = 0;
 
     /**
      * @ORM\Column(name="cpu_usage", type="smallint", options={"unsigned"=true, "default"="0"})
      */
-    private $cpuUsage;
+    private $cpuUsage = 0;
 
     public function __construct()
     {
@@ -179,6 +179,7 @@ class Host
         $this->lastSeenAt = new \DateTime();
         $this->suiteExecutions = new ArrayCollection();
         $this->targetLabels = [];
+        $this->suitesCount = 0;
     }
 
     public function getId(): ?int

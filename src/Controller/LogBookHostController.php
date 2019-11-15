@@ -26,8 +26,8 @@ class LogBookHostController extends AbstractController
      */
     public function index(HostRepository $hosts, PagePaginator $pagePaginator, $page = 1)
     {
-        $query = $hosts->createQueryBuilder('hosts')
-            ->orderBy('hosts.updatedAt', 'DESC');
+        $query = $hosts->createQueryBuilder('host')
+            ->orderBy('host.lastSeenAt', 'DESC');
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();

@@ -22,14 +22,16 @@
                    data-show-columns="true"
                    data-advanced-search="true"
                     {#data-id-table="advancedTable"#}
-                   data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500]" data-sort-order="desc">
+                   data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 5000]" data-sort-order="desc">
                 <thead>
                 <tr>
                     <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
                     <th data-sortable="true" data-switchable="false">ID</th>
                     <th data-sorter="htmlSorter" data-sortable="true" title="Full Name" data-switchable="false">Name</th>
                     <th data-sortable="true" title="IP ADDR" data-switchable="true">IP</th>
-                    <th data-field="Last Suite" data-sorter="dataTitleIntSorter" data-sortable="true" title="Last Suitee">Last Suite</th>
+                    <th data-sorter="htmlSorter" data-field="Last Suite" data-sortable="true" title="Last Suitee">Last Suite</th>
+                    <th data-sortable="true" title="Last Platform::Chip" data-switchable="true">Platform/Chp</th>
+                    <th data-sortable="true" title="Labels" data-switchable="true">Labels</th>
 {#                    <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>#}
 {#                    <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>#}
 {#                    <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true">Executed</th>#}
@@ -49,10 +51,10 @@
 {#                    <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>#}
 {#                    <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>#}
 {#                    <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>#}
-                    <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
-                    <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Last Seen time" data-visible="false">Last Seen</th>
+{#                    <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>#}
+                    <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Last Seen time" data-visible="true">Last Seen</th>
 {#                    <th data-sortable="true" title="Publish" data-switchable="true">Pub</th>#}
-                    <th class="suite_list_options_column">Options</th>
+{#                    <th class="suite_list_options_column">Options</th>#}
                 </tr>
                 </thead>
                 <tbody class="searchable">
@@ -70,24 +72,23 @@
                             {% endif %}
                         </td>
                         <td>{{ host.id }}</td>
-                        <td><a title="{{ host }}" href="{{ path('home_index', { 'id': host.id }) }}">{{ host.name }}</a></td>
+                        <td><a title="{{ host }}" href="{{ path('home_index', { 'id': host.id }) }}">{{ host.name }}&nbsp;</a></td>
                         <td>{{ host.ip }}</td>
                         <td>
                             {%  if host.lastSuite and host.lastSuite.id is defined %}
-                                <a href="{{ path('cycle_show_first', { 'id': host.lastSuite.cycle.id }) }}">{{ host.lastSuite.id }}:{{ host.lastSuite }}</a>
+                                <a href="{{ path('suite_cycle_show', { 'id': host.lastSuite.id }) }}">{{ host.lastSuite.id }}:{{ host.lastSuite }}</a>
                             {% endif %}
                         </td>
-                        <td><span data-title="{{ host.updatedAt|date('ymdHis') }}" title="Updated at {{ host.updatedAt|date('d/m/Y H:i:s') }}">{{ host.updatedAt|time_diff}}</span></td>
+                        <td>{{ host.targetLabel }}</td>
+                        <td>{{ host.targetLabels | join(', ') }}</td>
+{#                        <td><span data-title="{{ host.updatedAt|date('ymdHis') }}" title="Updated at {{ host.updatedAt|date('d/m/Y H:i:s') }}">{{ host.updatedAt|time_diff}}</span></td>#}
                         <td><span data-title="{{ host.lastSeenAt|date('ymdHis') }}" title="Created at {{ host.lastSeenAt|date('d/m/Y H:i:s') }}">{{ host.lastSeenAt|time_diff}}</span></td>
 {#                        <td>{{ suiteExecution.publish }}</td>#}
-                        <td>
-                            <div class="hidden-sm hidden-xs action-buttons">
-{#                                <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">#}
-{#                                    <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
-{#                                </a>#}
-                                <i class="ace-icon fa fa-pencil bigger-130"></i>
-                            </div>
-                        </td>
+{#                        <td>#}
+{#                            <div class="hidden-sm hidden-xs action-buttons">#}
+{#                                <i class="ace-icon fa fa-pencil bigger-130"></i>#}
+{#                            </div>#}
+{#                        </td>#}
                     </tr>
                 {% endfor %}
                 </tbody>

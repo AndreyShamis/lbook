@@ -271,11 +271,10 @@ class LogBookUploaderController extends AbstractController
             $created = true;
             try {
                 if ($suiteHost !== null) {
-                    $suiteHost
-                        ->setLastSuite($suiteExecution)
-                        ->setTargetLabel($suiteExecution->getChip())    // Set chip only
-                        ->addTargetLabel($suiteExecution->getChip())
-                        ->addTargetLabel($suiteExecution->getPlatform());
+                    $suiteHost->setLastSuite($suiteExecution);
+                    $suiteHost->setTargetLabel($suiteExecution->getChip());    // Set chip only
+                    $suiteHost->addTargetLabel($suiteExecution->getChip());
+                    $suiteHost->addTargetLabel($suiteExecution->getPlatform());
                     $this->em->persist($suiteHost);
                     $this->em->flush();
                 }

@@ -359,24 +359,32 @@ class Host
      */
     public function getTargetLabels(): array
     {
-        if ($this->targetLabels === null) {
-            $this->targetLabels = [];
-        }
+        $this->fix_array();
         return $this->targetLabels;
     }
 
     public function setTargetLabels(array $targetLabels): self
     {
-        if ($this->targetLabels === null) {
-            $this->targetLabels = [];
-        }
+        $this->fix_array();
         $this->targetLabels = $targetLabels;
 
         return $this;
     }
 
+    protected function fix_array(): void
+    {
+        try {
+            if ($this->targetLabels === null || \count($this->targetLabels) === 0) {
+                $this->targetLabels = [];
+            }
+        } catch (\Throwable $ex) {
+            $this->targetLabels = [];
+        }
+    }
+
     public function addTargetLabel(string $newLabel = null): self
     {
+        $this->fix_array();
         if ($this->targetLabels === null) {
             $this->targetLabels = [];
         }
@@ -392,6 +400,7 @@ class Host
         if (count($this->targetLabels) > 20) {
             array_pop($this->targetLabels);
         }
+
         return $this;
     }
 

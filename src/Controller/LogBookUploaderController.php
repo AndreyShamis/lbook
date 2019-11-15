@@ -269,6 +269,17 @@ class LogBookUploaderController extends AbstractController
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
+            try {
+                if ($suiteHost !== null) {
+                    $suiteHost
+                        ->setLastSuite($suiteExecution)
+                        ->setTargetLabel($suiteExecution->getChip())    // Set chip only
+                        ->addTargetLabel($suiteExecution->getChip())
+                        ->addTargetLabel($suiteExecution->getPlatform());
+                    $this->em->persist($suiteHost);
+                    $this->em->flush();
+                }
+            } catch (\Throwable $ex) {}
         } catch (\Throwable $e) {
             $method = $request->getMethod();
             $data['ip'] = $ip;

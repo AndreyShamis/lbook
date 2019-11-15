@@ -58,6 +58,66 @@ class Host
      */
     private $suiteExecutions;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\SuiteExecution", cascade={"persist"})
+     */
+    private $lastSuite;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $suitesCount;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $suitesPass;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsCount;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsFailed;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsError;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsExecuted;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsAndFlowsCount;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsAborted;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsNa;
+
+    /**
+     * @ORM\Column(name="target_label", type="string", length=50)
+     */
+    private $targetLabel;
+
+    /**
+     * @ORM\Column(name="target_labels", type="array")
+     */
+    private $targetLabels = [];
+
     public function __construct()
     {
         $this->updatedAt = new \DateTime();
@@ -155,5 +215,177 @@ class Host
     public function __toString()
     {
         return $this->getName() . ':' . $this->getIp();
+    }
+
+    public function getLastSuite(): ?SuiteExecution
+    {
+        return $this->lastSuite;
+    }
+
+    public function setLastSuite(?SuiteExecution $lastSuite): self
+    {
+        $this->lastSuite = $lastSuite;
+
+        return $this;
+    }
+
+    public function getSuitesCount(): int
+    {
+        return $this->suitesCount;
+    }
+
+    public function setSuitesCount(int $suitesCount): self
+    {
+        $this->suitesCount = $suitesCount;
+
+        return $this;
+    }
+
+    public function getSuitesPass(): int
+    {
+        return $this->suitesPass;
+    }
+
+    public function setSuitesPass(int $suitesPass): self
+    {
+        $this->suitesPass = $suitesPass;
+
+        return $this;
+    }
+
+    public function getTestsCount(): int
+    {
+        return $this->testsCount;
+    }
+
+    public function setTestsCount(int $testsCount): self
+    {
+        $this->testsCount = $testsCount;
+
+        return $this;
+    }
+
+    public function getTestsFailed(): int
+    {
+        return $this->testsFailed;
+    }
+
+    public function setTestsFailed(int $testsFailed): self
+    {
+        $this->testsFailed = $testsFailed;
+
+        return $this;
+    }
+
+    public function getTestsError(): int
+    {
+        return $this->testsError;
+    }
+
+    public function setTestsError(int $testsError): self
+    {
+        $this->testsError = $testsError;
+
+        return $this;
+    }
+
+    public function getTestsExecuted(): int
+    {
+        return $this->testsExecuted;
+    }
+
+    public function setTestsExecuted(int $testsExecuted): self
+    {
+        $this->testsExecuted = $testsExecuted;
+
+        return $this;
+    }
+
+    public function getTestsAndFlowsCount(): int
+    {
+        return $this->testsAndFlowsCount;
+    }
+
+    public function setTestsAndFlowsCount(int $testsAndFlowsCount): self
+    {
+        $this->testsAndFlowsCount = $testsAndFlowsCount;
+
+        return $this;
+    }
+
+    public function getTestsAborted(): int
+    {
+        return $this->testsAborted;
+    }
+
+    public function setTestsAborted(int $testsAborted): self
+    {
+        $this->testsAborted = $testsAborted;
+
+        return $this;
+    }
+
+    public function getTestsNa(): int
+    {
+        return $this->testsNa;
+    }
+
+    public function setTestsNa(int $testsNa): self
+    {
+        $this->testsNa = $testsNa;
+
+        return $this;
+    }
+
+    public function getTargetLabel(): string
+    {
+        return $this->targetLabel;
+    }
+
+    /**
+     * @param string $targetLabel
+     * @return $this
+     */
+    public function setTargetLabel(string $targetLabel): self
+    {
+        $this->targetLabel = $targetLabel;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTargetLabels(): array
+    {
+        return $this->targetLabels;
+    }
+
+    public function setTargetLabels(array $targetLabels): self
+    {
+        $this->targetLabels = $targetLabels;
+
+        return $this;
+    }
+
+    public function addTargetLabel(string $newLabel): self
+    {
+        if (!in_array($newLabel, $this->targetLabels)) {
+            array_unshift($this->targetLabels, $newLabel);
+        }
+        if (count($this->targetLabels) > 10) {
+            array_pop($this->targetLabels);
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $newLabels
+     */
+    public function addTargetLabels(array $newLabels): void
+    {
+        foreach ($newLabels as $newLabel) {
+            $this->addTargetLabel($newLabel);
+        }
     }
 }

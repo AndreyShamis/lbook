@@ -116,7 +116,7 @@ class Host
     /**
      * @ORM\Column(name="target_label", type="string", length=50)
      */
-    protected $targetLabel;
+    protected $targetLabel = '';
 
     /**
      * @ORM\Column(name="target_labels", type="array")
@@ -131,37 +131,37 @@ class Host
     /**
      * @ORM\Column(name="memory_total", type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $memoryTotal;
+    protected $memoryTotal = 0;
 
     /**
      * @ORM\Column(name="memory_free", type="integer", options={"unsigned"=true, "default"="0"})
      */
-    protected $memoryFree;
+    protected $memoryFree = 0;
 
     /**
      * @ORM\Column(name="system", type="string", length=50, options={"default"=""})
      */
-    protected $system;
+    protected $system = '';
 
     /**
      * @ORM\Column(name="system_release", type="string", length=50, options={"default"=""})
      */
-    protected $systemRelease;
+    protected $systemRelease = '';
 
     /**
      * @ORM\Column(name="system_version", type="string", length=80, options={"default"=""})
      */
-    protected $systemVersion;
+    protected $systemVersion = '';
 
     /**
      * @ORM\Column(type="string", length=20, options={"default"=""})
      */
-    protected $pythonVersion;
+    protected $pythonVersion = '';
 
     /**
      * @ORM\Column(name="user_name", type="string", length=150, options={"default"=""})
      */
-    protected $user_name;
+    protected $user_name = '';
 
     /**
      * @ORM\Column(name="cpu_count", type="smallint", options={"unsigned"=true, "default"="0"})

@@ -238,12 +238,19 @@ class LogBookUploaderController extends AbstractController
             $data = array();
         }
 
-        if (!array_key_exists('hostname', $data)) {
-            $data['hostname'] = '';
+        try {
+            if (!array_key_exists('hostname', $data)) {
+                $data['hostname'] = '';
+            }
+            $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
+            unset($data['hostname']);
+            $data['host'] = $suiteHost;
+        } catch (\Throwable $ex) {
+            $logger->critical('SUITE_CREATE_FAIL in host:[' . $data['hostname'] . ':' . $ip . ']',
+                array(
+                    'ip' => $ip,
+                ));
         }
-        $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
-        unset($data['hostname']);
-        $data['host'] = $suiteHost;
 //        $logger->critical($ip . '::IP  :' , $data);
 
         if (!array_key_exists('components', $data)) {
@@ -263,6 +270,11 @@ class LogBookUploaderController extends AbstractController
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
+            $logger->notice('NEW_SUITE:[' . $suiteExecution->getSummary() . ': Tests:' . $suiteExecution->getTestsCountEnabled() . ']',
+                array(
+                    'name' => $suiteExecution->getName(),
+                    'job_name' => $suiteExecution->getJobName(),
+                ));
             try {
                 if ($suiteHost !== null) {
                     $suiteHost->setLastSeenAt(new DateTime());
@@ -323,7 +335,16 @@ class LogBookUploaderController extends AbstractController
                     $this->em->persist($suiteHost);
                     $this->em->flush();
                 }
-            } catch (\Throwable $ex) {}
+            } catch (\Throwable $ex) {
+                $logger->critical('SUITE_HOST_UPDATE_FAILED:[' . $suiteHost->getName() . ':' . $suiteHost->getIp() . ']',
+                    array(
+                        'tarLab' => $tarLab,
+                        'PLATFORM' => $suiteExecution->getPlatform(),
+                        'CHIP' => $suiteExecution->getChip(),
+                        'SuiteName' => $suiteExecution->getName(),
+                        'SuiteSummary' => $suiteExecution->getSummary(),
+                    ));
+            }
         } catch (\Throwable $e) {
             $method = $request->getMethod();
             $data['ip'] = $ip;

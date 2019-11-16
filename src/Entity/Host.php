@@ -177,9 +177,21 @@ class Host
     {
         $this->updatedAt = new \DateTime();
         $this->lastSeenAt = new \DateTime();
+        $this->uptime = new \DateTime();
         $this->suiteExecutions = new ArrayCollection();
         $this->targetLabels = [];
         $this->suitesCount = 0;
+        $this->targetLabel = '';
+        $this->memoryTotal = 0;
+        $this->memoryFree = 0;
+        $this->memoryFree = 0;
+        $this->system = '';
+        $this->systemRelease = '';
+        $this->systemVersion = '';
+        $this->pythonVersion = '';
+        $this->user_name = '';
+        $this->cpuCount = 0;
+
     }
 
     public function getId(): ?int

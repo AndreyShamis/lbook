@@ -78,7 +78,7 @@
                         <td><span title="{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb total , {{ (host.memoryFree/1024)|round(1, 'floor') }} Gb free" data-title="{{ host.memoryTotal }}">{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb</span></td>
                         <td><span data-percent="{{ host.memoryFree }}" title="{{ host.memoryFree }}">{{ getPercentage(host.memoryFree, host.memoryTotal, 1) }}%</span></td>
                         <td>{{ host.system }}/{{ host.systemRelease }}/{{ host.systemVersion }}</td>
-                        <td><span data-title="{{ host.uptime|date('ymdHis') }}" title="Uptime at {{ host.lastSeenAt|date('d/m/Y H:i:s') }}">{{ host.uptime|time_diff}}</span></td>
+                        <td><span data-title="{{ host.uptime|date('ymdHis') }}" title="Uptime at {{ host.uptime|date('d/m/Y H:i:s') }}">{{ host.uptime|time_diff}}</span></td>
                         <td>{{ host.pythonVersion }}</td>
                         <td>
                             {%  if host.lastSuite and host.lastSuite.id is defined %}

@@ -401,7 +401,7 @@ class LogBookTest
     public function isPass(): bool
     {
         try {
-            $verdict = strtolower($this->getVerdict()->getName());
+            $verdict = $this->getVerdictStringLower();
             if ($verdict === 'pass' || $verdict === 'success') {
                 return true;
             }
@@ -415,12 +415,34 @@ class LogBookTest
     public function isFail(): bool
     {
         try {
-            $verdict = strtolower($this->getVerdict()->getName());
+            $verdict = $this->getVerdictStringLower();
             if ($verdict === 'fail' || $verdict === 'failed' || $verdict === 'failure') {
                 return true;
             }
         } catch (\Throwable $ex) {}
         return false;
+    }
+
+    public function getVerdictStringLower(): string
+    {
+        $ret = '';
+        try {
+            $ret = strtolower($this->getVerdictString());
+        } catch (\Throwable $ex) {}
+        return $ret;
+    }
+
+    public function getVerdictString(): string
+    {
+        $ret = '';
+        try {
+            if ($this->getVerdict() !== null) {
+                $ret = $this->getVerdict()->getName();
+            } else {
+                $ret = 'UNKNOWN';
+            }
+        } catch (\Throwable $ex) {}
+        return $ret;
     }
 
     /**
@@ -429,8 +451,7 @@ class LogBookTest
     public function isError(): bool
     {
         try {
-            $verdict = strtolower($this->getVerdict()->getName());
-            if ($verdict === 'error') {
+            if ($this->getVerdictStringLower() === 'error') {
                 return true;
             }
         } catch (\Throwable $ex) {}

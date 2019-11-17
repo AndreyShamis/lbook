@@ -236,7 +236,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
                                     <td>
                                         {% if suite.host and suite.host.ip is defined %}
-                                        <span title="{{ suite.host.ip }}">{{ suite.host.name }}</span>
+                                        <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}">{{ suite.host.name }}</a></span>
                                         {% endif %}
                                     </td>
                                     <td>{{ suite.closed ? 'X':'O' }}</td>

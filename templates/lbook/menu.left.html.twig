@@ -30,7 +30,7 @@
     <li class="{% if route starts with 'setup_' %}active{% endif %}">
         <a href="{{asset(path('setup_index_first'))}}">
             <i class="menu-icon fa fa-desktop"></i>
-            <span class="menu-text"> Setups </span>
+            <span class="menu-text" title="Setups"> Setups </span>
         </a>
 
         <b class="arrow"></b>
@@ -38,14 +38,14 @@
     <li class="{% if route starts with 'suites_' %}active{% endif %}">
         <a href="{{asset(path('suite_index'))}}">
             <i class="menu-icon fa fa-list-alt"></i>
-            <span class="menu-text bigger-120"> Suites </span>
+            <span class="menu-text bigger-120" title="Suites"> Suites </span>
         </a>
         <b class="arrow"></b>
     </li>
     <li class="{% if route starts with 'log_book_build_' %}active{% endif %}">
         <a href="{{asset(path('log_book_build_index'))}}" >
             <i class="menu-icon fa fa-pencil-square-o"></i>
-            <span class="menu-text" title="Build">Builds</span>
+            <span class="menu-text" title="Builds">Builds</span>
         </a>
         <b class="arrow"></b>
     </li>
@@ -58,7 +58,13 @@
         <b class="arrow"></b>
     </li>
 
-
+    <li class="{% if route starts with 'hosts_' %}active{% endif %}">
+        <a href="{{asset(path('hosts_index'))}}" >
+            <i class="menu-icon fa fa-laptop"></i>
+            <span class="menu-text" title="Hosts">Hosts</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 {#    <li class="{% if route starts with 'test_' %}active{% endif %}">#}
 {#        <a href="{{asset(path('test_index_first'))}}">#}
 {#            <i class="menu-icon fa fa-list-alt"></i>#}

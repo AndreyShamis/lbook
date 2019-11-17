@@ -12,7 +12,7 @@
         </tr>
         <tr>
             <th>Memory Total/ Free / Usage</th>
-            <td>{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb / {{ (host.memoryFree/1024)|round(1, 'floor') }} Gb / <strong>{{ getPercentage(host.memoryFree, host.memoryTotal, 2) }} % </strong> &nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <td>{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb / {{ (host.memoryFree/1024)|round(1, 'floor') }} Gb / <strong>{{ getPercentage(host.memoryTotal-host.memoryFree, host.memoryTotal, 2) }} % </strong> &nbsp;&nbsp;- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 &nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;<small>{{ host.memoryTotal }} Mb / {{ host.memoryFree }}  Mb</small></td>
         </tr>

@@ -59,14 +59,14 @@
                 <tbody class="searchable">
                 {% for host in hosts | slice(0, 10000)%}
                     <tr>
-                        <td title="Updated {{ host.updatedAt|time_diff }}">
-                            {% if date(host.updatedAt) > date('-5 minutes') %}
+                        <td title="Updated {{ host.lastSeenAt|time_diff }}">
+                            {% if date(host.lastSeenAt) > date('-5 minutes') %}
                                 <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
-                            {% elseif date(host.updatedAt) > date('-30 minutes') %}
+                            {% elseif date(host.lastSeenAt) > date('-30 minutes') %}
                                 <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
-                            {% elseif date(host.updatedAt) > date('-60 minutes') %}
+                            {% elseif date(host.lastSeenAt) > date('-60 minutes') %}
                                 <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
-                            {% elseif date(host.updatedAt) > date('-12 hours') %}
+                            {% elseif date(host.lastSeenAt) > date('-12 hours') %}
                                 <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                             {% endif %}
                         </td>

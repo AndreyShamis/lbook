@@ -75,7 +75,7 @@ class LogBookHostController extends AbstractController
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
-            'hosts'     => $iterator,
+            'iterator'     => $iterator,
             'paginator' => $paginator,
         ));
     }

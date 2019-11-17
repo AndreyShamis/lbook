@@ -71,7 +71,7 @@
                             {% endif %}
                         </td>
                         <td>{{ host.id }}</td>
-                        <td><a title="{{ host }}" href="{{ path('home_index', { 'id': host.id }) }}">{{ host.name }}&nbsp;</a></td>
+                        <td><a title="{{ host }}" href="{{ path('host_show', { 'id': host.id }) }}">{{ host.name }}&nbsp;</a></td>
                         <td>{{ host.ip }}</td>
                         <td>{{ host.cpuCount }}</td>
                         <td><span data-percent="{{ host.cpuUsage }}">{{ host.cpuUsage }}%</span></td>

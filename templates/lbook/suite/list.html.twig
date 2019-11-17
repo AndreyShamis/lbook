@@ -93,7 +93,7 @@
                 <td class="font9">{{ suiteExecution.productVersion }}</td>
                 <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
                 <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
-                <td>{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}">{{ suiteExecution.host.name }}</a>{% endif %}</td>
+                <td>{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
                 <td>{{ suiteExecution.closed ? 'X':'O'  }}</td>
                 <td>{{ suiteExecution.publish }}</td>
 {#                <td>#}

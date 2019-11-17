@@ -30,6 +30,18 @@
             <td><strong>{{ host.uptime|time_diff}}</strong> / {{ host.uptime|date('Y/m/d H:i:s') }}</td>
         </tr>
         <tr>
+            <th>Last Seen</th>
+            <td><strong style="color: #1e347b;">{{ host.lastSeenAt|time_diff}}</strong> / {{ host.lastSeenAt|date('Y/m/d H:i:s') }}</td>
+        </tr>
+        <tr>
+            <th>Last Suite</th>
+            <td>
+                {%  if host.lastSuite and host.lastSuite.id is defined %}
+                    <a href="{{ path('suite_cycle_show', { 'id': host.lastSuite.id }) }}">{{ host.lastSuite.id }}:{{ host.lastSuite }}</a>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
             <th>System</th>
             <td><strong>{{ host.system }}</strong> / {{ host.systemRelease }} / {{ host.systemVersion }}</td>
         </tr>

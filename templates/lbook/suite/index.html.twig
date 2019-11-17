@@ -1,10 +1,28 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Suite Execution list{% endblock %}
 {% block content %}
-    <h1 style="margin-top: 0 !important;">Suite Execution list</h1>
+    <h3 style="margin-top: 0 !important;">Suite Executions</h3>
+    <div class="row">
+        <div class="col-sm-12 text-center">
+            <div class="col-sm-4 text-center"></div>
+            <div class="col-sm-4 text-center">
+                Calculate statistic for:
+                <a href="{{ path('suite_calculate_api', {'days': 1}) }}" target="_blank">1 day</a>
+                <a href="{{ path('suite_calculate_api', {'days': 2}) }}" target="_blank">2 days</a>
+                <a href="{{ path('suite_calculate_api', {'days': 3}) }}" target="_blank">3 days</a>
+            </div>
+            <div class="col-sm-4 text-center">
+                Close suite older then:
+                <a href="{{ path('close_unclosed_suites_api', {'days': 1}) }}" target="_blank">3 day</a>
+                <a href="{{ path('close_unclosed_suites_api', {'days': 10}) }}" target="_blank">10 days</a>
+                <a href="{{ path('close_unclosed_suites_api', {'days': 30}) }}" target="_blank">30 days</a>
+            </div>
+        </div>
+    </div>
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "suite_index" %}
+
     <div class="row">
         <div class="col-sm-12 text-center">{% include "lbook/paginator.html.twig" %}</div>
     </div>

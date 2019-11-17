@@ -38,15 +38,21 @@
             <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
+            <th data-sortable="true" title="Node" data-switchable="true">Noe</th>
+            <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true">S</th>
             <th data-sortable="true" title="Publish" data-switchable="true">Pub</th>
-            <th class="suite_list_options_column">Options</th>
+{#            <th class="suite_list_options_column">Options</th>#}
         </tr>
         </thead>
         <tbody class="searchable">
         {% for suiteExecution in iterator | slice(0, 10000)%}
             {{ suiteExecution.calculateStatistic }}
-            <tr>
-                <td title="Updated {{ suiteExecution.updatedAt|time_diff }}">
+            {% set suite_css = '' %}
+            {% if not suiteExecution.closed %}
+                {% set suite_css = 'suite_wip' %}
+            {% endif %}
+            <tr class="{{ suite_css }}">
+                <td class="font6" title="Updated {{ suiteExecution.updatedAt|time_diff }}">
                     {% if date(suiteExecution.updatedAt) > date('-5 minutes') %}
                         <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
                     {% elseif date(suiteExecution.updatedAt) > date('-30 minutes') %}
@@ -57,7 +63,7 @@
                         <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                     {% endif %}
                 </td>
-                <td>{{ suiteExecution.id }}</td>
+                <td class="font8">{{ suiteExecution.id }}</td>
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
                 <td>
                     {% if suiteExecution.cycle.id is defined %}
@@ -78,31 +84,33 @@
                 <td>{{ suiteExecution.uuid }}</td>
                 <td>{{ suiteExecution.Platform }}</td>
                 <td>{{ suiteExecution.chip }}</td>
-                <td>{{ suiteExecution.components|join(', ') }}</td>
-                <td>{{ suiteExecution.ciUrl }}</td>
-                <td>{{ suiteExecution.buildTag }}</td>
+                <td class="font9">{{ suiteExecution.components|join(', ') }}</td>
+                <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
+                <td class="font9">{{ suiteExecution.buildTag }}</td>
                 <td>{% if suiteExecution.testSetUrl != '' %}<a href="{{ suiteExecution.testSetUrl }}" target="_blank">{{ suiteExecution.testSetUrl | jiraKey }}</a>{% endif %}</td>
                 <td>{% if suiteExecution.testPlanUrl != '' %}<a href="{{ suiteExecution.testPlanUrl }}" target="_blank">{{ suiteExecution.testPlanUrl | jiraKey }}</a>{% endif %}</td>
                 <td>{{ suiteExecution.testingLevel }}</td>
-                <td>{{ suiteExecution.productVersion }}</td>
-                <td><span data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
+                <td class="font9">{{ suiteExecution.productVersion }}</td>
+                <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
                 <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
+                <td>{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}">{{ suiteExecution.host.name }}</a>{% endif %}</td>
+                <td>{{ suiteExecution.closed ? 'X':'O'  }}</td>
                 <td>{{ suiteExecution.publish }}</td>
-                <td>
-                    <div class="hidden-sm hidden-xs action-buttons">
-                        <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">
-                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
-                        </a>
-                        {#                                {% if is_granted('edit', suiteExecution) %}#}
-                        {#                                    <a class="green" href="{{ path('suite_edit', { 'id': suiteExecution.id }) }}" title="Edit">#}
-                        <i class="ace-icon fa fa-pencil bigger-130"></i>
-                        {#                                    </a>#}
-                        {#                                {% endif %}#}
-                        {#<a class="red" href="#" title="Delete">#}
-                        {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
-                        {#</a>#}
-                    </div>
-                </td>
+{#                <td>#}
+{#                    <div class="hidden-sm hidden-xs action-buttons">#}
+{#                        <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">#}
+{#                            <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
+{#                        </a>#}
+{#                        #}{#                                {% if is_granted('edit', suiteExecution) %}#}
+{#                        #}{#                                    <a class="green" href="{{ path('suite_edit', { 'id': suiteExecution.id }) }}" title="Edit">#}
+{#                        <i class="ace-icon fa fa-pencil bigger-130"></i>#}
+{#                        #}{#                                    </a>#}
+{#                        #}{#                                {% endif %}#}
+{#                        #}{#<a class="red" href="#" title="Delete">#}
+{#                        #}{#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
+{#                        #}{#</a>#}
+{#                    </div>#}
+{#                </td>#}
             </tr>
         {% endfor %}
         </tbody>

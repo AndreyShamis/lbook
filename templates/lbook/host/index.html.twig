@@ -30,15 +30,15 @@
                     <th data-sorter="htmlSorter" data-sortable="true" title="Full Name" data-switchable="false">Name</th>
                     <th data-sortable="true" title="IP ADDR" data-switchable="true">IP</th>
                     <th data-sortable="true" title="CPU Count" data-switchable="true">CPU</th>
-                    <th data-sortable="true" title="CPU Usage" data-switchable="true">CPU %</th>
-                    <th data-sortable="true" title="Memory" data-switchable="true">Memory</th>
-                    <th data-sortable="true" title="Memory usage" data-switchable="true">Memory %</th>
+                    <th data-sorter="dataPercentSorter" data-sortable="true" title="CPU Usage" data-switchable="true">CPU %</th>
+                    <th data-sorter="dataTitleIntSorter" data-sortable="true" title="Memory" data-switchable="true">Memory</th>
+                    <th data-sorter="dataPercentSorter" data-sortable="true" title="Memory usage" data-switchable="true">Memory %</th>
                     <th data-sortable="true" title="Memory usage" data-switchable="true">System</th>
                     <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Node Uptiime" data-switchable="true">Uptime</th>
                     <th data-sortable="true" title="Python Version usage" data-switchable="true">Python</th>
                     <th data-sorter="htmlSorter" data-field="Last Suite" data-sortable="true" title="Last Suitee">Last Suite</th>
                     <th data-sortable="true" title="Last Platform::Chip" data-switchable="true">Platform/Chp</th>
-                    <th data-sortable="true" title="Labels" data-switchable="true">Labels</th>
+                    <th data-sorter="dataTitleIntSorter" data-sortable="true" title="Labels" data-switchable="true">Labels</th>
 {#                    <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>#}
 {#                    <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>#}
 {#                    <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true">Executed</th>#}
@@ -49,14 +49,6 @@
 {#                    <th data-sortable="true" title="Error Count" data-switchable="true" data-visible="true">E</th>#}
 {#                    <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>#}
 {#                    <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>#}
-{#                    <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>#}
-{#                    <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>#}
-{#                    <th data-sortable="true" title="Chip" data-switchable="true">Components</th>#}
-{#                    <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI</th>#}
-{#                    <th data-sortable="true" title="CI TAG" data-switchable="true">CI tag</th>#}
-{#                    <th data-sortable="true" title="Jira Test Set URL" data-switchable="true">TS</th>#}
-{#                    <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>#}
-{#                    <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>#}
 {#                    <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>#}
 {#                    <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>#}
                     <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Last Seen time" data-visible="true">Last Seen</th>
@@ -82,9 +74,9 @@
                         <td><a title="{{ host }}" href="{{ path('home_index', { 'id': host.id }) }}">{{ host.name }}&nbsp;</a></td>
                         <td>{{ host.ip }}</td>
                         <td>{{ host.cpuCount }}</td>
-                        <td>{{ host.cpuUsage }}%</td>
-                        <td>{{ host.host.memoryTotal/1024 }}G</td>
-                        <td title="{{ host.memoryFree }}">{{ getPercentage(host.memoryFree, host.memoryTotal) }}%</td>
+                        <td><span data-percent="{{ host.cpuUsage }}">{{ host.cpuUsage }}%</span></td>
+                        <td><span title="{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb total , {{ (host.memoryFree/1024)|round(1, 'floor') }} Gb free" data-title="{{ host.memoryTotal }}">{{ (host.memoryTotal/1024)|round(1, 'floor') }} Gb</span></td>
+                        <td><span data-percent="{{ host.memoryFree }}" title="{{ host.memoryFree }}">{{ getPercentage(host.memoryFree, host.memoryTotal, 1) }}%</span></td>
                         <td>{{ host.system }}/{{ host.systemRelease }}/{{ host.systemVersion }}</td>
                         <td><span data-title="{{ host.uptime|date('ymdHis') }}" title="Uptime at {{ host.lastSeenAt|date('d/m/Y H:i:s') }}">{{ host.uptime|time_diff}}</span></td>
                         <td>{{ host.pythonVersion }}</td>
@@ -94,7 +86,7 @@
                             {% endif %}
                         </td>
                         <td>{{ host.targetLabel }}</td>
-                        <td>{{ host.targetLabels | join(', ') }}</td>
+                        <td><span title="{{ host.targetLabels| sort | join('\n') }}" data-title="{{ host.targetLabels | length }}">{{ host.targetLabels | length }}</span></td>
 {#                        <td><span data-title="{{ host.updatedAt|date('ymdHis') }}" title="Updated at {{ host.updatedAt|date('d/m/Y H:i:s') }}">{{ host.updatedAt|time_diff}}</span></td>#}
                         <td><span data-title="{{ host.lastSeenAt|date('ymdHis') }}" title="Created at {{ host.lastSeenAt|date('d/m/Y H:i:s') }}">{{ host.lastSeenAt|time_diff}}</span></td>
 {#                        <td>{{ suiteExecution.publish }}</td>#}

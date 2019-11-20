@@ -65,6 +65,7 @@ class LogBookBotController extends AbstractController
             ->andWhere('setups.updatedAt <= :theDate')
             ->orderBy('setups.id', 'ASC')
             ->setParameter('theDate', new \DateTime('-'. 10 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->setMaxResults(5);
         ;
         $setups = $query->getQuery()->execute();
         $setupsForDelete = [];
@@ -82,11 +83,11 @@ class LogBookBotController extends AbstractController
 
         foreach ($setupsForDelete as $setup) {
             try {
-                //$this->em->remove($setup);
+                $this->em->remove($setup);
             } catch (\Throwable $ex) {}
 
         }
-        //$this->em->flush();
+        $this->em->flush();
         return array(
             'setupsForDelete'      => $setupsForDelete,
             'setups'  => $setups,

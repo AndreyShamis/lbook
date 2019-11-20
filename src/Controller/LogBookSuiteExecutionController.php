@@ -100,7 +100,7 @@ class LogBookSuiteExecutionController extends AbstractController
                         $em->flush();
                         $persisted = 0;
                         foreach ($suitePersisted as $tmp_suite) {
-                            $em->detach($tmp_suite);
+                            $em->clear($tmp_suite);
                         }
                     }
                 }

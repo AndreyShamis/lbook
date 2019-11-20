@@ -71,7 +71,7 @@ class LogBookSuiteExecutionController extends AbstractController
             ->andWhere('suite_execution.startedAt >= :started')
         ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME);
 
-        $paginator = $pagePaginator->paginate($query, 1, 3000);
+        $paginator = $pagePaginator->paginate($query, 1, 5000);
         $totalPosts = $paginator->count();
         /** @var \ArrayIterator $iterator */
         $iterator = $paginator->getIterator();
@@ -80,6 +80,9 @@ class LogBookSuiteExecutionController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $output = [];
         $start = microtime(true);
+        $persisted = 0;
+        $suitePersisted = [];
+        $iteratorSize = $iterator->count();
         try {
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
@@ -88,9 +91,18 @@ class LogBookSuiteExecutionController extends AbstractController
                     if ($suite !== null) {
                         $suite->calculateStatistic();
                         $em->persist($suite);
+                        $suitePersisted[] = $suite;
+                        $persisted++;
                         //$output[] = 'ID: ' . $suite->getId() . ' calculated';
                     }
                     $iterator->next();
+                    if ($persisted > 100) {
+                        $em->flush();
+                        $persisted = 0;
+                        foreach ($suitePersisted as $tmp_suite) {
+                            $em->detach($tmp_suite);
+                        }
+                    }
                 }
             }
         } catch (\Throwable $ex) { }
@@ -99,16 +111,14 @@ class LogBookSuiteExecutionController extends AbstractController
         $em->flush();
         $flush_time_elapsed_secs = microtime(true) - $start;
         return array(
-            'output'    => $output,
-            'size'      => $totalPosts,
-            'iterator'      => $iterator,
-            'time_elapsed_secs'      => $time_elapsed_secs,
-            'flush_time_elapsed_secs'      => $flush_time_elapsed_secs,
-            'needed_row'      => $needed_row,
+            'output'                        => $output,
+            'size'                          => $totalPosts,
+            'iteratorSize'                  => $iteratorSize,
+            'time_elapsed_secs'             => $time_elapsed_secs,
+            'flush_time_elapsed_secs'       => $flush_time_elapsed_secs,
+            'needed_row'                    => $needed_row,
         );
     }
-
-
 
     /**
      * @Route("/close_unclosed/{days}", name="close_unclosed_suites_api", methods="GET|POST")
@@ -156,7 +166,6 @@ class LogBookSuiteExecutionController extends AbstractController
                         $suite->setClosed(true);
                         $closed++;
                         $em->persist($suite);
-                        //$output[] = 'ID: ' . $suite->getId() . ' calculated';
                     }
                     $iterator->next();
                 }

@@ -2,7 +2,7 @@
 {% block title %}LBOOK hosts{% endblock %}
 {% block content %}
     Total count {{ size }}: <br/>
-    Updated  {{ iterator | length }} in  {{ time_elapsed_secs }}( flush {{ flush_time_elapsed_secs }}) sec [ETA: 1-4 suites in 1 sec] [search for {{ needed_row }}]: <br/>
+    Updated  {{ iteratorSize }} in  {{ time_elapsed_secs }}( flush {{ flush_time_elapsed_secs }}) sec [ETA: 1-4 suites in 1 sec] [search for {{ needed_row }}]: <br/>
 {#    {% for line in output | slice(0, 10000)%}#}
 {#    {{ line }}<br/>#}
 {#    {% endfor %}#}

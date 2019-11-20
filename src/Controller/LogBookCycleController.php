@@ -8,6 +8,8 @@ use App\Entity\SuiteExecution;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Doctrine\ORM\Query;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +20,7 @@ use App\Form\LogBookCycleType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Service\PagePaginator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -38,9 +41,9 @@ class LogBookCycleController extends AbstractController
      * @Route("/{id}/edit", name="cycle_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycle $obj
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return RedirectResponse|Response
+     * @throws LogicException
+     * @throws AccessDeniedException
      * @throws \LogicException
      */
     public function edit(Request $request, LogBookCycle $obj = null)
@@ -241,7 +244,7 @@ class LogBookCycleController extends AbstractController
      *
      * @Route("/new", name="cycle_new", methods={"GET|POST"})
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      * @throws \LogicException
      * @throws \Exception
      */
@@ -382,7 +385,7 @@ class LogBookCycleController extends AbstractController
      * @param SuiteExecution|null $suite
      * @param null $page
      * @param int $maxSize
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showSuiteFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
     {
@@ -405,7 +408,7 @@ class LogBookCycleController extends AbstractController
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
      * @param int $maxSize
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $maxSize = null): ?Response
     {
@@ -449,7 +452,7 @@ class LogBookCycleController extends AbstractController
      * @param LogBookCycle $cycle
      * @param int $page
      * @param bool $forJson if True the JSON table for tests will be used
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $forJson=false, $maxSize=null): ?Response
     {
@@ -593,7 +596,7 @@ class LogBookCycleController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showAjax(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): ?Response
     {
@@ -687,6 +690,7 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/cycle_not_found/{cycle}", name="cycle_not_found", methods={"GET", "POST"})
      * @param \Throwable $ex
      * @param LogBookCycle|null $cycle
      * @return Response
@@ -732,9 +736,9 @@ class LogBookCycleController extends AbstractController
      * @param Request $request
      * @param LogBookCycle $obj
      * @return RedirectResponse|Response
-     * @throws \Symfony\Component\Form\Exception\LogicException
+     * @throws LogicException
      * @throws \LogicException
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws AccessDeniedException
      */
     public function delete(Request $request, LogBookCycle $obj = null)
     {
@@ -765,7 +769,7 @@ class LogBookCycleController extends AbstractController
      *
      * @param LogBookCycle $obj The cycle entity
      *
-     * @return \Symfony\Component\Form\FormInterface | Response
+     * @return FormInterface | Response
      */
     private function createDeleteForm(LogBookCycle $obj)
     {

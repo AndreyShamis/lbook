@@ -59,13 +59,14 @@ class LogBookBotController extends AbstractController
      */
     public function setupCleaner(LogBookSetupRepository $setupRepo): array
     {
+        $maxDeleteAtOnce = 10;
         $query = $setupRepo->createQueryBuilder('setups')
             ->where('setups.disabled = 0')
             ->andWhere('setups.isPrivate = 0')
             ->andWhere('setups.updatedAt <= :theDate')
             ->orderBy('setups.id', 'ASC')
             ->setParameter('theDate', new \DateTime('-'. 10 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
-            ->setMaxResults(5);
+            ->setMaxResults(300);
         ;
         $setups = $query->getQuery()->execute();
         $setupsForDelete = [];
@@ -74,8 +75,11 @@ class LogBookBotController extends AbstractController
             try {
                 $sCycles = $setup->getCycles();
                 $sCyclesCount = \count($sCycles);
-                if ($sCyclesCount === 0) {
+                if ($sCyclesCount === 0 && count($setupsForDelete) <= $maxDeleteAtOnce) {
                     $setupsForDelete[] = $setup;
+                }
+                if (count($setupsForDelete) > $maxDeleteAtOnce) {
+                    continue;
                 }
             } catch (\Throwable $ex) {}
 

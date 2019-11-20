@@ -4,18 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\LogBookCycle;
-use App\Entity\LogBookSetup;
 use App\Model\EventStatus;
 use App\Model\EventType;
 use App\Repository\EventRepository;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,12 +25,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface as Container;
  */
 class LogBookBotController extends AbstractController
 {
-    /** @var ObjectManager  */
+    /** @var \Doctrine\Common\Persistence\ObjectManager  */
     protected $em;
 
     /** @var LoggerInterface */
     protected $logger;
-
     /**
      * LogBookUploaderController constructor.
      * @param Container $container
@@ -46,55 +41,10 @@ class LogBookBotController extends AbstractController
         $this->em = $this->getDoctrine()->getManager();
         $this->logger = $logger;
     }
-
-
-    /**
-     * Lists all setup entities.
-     *
-     * @Route("/setups/clean", name="setup_index", methods={"GET"})
-     * @Template(template="log_book_bot/delete.setups.html.twig")
-     * @param LogBookSetupRepository $setupRepo
-     * @return array
-     */
-    public function setupCleaner(LogBookSetupRepository $setupRepo): array
-    {
-        $query = $setupRepo->createQueryBuilder('setups')
-            ->where('setups.disabled = 0')
-            ->andWhere('setups.isPrivate = 0')
-            ->orderBy('setups.id', 'ASC')
-        ;
-        $setups = $query->getQuery()->execute();
-        $setupsForDelete = [];
-        /** @var LogBookSetup $setup */
-        foreach ($setups as $setup) {
-            try {
-                $sCycles = $setup->getCycles();
-                $sCyclesCount = \count($sCycles);
-                if ($sCyclesCount === 0) {
-                    $setupsForDelete[] = $setup;
-                }
-            } catch (\Throwable $ex) {}
-
-        }
-
-        foreach ($setupsForDelete as $setup) {
-            try {
-                //$this->em->remove($setup);
-            } catch (\Throwable $ex) {}
-
-        }
-        //$this->em->flush();
-        return array(
-            'setupsForDelete'      => $setupsForDelete,
-            'setups'  => $setups,
-        );
-    }
-
-
     /**
      * @Route("/delete_cycles", name="bot_delete_cycles")
      * @param LogBookCycleRepository $cycleRepo
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
@@ -110,7 +60,6 @@ class LogBookBotController extends AbstractController
         $query->execute();
         $cycles = $query->getResult();
         $responseContent = '';
-
         /** @var LogBookCycle $cycle */
         foreach ((array) $cycles as $cycle) {
             $cycleName = $cycle->getName();
@@ -133,17 +82,19 @@ class LogBookBotController extends AbstractController
      * @Route("/find_cycles_for_delete", name="find_cycles_for_delete")
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
     {
+
         $list = $cycleRepo->findByDeleteAt(500);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
         $counter = $skip = 0;
         foreach ($list as $cycle) {
+
             $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
             $type = EventType::DELETE_CYCLE;
             $new_event = new Event($type);
@@ -172,10 +123,12 @@ class LogBookBotController extends AbstractController
                     ));
                 $this->em->persist($new_event);
                 $counter++;
+
             } else {
                 $skip++;
                 //$this->log($new_event . ' already exist');
             }
+
         }
         $this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
         $this->em->flush();
@@ -236,7 +189,7 @@ class LogBookBotController extends AbstractController
      * @Route("/cycle_event_delete", name="delete_cycle_from_event_table")
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
     public function deleteCycleByEvent(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
@@ -299,12 +252,6 @@ class LogBookBotController extends AbstractController
         exit();
     }
 
-    /**
-     * @param LogBookCycleRepository $cycleRepo
-     * @param LogBookSetupRepository $setupRepo
-     * @return Response
-     * @throws \Exception
-     */
     public function deleteCycleRetention(LogBookCycleRepository $cycleRepo, LogBookSetupRepository $setupRepo): Response
     {
         $stopwatch = new Stopwatch();
@@ -333,7 +280,7 @@ class LogBookBotController extends AbstractController
                 s.is_disabled = 0
             LIMIT
                 100';
-        /** @var NativeQuery $setups_nq */
+        /** @var \Doctrine\ORM\NativeQuery $setups_nq */
         $setups_nq = $em->createNativeQuery($sql, $rsm);
         //$setups_nq->setParameter(':target_date', 'NOW()-INTERVAL s.retention_policy DAY');
         //$setups_nnq = $setupRepo->createNativeNamedQuery('s');

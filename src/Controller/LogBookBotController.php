@@ -55,13 +55,16 @@ class LogBookBotController extends AbstractController
      * @Template(template="log_book_bot/delete.setups.html.twig")
      * @param LogBookSetupRepository $setupRepo
      * @return array
+     * @throws \Exception
      */
     public function setupCleaner(LogBookSetupRepository $setupRepo): array
     {
         $query = $setupRepo->createQueryBuilder('setups')
             ->where('setups.disabled = 0')
             ->andWhere('setups.isPrivate = 0')
+            ->andWhere('setups.updatedAt <= :theDate')
             ->orderBy('setups.id', 'ASC')
+            ->setParameter('theDate', new \DateTime('-'. 10 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
         ;
         $setups = $query->getQuery()->execute();
         $setupsForDelete = [];

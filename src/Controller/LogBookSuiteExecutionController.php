@@ -223,7 +223,7 @@ class LogBookSuiteExecutionController extends AbstractController
     {
         $cycle = $suite->getCycle();
         if ($cycle === null) {
-            return $this->redirectToRoute('cycle_not_found', ['cycle' => null]);
+            return $this->redirectToRoute('cycle_not_found');
         }
         return $this->redirectToRoute('cycle_show_first', ['id' => $cycle->getId()]);
     }

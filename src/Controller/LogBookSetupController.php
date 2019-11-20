@@ -9,14 +9,19 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use App\Form\LogBookSetupType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -99,13 +104,9 @@ class LogBookSetupController extends AbstractController
             ->where('setups.disabled = 0')
             ->orderBy('setups.updatedAt', 'DESC')
             ->addOrderBy('setups.id', 'DESC');
-
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
-        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
-        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
@@ -137,10 +138,10 @@ class LogBookSetupController extends AbstractController
      *
      * @Route("/new", name="setup_new", methods={"GET|POST"})
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException|\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @return RedirectResponse|Response
+     * @throws LogicException|\LogicException|InvalidOptionsException
      */
-    public function newAction(Request $request)
+    public function new(Request $request)
     {
         $obj = new LogBookSetup();
         $form = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
@@ -170,7 +171,7 @@ class LogBookSetupController extends AbstractController
      * @param LogBookSetup $setup
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
@@ -185,7 +186,7 @@ class LogBookSetupController extends AbstractController
      * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
@@ -195,12 +196,12 @@ class LogBookSetupController extends AbstractController
             }
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
-                ->orderBy('t.timeEnd', 'DESC') //updatedAt
+                ->orderBy('t.timeEnd', 'DESC')
                 ->addOrderBy('t.updatedAt', 'DESC')
                 ->setParameter('setup', $setup->getId());
             $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
-            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
-            $iterator = $paginator->getIterator(); # ArrayIterator
+            $totalPosts = $paginator->count();
+            $iterator = $paginator->getIterator();
 
             $maxPages = ceil($totalPosts / $this->show_cycle_size);
             $thisPage = $page;
@@ -224,7 +225,7 @@ class LogBookSetupController extends AbstractController
     }
 
     /**
-     * @param \Doctrine\ORM\Tools\Pagination\Paginator $paginator
+     * @param Paginator $paginator
      * @return bool
      */
     protected function showUsers($paginator): bool
@@ -259,7 +260,7 @@ class LogBookSetupController extends AbstractController
     }
 
     /**
-     * @param \Doctrine\ORM\Tools\Pagination\Paginator $paginator
+     * @param Paginator $paginator
      * @return bool
      */
     protected function showBuild($paginator): bool
@@ -339,11 +340,11 @@ class LogBookSetupController extends AbstractController
      * @Route("/{id}/edit", name="setup_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookSetup $obj
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return RedirectResponse|Response
+     * @throws InvalidOptionsException
+     * @throws \LogicException|AccessDeniedException
      */
-    public function editAction(Request $request, LogBookSetup $obj = null)
+    public function edit(Request $request, LogBookSetup $obj = null)
     {
         try {
             if (!$obj) {
@@ -391,9 +392,9 @@ class LogBookSetupController extends AbstractController
      * @param Request $request
      * @param LogBookSetup $obj
      * @return RedirectResponse|Response
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
+     * @throws AccessDeniedException|\LogicException
      */
-    public function deleteAction(Request $request, LogBookSetup $obj = null)
+    public function delete(Request $request, LogBookSetup $obj = null)
     {
         try {
             if (!$obj) {
@@ -426,7 +427,7 @@ class LogBookSetupController extends AbstractController
      *
      * @param LogBookSetup $obj The test entity
      *
-     * @return \Symfony\Component\Form\FormInterface | Response
+     * @return FormInterface | Response
      */
     private function createDeleteForm(LogBookSetup $obj)
     {

@@ -51,7 +51,7 @@ class LogBookBotController extends AbstractController
     /**
      * Lists all setup entities.
      *
-     * @Route("/setups/clean", name="setup_index", methods={"GET"})
+     * @Route("/setups/clean", name="bot_setup_cleaner
      * @Template(template="log_book_bot/delete.setups.html.twig")
      * @param LogBookSetupRepository $setupRepo
      * @return array

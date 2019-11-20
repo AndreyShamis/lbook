@@ -4,4 +4,8 @@
     <h1 style="margin-top: 0 !important;">Setup clenaer</h1>
     <div>Setups count in search: {{ setups | length }}</div>
     <div>Setups for delete : {{ setupsForDelete | length }}</div>
+    {% for setup in setupsForDelete | slice(0, 10000)%}
+        {{ setup.id }} - {{ setup.name }} <br/>
+
+    {% endfor %}
 {% endblock %}

@@ -152,6 +152,17 @@ class LogBookTest
     /** @var string  */
     protected $failDescription = '';
 
+
+    protected $rate = 0;
+
+    public function setRate(float $r) {
+        $this->rate = round($r, 2);
+    }
+
+    public function getRate(): float{
+        return $this->rate;
+    }
+
     public function getTestType(): string
     {
         $ret = 'TEST';

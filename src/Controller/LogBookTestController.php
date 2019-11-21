@@ -149,7 +149,7 @@ class LogBookTestController extends AbstractController
     public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo): Response
     {
         set_time_limit(30);
-        $tests = array();
+        $tests = $new_tests = array();
         $verdict = null;
         $setups = null;
         $sql = '';
@@ -164,7 +164,7 @@ class LogBookTestController extends AbstractController
             $form->handleRequest($request);
         } catch (\Exception $ex) {}
 
-
+        $addOrder = true;
         $post = $request->request->get('test_search');
         if ($post !== null) {
             $enableSearch = false;
@@ -176,6 +176,9 @@ class LogBookTestController extends AbstractController
             }
             if (array_key_exists('limit', $post)) {
                 $limit = (int)$post['limit'];
+                if ($limit > 10000) {
+                    $limit = 500;
+                }
                 $test->setLimit($limit);
             }
             $test_name = $post['name'];
@@ -184,7 +187,6 @@ class LogBookTestController extends AbstractController
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.disabled = 0')
-                ->orderBy('t.id', 'DESC')
                 ->setMaxResults($test->getLimit());
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
                 $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
@@ -242,7 +244,11 @@ class LogBookTestController extends AbstractController
                     $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) != 0 OR t.id = :test_id')
                         ->setParameter('test_id', (int)$test_name);
                 } else {
-                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) != 0');
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) > 1 OR t.name LIKE :search_str');
+                    $qb->addSelect('MATCH_AGAINST(t.name, t.meta_data, :search_str) as rate');
+                    $qb->orderBy('rate', 'DESC');
+                    $qb->addOrderBy('t.id', 'DESC');
+                    $addOrder = false;
                 }
                 $test_name_match = $test_name;
                 $test_name_match = str_replace('  ', ' ', $test_name_match);
@@ -253,17 +259,31 @@ class LogBookTestController extends AbstractController
 
                 $enableSearch = True;
             }
+            if ($addOrder) {
+                $qb->orderBy('t.id', 'DESC');
+            }
+
             if ($enableSearch) {
                 $query = $qb->getQuery();
                 $sql = $query->getSQL();
                 $tests = $query->execute();
+                if (!$addOrder){
+                    foreach($tests as $tmp_test) {
+                        /** @var LogBookTest $t_t */
+                        $t_t = $tmp_test[0];
+                        $t_t->setRate($tmp_test['rate']);
+                        $new_tests[] = $t_t;
+                    }
+                } else {
+                    $new_tests = $tests;
+                }
             }
         }
 
         return $this->render('lbook/test/search.html.twig', array(
-            'tests' => $tests,
-            'iterator' => $tests,
-            'tests_count' => \count($tests),
+            //'tests' => $tests,
+            'iterator' => $new_tests,
+            'tests_count' => \count($new_tests),
             'sql' => $sql,
 //            'thisPage'      => 1,
 //            'maxPages'      => 1,

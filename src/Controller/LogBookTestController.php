@@ -174,6 +174,10 @@ class LogBookTestController extends AbstractController
             if (array_key_exists('setup', $post)) {
                 $setups = $post['setup']['name'];
             }
+            if (array_key_exists('limit', $post)) {
+                $limit = (int)$post['limit'];
+                $test->setLimit($limit);
+            }
             $test_name = $post['name'];
             $fromDate = $post['fromDate'];
             $toDate = $post['toDate'];
@@ -235,12 +239,17 @@ class LogBookTestController extends AbstractController
 //                $qb->setParameter('test_name', '%'.$test_name.'%')
 //                    ->setParameter('metadata', $test_name.'%');
                 if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
-                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, ":search_str" IN BOOLEAN MODE) != 0 OR t.id = :test_id')
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) != 0 OR t.id = :test_id')
                         ->setParameter('test_id', (int)$test_name);
                 } else {
-                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, ":search_str" IN BOOLEAN MODE) != 0');
+                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) != 0');
                 }
-                $qb->setParameter('search_str',  $test_name);
+                $test_name_match = $test_name;
+                $test_name_match = str_replace('  ', ' ', $test_name_match);
+                $test_name_match = str_replace(' ', ' +', $test_name_match);
+                $test_name_match = str_replace(' ++', ' +', $test_name_match);
+
+                $qb->setParameter('search_str', $test_name_match);
 
                 $enableSearch = True;
             }

@@ -54,11 +54,11 @@ class MatchAgainst extends \Doctrine\ORM\Query\AST\Functions\FunctionNode
             $first ? $first = false : $haystack .= ', ';
             $haystack .= $column->dispatch($sqlWalker);
         }
-        $query = 'MATCH(' . $haystack . ') AGAINST (' . $this->needle->dispatch($sqlWalker);
+
         if ($this->mode) {
-            $query .= ' ' . $this->mode->dispatch($sqlWalker) . ' )';
+            $query = 'MATCH(' . $haystack . ') AGAINST (' . $this->needle->dispatch($sqlWalker) . ' ' . $this->mode->dispatch($sqlWalker) . ' )';
         } else {
-            $query .= ' )';
+            $query = 'MATCH(' . $haystack . ') AGAINST (' . $this->needle->dispatch($sqlWalker) . ' IN BOOLEAN MODE)';
         }
         return $query;
     }

@@ -240,7 +240,7 @@ class LogBookTestController extends AbstractController
                 } else {
                     $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data,  :search_str) != 0');
                 }
-                $qb->setParameter('search_str', $test_name);
+                $qb->setParameter('search_str', '"'. $test_name. '"');
 
                 $enableSearch = True;
             }

@@ -27,6 +27,13 @@ class TestSearch
     public static $MAX_LIMIT = 10000;
 
     public static $DEFAULT_LIMIT = 2000;
+
+    public function __construct()
+    {
+        $d = new \DateTime('- 14 days');
+        $this->fromDate = $d->format('m/d/Y');
+    }
+
     /**
      * @return int
      */

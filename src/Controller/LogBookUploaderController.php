@@ -23,6 +23,7 @@ use App\Repository\SuiteExecutionRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -46,7 +47,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class LogBookUploaderController extends AbstractController
 {
-    /** @var \Doctrine\Common\Persistence\ObjectManager  */
+    /** @var EntityManagerInterface */
     protected $em;
     /** @var LogBookTestRepository $testsRepo */
     protected $testsRepo;
@@ -534,8 +535,11 @@ class LogBookUploaderController extends AbstractController
                 try {
                     /** @var SuiteExecution $current_cuite_execution */
                     $current_cuite_execution = $test->getSuiteExecution();
-                    $current_cuite_execution->calculateStatistic();
-                    $this->em->persist($current_cuite_execution);
+                    if ($current_cuite_execution !== null) {
+                        $current_cuite_execution->calculateStatistic();
+                        $this->em->persist($current_cuite_execution);
+                    }
+
                 } catch (\Throwable $ex) {}
                 $this->em->flush();
                 $obj->addMessage('TestID is ' . $test->getId() . '.');

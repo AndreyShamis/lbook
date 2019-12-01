@@ -65,6 +65,7 @@ class Host
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\SuiteExecution", cascade={"persist"})
+     * @ORM\JoinColumn(name="last_suite_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $lastSuite;
 

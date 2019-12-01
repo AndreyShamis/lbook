@@ -184,6 +184,7 @@ class LogBookSuiteExecutionController extends AbstractController
             'closed'      => $closed,
         );
     }
+
     /**
      * @Route("/show/{id}", name="suite_show", methods="GET")
      * @param SuiteExecution $suite

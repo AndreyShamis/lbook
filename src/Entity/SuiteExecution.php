@@ -110,12 +110,12 @@ class SuiteExecution
     /**
      * @ORM\Column(type="simple_array")
      */
-    private $components = [];
+    private $components;
 
     /**
      * @ORM\Column(name="test_environments", type="simple_array")
      */
-    private $testEnvironments = [];
+    private $testEnvironments;
 
     /**
      * @ORM\Column(name="test_plan_url", type="string", length=255, nullable=true)
@@ -249,6 +249,8 @@ class SuiteExecution
         $this->finishedAt = new \DateTime();
         $this->tests = new ArrayCollection();
         $this->setClosed(false);
+        $this->components = [];
+        $this->testEnvironments = [];
     }
 
     public function getRunTime(): int

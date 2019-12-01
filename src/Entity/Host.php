@@ -185,7 +185,6 @@ class Host
         $this->targetLabel = '';
         $this->memoryTotal = 0;
         $this->memoryFree = 0;
-        $this->memoryFree = 0;
         $this->system = '';
         $this->systemRelease = '';
         $this->systemVersion = '';

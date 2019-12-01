@@ -299,7 +299,7 @@ class LogBookBotController extends AbstractController
         }
         $this->em->flush();
         foreach ($list as $event) {
-            $this->em->detach($event);
+            $this->em->clear($event);
         }
         $this->log('===================================================================', $monolog);
         $this->clearSuccess($events);

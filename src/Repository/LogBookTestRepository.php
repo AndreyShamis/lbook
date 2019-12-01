@@ -88,7 +88,7 @@ class LogBookTestRepository extends ServiceEntityRepository
 //            /** @var LogBookTest $test */
 //            //$msgRepo->deleteByTestId($test->getId());
 //            $this->delete($test);
-//            $this->_em->detach($test);
+//            $this->_em->clear($test);
 //        }
         /**
          * Additional clean | optional and may be removed

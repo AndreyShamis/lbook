@@ -76,7 +76,7 @@ class LogBookSetup
     protected $moderators;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookCycle", mappedBy="setup", cascade={"all"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookCycle", mappedBy="setup", cascade={"all"}, fetch="EXTRA_LAZY", orphanRemoval=true)
      * @ORM\JoinColumn(name="cycles", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"id" = "DESC"})
      */

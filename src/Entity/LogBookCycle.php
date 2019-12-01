@@ -32,7 +32,7 @@ class LogBookCycle
     protected $name = '';
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="cycle", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="cycle", fetch="EXTRA_LAZY", orphanRemoval=true)
      * @ORM\JoinColumn(name="tests", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"executionOrder" = "ASC"})
      */

@@ -113,8 +113,20 @@ class LogBookSetupRepository extends ServiceEntityRepository
         /** @var LogBookCycle $cycle */
         //$cycles = $setup->getCycles();
         //echo "Cycles count :" . ($setup->getCycles()) . "\n";
+        $cycleDeleteErrorFound = false;
+        $exs = [];
         foreach ($setup->getCycles() as $cycle) {
-            $cycleRepo->delete($cycle);
+            try {
+                $cycleRepo->delete($cycle);
+            } catch (\Throwable $ex) {
+                $cycleDeleteErrorFound = true;
+                $exs[] = $ex;
+                $this->logger->critical('[SETUP][DELETE_CYCLE]: Failed delete cycle in setup: ' . $setup->getId() . ' [' . $setup->getName() . '] ',
+                    array(
+                        $ex->getMessage(),
+                        $ex,
+                        $setup->getName()));
+            }
         }
         try {
             $fileSystem = new Filesystem();
@@ -135,7 +147,9 @@ class LogBookSetupRepository extends ServiceEntityRepository
                     $ex,
                     $setup->getName()));
         }
-        $this->_em->remove($setup);
+        if (!$cycleDeleteErrorFound) {
+            $this->_em->remove($setup);
+        }
         $this->_em->flush($setup);
     }
 }

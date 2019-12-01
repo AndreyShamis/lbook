@@ -251,7 +251,7 @@ class LogBookTestController extends AbstractController
                     $qb->addOrderBy('t.id', 'DESC');
                     $addOrder = false;
                 }
-                $test_name_match = $test_name;
+                $test_name_match = trim($test_name);
                 $test_name_match = str_replace('  ', ' ', $test_name_match);
                 $test_name_match = str_replace(' ', ' +', $test_name_match);
                 $test_name_match = str_replace(' ++', ' +', $test_name_match);

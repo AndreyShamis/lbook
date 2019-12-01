@@ -10,8 +10,7 @@ use App\Model\EventType;
 use App\Repository\EventRepository;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Psr\Log\LoggerInterface;
@@ -29,7 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as Container;
  */
 class LogBookBotController extends AbstractController
 {
-    /** @var ObjectManager  */
+    /** @var EntityManagerInterface  */
     protected $em;
 
     /** @var LoggerInterface */

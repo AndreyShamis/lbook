@@ -8,7 +8,7 @@ use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookCycleRepository extends ServiceEntityRepository
@@ -17,10 +17,10 @@ class LogBookCycleRepository extends ServiceEntityRepository
     protected $logger;
     /**
      * LogBookCycleRepository constructor.
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      * @param LoggerInterface $logger
      */
-    public function __construct(RegistryInterface $registry, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookCycle::class);
         $this->logger = $logger;

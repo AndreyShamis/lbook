@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\SuiteExecution;
 use App\Repository\SuiteExecutionRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +21,7 @@ use Psr\Log\LoggerInterface;
  */
 class LogBookApiController extends AbstractController
 {
-    /** @var \Doctrine\Common\Persistence\ObjectManager  */
+    /** @var EntityManagerInterface  */
     protected $em;
 
     /**

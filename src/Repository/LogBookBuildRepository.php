@@ -4,15 +4,15 @@ namespace App\Repository;
 
 use App\Entity\LogBookBuild;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 class LogBookBuildRepository extends ServiceEntityRepository
 {
     /**
      * LogBookBuildRepository constructor.
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LogBookBuild::class);
     }

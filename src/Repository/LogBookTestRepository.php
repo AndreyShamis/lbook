@@ -8,7 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookTestRepository extends ServiceEntityRepository
@@ -18,10 +18,10 @@ class LogBookTestRepository extends ServiceEntityRepository
 
     /**
      * LogBookTestRepository constructor.
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      * @param LoggerInterface $logger
      */
-    public function __construct(RegistryInterface $registry, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookTest::class);
         $this->logger = $logger;

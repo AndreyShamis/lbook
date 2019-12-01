@@ -23,6 +23,7 @@ use App\Repository\SuiteExecutionRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -46,7 +47,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class LogBookUploaderController extends AbstractController
 {
-    /** @var \Doctrine\Common\Persistence\ObjectManager  */
+    /** @var EntityManagerInterface */
     protected $em;
     /** @var LogBookTestRepository $testsRepo */
     protected $testsRepo;

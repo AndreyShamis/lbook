@@ -100,7 +100,7 @@ class LogBookTest
     protected $cycle;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookMessage", mappedBy="test", fetch="EXTRA_LAZY", orphanRemoval=true)
      * @ORM\JoinColumn(name="logs", fieldName="id", referencedColumnName="id")
      * @ORM\OrderBy({"chain" = "ASC"})
      */

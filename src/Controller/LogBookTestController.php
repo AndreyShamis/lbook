@@ -10,6 +10,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -31,7 +32,7 @@ class LogBookTestController extends AbstractController
     protected $index_size = 500;
 
     protected $log_size = 3000;
-    /** @var \Doctrine\Common\Persistence\ObjectManager  */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /**

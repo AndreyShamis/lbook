@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookTarget;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 class LogBookTargetRepository extends ServiceEntityRepository
 {
@@ -13,7 +13,7 @@ class LogBookTargetRepository extends ServiceEntityRepository
      */
     protected static $hashedData = array();
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LogBookTarget::class);
     }
@@ -21,6 +21,8 @@ class LogBookTargetRepository extends ServiceEntityRepository
     /**
      * @param array $criteria
      * @return LogBookTarget
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function findOneOrCreate(array $criteria): LogBookTarget
     {

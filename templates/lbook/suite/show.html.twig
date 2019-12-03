@@ -24,6 +24,18 @@
             <td>{{ suite.runTime | ExecutionTimeGeneric }}</td>
         </tr>
         <tr>
+            <th>Tests</th>
+            <td>{{ suite.testsCountEnabled }}</td>
+            <th>Pass</th>
+            <td>{{ suite.passCount }}</td>
+            <th>Fail</th>
+            <td>{{ suite.failCount }}</td>
+            <th>Error</th>
+            <td>{{ suite.errorCount }}</td>
+            <th>PR</th>
+            <td title="Passs Rate">{{ suite.passRate }}%</td>
+        </tr>
+        <tr>
             <th>Name</th>
             <td>{{ suite.name }}</td>
             <th>Platform</th>

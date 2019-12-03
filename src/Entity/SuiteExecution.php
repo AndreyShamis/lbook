@@ -274,11 +274,12 @@ class SuiteExecution
         $failCount = 0;
         $errorCount = 0;
         $total_test_time = 0;
-        $startTime = new \DateTime('+100 years');
+        $startTime = $this->getStartedAt();
         $endTime = new \DateTime('-100 years');
         $totoal_real_tests_found = 0;
         /** @var LogBookTest[] $tests */
         $tests = $this->getTests();
+        $testsFound = false;
         /** @var LogBookTest $test */
         foreach ($tests as $test) {
             $type = $test->getTestType();
@@ -298,6 +299,7 @@ class SuiteExecution
             $endTime = max($endTime, $test->getTimeEnd());
 
             $total_test_time += $test->getTimeRun();
+            $testsFound = true;
         }
 
         $suite_tests_count = $this->getTestsCountEnabled();
@@ -317,7 +319,13 @@ class SuiteExecution
         $this->setFailCount($failCount);
         $this->setErrorCount($errorCount);
         $this->setStartedAt($startTime);
-        $this->setFinishedAt($endTime);
+        /** WA for suite without tests */
+        if ($testsFound) {
+            $this->setFinishedAt($endTime);
+        } else {
+            $this->setFinishedAt($this->getFinishedAt());
+        }
+
     }
 
     /**

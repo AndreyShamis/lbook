@@ -38,7 +38,7 @@
             <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
-            <th data-sortable="true" title="Node" data-switchable="true">Noe</th>
+            <th data-sortable="true" title="Node" data-switchable="true">Node</th>
             <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true">S</th>
             <th data-sortable="true" title="Publish" data-switchable="true">Pub</th>
 {#            <th class="suite_list_options_column">Options</th>#}
@@ -93,7 +93,7 @@
                 <td class="font9">{{ suiteExecution.productVersion }}</td>
                 <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
                 <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
-                <td>{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
+                <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
                 <td>{{ suiteExecution.closed ? 'X':'O'  }}</td>
                 <td>{{ suiteExecution.publish }}</td>
 {#                <td>#}

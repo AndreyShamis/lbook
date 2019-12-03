@@ -245,6 +245,7 @@ class SuiteExecution
             $this->setCreatedAt();
         } catch (\Exception $e) {
         }
+        $this->createdAt = new \DateTime();
         $this->startedAt = new \DateTime();
         $this->finishedAt = new \DateTime();
         $this->tests = new ArrayCollection();
@@ -274,7 +275,7 @@ class SuiteExecution
         $failCount = 0;
         $errorCount = 0;
         $total_test_time = 0;
-        $startTime = $this->getStartedAt();
+        $startTime = $this->getCreatedAt();
         $endTime = new \DateTime('-100 years');
         $totoal_real_tests_found = 0;
         /** @var LogBookTest[] $tests */
@@ -323,7 +324,7 @@ class SuiteExecution
         if ($testsFound) {
             $this->setFinishedAt($endTime);
         } else {
-            $this->setFinishedAt($this->getFinishedAt());
+            $this->setFinishedAt($this->getCreatedAt());
         }
 
     }

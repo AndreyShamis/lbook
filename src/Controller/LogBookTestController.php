@@ -255,6 +255,7 @@ class LogBookTestController extends AbstractController
                 $test_name_match = str_replace('  ', ' ', $test_name_match);
                 $test_name_match = str_replace(' ', ' +', $test_name_match);
                 $test_name_match = str_replace(' ++', ' +', $test_name_match);
+                $test_name_match = str_replace(' +-', ' -', $test_name_match);
 
                 $qb->setParameter('search_str', $test_name_match);
 

@@ -28,6 +28,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -864,6 +865,37 @@ class LogBookUploaderController extends AbstractController
         return \count($this->log_first_lines);
     }
 
+
+    private function splitTestContentToTests(array &$temp_arr, LoggerInterface $logger): array
+    {
+        $ret = [];
+        $testsFound = 0;
+        $counter = 0;
+        $appendFirstLines = true;
+        foreach ($temp_arr as $line) {
+            if (!isset($ret[$testsFound])){
+                $ret[$testsFound] = [];
+            }
+            if (strpos($line, 'BULK: Processing control file') !== false) {
+                if ($appendFirstLines === true && $testsFound === 0 && count($ret[$testsFound]) > 0) {
+                    $appendFirstLines = false;
+
+                } else {
+                    $testsFound++;
+                }
+                $logger->log(LogLevel::CRITICAL, 'Test found Counter' . $counter . ',' . $line);
+
+            } else {
+
+                $ret[$testsFound][] = $line;
+
+            }
+            $counter++;
+        }
+
+        return $ret;
+    }
+
     /**
      * @param String $filePath
      * @param LogBookTest $test
@@ -875,12 +907,24 @@ class LogBookUploaderController extends AbstractController
      */
     protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
     {
+        $debug = 0;
+        if ($debug) {
+            $start_time = microtime(true);
+        }
         $ret_data = array();
-        $file_data = file_get_contents($filePath, FILE_USE_INCLUDE_PATH);
-        $tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data);
-        $newTempArr = $this->prepareLogArray($tmp_log_arr, $logger);
+        //$file_data = file_get_contents($filePath, FILE_USE_INCLUDE_PATH);
+        //$tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data); // Execution time of script = 2.5779519081116 sec
+        $tmp_log_arr = file($filePath);  // Execution time of script = 2.5554959774017 sec
 
-        unset($file_data);
+        $newTempArr = $this->prepareLogArray($tmp_log_arr, $logger);
+        if ($debug) {
+            $this->splitTestContentToTests($newTempArr, $logger);
+            $end_time = microtime(true);
+            $execution_time = ($end_time - $start_time);
+            $logger->log(LogLevel::CRITICAL, 'Execution time of script = ' . $execution_time. ' sec');
+        }
+
+        //unset($file_data);
 
         $counter=0;
         $objectsToClear = array();

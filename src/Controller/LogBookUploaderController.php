@@ -29,6 +29,8 @@ use Doctrine\ORM\ORMException;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -118,7 +120,7 @@ class LogBookUploaderController extends AbstractController
     /**
      * @Route("/", name="upload_index", methods={"GET"})
      */
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index(): Response
     {
         return $this->render('lbook/upload/index.html.twig', array());
     }
@@ -225,11 +227,9 @@ class LogBookUploaderController extends AbstractController
      * @param Request $request
      * @param LoggerInterface $logger
      * @param HostRepository $hosts
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @return Response
      */
-    public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts): \Symfony\Component\HttpFoundation\Response
+    public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts): Response
     {
         $created = false;
         $ip = $request->getClientIp();
@@ -354,7 +354,7 @@ class LogBookUploaderController extends AbstractController
             $data['query'] = $request->query->all();
             $data['trace'] = $e->getTraceAsString();
             $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
-            return new \Symfony\Component\HttpFoundation\Response($e->getMessage());
+            return new Response($e->getMessage());
         }
 
         return $this->render('lbook/suite/add_execution.html.twig', array(
@@ -369,7 +369,7 @@ class LogBookUploaderController extends AbstractController
      * @Route("/new_cli", name="upload_new_cli", methods={"GET|POST"})
      * @param Request $request
      * @param LoggerInterface $logger
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      * @throws Exception
      */
     public function newCli(Request $request, LoggerInterface $logger)
@@ -865,18 +865,18 @@ class LogBookUploaderController extends AbstractController
     }
 
     /**
-     * @param String $file
+     * @param String $filePath
      * @param LogBookTest $test
      * @param LogBookUpload $uploadObj
      * @param LoggerInterface $logger
      * @return array
      * @throws ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws OptimisticLockException
      */
-    protected function parseFile($file, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
+    protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
     {
         $ret_data = array();
-        $file_data = file_get_contents($file , FILE_USE_INCLUDE_PATH);
+        $file_data = file_get_contents($filePath, FILE_USE_INCLUDE_PATH);
         $tmp_log_arr = preg_split('/\\r\\n|\\r|\\n/', $file_data);
         $newTempArr = $this->prepareLogArray($tmp_log_arr, $logger);
 
@@ -1392,7 +1392,7 @@ class LogBookUploaderController extends AbstractController
      *
      * @Route("/new", name="upload_new", methods={"GET|POST"})
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */

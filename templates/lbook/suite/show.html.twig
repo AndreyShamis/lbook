@@ -35,9 +35,10 @@
             <td class="failClass">{{ suite.failCount }}</td>
             <th>Error</th>
             <td class="errorClass">{{ suite.errorCount }}</td>
-            <th>PR</th>
+            <th>PR &nbsp;&nbsp;&nbsp;&nbsp; HOST</th>
             <td>
                 <span class="{{ passRateToColor(suite.passRate) }}" title="Passs Rate">{{ suite.passRate }}%</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 {% if suite.host.name is defined %}<a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a>{% endif %}
             </td>
         </tr>

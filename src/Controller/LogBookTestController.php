@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -255,6 +256,7 @@ class LogBookTestController extends AbstractController
                 $test_name_match = str_replace('  ', ' ', $test_name_match);
                 $test_name_match = str_replace(' ', ' +', $test_name_match);
                 $test_name_match = str_replace(' ++', ' +', $test_name_match);
+                $test_name_match = str_replace(' +-', ' -', $test_name_match);
 
                 $qb->setParameter('search_str', $test_name_match);
 
@@ -311,8 +313,8 @@ class LogBookTestController extends AbstractController
      *
      * @Route("/new", name="test_new", methods={"GET|POST"})
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @throws \LogicException
+     * @return RedirectResponse|Response
+     * @throws \Exception
      */
     public function new(Request $request)
     {
@@ -423,7 +425,7 @@ class LogBookTestController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookMessageRepository $logRepo
      * @param LogBookTestRepository $testRepo
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function show(PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo, LogBookTest $test = null): ?Response
     {
@@ -439,7 +441,7 @@ class LogBookTestController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookMessageRepository $logRepo
      * @param LogBookTestRepository $testRepo
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function showFull(PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo, LogBookTest $test = null, $page = 1): ?Response
     {
@@ -580,7 +582,7 @@ class LogBookTestController extends AbstractController
      * @Route("/{id}/edit", name="test_edit", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTest $test
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\Symfony\Component\Security\Core\Exception\AccessDeniedException|\LogicException
      */
     public function edit(Request $request, LogBookTest $test = null)
@@ -618,7 +620,7 @@ class LogBookTestController extends AbstractController
      * @Route("/{id}", name="test_delete", methods={"DELETE"})
      * @param Request $request
      * @param LogBookTest $test
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse | Response
+     * @return RedirectResponse | Response
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function delete(Request $request, LogBookTest $test = null)

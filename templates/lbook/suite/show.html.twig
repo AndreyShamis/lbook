@@ -24,7 +24,7 @@
             <td>
                 <i class="ace-icon fa fa-info-circle" title="Suite Run Time"></i>
                 <span title="{{suite.runTime}} seconds"> {{ suite.runTime | ExecutionTimeGeneric }}</span>
-               </td>
+            </td>
         </tr>
         <tr>
             <th>Tests</th>
@@ -63,7 +63,7 @@
             <th>Summary</th>
             <td>{{ suite.summary }}</td>
             <th>Chip</th>
-            <td><span class="label label-purple label-white middle" style="background-color: {{ stringToColor(suite.platform) }} !important;">{{ suite.chip }}</span></td>
+            <td><span class="label label-purple label-white middle" style="background-color: {{ stringToColor(suite.chip) }} !important;">{{ suite.chip }}</span></td>
             <th>CI URL</th>
             <td><a href="{{ suite.ciUrl }}" target="_blank">{{ suite.ciUrl }}</a></td>
             <th>CI ARCH</th>
@@ -90,9 +90,9 @@
     </div>
 
     {#    <ul>#}
-{#        <li><a href="{{ path('user_index') }}">Back to the list</a></li>#}
-{#        {% if is_granted('edit', user) %}#}
-{#            <li><a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a></li>#}
-{#        {% endif %}#}
-{#    </ul>#}
+    {#        <li><a href="{{ path('user_index') }}">Back to the list</a></li>#}
+    {#        {% if is_granted('edit', user) %}#}
+    {#            <li><a href="{{ path('user_edit', { 'id': user.id }) }}">Edit</a></li>#}
+    {#        {% endif %}#}
+    {#    </ul>#}
 {% endblock %}

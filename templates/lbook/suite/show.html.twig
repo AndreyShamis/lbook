@@ -46,7 +46,7 @@
             <th>Name</th>
             <td><strong>{{ suite.name }}</strong></td>
             <th>Platform</th>
-            <td><span class="label label-info label-white middle">{{ suite.platform }}</span></td>
+            <td><span class="label label-info label-white middle" style="background-color: {{ stringToColor(suite.platform) }} !important;">{{ suite.platform }}</span></td>
             <th>Build Tag</th>
             <td>{{ suite.buildTag }}</td>
             <th>CI TAGET ARCH</th>
@@ -63,7 +63,7 @@
             <th>Summary</th>
             <td>{{ suite.summary }}</td>
             <th>Chip</th>
-            <td><span class="label label-purple label-white middle">{{ suite.chip }}</span></td>
+            <td><span class="label label-purple label-white middle" style="background-color: {{ stringToColor(suite.platform) }} !important;">{{ suite.chip }}</span></td>
             <th>CI URL</th>
             <td><a href="{{ suite.ciUrl }}" target="_blank">{{ suite.ciUrl }}</a></td>
             <th>CI ARCH</th>

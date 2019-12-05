@@ -9,6 +9,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use App\Utils\LogBookCommon;
 
 class AppExtension extends AbstractExtension
 {
@@ -21,6 +22,7 @@ class AppExtension extends AbstractExtension
     public function getFilters(): array
     {
         return array(
+            new TwigFilter('stringToColor', array($this, 'stringToColor')),
             new TwigFilter('ExecutionTimeInHours', array($this, 'ExecutionTimeInHours')),
             new TwigFilter('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
             new TwigFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
@@ -42,6 +44,7 @@ class AppExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('stringToColor', array($this, 'stringToColor')),
             new TwigFunction('ExecutionTimeGeneric', array($this, 'ExecutionTimeGeneric')),
             new TwigFunction('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
             new TwigFunction('relativeTime', array($this, 'relativeTime')),
@@ -315,6 +318,33 @@ class AppExtension extends AbstractExtension
 //    {
 //        $this->parser = $parser;
 //    }
+
+
+    public function stringToColor($input=null): string
+    {
+        $ret = '000000';
+        try {
+            $ret = sprintf('%d%d', LogBookCommon::stringDigitsToInt($input),  LogBookCommon::stringToInt($input));
+            if (strlen($ret) < 6) {
+                $ret = sprintf('%d%d%d', LogBookCommon::stringDigitsToInt($input),  LogBookCommon::stringToInt($input), LogBookCommon::stringDigitsToInt($input));
+            }
+            if (strlen($ret) < 6) {
+                $ret = sprintf('%d%d%d%d', LogBookCommon::stringDigitsToInt($input),  LogBookCommon::stringToInt($input), LogBookCommon::stringDigitsToInt($input), LogBookCommon::stringToInt($input));
+            }
+            if (strlen($ret) < 6) {
+                $ret = sprintf('%d%d%02d%d', LogBookCommon::stringDigitsToInt($input),  LogBookCommon::stringToInt($input), LogBookCommon::stringDigitsToInt($input), LogBookCommon::stringToInt($input));
+            }
+            if (strlen($ret) < 6) {
+                $ret = sprintf('%d%d%02d%02d', LogBookCommon::stringDigitsToInt($input),  LogBookCommon::stringToInt($input), LogBookCommon::stringDigitsToInt($input), LogBookCommon::stringToInt($input));
+            }
+            if (strlen($ret) > 6) {
+                $ret = substr($ret, 0, 6);
+            }
+        }
+        catch (Exception $ex) {
+        }
+        return '#'.$ret;
+    }
 
     /**
      * @param $valueOf

@@ -82,8 +82,8 @@
                 <td class="errorClass">{{ suiteExecution.errorCount }}</td>
                 <td>{{ suiteExecution.summary }}</td>
                 <td>{{ suiteExecution.uuid }}</td>
-                <td>{{ suiteExecution.Platform }}</td>
-                <td>{{ suiteExecution.chip }}</td>
+                <td style="color: {{ stringToColor(suiteExecution.Platform) }} !important;">{{ suiteExecution.Platform }}</td>
+                <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
                 <td class="font9">{{ suiteExecution.components|join(', ') }}</td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>

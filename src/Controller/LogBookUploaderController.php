@@ -476,21 +476,22 @@ class LogBookUploaderController extends AbstractController
                 $testVerdictDefault = $this->parseVerdict('ERROR');
 
                 // the argument is the path of the directory where the locks are created
-                $store = new FlockStore(sys_get_temp_dir());
-                $factory = new Factory($store);
-                $lockName = 'cycle_' . $cycle->getId(). '_order';
-                $lock = $factory->createLock($lockName, 15);
-                $lock->setLogger($logger);
-                if ($lock->acquire(true)) {
-                    try {
-                        $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
-                        $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
-                    } catch (Exception $ex) {
-                        $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
-                    } finally {
-                        $lock->release();
-                    }
+//                $store = new FlockStore(sys_get_temp_dir());
+//                $factory = new Factory($store);
+//                $lockName = 'cycle_' . $cycle->getId(). '_order';
+//                $lock = $factory->createLock($lockName, 15);
+//                $lock->setLogger($logger);
+//                if ($lock->acquire(true)) {
+                try {
+                    $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
+                    $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                } catch (Exception $ex) {
+                    $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }
+//                    finally {
+////                        $lock->release();
+////                    }
+//                }
                 if ($suite_execution_id > 0) {
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
                     if ($suite_execution !== null) {

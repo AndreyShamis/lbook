@@ -128,7 +128,7 @@
             <div class="infobox infobox-green">
                 <div class="infobox-progress">
                     <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ suite.passRate }}" data-color="#82af6f">
-                        <span class="percent">{{ suite.passRate | getPercentage (suite.testsCountEnabled, 1) }}%</span>
+                        <span class="percent">{{ suite.passCount | getPercentage (suite.testsCountEnabled, 1) }}%</span>
                     </div>
                 </div>
                 <div class="infobox-data" title="Pass Rate - {{ suite.passRate }}%">

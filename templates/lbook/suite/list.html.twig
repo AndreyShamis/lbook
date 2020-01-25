@@ -67,7 +67,7 @@
                 <td class="font8">{{ suiteExecution.id }}</td>
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
                 <td>
-                    {% if suiteExecution.cycle.id is defined %}
+                    {% if suiteExecution.cycle.id is defined and suiteExecution.cycle.name is defined %}
                         {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
                     {% else %}
                         NOT_FOUND

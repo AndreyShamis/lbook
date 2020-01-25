@@ -455,7 +455,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% if suitesCount > 0 %}
                     <td>
                         {% if test.suiteExecution.id is defined and test.suiteExecution.name is defined %}
-                        <span><a href="{{ path('suite_show', {'id': test.testsuiteExecution.id}) }}" target="_blank" title="{{ test.suiteExecution.uuid }}:{{ test.suiteExecution.summary}}:{{ test.suiteExecution.chip }}:{{ test.suiteExecution.platform }}">{{ test.suiteExecution.name }}</a></span>
+                        <span><a href="{{ path('suite_show', {'id': test.suiteExecution.id}) }}" target="_blank" title="[{{ test.suiteExecution.uuid }}] : {{ test.suiteExecution.summary}}  CHIP::{{ test.suiteExecution.chip }}; PLATFORM::{{ test.suiteExecution.platform }}">{{ test.suiteExecution.name }}</a></span>
                         {% endif %}
                     </td>
                 {% endif %}

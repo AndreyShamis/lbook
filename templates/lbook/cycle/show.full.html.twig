@@ -6,7 +6,6 @@ Suite of Cycle [{{ cycle.id }}:{{ cycle.name }}]
 Cycle [{{ cycle.id }}:{{ cycle.name }}]
 {% endif %}
 {% endblock %}
-
 {% block content %}
     {% set testsCount = cycle.testsCount %}
     {% set allTestsCount = cycle.tests|length  %}
@@ -388,9 +387,15 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% if cycle_show_test_time_ratio_show == true %}
                 <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
             {% endif %}
+            {% if suitesCount > 0 %}
+            <th data-sortable="true" data-field="Suite" title="Suite Execution">Suite</th>
+            {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}
+                    {% if item == 'SUITE_SHOW' and suitesCount > 0 %}
+                    {% else %}
                     <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             {% if show_metadata_opt == true %}
@@ -447,28 +452,40 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% endif %}
                 {% if cycle_show_test_time_ratio_show == true %}
                     <td><span data-title="{{ test.timeRun }}"></span>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
+                {% if suitesCount > 0 %}
+
+                    <td>
+                        {% if suiteExecution.id is defined and test.suiteExecution.name is defined %}
+                        <span><a href="{{ path('suite_show', {'id': suiteExecution.id}) }}" target="_blank">{{ suiteExecution.summary }}</a></span>
+                        {% endif %}
+                    </td>
+                {% endif %}
+
                 {% endif %}
                 {% if show_metadata == true %}
                     {% for key, item in additional_cols %}
+                        {% if item == 'SUITE_SHOW' and test.suiteExecution.name is defined %}
+                        {% else %}
                         <td title="{{ item }}">
-                        {% if item in test.metaData|keys %}
-                            {% if isUrl(test.metaData[item]) %}
-                                <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
-                            {% elseif item == 'EXECUTION_SHOW' or item == 'TEST_CASE_SHOW' %}
-                                {% if test.testKey is defined and test.testKey | length > 3 %}
-                                    {% set jira_domain = parseDomain(test.suiteExecution.testSetUrl) %}
-                                    {% if jira_domain | length > 0 %}
-                                        {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ test.metaData[item] %}
-                                        <a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ test.metaData[item] }}</a>
+                            {% if item in test.metaData|keys %}
+                                {% if isUrl(test.metaData[item]) %}
+                                    <a target="_blank" href="{{ test.metaData[item] }}" >Link</a>
+                                {% elseif item == 'EXECUTION_SHOW' or item == 'TEST_CASE_SHOW' %}
+                                    {% if test.testKey is defined and test.testKey | length > 3 %}
+                                        {% set jira_domain = parseDomain(test.suiteExecution.testSetUrl) %}
+                                        {% if jira_domain | length > 0 %}
+                                            {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ test.metaData[item] %}
+                                            <a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ test.metaData[item] }}</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                                     {% endif %}
                                 {% else %}
                                     <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
                                 {% endif %}
-                            {% else %}
-                                <span title="{{ test.metaData[item] }}">{{ test.metaData[item] }}</span>
-                        {% endif %}
-                        {% endif %}
+                            {% endif %}
                         </td>
+                        {% endif %}
                     {% endfor %}
                 {% endif %}
                 {% if show_metadata_opt == true %}

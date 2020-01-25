@@ -202,3 +202,7 @@ th.meta_data_column{
 .suite_wip{
     background-color: #fdfbca !important;
 }
+.suiteSelected{
+    background-color: #b8fdb0 !important;
+    font-weight: bold !important;
+}

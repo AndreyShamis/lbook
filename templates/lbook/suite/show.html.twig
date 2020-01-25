@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Suite Execution</h1>
-
+    {% set selectedSuiteId = suite.id %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
         <tr>
@@ -10,8 +10,12 @@
             <td>{{ suite.id }}
 
                 {% if suite.cycle.id is defined %}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     Cycle :
                     {{ suite.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    Suite Cycle :
+                    {{ suite.cycle.id }}:<a href="{{ path('cycle_suite_show_first', { 'cycle': suite.cycle.id, 'suite': suite.id }) }}">{{ suite.cycle.name }}</a>
                 {% endif %}
             </td>
             <th>Testing Level</th>

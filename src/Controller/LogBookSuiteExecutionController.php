@@ -212,7 +212,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = 1;
-        $suite->calculateStatistic();
+        //$suite->calculateStatistic();
         return $this->render('lbook/suite/show.html.twig',
             [
                 'suite' => $suite,

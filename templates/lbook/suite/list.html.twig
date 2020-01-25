@@ -46,11 +46,17 @@
         </tr>
         </thead>
         <tbody class="searchable">
+        {% if selectedSuiteId is not defined %}
+        {% set selectedSuiteId = 0 %}
+        {% endif %}
         {% for suiteExecution in iterator | slice(0, 10000)%}
             {{ suiteExecution.calculateStatistic }}
             {% set suite_css = '' %}
             {% if not suiteExecution.closed %}
-                {% set suite_css = 'suite_wip' %}
+                {% set suite_css = ' suite_wip ' %}
+            {% endif %}
+            {% if selectedSuiteId == suiteExecution.id %}
+                {% set suite_css = suite_css ~ ' suiteSelected ' %}
             {% endif %}
             <tr class="{{ suite_css }}">
                 <td class="font6" title="Updated {{ suiteExecution.updatedAt|time_diff }}">

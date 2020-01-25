@@ -37,6 +37,7 @@
             <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
             <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
             <th data-sortable="true" title="Node" data-switchable="true">Node</th>
             <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true">S</th>
@@ -67,7 +68,9 @@
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
                 <td>
                     {% if suiteExecution.cycle.id is defined %}
-                        {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name }}</a>
+                        {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
+                    {% else %}
+                        NOT_FOUND
                     {% endif %}
                 </td>
                 <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime |  executionTimeGenericShort}}</span></td>
@@ -75,7 +78,7 @@
                 <td>{{ suiteExecution.testsCountEnabled }}</td>
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
                 <td>{{ suiteExecution.tests | length}}</td>
-                <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</td>
+                <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
 
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>
@@ -91,7 +94,8 @@
                 <td>{% if suiteExecution.testPlanUrl != '' %}<a href="{{ suiteExecution.testPlanUrl }}" target="_blank">{{ suiteExecution.testPlanUrl | jiraKey }}</a>{% endif %}</td>
                 <td>{{ suiteExecution.testingLevel }}</td>
                 <td class="font9">{{ suiteExecution.productVersion }}</td>
-                <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}" title="Updated at {{ suiteExecution.updatedAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
+                <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|date('Y/m/d H:i:s')}}</span></td>
+                <td><span class="font8" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
                 <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
                 <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
                 <td>{{ suiteExecution.closed ? 'X':'O'  }}</td>

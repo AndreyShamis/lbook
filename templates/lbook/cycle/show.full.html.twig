@@ -453,10 +453,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% if cycle_show_test_time_ratio_show == true %}
                     <td><span data-title="{{ test.timeRun }}"></span>{{ getPercentage(test.timeRun, cycle.testsTimeSum) }}%</td>
                 {% if suitesCount > 0 %}
-
                     <td>
-                        {% if suiteExecution.id is defined and test.suiteExecution.name is defined %}
-                        <span><a href="{{ path('suite_show', {'id': suiteExecution.id}) }}" target="_blank">{{ suiteExecution.summary }}</a></span>
+                        {% if test.suiteExecution.id is defined and test.suiteExecution.name is defined %}
+                        <span><a href="{{ path('suite_show', {'id': test.testsuiteExecution.id}) }}" target="_blank" title="{{ test.suiteExecution.uuid }}:{{ test.suiteExecution.summary}}:{{ test.suiteExecution.chip }}:{{ test.suiteExecution.platform }}">{{ test.suiteExecution.name }}</a></span>
                         {% endif %}
                     </td>
                 {% endif %}

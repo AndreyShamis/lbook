@@ -541,7 +541,11 @@ class LogBookCycleController extends AbstractController
                                     }
                                 } else {
                                     if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
-                                        $additional_cols[] = $key;
+                                        if ($this->endsWith($key, 'SUITE_SHOW') && count($cycle->getSuiteExecution()) ) {
+
+                                        } else {
+                                            $additional_cols[] = $key;
+                                        }
                                     } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
                                         $additional_opt_cols[] = $key;
                                     }

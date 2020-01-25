@@ -67,7 +67,9 @@
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
                 <td>
                     {% if suiteExecution.cycle.id is defined %}
-                        {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name }}</a>
+                        {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
+                    {% else %}
+                        NOT_FOUND
                     {% endif %}
                 </td>
                 <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime |  executionTimeGenericShort}}</span></td>
@@ -75,7 +77,7 @@
                 <td>{{ suiteExecution.testsCountEnabled }}</td>
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
                 <td>{{ suiteExecution.tests | length}}</td>
-                <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</td>
+                <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
 
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>

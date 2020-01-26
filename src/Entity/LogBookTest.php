@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @ORM\Table(name="lbook_tests", indexes={
  *     @Index(name="i_test_key", columns={"test_key"}),
  *     @Index(name="i_disabled", columns={"disabled"}),
+ *     @Index(name="i_cycle_execution_order", columns={"cycle", "execution_order"}),
  *     @Index(name="i_cycle_disabled", columns={"cycle", "disabled"}),
  *     @Index(name="full_text_metadata", columns={"meta_data"}, flags={"fulltext"}),
  *     @Index(name="fulltext_name", columns={"name"}, flags={"fulltext"}),

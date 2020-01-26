@@ -376,6 +376,29 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/suite/keep/{cycle}", name="cycle_keep", methods={"GET"})
+     * @param LogBookCycle $cycle
+     * @return RedirectResponse|Response
+     * @throws \Exception
+     */
+    public function keepCycle(LogBookCycle $cycle = null)
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('');
+            }
+            $em = $this->getDoctrine()->getManager();
+            $cycle->setDeleteAt(new \DateTime('+3 months'));
+            $em->persist($cycle);
+            $em->flush();
+            return $this->redirectToRoute('cycle_show_first', ['id' => $cycle->getId()]);
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($ex, $cycle);
+        }
+
+    }
+
+    /**
      * @Route("/suite/{cycle}/{suite}", name="cycle_suite_show_first", methods={"GET"})
      * @Route("/suite/{cycle}/{suite}/{maxSize}", name="cycle_suite_show_size", methods={"GET"}, defaults={"maxSize"=""})
      * @Route("/suite/{cycle}/{suite}/{maxSize}/{page}", name="cycle_suite_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=1000})

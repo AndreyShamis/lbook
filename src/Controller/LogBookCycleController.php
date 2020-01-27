@@ -376,19 +376,19 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
-     * @Route("/suite/keep/{cycle}", name="cycle_keep", methods={"GET"})
+     * @Route("/suite/keep/{cycle}/{weeks}", name="cycle_keep", methods={"GET"})
      * @param LogBookCycle $cycle
+     * @param int $weeks
      * @return RedirectResponse|Response
-     * @throws \Exception
      */
-    public function keepCycle(LogBookCycle $cycle = null)
+    public function keepCycle(LogBookCycle $cycle = null, int $weeks=12)
     {
         try {
             if (!$cycle) {
                 throw new \RuntimeException('');
             }
             $em = $this->getDoctrine()->getManager();
-            $cycle->setDeleteAt(new \DateTime('+3 months'));
+            $cycle->setDeleteAt(new \DateTime('+' . $weeks . ' weeks'));
             $em->persist($cycle);
             $em->flush();
             return $this->redirectToRoute('cycle_show_first', ['id' => $cycle->getId()]);

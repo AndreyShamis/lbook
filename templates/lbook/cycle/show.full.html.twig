@@ -113,7 +113,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                             <i class="ace-icon fa fa-fire"></i>
                                             Delete {{ cycle.deleteAt|time_diff}}
                                         </span>
-                                        Keep for +3 month (WIP)
+                                        <button class="btn btn-minier" title="Keep for +3 month" id="keep3months">+3 month</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -390,6 +390,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% endif %}
             {% if suitesCount > 0 %}
             <th data-sortable="true" data-field="Suite" title="Suite Execution">Suite</th>
+            <th data-sortable="true" data-field="Suite" title="Suite Execution">Platform</th>
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}
@@ -456,7 +457,12 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% if suitesCount > 0 %}
                     <td>
                         {% if test.suiteExecution.id is defined and test.suiteExecution.name is defined %}
-                        <span><a href="{{ path('suite_show', {'id': test.suiteExecution.id}) }}" target="_blank" title="[{{ test.suiteExecution.uuid }}] : {{ test.suiteExecution.summary}}  CHIP::{{ test.suiteExecution.chip }}; PLATFORM::{{ test.suiteExecution.platform }}">{{ test.suiteExecution.name }}</a></span>
+                        <span><a href="{{ path('suite_show', {'id': test.suiteExecution.id}) }}" target="_blank" title="[{{ test.suiteExecution.uuid }}] : PLATFORM::{{ test.suiteExecution.platform }}/{{ test.suiteExecution.chip }}">{{ test.suiteExecution.name }}</a></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if test.suiteExecution.id is defined and test.suiteExecution.platform is defined %}
+                            <span style="color: {{ stringToColor(test.suiteExecution.platform) }} !important;">{{ test.suiteExecution.platform }}</span>
                         {% endif %}
                     </td>
                 {% endif %}
@@ -570,6 +576,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
         $(document).ready(function() {
             $( "#cycleShowToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
+            });
+            $( "#keep3months" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_keep', { 'cycle': cycle.id, 'weeks': 12}) }}";
             });
 
             drawEasyPieChart();

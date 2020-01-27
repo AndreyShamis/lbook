@@ -50,8 +50,8 @@ class LogBookApiController extends AbstractController
         $fin_res['memory_get_peak_usage'] = memory_get_peak_usage();  # int
         try {
             $file = file('/proc/cpuinfo');
-            $fin_res['model_name'] = str_replace("           ", " ",
-                substr(str_replace("model name   : ", "", $file[4]),0,-1));;  # string
+            $fin_res['model_name'] = explode(': ', $file[4])[1];  # string
+            $fin_res['cpu_family'] = explode(': ', $file[2])[1];  # string
 
         } catch (\Throwable $ex) {}
         $response =  new JsonResponse($fin_res);

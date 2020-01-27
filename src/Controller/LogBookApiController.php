@@ -37,21 +37,26 @@ class LogBookApiController extends AbstractController
 
     /**
      * @Route("/cpu_load", name="api_get_cpu_load_avg", methods={"GET", "POST"})
-     * @return Response
+     * @return JsonResponse
      */
-    public function getLoadAvg(): Response
+    public function getLoadAvg(): JsonResponse
     {
-        $load = sys_getloadavg();
-//        Array(
-//            [0] => 1.5
-//            [1] => 1.36
-//            [2] => 1.3
-//        )
-        $response = new Response(
-            'CPU_LOAD_1::'.$load[0] . ';;CPU_LOAD_2::'.$load[1] . ';;CPU_LOAD_3::'.$load[2] . ';;',
-            Response::HTTP_OK,
-            ['content-type' => 'text/plain']
-        );
+        // Returns three samples representing the average system load (the number of processes in the system run queue)
+        // over the last 1, 5 and 15 minutes, respectively.
+        $fin_res['CPU'] = sys_getloadavg();
+        // Returns the amount of memory allocated to PHP
+        $fin_res['memory_get_usage'] = memory_get_usage();  # int
+        // Returns the peak of memory allocated by PHP
+        $fin_res['memory_get_peak_usage'] = memory_get_peak_usage();  # int
+        try {
+            $file = file('/proc/cpuinfo');
+            $fin_res['model_name'] = str_replace("           ", " ",
+                substr(str_replace("model name   : ", "", $file[4]),0,-1));;  # string
+
+        } catch (\Throwable $ex) {}
+        $response =  new JsonResponse($fin_res);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+
         return $response;
     }
 

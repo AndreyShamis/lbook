@@ -387,10 +387,21 @@ class LogBookCycleController extends AbstractController
             if (!$cycle) {
                 throw new \RuntimeException('');
             }
-            $em = $this->getDoctrine()->getManager();
-            $cycle->setDeleteAt(new \DateTime('+' . $weeks . ' weeks'));
-            $em->persist($cycle);
-            $em->flush();
+            if ($weeks > 100) {
+                $weeks = 20;
+            }
+            if ($weeks < 1) {
+                $weeks = 3;
+            }
+            if ($cycle->getDeleteAt() > new \DateTime('+' . $weeks . ' weeks')) {
+                
+            } else {
+                $em = $this->getDoctrine()->getManager();
+                $cycle->setDeleteAt(new \DateTime('+' . $weeks . ' weeks'));
+                $em->persist($cycle);
+                $em->flush();
+            }
+
             return $this->redirectToRoute('cycle_show_first', ['id' => $cycle->getId()]);
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($ex, $cycle);

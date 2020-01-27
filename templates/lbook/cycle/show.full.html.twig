@@ -578,7 +578,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 location.reload();
             });
             $( "#keep3months" ).bind( "click", function() {
-                window.location.href = "{{ path('cycle_keep', { 'cycle': cycle.id, 'weeks': 12}) }}";
+                window.location.href = "{{ path('cycle_keep', { 'cycle': cycle.id, 'weeks': 14}) }}";
             });
 
             drawEasyPieChart();

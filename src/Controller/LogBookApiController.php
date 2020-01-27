@@ -36,6 +36,26 @@ class LogBookApiController extends AbstractController
     }
 
     /**
+     * @Route("/cpu_load", name="api_get_cpu_load_avg", methods={"GET", "POST"})
+     * @return Response
+     */
+    public function getLoadAvg(): Response
+    {
+        $load = sys_getloadavg();
+//        Array(
+//            [0] => 1.5
+//            [1] => 1.36
+//            [2] => 1.3
+//        )
+        $response = new Response(
+            'CPU_LOAD_1::'.$load[0] . ';;CPU_LOAD_2::'.$load[1] . ';;CPU_LOAD_3::'.$load[2] . ';;',
+            Response::HTTP_OK,
+            ['content-type' => 'text/plain']
+        );
+        return $response;
+    }
+
+    /**
      * @Route("/", name="api_index")
      */
     public function index(): Response

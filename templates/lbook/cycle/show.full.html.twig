@@ -440,6 +440,10 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% set testType = ' test-pre-cycle ' %}
             {% elseif test.testType == 'POST_CYCLE' %}
                 {% set testType = ' test-post-cycle ' %}
+            {% elseif test.testType == 'HEALTH_CHECK' %}
+                {% set testType = ' test-health-cycle ' %}
+            {% elseif test.testType == 'RECOVERY' %}
+                {% set testType = ' test-recovery-cycle ' %}
             {% endif %}
             <tr class='{{ test_disabled }}{{ testType }}'>
                 {#{% if is_granted('edit', cycle.setup) %}#}

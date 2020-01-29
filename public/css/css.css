@@ -43,6 +43,17 @@
     border-color: #6a858e !important;
     color: #728088 !important;
 }
+
+.test-health-cycle{
+    background-color: #ddcfec !important;
+    border-color: #6a858e !important;
+    color: #728088 !important;
+}
+.test-recovery-cycle{
+    background-color: #ecc5c9 !important;
+    border-color: #6a858e !important;
+    color: #728088 !important;
+}
 .test-post-cycle{
     background-color: #bad0ec !important;
     border-color: #6a858e !important;

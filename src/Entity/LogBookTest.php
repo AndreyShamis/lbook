@@ -170,11 +170,11 @@ class LogBookTest
         $key = 'TEST_TYPE_SHOW_OPT';
         $md = $this->getMetaData();
         if (array_key_exists($key, $md)) {
-            $tmp_ret = $md[$key];
-            if ($tmp_ret === 'PRE_TEST_FLOW') {
+            $ret = $md[$key];
+            if ($ret === 'PRE_TEST_FLOW') {
                 $ret = 'PRE_CYCLE';
             }
-            if ($tmp_ret === 'POST_TEST_FLOW') {
+            if ($ret === 'POST_TEST_FLOW') {
                 $ret = 'POST_CYCLE';
             }
         }

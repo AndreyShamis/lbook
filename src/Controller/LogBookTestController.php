@@ -253,13 +253,19 @@ class LogBookTestController extends AbstractController
                     $addOrder = false;
                 }
                 $test_name = trim($test_name);
-                $test_name_match = str_replace('  ', ' ', $test_name);
+                $test_name_match = str_replace('%', ' ', $test_name);
+                $test_name_match = str_replace('?', ' ', $test_name_match);
+                $test_name_match = str_replace('  ', ' ', $test_name_match);
                 $test_name_match = str_replace(' ', ' +', $test_name_match);
                 $test_name_match = str_replace(' ++', ' +', $test_name_match);
                 $test_name_match = str_replace(' +-', ' -', $test_name_match);
 
                 $qb->setParameter('search_str', $test_name_match);
-                $qb->setParameter('test_name', $test_name);
+                $test_name_search = $test_name;
+                if (mb_strlen($test_name_search) > 10) {
+                    $test_name_search .= '%';
+                }
+                $qb->setParameter('test_name', $test_name_search);
 
                 $enableSearch = True;
             }

@@ -32,6 +32,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
             new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
             new TwigFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
+            new TwigFilter('arrayToString', array($this, 'arrayToString')),
             new TwigFilter('time_ago', function ($time) { return $this->ExecutionTimeInHours(time() - $time);}),
             new TwigFilter('filter_name', [$this, 'doSomething'], ['is_safe' => ['html']]),
         );
@@ -57,6 +58,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getPercentage', [$this, 'getPercentage']),
             new TwigFunction('logTypeToTableColor', [$this, 'logTypeToTableColor']),
             new TwigFunction('inarray', array($this, 'inArray')),
+            new TwigFunction('arrayToString', array($this, 'arrayToString')),
             new TwigFunction('parseDomain', array($this, 'parseDomain')),
             new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
             new TwigFunction('jiraKey', array($this, 'jiraKey')),
@@ -290,6 +292,24 @@ class AppExtension extends AbstractExtension
     public function pre_print_r($obj): string
     {
         return '<pre>' . print_r($obj, true) . '</pre>';
+    }
+
+    public function arrayToString($array): string
+    {
+        $ret = '';
+        try{
+            foreach ($array as $key => $val) {
+                if (mb_strlen($ret) > 0) {
+                    $ret .= ';' . $val;
+                } else {
+                    $ret = $val;
+                }
+
+            }
+        }catch (\Throwable $ex) {
+
+        }
+        return $ret;
     }
 
     /**

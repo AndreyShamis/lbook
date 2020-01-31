@@ -94,7 +94,7 @@
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
                 <td class="font9">
-                    {{ suiteExecution.components|arrayToString}}
+{#                    {{ suiteExecution.components|arrayToString}}#}
                 </td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>

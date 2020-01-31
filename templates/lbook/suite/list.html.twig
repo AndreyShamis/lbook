@@ -9,7 +9,7 @@
            data-show-columns="true"
            data-advanced-search="true"
             {#data-id-table="advancedTable"#}
-           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500]" data-sort-order="desc">
+           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 5000]" data-sort-order="desc">
         <thead>
         <tr>
             <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
@@ -29,13 +29,13 @@
             <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
-            <th data-sortable="true" title="Chip" data-switchable="true">Components</th>
+            <th data-sortable="true" title="Components" data-switchable="true">Components</th>
             <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI</th>
             <th data-sortable="true" title="CI TAG" data-switchable="true">CI tag</th>
             <th data-sortable="true" title="Jira Test Set URL" data-switchable="true">TS</th>
             <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>
             <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
-            <th data-sortable="true" title="Testing Level" data-switchable="true">Product Version</th>
+            <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
@@ -49,8 +49,7 @@
         {% if selectedSuiteId is not defined %}
         {% set selectedSuiteId = 0 %}
         {% endif %}
-        {% for suiteExecution in iterator | slice(0, 10000)%}
-            {{ suiteExecution.calculateStatistic }}
+        {% for suiteExecution in iterator | slice(0, 5000)%}
             {% set suite_css = '' %}
             {% if not suiteExecution.closed %}
                 {% set suite_css = ' suite_wip ' %}
@@ -85,7 +84,6 @@
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
                 <td>{{ suiteExecution.tests | length}}</td>
                 <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
-
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>
                 <td class="errorClass">{{ suiteExecution.errorCount }}</td>
@@ -93,9 +91,7 @@
                 <td>{{ suiteExecution.uuid }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
-                <td class="font9">
-{#                    {{ suiteExecution.components|arrayToString}}#}
-                </td>
+                <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>
                 <td>{% if suiteExecution.testSetUrl != '' %}<a href="{{ suiteExecution.testSetUrl }}" target="_blank">{{ suiteExecution.testSetUrl | jiraKey }}</a>{% endif %}</td>

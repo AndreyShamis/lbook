@@ -394,7 +394,7 @@ class LogBookCycleController extends AbstractController
                 $weeks = 3;
             }
             if ($cycle->getDeleteAt() > new \DateTime('+' . $weeks . ' weeks')) {
-                
+
             } else {
                 $em = $this->getDoctrine()->getManager();
                 $cycle->setDeleteAt(new \DateTime('+' . $weeks . ' weeks'));
@@ -410,6 +410,7 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/suiteid/{suite}", name="cycle_no_suiteid_show_first", methods={"GET", "POST"})
      * @Route("/suite/{cycle}/{suite}", name="cycle_suite_show_first", methods={"GET"})
      * @Route("/suite/{cycle}/{suite}/{maxSize}", name="cycle_suite_show_size", methods={"GET"}, defaults={"maxSize"=""})
      * @Route("/suite/{cycle}/{suite}/{maxSize}/{page}", name="cycle_suite_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=1000})
@@ -423,6 +424,9 @@ class LogBookCycleController extends AbstractController
      */
     public function showSuiteFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
     {
+        if ($cycle === null && $suite !== null) {
+            $cycle = $suite->getCycle();
+        }
         if ($page === null) {
             $page = 1;
         }
@@ -484,8 +488,10 @@ class LogBookCycleController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
+     * @param SuiteExecution|null $suite
      * @param int $page
      * @param bool $forJson if True the JSON table for tests will be used
+     * @param null $maxSize
      * @return Response
      */
     public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $forJson=false, $maxSize=null): ?Response
@@ -498,7 +504,11 @@ class LogBookCycleController extends AbstractController
             $maxSize = $this->show_tests_size;
         }
         try {
-            if (!$cycle) {
+
+            if ($cycle === null && $suite !== null) {
+                $cycle = $suite->getCycle();
+            }
+            if ($cycle === null) {
                 throw new \RuntimeException('');
             }
 

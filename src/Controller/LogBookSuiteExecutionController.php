@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\SuiteExecution;
 use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param SuiteExecutionRepository $suites
      * @param int $page
      * @return array
+     * @throws Exception
      */
     public function index(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $page = 1): array
     {
@@ -56,7 +58,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param SuiteExecutionRepository $suites
      * @param int $days
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function calculate_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
     {
@@ -127,7 +129,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param SuiteExecutionRepository $suites
      * @param int $days
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function close_unclosed_suites_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
     {
@@ -191,6 +193,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param SuiteExecutionRepository $suites
      * @return Response
+     * @throws Exception
      */
     public function show(SuiteExecution $suite, PagePaginator $pagePaginator, SuiteExecutionRepository $suites): Response
     {

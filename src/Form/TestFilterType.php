@@ -18,8 +18,17 @@ class TestFilterType extends AbstractType
             ->add('testList')
             ->add('testingLevel')
             ->add('projectName')
+            ->add('chip')
+            ->add('platform')
+            ->add('executionMode')
+            ->add('branchName')
+            ->add('enabled')
+            ->add('description')
+            ->add('defectUrl')
+            ->add('createdAt')
+            ->add('updatedAt')
+            ->add('issueContact')
 //            ->add('user')
-
         ;
     }
 

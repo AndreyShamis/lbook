@@ -32,7 +32,7 @@ class TestFilter
     private $cluster = '';
 
     /**
-     * @ORM\Column(type="string", length=32000, options={"default"=""})
+     * @ORM\Column(type="string", length=320, options={"default"=""})
      */
     private $testList = '';
 
@@ -51,6 +51,56 @@ class TestFilter
      * @ORM\Column(type="string", length=150, options={"default"=""})
      */
     private $projectName = '';
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $chip;
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $platform;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $executionMode;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $branchName;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $enabled;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $defectUrl;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $issueContact;
 
     public function getId(): ?int
     {
@@ -137,6 +187,126 @@ class TestFilter
     public function setProjectName(string $projectName): self
     {
         $this->projectName = $projectName;
+
+        return $this;
+    }
+
+    public function getChip(): ?string
+    {
+        return $this->chip;
+    }
+
+    public function setChip(string $chip): self
+    {
+        $this->chip = $chip;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?string
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(string $platform): self
+    {
+        $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getExecutionMode(): ?bool
+    {
+        return $this->executionMode;
+    }
+
+    public function setExecutionMode(bool $executionMode): self
+    {
+        $this->executionMode = $executionMode;
+
+        return $this;
+    }
+
+    public function getBranchName(): ?string
+    {
+        return $this->branchName;
+    }
+
+    public function setBranchName(string $branchName): self
+    {
+        $this->branchName = $branchName;
+
+        return $this;
+    }
+
+    public function getEnabled(): ?bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDefectUrl(): ?string
+    {
+        return $this->defectUrl;
+    }
+
+    public function setDefectUrl(string $defectUrl): self
+    {
+        $this->defectUrl = $defectUrl;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getIssueContact(): ?string
+    {
+        return $this->issueContact;
+    }
+
+    public function setIssueContact(string $issueContact): self
+    {
+        $this->issueContact = $issueContact;
 
         return $this;
     }

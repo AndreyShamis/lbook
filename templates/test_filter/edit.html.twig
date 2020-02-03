@@ -1,8 +1,7 @@
-{% extends 'base.html.twig' %}
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Edit TestFilter{% endblock %}
+{% block content %}
 
-{% block title %}Edit TestFilter{% endblock %}
-
-{% block body %}
     <h1>Edit TestFilter</h1>
 
     {{ include('test_filter/_form.html.twig', {'button_label': 'Update'}) }}

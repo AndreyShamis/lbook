@@ -20,6 +20,7 @@ use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
+use App\Repository\TestFilterRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -30,6 +31,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -362,6 +364,158 @@ class LogBookUploaderController extends AbstractController
         ));
     }
 
+
+    /**
+     * @Route("/create_suite_execution", name="add_new_suite_execution_json", methods={"GET|POST"})
+     * @param Request $request
+     * @param LoggerInterface $logger
+     * @param HostRepository $hosts
+     * @param TestFilterRepository $filtersRepo
+     * @return JsonResponse
+     */
+    public function createSuiteExecutionNew(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
+    {
+        $created = false;
+        $ip = $request->getClientIp();
+        $suiteExecution = null;
+        $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            $data = array();
+        }
+
+        try {
+            if (!array_key_exists('hostname', $data)) {
+                $data['hostname'] = '';
+            }
+            $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
+            unset($data['hostname']);
+            $data['host'] = $suiteHost;
+        } catch (\Throwable $ex) {
+            $logger->critical('SUITE_CREATE_FAIL in host:[' . $data['hostname'] . ':' . $ip . ']',
+                array(
+                    'ip' => $ip,
+                ));
+        }
+//        $logger->critical($ip . '::IP  :' , $data);
+
+        if (!array_key_exists('components', $data)) {
+            $data['components'] = array();
+        }
+
+        if (!array_key_exists('summary', $data)) {
+            $data['summary'] = '';
+        }
+        if (!array_key_exists('name', $data)) {
+            $data['name'] = '';
+        }
+        if (!array_key_exists('test_environments', $data)) {
+            $data['test_environments'] = array();
+        }
+        $data['components'] = array_filter($data['components']);
+        $data['test_environments'] = array_filter($data['test_environments']);
+        try {
+            $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
+            $created = true;
+            $logger->notice('NEW_SUITE:[' . $suiteExecution->getSummary() . ': Tests:' . $suiteExecution->getTestsCountEnabled() . ']',
+                array(
+                    'name' => $suiteExecution->getName(),
+                    'job_name' => $suiteExecution->getJobName(),
+                ));
+            try {
+                if ($suiteHost !== null) {
+                    $suiteHost->setLastSeenAt(new DateTime());
+                    try {
+                        if (array_key_exists('host_uptime', $data)) {
+                            $suiteHost->setUptime(DateTime::createFromFormat('U', $data['host_uptime']));
+                        }
+                    } catch (\Throwable $ex) {}
+
+                    try {
+                        if (array_key_exists('host_memory_total', $data)) {
+                            $suiteHost->setMemoryTotal($data['host_memory_total']);
+                        }
+                        if (array_key_exists('host_memory_free', $data)) {
+                            $suiteHost->setMemoryFree($data['host_memory_free']);
+                        }
+                    } catch (\Throwable $ex) {}
+
+                    try {
+                        if (array_key_exists('host_system', $data)) {
+                            $suiteHost->setSystem($data['host_system']);
+                        }
+                        if (array_key_exists('host_release', $data)) {
+                            $suiteHost->setSystemRelease($data['host_release']);
+                        }
+                        if (array_key_exists('host_version', $data)) {
+                            $suiteHost->setSystemVersion($data['host_version']);
+                        }
+                    } catch (\Throwable $ex) {}
+
+                    try {
+                        if (array_key_exists('host_cpu_count', $data)) {
+                            $suiteHost->setCpuCount($data['host_cpu_count']);
+                        }
+                        if (array_key_exists('host_cpu_usage', $data)) {
+                            $suiteHost->setCpuUsage($data['host_cpu_usage']);
+                        }
+                    } catch (\Throwable $ex) {}
+                    try {
+                        if (array_key_exists('host_user', $data)) {
+                            $suiteHost->setUserName($data['host_user']);
+                        }
+                        if (array_key_exists('host_python_version', $data)) {
+                            $suiteHost->setPythonVersion($data['host_python_version']);
+                        }
+                    } catch (\Throwable $ex) {}
+
+
+
+                    $suiteHost->setLastSuite($suiteExecution);
+                    $tarLab = '';
+                    try {
+                        $tarLab = $suiteExecution->getPlatform() . '::' . $suiteExecution->getChip();
+                    } catch (\Throwable $ex) {}
+                    $suiteHost->setTargetLabel($tarLab);
+                    $suiteHost->addTargetLabel($suiteExecution->getChip());
+                    $suiteHost->addTargetLabel($suiteExecution->getPlatform());
+                    $this->em->persist($suiteHost);
+                    $this->em->flush();
+                }
+            } catch (\Throwable $ex) {
+                $logger->critical('SUITE_HOST_UPDATE_FAILED:[' . $suiteHost->getName() . ':' . $suiteHost->getIp() . ']',
+                    array(
+                        'tarLab' => $tarLab,
+                        'PLATFORM' => $suiteExecution->getPlatform(),
+                        'CHIP' => $suiteExecution->getChip(),
+                        'SuiteName' => $suiteExecution->getName(),
+                        'SuiteSummary' => $suiteExecution->getSummary(),
+                    ));
+            }
+        } catch (\Throwable $e) {
+            $method = $request->getMethod();
+            $data['ip'] = $ip;
+            $data['method'] = $method;
+            $data['request'] = $request->request->all();
+            $data['query'] = $request->query->all();
+            $data['trace'] = $e->getTraceAsString();
+            $data['message'] = $e->getMessage();
+            $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
+            $response =  new JsonResponse($data);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+
+        $fin_res['SUITE_EXECUTION_ID'] = $suiteExecution->getId();
+        $fin_res['FILTERS'] = array();
+        $filters = $filtersRepo->findAll();
+        foreach ($filters as $filter) {
+            $fin_res['FILTERS'][] = $filter->toJson();
+        }
+
+        $response =  new JsonResponse($fin_res);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+    }
     /**
      * Creates a new Upload entity.
      *

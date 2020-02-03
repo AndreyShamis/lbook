@@ -310,4 +310,21 @@ class TestFilter
 
         return $this;
     }
+
+    public function toJson()
+    {
+        return [
+            'id' => $this->getId(),
+            'branch' => $this->getBranchName(),
+            'suiteUuid' => $this->getSuiteUuid(),
+            'tests' => $this->getTestList(),
+            'cluster' => $this->getCluster(),
+            'platform' => $this->getPlatform(),
+            'chip' => $this->getChip(),
+            'owner' => $this->getUser()->getFullName(),
+            'contact' => $this->getIssueContact(),
+            'description' => $this->getDescription(),
+            'defectUrl' => $this->getDefectUrl()
+        ];
+    }
 }

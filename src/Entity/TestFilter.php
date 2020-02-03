@@ -32,7 +32,7 @@ class TestFilter
     private $cluster = '';
 
     /**
-     * @ORM\Column(type="string", length=32000, options={"default"=""})
+     * @ORM\Column(type="string", length=320, options={"default"=""})
      */
     private $testList = '';
 

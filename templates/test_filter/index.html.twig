@@ -1,8 +1,7 @@
-{% extends 'base.html.twig' %}
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK TestFilter{% endblock %}
+{% block content %}
 
-{% block title %}TestFilter index{% endblock %}
-
-{% block body %}
     <h1>TestFilter index</h1>
 
     <table class="table">
@@ -24,8 +23,8 @@
                 <td>{{ test_filter.id }}</td>
                 <td>{{ test_filter.name }}</td>
                 <td>{{ test_filter.suiteUuid }}</td>
-                <td>{{ test_filter.cluster }}</td>
-                <td>{{ test_filter.testList }}</td>
+                <td>{{ test_filter.cluster|nl2br }}</td>
+                <td>{{ test_filter.testList|nl2br }}</td>
                 <td>{{ test_filter.testingLevel }}</td>
                 <td>{{ test_filter.projectName }}</td>
                 <td>

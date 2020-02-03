@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TestFilter index{% endblock %}
+
+{% block body %}
+    <h1>TestFilter index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>SuiteUuid</th>
+                <th>Cluster</th>
+                <th>TestList</th>
+                <th>TestingLevel</th>
+                <th>ProjectName</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for test_filter in test_filters %}
+            <tr>
+                <td>{{ test_filter.id }}</td>
+                <td>{{ test_filter.name }}</td>
+                <td>{{ test_filter.suiteUuid }}</td>
+                <td>{{ test_filter.cluster }}</td>
+                <td>{{ test_filter.testList }}</td>
+                <td>{{ test_filter.testingLevel }}</td>
+                <td>{{ test_filter.projectName }}</td>
+                <td>
+                    <a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">show</a>
+                    <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('test_filter_new') }}">Create new</a>
+{% endblock %}

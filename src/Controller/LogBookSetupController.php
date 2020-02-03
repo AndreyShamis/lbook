@@ -350,8 +350,7 @@ class LogBookSetupController extends AbstractController
             if (!$obj) {
                 throw new \RuntimeException('');
             }
-            $user= $this->get('security.token_storage')->getToken()->getUser();
-
+            $user = $this->get('security.token_storage')->getToken()->getUser();
             // check for "edit" access: calls all voters
             $this->denyAccessUnlessGranted('edit', $obj);
             /** @var PersistentCollection $moderators */

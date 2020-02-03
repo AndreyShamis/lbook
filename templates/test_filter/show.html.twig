@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TestFilter{% endblock %}
+
+{% block body %}
+    <h1>TestFilter</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ test_filter.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ test_filter.name }}</td>
+            </tr>
+            <tr>
+                <th>SuiteUuid</th>
+                <td>{{ test_filter.suiteUuid }}</td>
+            </tr>
+            <tr>
+                <th>Cluster</th>
+                <td>{{ test_filter.cluster }}</td>
+            </tr>
+            <tr>
+                <th>TestList</th>
+                <td>{{ test_filter.testList }}</td>
+            </tr>
+            <tr>
+                <th>TestingLevel</th>
+                <td>{{ test_filter.testingLevel }}</td>
+            </tr>
+            <tr>
+                <th>ProjectName</th>
+                <td>{{ test_filter.projectName }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('test_filter_index') }}">back to list</a>
+
+    <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
+
+    {{ include('test_filter/_delete_form.html.twig') }}
+{% endblock %}

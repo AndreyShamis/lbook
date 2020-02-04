@@ -9,6 +9,7 @@ use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
 use App\Entity\SuiteExecution;
+use App\Entity\TestFilter;
 use App\Repository\HostRepository;
 use App\Repository\LogBookBuildRepository;
 use App\Repository\LogBookCycleRepository;
@@ -378,6 +379,7 @@ class LogBookUploaderController extends AbstractController
         $created = false;
         $ip = $request->getClientIp();
         $suiteExecution = null;
+        $fin_res['DEBUG'] = array();
         $data = json_decode($request->getContent(), true);
         if ($data === null) {
             $data = array();
@@ -428,7 +430,9 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('host_uptime', $data)) {
                             $suiteHost->setUptime(DateTime::createFromFormat('U', $data['host_uptime']));
                         }
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
 
                     try {
                         if (array_key_exists('host_memory_total', $data)) {
@@ -437,7 +441,9 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('host_memory_free', $data)) {
                             $suiteHost->setMemoryFree($data['host_memory_free']);
                         }
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
 
                     try {
                         if (array_key_exists('host_system', $data)) {
@@ -449,7 +455,9 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('host_version', $data)) {
                             $suiteHost->setSystemVersion($data['host_version']);
                         }
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
 
                     try {
                         if (array_key_exists('host_cpu_count', $data)) {
@@ -458,7 +466,9 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('host_cpu_usage', $data)) {
                             $suiteHost->setCpuUsage($data['host_cpu_usage']);
                         }
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
                     try {
                         if (array_key_exists('host_user', $data)) {
                             $suiteHost->setUserName($data['host_user']);
@@ -466,7 +476,9 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('host_python_version', $data)) {
                             $suiteHost->setPythonVersion($data['host_python_version']);
                         }
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
 
 
 
@@ -474,7 +486,9 @@ class LogBookUploaderController extends AbstractController
                     $tarLab = '';
                     try {
                         $tarLab = $suiteExecution->getPlatform() . '::' . $suiteExecution->getChip();
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
                     $suiteHost->setTargetLabel($tarLab);
                     $suiteHost->addTargetLabel($suiteExecution->getChip());
                     $suiteHost->addTargetLabel($suiteExecution->getPlatform());
@@ -482,6 +496,7 @@ class LogBookUploaderController extends AbstractController
                     $this->em->flush();
                 }
             } catch (\Throwable $ex) {
+                $fin_res['DEBUG'][] = $ex->getMessage();
                 $logger->critical('SUITE_HOST_UPDATE_FAILED:[' . $suiteHost->getName() . ':' . $suiteHost->getIp() . ']',
                     array(
                         'tarLab' => $tarLab,
@@ -498,18 +513,27 @@ class LogBookUploaderController extends AbstractController
             $data['request'] = $request->request->all();
             $data['query'] = $request->query->all();
             $data['trace'] = $e->getTraceAsString();
-            $data['message'] = $e->getMessage();
+            $data['DEBUG'][] = $e->getMessage();
             $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
             $response =  new JsonResponse($data);
             $response->setEncodingOptions(JSON_PRETTY_PRINT);
             return $response;
         }
 
-        $fin_res['SUITE_EXECUTION_ID'] = $suiteExecution->getId();
         $fin_res['FILTERS'] = array();
-        $filters = $filtersRepo->findAll();
-        foreach ($filters as $filter) {
-            $fin_res['FILTERS'][] = $filter->toJson();
+        if ($suiteExecution !== null && $suiteExecution->getId()) {
+            $fin_res['SUITE_EXECUTION_ID'] = $suiteExecution->getId();
+            $filters = $filtersRepo->findRelevantFiltersTo($suiteExecution);
+            /** @var TestFilter $filter */
+            foreach ($filters as $filter) {
+                try{
+                    $fin_res['FILTERS'][] = $filter->toJson();
+                } catch (\Throwable $ex) {
+                    $fin_res['DEBUG'][] = $ex->getMessage();
+                }
+            }
+        } else {
+            $fin_res['ERROR'] = 'Suite execution not created';
         }
 
         $response =  new JsonResponse($fin_res);

@@ -222,8 +222,11 @@ class TestFilter
         return $this;
     }
 
-    public function getExecutionMode(): ?bool
+    public function getExecutionMode(): string
     {
+        if ($this->executionMode === '') {
+            $this->executionMode = '*';
+        }
         return $this->executionMode;
     }
 

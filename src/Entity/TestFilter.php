@@ -55,27 +55,27 @@ class TestFilter
     /**
      * @ORM\Column(type="string", length=150)
      */
-    private $chip;
+    private $chip = '*';
 
     /**
      * @ORM\Column(type="string", length=150)
      */
-    private $platform;
+    private $platform = '*';
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="string", length=50)
      */
-    private $executionMode;
+    private $executionMode = '*';
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $branchName;
+    private $branchName = '*';
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $enabled;
+    private $enabled = true;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -100,14 +100,21 @@ class TestFilter
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $issueContact;
+    private $issueContact = '';
+
+    public function __construct()
+    {
+        $this->setEnabled(true);
+        $this->setCreatedAt(new \DateTime());
+        $this->setUpdatedAt(new \DateTime());
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -119,7 +126,7 @@ class TestFilter
         return $this;
     }
 
-    public function getSuiteUuid(): ?string
+    public function getSuiteUuid(): string
     {
         return $this->suiteUuid;
     }
@@ -131,19 +138,19 @@ class TestFilter
         return $this;
     }
 
-    public function getCluster(): ?string
+    public function getCluster(): string
     {
         return $this->cluster;
     }
 
     public function setCluster(string $cluster): self
     {
-        $this->cluster = $cluster;
+        $this->cluster = strtoupper($cluster);
 
         return $this;
     }
 
-    public function getTestList(): ?string
+    public function getTestList(): string
     {
         return $this->testList;
     }
@@ -155,14 +162,14 @@ class TestFilter
         return $this;
     }
 
-    public function getTestingLevel(): ?string
+    public function getTestingLevel(): string
     {
         return $this->testingLevel;
     }
 
     public function setTestingLevel(string $testingLevel): self
     {
-        $this->testingLevel = $testingLevel;
+        $this->testingLevel = strtoupper($testingLevel);
 
         return $this;
     }
@@ -220,7 +227,7 @@ class TestFilter
         return $this->executionMode;
     }
 
-    public function setExecutionMode(bool $executionMode): self
+    public function setExecutionMode(string $executionMode): self
     {
         $this->executionMode = $executionMode;
 

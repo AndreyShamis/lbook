@@ -26,9 +26,17 @@ class TestFilterRepository extends ServiceEntityRepository
         try {
             $qb = $this->createQueryBuilder('f')
                 ->where('f.suiteUuid IN (:uuids)')
-                ->andWhere('f.enabled = 1')
-                ->setMaxResults(100)
-                ->setParameter('uuids', [$suite->getUuid(), '']);
+
+                ->setParameter('uuids', [$suite->getUuid(), '*'])
+            ;
+
+                $qb->andWhere('f.testingLevel IN (:testing_level)')
+                    ->setParameter('testing_level', [strtoupper($suite->getTestingLevel()), '*'])
+                    ;
+
+            $qb->andWhere('f.enabled = 1')
+            ->setMaxResults(100)
+            ;
         } catch (\Exception $e) {
         }
         return $qb->getQuery()->execute();

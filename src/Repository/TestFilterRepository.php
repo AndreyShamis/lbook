@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\SuiteExecution;
 use App\Entity\TestFilter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -19,6 +20,19 @@ class TestFilterRepository extends ServiceEntityRepository
         parent::__construct($registry, TestFilter::class);
     }
 
+
+    public function findRelevantFiltersTo(SuiteExecution $suite)
+    {
+        try {
+            $qb = $this->createQueryBuilder('f')
+                ->where('f.suiteUuid IN (:uuids)')
+                ->andWhere('f.enabled = 1')
+                ->setMaxResults(100)
+                ->setParameter('uuids', [$suite->getUuid(), '']);
+        } catch (\Exception $e) {
+        }
+        return $qb->getQuery()->execute();
+    }
 //    /**
 //     * @return TestFilter[] Returns an array of TestFilter objects
 //     */

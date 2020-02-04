@@ -315,12 +315,16 @@ class TestFilter
     {
         return [
             'id' => $this->getId(),
+            'name' => $this->getName(),
             'branch' => $this->getBranchName(),
             'suiteUuid' => $this->getSuiteUuid(),
             'tests' => $this->getTestList(),
             'cluster' => $this->getCluster(),
             'platform' => $this->getPlatform(),
             'chip' => $this->getChip(),
+            'testing_level' => $this->getTestingLevel(),
+            'project_name' => $this->getProjectName(),  // for Sanity only
+            'execution_mode' => $this->getExecutionMode(),  // for regular/pack
             'owner' => $this->getUser()->getFullName(),
             'contact' => $this->getIssueContact(),
             'description' => $this->getDescription(),

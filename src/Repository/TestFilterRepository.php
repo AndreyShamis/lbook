@@ -21,7 +21,14 @@ class TestFilterRepository extends ServiceEntityRepository
     }
 
 
-    public function findRelevantFiltersTo(SuiteExecution $suite)
+    /**
+     * @param SuiteExecution $suite
+     * @param string|null $branch
+     * @param string|null $project
+     * @param array|null $clusters
+     * @return mixed
+     */
+    public function findRelevantFiltersTo(SuiteExecution $suite, string $branch=null, string $project=null, array $clusters=null)
     {
         try {
             $qb = $this->createQueryBuilder('f')
@@ -29,8 +36,22 @@ class TestFilterRepository extends ServiceEntityRepository
                 ->andWhere('f.testingLevel IN (:testing_level)')
                 ->setParameter('uuids', [$suite->getUuid(), '*'])
                 ->setParameter('testing_level', [strtoupper($suite->getTestingLevel()), '*'])
-                ->andWhere('f.enabled = 1')
-                ->setMaxResults(100)
+                ;
+            if ($branch !== null && mb_strlen($branch) > 2) {
+                $qb->andWhere('f.branchName IN (:branch)')
+                    ->setParameter('branch', [$branch, '*']);
+            }
+            if ($project !== null && mb_strlen($project) > 2) {
+                $qb->andWhere('f.projectName IN (:project)')
+                    ->setParameter('project', [$project, '*']);
+            }
+            if ($clusters !== null && count($clusters)) {
+                $clusters[] = '*';
+                $qb->andWhere('f.cluster IN (:cluster)')
+                    ->setParameter('cluster', $clusters);
+            }
+            $qb->andWhere('f.enabled = 1')
+                ->setMaxResults(200)
             ;
         } catch (\Exception $e) {
         }

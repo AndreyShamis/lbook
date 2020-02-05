@@ -404,6 +404,15 @@ class LogBookUploaderController extends AbstractController
             $data['components'] = array();
         }
 
+        if (!array_key_exists('GERRIT_PROJECT', $data)) {
+            $data['GERRIT_PROJECT'] = null;
+        }
+        if (!array_key_exists('GERRIT_BRANCH', $data)) {
+            $data['GERRIT_BRANCH'] = null;
+        }
+        if (!array_key_exists('clusters', $data)) {
+            $data['clusters'] = null;
+        }
         if (!array_key_exists('summary', $data)) {
             $data['summary'] = '';
         }
@@ -523,7 +532,7 @@ class LogBookUploaderController extends AbstractController
         $fin_res['FILTERS'] = array();
         if ($suiteExecution !== null && $suiteExecution->getId()) {
             $fin_res['SUITE_EXECUTION_ID'] = $suiteExecution->getId();
-            $filters = $filtersRepo->findRelevantFiltersTo($suiteExecution);
+            $filters = $filtersRepo->findRelevantFiltersTo($suiteExecution, $data['GERRIT_BRANCH'], $data['GERRIT_PROJECT'], $data['clusters']);
             /** @var TestFilter $filter */
             foreach ($filters as $filter) {
                 try{

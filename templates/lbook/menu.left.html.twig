@@ -90,6 +90,15 @@
     </li>
     {% endif %}
 
+    {% if 1== 2 and app.user.roles is defined and 'ROLE_FILTER_CREATOR' in app.user.roles %}
+        <li class="{% if route starts with 'filters' %}active{% endif %}">
+            <a href="{{asset(path('test_filter_index'))}}" >
+                <i class="menu-icon fa fa-cloud-upload"></i>
+                <span class="menu-text">Filters</span>
+            </a>
+            <b class="arrow"></b>
+        </li>
+    {% endif %}
     {#<li class="{% if route starts with 'log_' %}active{% endif %}">#}
         {#<a href="{{asset(path('log_index'))}}">#}
         {#<i class="menu-icon fa fa-file-o"></i>#}

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TestFilterRepository")
@@ -27,9 +28,9 @@ class TestFilter
     private $suiteUuid = '';
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default"=""})
+     * @ORM\Column(type="string", length=255, options={"default"="*"})
      */
-    private $cluster = '';
+    private $cluster = '*';
 
     /**
      * @ORM\Column(type="string", length=320, options={"default"=""})
@@ -48,27 +49,27 @@ class TestFilter
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=150, options={"default"=""})
+     * @ORM\Column(type="string", length=150, options={"default"="*"})
      */
-    private $projectName = '';
+    private $projectName = '*';
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=150, options={"default"="*"})
      */
     private $chip = '*';
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=150, options={"default"="*"})
      */
     private $platform = '*';
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, options={"default"="*"})
      */
     private $executionMode = '*';
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, options={"default"="*"})
      */
     private $branchName = '*';
 
@@ -98,6 +99,12 @@ class TestFilter
     private $updatedAt;
 
     /**
+     * @Assert\Length(
+     *      min = 10,
+     *      max = 255,
+     *      minMessage = "Please provide Person Of Contact",
+     *      maxMessage = "The POC is too long"
+     * )
      * @ORM\Column(type="string", length=255)
      */
     private $issueContact = '';

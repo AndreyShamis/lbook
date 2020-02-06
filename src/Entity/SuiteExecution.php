@@ -98,6 +98,11 @@ class SuiteExecution
     private $testingLevel = 'integration';
 
     /**
+     * @ORM\Column(name="package_mode", type="string", length=30, options={"default"=""})
+     */
+    private $packageMode = 'regular_mode';
+
+    /**
      * @ORM\Column(type="string", length=40)
      */
     private $platform;
@@ -253,6 +258,22 @@ class SuiteExecution
         $this->components = [];
         $this->testEnvironments = [];
     }
+
+    /**
+     * @return string
+     */
+    public function getPackageMode(): string
+    {
+        return $this->packageMode;
+    }
+
+    /**
+     * @param string $packageMode
+     */
+    public function setPackageMode(string $packageMode): void
+    {
+        $this->packageMode = $packageMode;
+    }  // or package_mode
 
     public function getRunTime(): int
     {

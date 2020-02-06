@@ -34,8 +34,12 @@ class TestFilterRepository extends ServiceEntityRepository
             $qb = $this->createQueryBuilder('f')
                 ->where('f.suiteUuid IN (:uuids)')
                 ->andWhere('f.testingLevel IN (:testing_level)')
+                ->andWhere('f.platform IN (:platform)')
+                ->andWhere('f.chip IN (:chip)')
                 ->setParameter('uuids', [$suite->getUuid(), '*'])
                 ->setParameter('testing_level', [strtoupper($suite->getTestingLevel()), '*'])
+                ->setParameter('platform', [$suite->getPlatform(), '*'])
+                ->setParameter('chip', [$suite->getChip(), '*'])
                 ;
             if ($branch !== null && mb_strlen($branch) > 2) {
                 $qb->andWhere('f.branchName IN (:branch)')

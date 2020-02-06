@@ -67,9 +67,11 @@ class TestFilterController extends AbstractController
      * @param Request $request
      * @param TestFilter $testFilter
      * @return Response
+     * @throws \Exception
      */
     public function edit(Request $request, TestFilter $testFilter): Response
     {
+        $this->denyAccessUnlessGranted('edit', $testFilter);
         $form = $this->createForm(TestFilterType::class, $testFilter);
         $form->handleRequest($request);
 
@@ -95,6 +97,7 @@ class TestFilterController extends AbstractController
      */
     public function delete(Request $request, TestFilter $testFilter): Response
     {
+        $this->denyAccessUnlessGranted('delete', $testFilter);
         if ($this->isCsrfTokenValid('delete'.$testFilter->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($testFilter);

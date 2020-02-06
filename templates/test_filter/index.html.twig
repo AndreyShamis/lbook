@@ -7,29 +7,43 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <th>Name</th>
-                <th>SuiteUuid</th>
+                <th>Suite UUID</th>
+                <th>Tests</th>
+                <th>TLevel</th>
                 <th>Cluster</th>
-                <th>TestList</th>
-                <th>TestingLevel</th>
-                <th>ProjectName</th>
+                <th>Branch</th>
+                <th>Project Name</th>
+                <th>Platform</th>
+                <th>Chip</th>
+                <th>EMode</th>
+                <th>Owner</th>
+                <th>Url</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for test_filter in test_filters %}
             <tr>
-                <td>{{ test_filter.id }}</td>
-                <td>{{ test_filter.name }}</td>
+                <td><a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">{{ test_filter.id }}</a></td>
+                <td><a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">{{ test_filter.name }}</a></td>
                 <td>{{ test_filter.suiteUuid }}</td>
-                <td>{{ test_filter.cluster|nl2br }}</td>
                 <td>{{ test_filter.testList|nl2br }}</td>
                 <td>{{ test_filter.testingLevel }}</td>
+                <td>{{ test_filter.cluster|nl2br }}</td>
+                <td>{{ test_filter.branchName }}</td>
                 <td>{{ test_filter.projectName }}</td>
+                <td>{{ test_filter.platform }}</td>
+                <td>{{ test_filter.chip }}</td>
+                <td>{{ test_filter.executionMode }}</td>
+                <td>{{ test_filter.user }}</td>
+                <td>{{ test_filter.defectUrl }}</td>
                 <td>
-                    <a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">show</a>
-                    <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
+                    {% if is_granted('edit', test_filter) %}
+                        <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
+                    {% endif %}
+
                 </td>
             </tr>
         {% else %}
@@ -39,6 +53,7 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('test_filter_new') }}">Create new</a>
+    {% if is_granted('create') %}
+        <a href="{{ path('test_filter_new') }}">Create new</a>
+    {% endif %}
 {% endblock %}

@@ -422,6 +422,10 @@ class LogBookUploaderController extends AbstractController
         if (!array_key_exists('test_environments', $data)) {
             $data['test_environments'] = array();
         }
+
+        if (!array_key_exists('package_mode', $data)) {
+            $data['package_mode'] = 'package_mode';
+        }
         $data['components'] = array_filter($data['components']);
         $data['test_environments'] = array_filter($data['test_environments']);
         try {

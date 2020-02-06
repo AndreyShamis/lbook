@@ -53,7 +53,7 @@
         {% endfor %}
         </tbody>
     </table>
-    {% if is_granted('create') %}
+    {% if app.user.roles is defined and 'ROLE_FILTER_CREATOR' in app.user.roles %}
         <a href="{{ path('test_filter_new') }}">Create new</a>
     {% endif %}
 {% endblock %}

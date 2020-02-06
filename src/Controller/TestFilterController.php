@@ -67,6 +67,7 @@ class TestFilterController extends AbstractController
      * @param Request $request
      * @param TestFilter $testFilter
      * @return Response
+     * @throws \Exception
      */
     public function edit(Request $request, TestFilter $testFilter): Response
     {
@@ -74,8 +75,8 @@ class TestFilterController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-//            $user = $this->get('security.token_storage')->getToken()->getUser();
-//            $testFilter->setUser($user);
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $testFilter->setUser($user);
             $testFilter->setUpdatedAt(new \DateTime());
             $this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('test_filter_edit', ['id' => $testFilter->getId()]);

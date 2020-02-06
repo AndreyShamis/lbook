@@ -3,10 +3,15 @@
 {% block content %}
 
     <h1>Edit TestFilter</h1>
-
+{#    {{ form_start(form, { 'attr': {'id': 'filterEditForm'} }) }}#}
+{#    {{ form_widget(form) }}#}
     {{ include('test_filter/_form.html.twig', {'button_label': 'Update'}) }}
 
     <a href="{{ path('test_filter_index') }}">back to list</a>
 
     {{ include('test_filter/_delete_form.html.twig') }}
+{#    {{ form_end(form) }}#}
+
+
+
 {% endblock %}

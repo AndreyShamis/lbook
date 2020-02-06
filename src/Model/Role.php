@@ -14,6 +14,7 @@ abstract class Role
     protected const ROLE_ADMIN = '1';
     protected const ROLE_MANAGER = '2';
     protected const ROLE_USER = '3';
+    protected const ROLE_FILTER_CREATOR = '4';
 
     /** @var array user friendly named Roles */
     protected static $roles = [
@@ -21,6 +22,7 @@ abstract class Role
         self::ROLE_ADMIN => 'ROLE_ADMIN',
         self::ROLE_MANAGER => 'ROLE_MANAGER',
         self::ROLE_USER  => 'ROLE_USER',
+        self::ROLE_FILTER_CREATOR  => 'ROLE_FILTER_CREATOR',
     ];
 
     /**
@@ -44,6 +46,7 @@ abstract class Role
             self::ROLE_SUPER_ADMIN,
             self::ROLE_ADMIN,
             self::ROLE_MANAGER,
+            self::ROLE_FILTER_CREATOR,
             self::ROLE_USER,
         ];
     }

@@ -2,24 +2,38 @@
 {% block title %}LBOOK TestFilter{% endblock %}
 {% block content %}
 
-    <h1>TestFilter index</h1>
+    <h4>Filters</h4>
 
-    <table class="table">
+    <table  class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+            id="filtersTable" data-pagination="true" data-search="true" data-toggle="table"
+            data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 50000, 'ALL']" data-sort-order="desc"
+            data-toolbar="#filtersTableShowToolbar"
+            data-show-refresh="true"
+            {#data-show-toggle="true"#}
+            data-show-footer="true"
+            data-show-export="true"
+            data-show-columns="true"
+            data-advanced-search="true"
+            data-id-table="advancedTable"
+    >
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Suite UUID</th>
+                <th data-sortable="true" >Name</th>
+                <th data-sortable="true" >Suite UUID</th>
                 <th>Tests</th>
-                <th>TLevel</th>
-                <th>Cluster</th>
-                <th>Branch</th>
-                <th>Project Name</th>
-                <th>Platform</th>
-                <th>Chip</th>
-                <th>EMode</th>
-                <th>Owner</th>
+                <th data-sortable="true"  title="Testing Level">TL</th>
+                <th data-sortable="true" >Cluster</th>
+                <th data-sortable="true" >Branch</th>
+                <th data-sortable="true" >Project Name</th>
+                <th data-sortable="true" >Platform</th>
+                <th data-sortable="true" >Chip</th>
+                <th data-sortable="true"  title="Package Mode">Mode</th>
+                <th data-sortable="true" >Owner</th>
+                <th>Contact</th>
                 <th>Url</th>
+                <th>Created</th>
+                <th>Updated</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -28,8 +42,14 @@
             <tr>
                 <td><a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">{{ test_filter.id }}</a></td>
                 <td><a href="{{ path('test_filter_show', {'id': test_filter.id}) }}">{{ test_filter.name }}</a></td>
-                <td>{{ test_filter.suiteUuid }}</td>
-                <td>{{ test_filter.testList|nl2br }}</td>
+                <td><span {% if test_filter.enabled %} style="background-color: #c8ecce !important;"{% endif %}>{{ test_filter.suiteUuid }}</span></td>
+                <td title="{{ testFilterTestToBr(test_filter.testList, "\n") | raw }}">
+                    {% if test_filter.testList | length < 50 %}
+                    {{ test_filter.testList | testFilterTestToBr | raw }}
+                        {% else %}
+                        <i>data too long</i>
+                    {% endif %}
+                </td>
                 <td>{{ test_filter.testingLevel }}</td>
                 <td>{{ test_filter.cluster|nl2br }}</td>
                 <td>{{ test_filter.branchName }}</td>
@@ -38,7 +58,10 @@
                 <td>{{ test_filter.chip }}</td>
                 <td>{{ test_filter.executionMode }}</td>
                 <td>{{ test_filter.user }}</td>
-                <td>{{ test_filter.defectUrl }}</td>
+                <td>{{ test_filter.issueContact }}</td>
+                <td><a href="{{ test_filter.defectUrl }}" target="_blank">{{ test_filter.defectUrl }}</a></td>
+                <td>{{ test_filter.createdAt | date('d/m/Y H:i:s') }}</td>
+                <td>{{ test_filter.updatedAt | date('d/m/Y H:i:s') }}</td>
                 <td>
                     {% if is_granted('edit', test_filter) %}
                         <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>

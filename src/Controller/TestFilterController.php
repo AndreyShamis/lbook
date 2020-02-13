@@ -33,8 +33,8 @@ class TestFilterController extends AbstractController
     public function new(Request $request): Response
     {
         $testFilter = new TestFilter();
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        $testFilter->setUser($user);
+//        $user = $this->get('security.token_storage')->getToken()->getUser();
+//        $testFilter->setUser($user);
         $form = $this->createForm(TestFilterType::class, $testFilter);
         $form->handleRequest($request);
 

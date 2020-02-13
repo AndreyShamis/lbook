@@ -2,7 +2,7 @@
 {% block title %}LBOOK TestFilter{% endblock %}
 {% block content %}
 
-    <h1>TestFilter</h1>
+    <h1>Test Filter</h1>
 
     <table class="table">
         <tbody>
@@ -15,28 +15,83 @@
                 <td>{{ test_filter.name }}</td>
             </tr>
             <tr>
-                <th>SuiteUuid</th>
-                <td>{{ test_filter.suiteUuid }}</td>
+                <th>Description</th>
+                <td>{{ test_filter.description }}</td>
             </tr>
             <tr>
-                <th>Cluster</th>
-                <td>{{ test_filter.cluster | nl2br }}</td>
+                <th>Defect URL</th>
+                <td>{{ test_filter.defectUrl }}</td>
             </tr>
             <tr>
-                <th>TestList</th>
-                <td>{{ test_filter.testList | nl2br }}</td>
+                <th>Owner</th>
+                <td>{{ test_filter.user }}</td>
             </tr>
             <tr>
-                <th>TestingLevel</th>
-                <td>{{ test_filter.testingLevel }}</td>
+                <th>Person of Contact</th>
+                <td>{{ test_filter.issueContact }}</td>
             </tr>
             <tr>
-                <th>ProjectName</th>
-                <td>{{ test_filter.projectName }}</td>
+                <th>Enabled</th>
+                <td>
+                    {% if test_filter.enabled %}
+                    On
+                    {% else %}
+                    Off
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Created</th>
+                <td>{{ test_filter.createdAt | date('d/m/Y H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Updated</th>
+                <td>{{ test_filter.updatedAt | date('d/m/Y H:i:s') }}</td>
             </tr>
         </tbody>
     </table>
 
+    <h3>Filter</h3>
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>Suite UUID</th>
+            <td><strong>{{ test_filter.suiteUuid }}</strong></td>
+        </tr>
+        <tr>
+            <th>Test/s</th>
+            <td>{{ test_filter.testList | testFilterTestToBr | raw }}</td>
+        </tr>
+        <tr>
+            <th>Testing Level (SANITY/INTEGRATION/NIGHTLY/WEEKLY/*)</th>
+            <td>{{ test_filter.testingLevel }}</td>
+        </tr>
+        <tr>
+            <th>Project Name</th>
+            <td>{{ test_filter.projectName }}</td>
+        </tr>
+        <tr>
+            <th>Cluster</th>
+            <td>{{ test_filter.cluster | nl2br }}</td>
+        </tr>
+        <tr>
+            <th>Platform</th>
+            <td>{{ test_filter.platform }}</td>
+        </tr>
+        <tr>
+            <th>Chip</th>
+            <td>{{ test_filter.chip }}</td>
+        </tr>
+        <tr>
+            <th>Package Mode (regular_mode/package_mode/*)</th>
+            <td>{{ test_filter.executionMode }}</td>
+        </tr>
+        <tr>
+            <th>Branch Name (GERRIT_BRANCH/MANIFEST_REVISION)</th>
+            <td>{{ test_filter.branchName }}</td>
+        </tr>
+        </tbody>
+    </table>
     <a href="{{ path('test_filter_index') }}">back to list</a>
     {% if is_granted('edit', test_filter) %}
         <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>

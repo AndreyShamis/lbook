@@ -164,7 +164,8 @@ class TestFilter
 
     public function setTestList(string $testList): self
     {
-        $this->testList = $testList;
+
+        $this->testList = $this->clean_tests_input($testList);
 
         return $this;
     }
@@ -347,5 +348,22 @@ class TestFilter
             'description' => $this->getDescription(),
             'defectUrl' => $this->getDefectUrl()
         ];
+    }
+
+    public function clean_tests_input(string $input=null): string
+    {
+        if ($input !== null) {
+            $input = str_replace(' ', ',', $input);
+            $input = str_replace('\n', ',', $input);
+            $input = str_replace(', ', ',', $input);
+            $input = str_replace(' , ', ',', $input);
+            $input = str_replace(' ,', ',', $input);
+            $input = str_replace(' ,', ',', $input);
+            $input = str_replace(' ', ',', $input);
+            $input = str_replace(' ', ',', $input);
+        } else {
+            $input = '';
+        }
+        return $input;
     }
 }

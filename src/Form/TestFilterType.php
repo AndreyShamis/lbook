@@ -15,23 +15,44 @@ class TestFilterType extends AbstractType
         $builder
             ->add('name', null, array(
                 'label' => 'Filter Name',
+                'help' => 'Provide name for new filter, you can add here suite name if relevant'
             ))
-            ->add('suiteUuid', null, array(
+            ->add('suiteUuid', null, [
                 'label' => 'Suite UUID',
-            ))
-            ->add('testList',TextareaType::class, array(
+                'help' => 'Suite UUID or "*" for ALL suites'
+            ])
+            ->add('testList',TextareaType::class, [
                 'attr' => array('class' => 'filterTestList', 'rows' => '10'),
                 'label' => 'Test/s',
-            ))
+            ])
             ->add('testingLevel')
-            ->add('projectName')
-            ->add('cluster')
-            ->add('chip', null, array('required' => false))
-            ->add('platform', null, array('required' => false))
-            ->add('executionMode', null, array('required' => false))
-            ->add('branchName', null, array('required' => false))
+            ->add('projectName', null, [
+                'label' => 'Project Name',
+                'help' => 'Gerrit project name like company/myproject'
+            ])
+            ->add('cluster', null, [
+                'label' => 'Cluster',
+                'help' => 'Cluster name, example: "cluster_lbk"'
+            ])
+            ->add('chip', null, [
+                'required' => false
+            ])
+            ->add('platform', null, [
+                'required' => false
+            ])
+            ->add('executionMode', null, [
+                'required' => false
+            ])
+            ->add('branchName', null, [
+                'required' => false,
+                'help' => '[Branch Name (GERRIT_BRANCH) in PRE and MANIFEST_REVISION]']
+            )
 //            ->add('enabled')
-            ->add('description')
+            ->add('description', null, [
+                'required' => true,
+                'label' => 'Description',
+                'help' => 'Provide description for this filter, this message printed with disabled message in suite'
+            ])
             ->add('defectUrl')
 //            ->add('createdAt')
 //            ->add('updatedAt')

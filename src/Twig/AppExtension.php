@@ -28,6 +28,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('executionTimeGenericShort', array($this, 'executionTimeGenericShort')),
             new TwigFilter('TimeToHour', array($this, 'TimeToHour')),
             new TwigFilter('getPercentage', array($this, 'getPercentage')),
+            new TwigFilter('testFilterTestToBr', array($this, 'testFilterTestToBr')),
             new TwigFilter('jiraKey', array($this, 'jiraKey')),
             new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
             new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
@@ -62,7 +63,22 @@ class AppExtension extends AbstractExtension
             new TwigFunction('parseDomain', array($this, 'parseDomain')),
             new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
             new TwigFunction('jiraKey', array($this, 'jiraKey')),
+            new TwigFunction('testFilterTestToBr', array($this, 'testFilterTestToBr')),
+
         ];
+    }
+
+    public function testFilterTestToBr(string $input=null, string $replace='<br/>'): string
+    {
+        if ($input !== null) {
+            $input = str_replace(' ', ',', $input);
+            $input = str_replace('\n', ',', $input);
+            $input = str_replace(', ', ',', $input);
+        } else {
+            $input = '';
+        }
+        $output = str_replace(',', $replace, $input);
+        return $output;
     }
 
     public function parseDomain(string $input= null): string

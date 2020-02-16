@@ -100,8 +100,6 @@ class TestFilterController extends AbstractController
     public function edit(Request $request, TestFilter $testFilter, FilterEditHistoryRepository $historyRepo): Response
     {
         $this->denyAccessUnlessGranted('edit', $testFilter);
-
-
         $form = $this->createForm(TestFilterType::class, $testFilter);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

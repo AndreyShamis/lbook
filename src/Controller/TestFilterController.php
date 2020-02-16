@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\LogBookUser;
 use App\Entity\TestFilter;
 use App\Form\TestFilterType;
+use App\Repository\FilterEditHistoryRepository;
 use App\Repository\TestFilterRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,22 +71,59 @@ class TestFilterController extends AbstractController
     }
 
     /**
+     * @Route("/showtest/{id}", name="show_test_test_filter_show", methods="GET")
+     * @param TestFilter $testFilter
+     * @return Response
+     */
+    public function showTest(TestFilter $testFilter): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $testFilter->setName('AAAAAA');
+        /** @var UnitOfWork $uow */
+        $uow = $em->getUnitOfWork();
+        $uow->computeChangeSets(); // do not compute changes if inside a listener
+        $changeset = $uow->getEntityChangeSet($testFilter);
+        return $this->render('test_filter/show_test_show.html.twig', [
+            'uow' => $uow,
+            'changeset' => print_r($changeset, false),
+        ]);
+    }
+
+    /**
      * @Route("/{id}/edit", name="test_filter_edit", methods="GET|POST")
      * @param Request $request
      * @param TestFilter $testFilter
+     * @param FilterEditHistoryRepository $historyRepo
      * @return Response
      * @throws \Exception
      */
-    public function edit(Request $request, TestFilter $testFilter): Response
+    public function edit(Request $request, TestFilter $testFilter, FilterEditHistoryRepository $historyRepo): Response
     {
         $this->denyAccessUnlessGranted('edit', $testFilter);
+
+
         $form = $this->createForm(TestFilterType::class, $testFilter);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
 //            $user = $this->get('security.token_storage')->getToken()->getUser();
 //            $testFilter->setUser($user);
             $testFilter->setUpdatedAt(new \DateTime());
+            try{
+                /** @var UnitOfWork $uow */
+                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                $uow->computeChangeSets(); // do not compute changes if inside a listener
+                $changeset = $uow->getEntityChangeSet($testFilter);
+                $user = $this->get('security.token_storage')->getToken()->getUser();
+                $f = [
+                    'user' => $user,
+                    'testFilter' => $testFilter,
+                    'diff' => json_encode($changeset, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT),
+                    'happenedAt' => new \DateTime(),
+                ];
+
+                $history = $historyRepo->findOneOrCreate($f);
+                $testFilter->addFilterEditHistory($history);
+            } catch (\Throwable $ex) {}
             $this->getDoctrine()->getManager()->flush();
             return $this->redirectToRoute('test_filter_edit', ['id' => $testFilter->getId()]);
         }

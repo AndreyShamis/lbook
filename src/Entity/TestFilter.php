@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -109,11 +111,17 @@ class TestFilter
      */
     private $issueContact = '';
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\FilterEditHistory", mappedBy="testFilter", orphanRemoval=true)
+     */
+    private $filterEditHistories;
+
     public function __construct()
     {
         $this->setEnabled(true);
         $this->setCreatedAt(new \DateTime());
         $this->setUpdatedAt(new \DateTime());
+        $this->filterEditHistories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -382,5 +390,36 @@ class TestFilter
             }
         } catch (\Throwable $ex) {}
         return implode(',', $ret_arr);
+    }
+
+    /**
+     * @return Collection|FilterEditHistory[]
+     */
+    public function getFilterEditHistories(): Collection
+    {
+        return $this->filterEditHistories;
+    }
+
+    public function addFilterEditHistory(FilterEditHistory $filterEditHistory): self
+    {
+        if (!$this->filterEditHistories->contains($filterEditHistory)) {
+            $this->filterEditHistories[] = $filterEditHistory;
+            $filterEditHistory->setTestFilter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilterEditHistory(FilterEditHistory $filterEditHistory): self
+    {
+        if ($this->filterEditHistories->contains($filterEditHistory)) {
+            $this->filterEditHistories->removeElement($filterEditHistory);
+            // set the owning side to null (unless already changed)
+            if ($filterEditHistory->getTestFilter() === $this) {
+                $filterEditHistory->setTestFilter(null);
+            }
+        }
+
+        return $this;
     }
 }

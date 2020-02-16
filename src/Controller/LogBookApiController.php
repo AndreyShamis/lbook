@@ -81,6 +81,28 @@ class LogBookApiController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/suite_uuid_info/{uuid}", name="api_suite_uuid_to_info", methods={"POST", "GET"})
+     * @param string|null $uuid
+     * @param SuiteExecutionRepository $suites
+     * @return Response
+     */
+    public function getExecutionSuiteNameByUuid(string $uuid, SuiteExecutionRepository $suites): JsonResponse
+    {
+        $name = $uuid;
+        $tests_c = 0;
+        $tests_ce = 0;
+        $suite = $suites->findOneBy(['uuid' => $uuid], ['id' => 'DESC']);
+        if ($suite !== null) {
+            $name = $suite->getName();
+            $tests_ce = $suite->getTestsCountEnabled();
+            $tests_c = $suite->getTestsCount();
+        }
+        $fin_res['name'] = $name;
+        $fin_res['tests_count_enabled'] = $tests_ce;
+        $fin_res['tests_count'] = $tests_c;
+        return new JsonResponse($fin_res);
+    }
 
     /**
      *

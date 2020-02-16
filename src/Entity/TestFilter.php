@@ -113,6 +113,7 @@ class TestFilter
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\FilterEditHistory", mappedBy="testFilter", orphanRemoval=true)
+     * @ORM\OrderBy({"id" = "DESC"})
      */
     private $filterEditHistories;
 

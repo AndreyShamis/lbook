@@ -92,6 +92,29 @@
         </tr>
         </tbody>
     </table>
+    <br/>
+    <h4>History</h4>
+    <i class="ace-icon fa fa-info-circle" title="History"></i>
+    <table class="records_list table table-striped table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Diff</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for history in test_filter.filterEditHistories | slice(0, 30) %}
+            <tr>
+                <td>{{history.id}}</td>
+                <td>{{history.happenedAt | date('Y-m-d H:i:s')}}</td>
+                <td>{{history.user}}</td>
+                <td><pre>{{history.diff}}</pre></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     <a href="{{ path('test_filter_index') }}">back to list</a>
     {% if is_granted('edit', test_filter) %}
         <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>

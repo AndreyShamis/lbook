@@ -112,12 +112,16 @@ class TestFilterController extends AbstractController
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
                 $uow->computeChangeSets(); // do not compute changes if inside a listener
-                $changeset = $uow->getEntityChangeSet($testFilter);
+                $diff_arr = $uow->getEntityChangeSet($testFilter);
                 $user = $this->get('security.token_storage')->getToken()->getUser();
+                try{
+                    unset($diff_arr['updatedAt']);
+                } catch (\Throwable $ex) {}
+                $diff_str = json_encode($diff_arr, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT);
                 $f = [
                     'user' => $user,
                     'testFilter' => $testFilter,
-                    'diff' => json_encode($changeset, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT),
+                    'diff' => $diff_str,
                     'happenedAt' => new \DateTime(),
                 ];
 

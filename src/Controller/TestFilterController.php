@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookUser;
 use App\Entity\TestFilter;
 use App\Form\TestFilterType;
 use App\Repository\TestFilterRepository;
@@ -34,7 +35,11 @@ class TestFilterController extends AbstractController
     {
         $testFilter = new TestFilter();
         $user = $this->get('security.token_storage')->getToken()->getUser();
-        $testFilter->setUser($user);
+        if ($user !== null && $user instanceof LogBookUser) {
+            $testFilter->setUser($user);
+        } else {
+            return $this->redirectToRoute('index');
+        }
         $form = $this->createForm(TestFilterType::class, $testFilter);
         $form->handleRequest($request);
 
@@ -100,7 +105,9 @@ class TestFilterController extends AbstractController
         $this->denyAccessUnlessGranted('delete', $testFilter);
         if ($this->isCsrfTokenValid('delete'.$testFilter->getId(), $request->request->get('_token'))) {
             $em = $this->getDoctrine()->getManager();
-            $em->remove($testFilter);
+            //$em->remove($testFilter);
+            $testFilter->setEnabled(false);
+            $em->persist($em);
             $em->flush();
         }
 

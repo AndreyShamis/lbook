@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\TestFilter;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -85,6 +86,19 @@ class TestFilterType extends AbstractType
 //            ->add('updatedAt')
             ->add('issueContact')
 //            ->add('user')
+        ;
+
+        $builder->get('testList')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($input) {
+                    // transform the array to a string
+                    return str_replace(',', "\n", $input);
+                },
+                function ($input) {
+                    // transform the string back to an array
+                    return str_replace("\n", ',', $input);
+                }
+            ))
         ;
     }
 

@@ -119,9 +119,9 @@
     {% if is_granted('edit', test_filter) %}
         <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
     {% endif %}
-    {% if is_granted('delete', test_filter) %}
-        {{ include('test_filter/_delete_form.html.twig') }}
-    {% endif %}
+{#    {% if is_granted('delete', test_filter) %}#}
+{#        {{ include('test_filter/_delete_form.html.twig') }}#}
+{#    {% endif %}#}
 
 
 {% endblock %}

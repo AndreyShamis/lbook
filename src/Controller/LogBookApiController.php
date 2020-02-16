@@ -87,7 +87,7 @@ class LogBookApiController extends AbstractController
      * @param SuiteExecutionRepository $suites
      * @return Response
      */
-    public function getExecutionSuiteNameByUuid(string $uuid, SuiteExecutionRepository $suites): JsonResponse
+    public function getExecutionSuiteNameByUuid(string $uuid='', SuiteExecutionRepository $suites=null): JsonResponse
     {
         $name = $uuid;
         $tests_c = 0;

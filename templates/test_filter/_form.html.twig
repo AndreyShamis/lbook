@@ -22,6 +22,25 @@
         {#        return false;#}
         {#    }#}
         {#});#}
+        $('#test_filter_suiteUuid').keyup(function() {
+            var uuid = $(this).val();
+            if (uuid !== ''){
+                var path = "{{ path('api_suite_uuid_to_info') }}/" + uuid;
+                $.ajax({
+                    url: path,
+                    type: 'GET',
+                    success: function(result) {
+                        if (result) {
+                            $('#test_filter_name_help').html('Suite name : <strong class="brown">' + result['name'] + '</strong> with ' + result['tests_count_enabled'] + ' tests enabled.');
+                        }
+                    },
+                    error: function(result) {
+                        console.log(result);
+                    },
+                });
+            }
 
+
+        });
     });
 </script>

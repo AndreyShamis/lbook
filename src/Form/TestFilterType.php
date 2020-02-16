@@ -62,6 +62,7 @@ class TestFilterType extends AbstractType
             ->add('executionMode', ChoiceType::class, [
                 'choices' => [
                     '*', 'regular_mode', 'package_mode'],
+                'label' => 'Package Mode',
                 'choice_label' => function(string $executionMode, $key, $value) {
                     return $executionMode;
                 },

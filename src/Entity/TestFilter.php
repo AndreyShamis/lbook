@@ -354,10 +354,10 @@ class TestFilter
     {
         if ($input !== null) {
             $input = str_replace(' ', ',', $input);
-            $input = str_replace('\n', ',', $input);
-            $input = str_replace(', ', ',', $input);
-            $input = str_replace(' , ', ',', $input);
-            $input = str_replace(' ,', ',', $input);
+            $input = str_replace("\n", ',', $input);
+            $input = str_replace(", ", ',', $input);
+            $input = str_replace(" , ", ',', $input);
+            $input = str_replace(" ,", ',', $input);
             $input = str_replace(' ,', ',', $input);
             $input = str_replace(' ', ',', $input);
             $input = str_replace(' ', ',', $input);

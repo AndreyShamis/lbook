@@ -352,18 +352,35 @@ class TestFilter
 
     public function clean_tests_input(string $input=null): string
     {
+        $ret_arr = [];
         if ($input !== null) {
-            $input = str_replace(' ', ',', $input);
-            $input = str_replace("\n", ',', $input);
-            $input = str_replace(", ", ',', $input);
-            $input = str_replace(" , ", ',', $input);
-            $input = str_replace(" ,", ',', $input);
-            $input = str_replace(' ,', ',', $input);
-            $input = str_replace(' ', ',', $input);
-            $input = str_replace(' ', ',', $input);
+            try{
+                $input = str_replace(' ', ',', $input);
+                $input = str_replace("\n", ',', $input);
+                $input = str_replace("\r", ',', $input);
+                $input = str_replace(", ", ',', $input);
+                $input = str_replace(" , ", ',', $input);
+                $input = str_replace(" ,", ',', $input);
+                $input = str_replace(' ,', ',', $input);
+                $input = str_replace(' ', ',', $input);
+                $input = str_replace(' ', ',', $input);
+                $input = str_replace(',,', ',', $input);
+                $input = str_replace(',,', ',', $input);
+            } catch (\Throwable $ex) {}
         } else {
             $input = '';
         }
-        return $input;
+        try{
+            $arr = explode(',', $input);
+            foreach ($arr as $value) {
+                try{
+                    $tmp_value = trim($value);
+                    if (!in_array($tmp_value, $ret_arr)){
+                        $ret_arr[] = $tmp_value;
+                    }
+                } catch (\Throwable $ex) {}
+            }
+        } catch (\Throwable $ex) {}
+        return implode(',', $ret_arr);
     }
 }

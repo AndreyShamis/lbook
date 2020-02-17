@@ -66,6 +66,9 @@
                     {% if is_granted('edit', test_filter) %}
                         <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">edit</a>
                     {% endif %}
+                    {% if is_granted('EDIT', test_filter) %}
+                        <a href="{{ path('test_filter_edit', {'id': test_filter.id}) }}">EDIT</a>
+                    {% endif %}
 
                 </td>
             </tr>

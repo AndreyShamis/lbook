@@ -94,7 +94,7 @@ class TestFilterVoter extends Voter
      */
     private function canEdit(TestFilter $testFilter, LogBookUser $user): bool
     {
-        return $user === $testFilter->getUser();
+        return $user === $testFilter->getUser() || in_array('ROLE_FILTER_CREATOR', $user->getRoles());
     }
 
     /**

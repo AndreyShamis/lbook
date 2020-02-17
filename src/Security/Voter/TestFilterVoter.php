@@ -39,8 +39,7 @@ class TestFilterVoter extends Voter
         if (!\in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE), true)) {
             return false;
         }
-        // only vote on Post objects inside this voter
-        if (!$subject instanceof LogBookUser) {
+        if (!$subject instanceof TestFilter) {
             return false;
         }
 
@@ -71,10 +70,6 @@ class TestFilterVoter extends Voter
         if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FILTER_CREATOR'))) {
             return true;
         }
-        if (in_array('ROLE_FILTER_CREATOR', $user->getRoles())){
-            return true;
-        }
-
         switch ($attribute) {
             case self::VIEW:
                 return true;
@@ -94,7 +89,7 @@ class TestFilterVoter extends Voter
      */
     private function canEdit(TestFilter $testFilter, LogBookUser $user): bool
     {
-        return $user === $testFilter->getUser() || in_array('ROLE_FILTER_CREATOR', $user->getRoles());
+        return $user === $testFilter->getUser();
     }
 
     /**

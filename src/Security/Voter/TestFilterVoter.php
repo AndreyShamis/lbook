@@ -71,6 +71,9 @@ class TestFilterVoter extends Voter
         if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FILTER_CREATOR'))) {
             return true;
         }
+        if (in_array('ROLE_FILTER_CREATOR', $user->getRoles())){
+            return true;
+        }
 
         switch ($attribute) {
             case self::VIEW:

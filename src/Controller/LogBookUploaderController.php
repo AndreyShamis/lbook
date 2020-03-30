@@ -1203,7 +1203,7 @@ class LogBookUploaderController extends AbstractController
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
                         // In case this log LEVEL ignored for DB insert
-                        if ($skip_counter > 15) {
+                        if ($skip_counter > 90) {
                             continue;
                         }
                         $skip_counter++;

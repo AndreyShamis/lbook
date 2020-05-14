@@ -482,6 +482,71 @@ class LogBookCycleController extends AbstractController
 //    }
 
     /**
+     * Tests exporter to JSON file
+     *
+     * @Route("export/{cycle}", name="test_exporter", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @return JsonResponse|Response
+     */
+    public function export(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null)
+    {
+        try {
+            if ($cycle === null) {
+                throw new \RuntimeException('');
+            }
+
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.cycle = :cycle')
+                ->andWhere('t.disabled = :disabled')
+                ->orderBy('t.executionOrder', 'ASC')
+                //->setParameter('cycle', $cycle->getId());
+                ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+
+            $paginator = $pagePaginator->paginate($qb, 0, 200000); //$this->show_tests_size);
+            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $iterator = $paginator->getIterator(); # ArrayIterator
+            $fin_res = array();
+            $iterator->rewind();
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookTest $test */
+                    $test = $iterator->current();
+                    if ($test !== null) {
+                        $ret_test = array();
+
+
+                        $ret_test['id'] = $test->getId();
+                        $ret_test['name'] = $test->getName();
+                        $ret_test['time_start'] = $test->getTimeStart();
+                        $ret_test['time_end'] = $test->getTimeEnd();
+                        $ret_test['duration'] = $test->getTimeRun();
+                        $ret_test['verdict'] = $test->getVerdict()->getName();
+                        $ret_test['order'] = $test->getExecutionOrder();
+                        $ret_test['chip'] = $test->getChip();
+                        $ret_test['platform'] = $test->getPlatform();
+                        $ret_test['test_type'] = $test->getTestType();
+                        $ret_test['metadata'] = $test->getMetaData(); //array();
+                        $suite = $test->getSuiteExecution();
+                        if ($suite !== null) {
+                            $ret_test['suite_id'] = $suite->getId();
+                            $ret_test['suite_name'] = $suite->getName();
+                            $ret_test['suite_uuid'] = $suite->getUuid();
+                        }
+                        $fin_res[] = $ret_test;
+                    }
+                    $iterator->next();
+                }
+            }
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            return $this->cycleNotFound($ex, $cycle);
+        }
+    }
+
+    /**
      * Finds and displays a cycle entity with paginator.
      *
      * @Route("/{id}/{maxSize<\d+>?1}/{page<\d+>?1}/use_json/{forJson}", name="cycle_show", methods={"GET"})

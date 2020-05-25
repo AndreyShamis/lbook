@@ -53,6 +53,7 @@ class LogBookApplicationTestCase extends WebTestCase
             self::runCommand('doctrine:schema:create -vvv');
             //self::runCommand('doctrine:fixtures:load --append --no-interaction');
             try{
+                self::ensureKernelShutdown();
                 self::$client = static::createClient();
                 self::$container = self::$client->getContainer();
                 parent::setUp();
@@ -65,6 +66,7 @@ class LogBookApplicationTestCase extends WebTestCase
 
         }
         if (self::$container === null) {
+            self::ensureKernelShutdown();
             self::$client = static::createClient();
             self::$container = self::$client->getContainer();
             parent::setUp();

@@ -42,9 +42,9 @@ class LogBookCycleController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
-    public function export(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null)
+    public function export(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null): JsonResponse
     {
         try {
             if ($cycle === null) {
@@ -62,6 +62,7 @@ class LogBookCycleController extends AbstractController
             $iterator = $paginator->getIterator(); # ArrayIterator
             $fin_res = array();
             $iterator->rewind();
+            $cycle_info = [];
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
@@ -73,12 +74,29 @@ class LogBookCycleController extends AbstractController
                         $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
                         $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
                         $ret_test['duration'] = $test->getTimeRun();
-                        $ret_test['verdict'] = $test->getVerdict()->getName();
+                        if ($test->getVerdict() !== null) {
+                            $ret_test['verdict'] = $test->getVerdict()->getName();
+                        } else {
+                            $ret_test['verdict'] = 'WIP';
+                        }
                         $ret_test['order'] = $test->getExecutionOrder();
                         $ret_test['chip'] = $test->getChip();
                         $ret_test['platform'] = $test->getPlatform();
                         $ret_test['test_type'] = $test->getTestType();
                         $ret_test['metadata'] = $test->getMetaData(); //array();
+                        try {
+                            unset($ret_test['metadata']['TEST_FILENAME']);
+                            unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
+                            unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
+                            unset($ret_test['metadata']['SUITE_SHOW']);
+                            unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
+                            unset($ret_test['metadata']['CHIP']);
+                            unset($ret_test['metadata']['PLATFORM']);
+                            unset($ret_test['metadata']['TIMEOUT']);
+                            $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                            unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                            $ret_test['metadata']['CONTROL'] = $control_path;
+                        } catch (\Throwable $ex) {}
                         $suite = $test->getSuiteExecution();
                         if ($suite !== null) {
                             $ret_test['suite_id'] = $suite->getId();
@@ -90,7 +108,31 @@ class LogBookCycleController extends AbstractController
                     $iterator->next();
                 }
             }
-            return new JsonResponse($fin_res);
+            if ($cycle !== null) {
+                $cycle_info['id'] = $cycle->getId();
+                $cycle_info['name'] = $cycle->getName();
+                $cycle_info['build_project'] = $cycle->getBuild()->getName();
+                $cycle_info['setup'] = $cycle->getSetup()->getName();
+                $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
+                $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
+                $cycle_info['period'] = $cycle->getPeriod();
+                $cycle_info['run_time'] = $cycle->getTestsTimeSum();
+                $cycle_info['tests_fail'] = $cycle->getTestsFail();
+                $cycle_info['tests_error'] = $cycle->getTestsError();
+                $cycle_info['tests_pass'] = $cycle->getTestsPass();
+                $cycle_info['tests_na'] = $cycle->getTestsNa();
+                $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
+                $cycle_info['tests_warning'] = $cycle->getTestsWarning();
+                $cycle_info['tests_total'] = $cycle->getTestsCount();
+                $cycle_info['metadata'] = $cycle->getMetaData();
+            }
+            $fin_resp = [
+                "tests" => $fin_res,
+                "cycle" => $cycle_info
+            ];
+            $response =  new JsonResponse($fin_resp);
+            // $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
         } catch (\Throwable $ex) {
             return $this->cycleNotFound($ex, $cycle);
         }

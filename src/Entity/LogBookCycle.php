@@ -186,56 +186,56 @@ class LogBookCycle
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_count", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_count", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsCount = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_disabled", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_disabled", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsDisabled = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_pass", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_pass", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsPass = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_fail", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_fail", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsFail = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_error", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_error", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsError = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_warning", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_warning", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsWarning = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_na", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_na", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsNa = 0;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="tests_unknown", type="smallint", options={"unsigned"=true, "default"="0"})
+     * @ORM\Column(name="tests_unknown", type="integer", options={"unsigned"=true, "default"="0"})
      */
     protected $testsUnknown = 0;
 

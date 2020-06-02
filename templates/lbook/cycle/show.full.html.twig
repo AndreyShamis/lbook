@@ -360,7 +360,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
     {% apply spaceless %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="cycleTestsTable" data-pagination="true" data-search="true" data-toggle="table"
-           data-page-size="2000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 50000, 'ALL']" data-sort-order="desc"
+           data-page-size="5000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 50000, 'ALL']" data-sort-order="desc"
            data-toolbar="#cycleShowToolbar"
            data-show-refresh="true"
            {#data-show-toggle="true"#}
@@ -403,6 +403,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             <th data-sortable="true" data-field="Platform" title="Platform">Platform</th>
             <th data-sortable="true" data-field="Chip" title="Chip">Chip</th>
             <th data-sortable="true" data-field="Components" title="Components" data-visible="false">Components</th>
+            <th data-sortable="true" data-field="Host" title="Host" data-visible="false">Host</th>
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}
@@ -476,23 +477,11 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         <span><a href="{{ path('suite_show', {'id': test.suiteExecution.id}) }}" target="_blank" title="[{{ test.suiteExecution.uuid }}] : PLATFORM::{{ test.suiteExecution.platform }}/{{ test.suiteExecution.chip }}">{{ test.suiteExecution.name }}</a></span>
                         {% endif %}
                     </td>
-                    <td>
-                        {% if test.suiteExecution.id is defined and test.suiteExecution.platform is defined %}
-                            <span style="color: {{ stringToColor(test.suiteExecution.platform) }} !important;">{{ test.suiteExecution.platform }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if test.suiteExecution.id is defined and test.suiteExecution.chip is defined %}
-                            <span style="color: {{ stringToColor(test.suiteExecution.chip) }} !important;">{{ test.suiteExecution.chip }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if test.suiteExecution.id is defined and test.suiteExecution.components is defined %}
-                        <span style="color: {{ stringToColor(test.suiteExecution.chip) }} !important;">{{ test.suiteExecution.components|join(', ') }}</span>
-                        {% endif %}
-                    </td>
+                    <td>{% if test.suiteExecution.id is defined and test.suiteExecution.platform is defined %}<span style="color: {{ stringToColor(test.suiteExecution.platform) }} !important;">{{ test.suiteExecution.platform }}</span>{% endif %}</td>
+                    <td>{% if test.suiteExecution.id is defined and test.suiteExecution.chip is defined %}<span style="color: {{ stringToColor(test.suiteExecution.chip) }} !important;">{{ test.suiteExecution.chip }}</span>{% endif %}</td>
+                    <td>{% if test.suiteExecution.id is defined and test.suiteExecution.components is defined %}{{ test.suiteExecution.components|join(', ') }}{% endif %}</td>
+                    <td>{% if test.suiteExecution.id is defined and test.suiteExecution.host is defined %}{{ test.suiteExecution.host.name }}{% endif %}</td>
                 {% endif %}
-
                 {% endif %}
                 {% if show_metadata == true %}
                     {% for key, item in additional_cols %}

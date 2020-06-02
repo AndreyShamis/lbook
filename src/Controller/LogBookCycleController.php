@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Serializer;
 class LogBookCycleController extends AbstractController
 {
     protected $index_size = 1000;
-    protected $show_tests_size = 2000;
+    protected $show_tests_size = 5000;
 
     /**
      * Tests exporter to JSON file

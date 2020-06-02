@@ -544,7 +544,7 @@ class LogBookCycleController extends AbstractController
     /**
      * @Route("/{id}", name="cycle_show_first", methods={"GET"})
      * @Route("/{id}/{maxSize}", name="cycle_show_size", methods={"GET"}, defaults={"maxSize"=""})
-     * @Route("/{id}/{maxSize}/{page}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=1000})
+     * @Route("/{id}/{maxSize}/{page}", name="cycle_show_page", methods={"GET"}, defaults={"page"=1, "maxSize"=5000})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycle $cycle

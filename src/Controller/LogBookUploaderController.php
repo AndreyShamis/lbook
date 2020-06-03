@@ -587,6 +587,8 @@ class LogBookUploaderController extends AbstractController
             if ($request->request->get('debug', false) === 'true') {
                 $obj->setDebug(true);
             }
+            $req_test_name = $request->request->get('test_name', '');
+            $req_test_result = $request->request->get('test_result', '');
             $cycle_name = $request->request->get('cycle', '');
             $setup_name = $request->request->get('setup', '');
             $cycle_token = $request->request->get('token', '');
@@ -656,13 +658,36 @@ class LogBookUploaderController extends AbstractController
 //                    /** TODO - cycle not found, setup not found, Create Setup and then Cycle */
 //                }
 //            }
+            $parseFileName = true;
+            $parseTestVerdict = true;
+            if ($req_test_result !== '') {
+                $parseTestVerdict = false;
+                if ($req_test_result === 'PASSED') {
+                    $req_test_result = 'PASS';
+                } else if ($req_test_result === 'FAILED') {
+                    $req_test_result = 'FAIL';
+                } else if ($req_test_result === 'ERROR') {
+                    $req_test_result = 'ERROR';
+                } else {
+                    $parseTestVerdict = true;
+                }
+            }
             if ($continue) {
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
                 $remote_ip = $request->getClientIp();
                 $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger, $remote_ip);
+                if ($req_test_name !== '') {
+                    $testName = $req_test_name;
+                    $parseFileName = false;
+                } else {
+                    $testName = $file->getClientOriginalName();
+                }
+                if (!$parseTestVerdict) {
+                    $testVerdictDefault = $this->parseVerdict($req_test_result);
 
-                $testName = $file->getClientOriginalName();
-                $testVerdictDefault = $this->parseVerdict('ERROR');
+                } else {
+                    $testVerdictDefault = $this->parseVerdict('ERROR');
+                }
 
                 // the argument is the path of the directory where the locks are created
 //                $store = new FlockStore(sys_get_temp_dir());
@@ -689,7 +714,7 @@ class LogBookUploaderController extends AbstractController
                     }
                 }
                 $this->em->flush();
-                $this->parseFile($new_file, $test, $obj, $logger);
+                $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
                 $this->em->refresh($cycle);
                 $this->calculateAndSetBuild($build_name, $cycle);
 
@@ -1091,11 +1116,13 @@ class LogBookUploaderController extends AbstractController
      * @param LogBookTest $test
      * @param LogBookUpload $uploadObj
      * @param LoggerInterface $logger
+     * @param bool $search_test_name
+     * @param bool $search_test_verdict
      * @return array
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger): array
+    protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger, bool $search_test_name = true, bool $search_test_verdict = true): array
     {
         $debug = 0;
         if ($debug) {
@@ -1171,31 +1198,34 @@ class LogBookUploaderController extends AbstractController
                 $logTime_str = $oneLine[1][0];
 
                 /** Test verdict section **/
-                if ($msgType_str === 'INFO') {
-                    preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
-                    if (\count($possibleVerdict) === 2) {
-                        $testVerdict = $this->parseVerdict($possibleVerdict[1]);
-                        if ($testVerdict !== null) {
-                            $verName = $testVerdict->getName();
-                            if ($verName === 'ABORT' || $verName === 'PASS' || $verName === 'ERROR' || $verName === 'FAIL' || $verName === 'TEST_NA') {
-                                $msgType_str = $testVerdict->getName();
+                if ($search_test_verdict) {
+                    if ($msgType_str === 'INFO') {
+                        preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
+                        if (\count($possibleVerdict) === 2) {
+                            $testVerdict = $this->parseVerdict($possibleVerdict[1]);
+                            if ($testVerdict !== null) {
+                                $verName = $testVerdict->getName();
+                                if ($verName === 'ABORT' || $verName === 'PASS' || $verName === 'ERROR' || $verName === 'FAIL' || $verName === 'TEST_NA') {
+                                    $msgType_str = $testVerdict->getName();
+                                }
                             }
-                        }
-                    } else {
-                        /** Will replace log line verdict if found something from next regex */
-                        preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/', $msg_str, $possibleMessageType);
-                        if (\count($possibleMessageType) === 3) {
-                            if ($possibleMessageType[1] === 'GOOD') {
-                                $possibleMessageType[1] = 'PASS';
-                            } elseif ($possibleMessageType[1] === 'WARN') {
-                                $possibleMessageType[1] = 'WARNING';
-                            } elseif  ($possibleMessageType[1] === 'NOTIC') {
-                                $possibleMessageType[1] = 'NOTICE';
+                        } else {
+                            /** Will replace log line verdict if found something from next regex */
+                            preg_match('/\s*(FAIL|GOOD|ERROR|TEST_NA|ABORT|WARN)\s*.*(.*timestamp\=.*localtime\=)/', $msg_str, $possibleMessageType);
+                            if (\count($possibleMessageType) === 3) {
+                                if ($possibleMessageType[1] === 'GOOD') {
+                                    $possibleMessageType[1] = 'PASS';
+                                } elseif ($possibleMessageType[1] === 'WARN') {
+                                    $possibleMessageType[1] = 'WARNING';
+                                } elseif  ($possibleMessageType[1] === 'NOTIC') {
+                                    $possibleMessageType[1] = 'NOTICE';
+                                }
+                                $msgType_str = $possibleMessageType[1];
                             }
-                            $msgType_str = $possibleMessageType[1];
                         }
                     }
                 }
+
 
                 /** **/
                 try {
@@ -1226,40 +1256,43 @@ class LogBookUploaderController extends AbstractController
                 $log = $this->logsRepo->create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
+
                 /** Test Name section */
-                if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
-                    $tmpName = null;
+                if ($search_test_name) {
+                    if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
+                        $tmpName = null;
 
-                    if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
-                        if ($tmpName !== null) {
-                            $controlFullFile = $tmpName;
-                            $tmpTestNameFlag_AutotestTestPrint = true;
-                        }
-                    } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
-                        if ($tmpName !== null) {
-                            $tmpTestNameFlag_TestPrint = true;
-                            if ($tmpName[1] !== null) {
-                                $controlVersion = $tmpName[1];
+                        if (!$tmpTestNameFlag_AutotestTestPrint && !$tmpTestNameFlag_ControlTestPrint) {
+                            $tmpName = $this->searchTestNameInSingleLogAutoTestPrint($log);
+                            if ($tmpName !== null) {
+                                $controlFullFile = $tmpName;
+                                $tmpTestNameFlag_AutotestTestPrint = true;
                             }
-                            $tmpName = $tmpName[0]; // set $tmpName to be first element in array(control file name)
-                            $controlFile = $tmpName;
-                        }
-                    } else if (!$tmpTestNameFlag_ControlTestPrint) {
-                        $tmpName = $this->searchTestNameInSingleLogControlPrint($log, true);
-                        if ($tmpName !== null) {
-                            $tmpTestNameFlag_ControlTestPrint = true;
-                            $testNameFound = true;
-                            if ($tmpName[1] !== null) {
-                                $testVersion = $tmpName[1];
+                        } else if (!$tmpTestNameFlag_TestPrint && !$tmpTestNameFlag_ControlTestPrint) {
+                            $tmpName = $this->searchTestNameInSingleLogTestPrint($log, true);
+                            if ($tmpName !== null) {
+                                $tmpTestNameFlag_TestPrint = true;
+                                if ($tmpName[1] !== null) {
+                                    $controlVersion = $tmpName[1];
+                                }
+                                $tmpName = $tmpName[0]; // set $tmpName to be first element in array(control file name)
+                                $controlFile = $tmpName;
                             }
-                            $tmpName = $tmpName[0]; // set $tmpName to be first element in array(test name)
+                        } else if (!$tmpTestNameFlag_ControlTestPrint) {
+                            $tmpName = $this->searchTestNameInSingleLogControlPrint($log, true);
+                            if ($tmpName !== null) {
+                                $tmpTestNameFlag_ControlTestPrint = true;
+                                $testNameFound = true;
+                                if ($tmpName[1] !== null) {
+                                    $testVersion = $tmpName[1];
+                                }
+                                $tmpName = $tmpName[0]; // set $tmpName to be first element in array(test name)
+                            }
                         }
-                    }
 
-                    if ($tmpName !== null) {
-                        $testName = $tmpName;
+                        if ($tmpName !== null) {
+                            $testName = $tmpName;
+                        }
                     }
                 }
 

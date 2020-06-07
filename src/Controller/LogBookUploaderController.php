@@ -638,6 +638,13 @@ class LogBookUploaderController extends AbstractController
                     $obj->addMessage('WARNING: cycle name changed, updating to new one ['. $cycle_name .']');
                     $cycle->setName($cycle_name);
                 }
+                $t_count = $cycle->getTestsCount();
+                if ($t_count >= 20000) {
+                    if (rand(1, 100) >= 97) {
+                        $cycle->setCalculateStatistic(false);
+                    }
+
+                }
             } else if ($cycle === null) {
                 $obj->addMessage('Cycle not created/found.');
                 $continue = false;

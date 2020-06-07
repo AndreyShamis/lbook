@@ -286,6 +286,8 @@ class LogBookCycle
      */
     private $suiteExecution;
 
+    protected $calculateStatistic = true;
+
     /**
      * LogBookCycle constructor.
      * @throws \Exception
@@ -306,6 +308,22 @@ class LogBookCycle
         /**  Other stuff */
         $this->tests = new ArrayCollection();
         $this->suiteExecution = new ArrayCollection();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCalculateStatistic(): bool
+    {
+        return $this->calculateStatistic;
+    }
+
+    /**
+     * @param bool $calculateStatistic
+     */
+    public function setCalculateStatistic(bool $calculateStatistic): void
+    {
+        $this->calculateStatistic = $calculateStatistic;
     }
 
     /**
@@ -457,30 +475,32 @@ class LogBookCycle
      */
     public function updateTimes(): void
     {
-        if ($this->isForDelete() === true) {
-            return;
-        }
-        $testsTimeSum = 0;
-        $min_time = new \DateTime('+100 years');
-        $max_time = new \DateTime('-100 years');
-        $tests = $this->getTests();
-        if (\is_object($tests) && $tests->count() > 0) {
-            foreach ($tests as $test) {
-                if ($test->isDisabled() !== true) {
-                    /** @var LogBookTest $test */
-                    $max_time = max($max_time, $test->getTimeEnd());
-                    $min_time = min($min_time, $test->getTimeStart());
-                    $testsTimeSum += $test->getTimeRun();
-                }
+        if ($this->isCalculateStatistic()) {
+            if ($this->isForDelete() === true) {
+                return;
             }
-        } else {
-            $min_time = new \DateTime();
-            $max_time = new \DateTime();
+            $testsTimeSum = 0;
+            $min_time = new \DateTime('+100 years');
+            $max_time = new \DateTime('-100 years');
+            $tests = $this->getTests();
+            if (\is_object($tests) && $tests->count() > 0) {
+                foreach ($tests as $test) {
+                    if ($test->isDisabled() !== true) {
+                        /** @var LogBookTest $test */
+                        $max_time = max($max_time, $test->getTimeEnd());
+                        $min_time = min($min_time, $test->getTimeStart());
+                        $testsTimeSum += $test->getTimeRun();
+                    }
+                }
+            } else {
+                $min_time = new \DateTime();
+                $max_time = new \DateTime();
+            }
+            $this->setTimeStart($min_time);
+            $this->setTimeEnd($max_time);
+            $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
+            $this->setTestsTimeSum($testsTimeSum);
         }
-        $this->setTimeStart($min_time);
-        $this->setTimeEnd($max_time);
-        $this->setPeriod($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
-        $this->setTestsTimeSum($testsTimeSum);
     }
 
     /**
@@ -492,61 +512,64 @@ class LogBookCycle
         if ($this->isForDelete() === true) {
             return;
         }
-        $passCount = $failCount = $errorCount = $warningCount = $unknown = $naCount = $disabledCount = $forDeleteCount = 0;
-        $tests = $this->getTests();
-        $allCount = $tests->count();
-        if (\is_object($tests) && $allCount > 0) {
-            foreach ($tests as $test) {
-                /** @var LogBookTest $test */
-                if ($test->isDisabled() !== true) {
-                    $verdictStr = $test->getVerdict();
-                    if (strcasecmp($verdictStr, 'PASS') === 0) {
-                        $passCount++;
-                    } else if (strcasecmp($verdictStr, 'FAIL') === 0) {
-                        $failCount++;
-                    } else if(strcasecmp($verdictStr, 'ERROR') === 0) {
-                        $errorCount++;
-                    } else if(strcasecmp($verdictStr, 'WARNING') === 0) {
-                        $warningCount++;
-                    } else if(strcasecmp($verdictStr, 'TEST_NA') === 0) {
-                        $naCount++;
-                    }
-                } else {
-                    if ($test->isForDelete() === false) {
-                        $disabledCount++;
+        if ($this->isCalculateStatistic()) {
+
+            $passCount = $failCount = $errorCount = $warningCount = $unknown = $naCount = $disabledCount = $forDeleteCount = 0;
+            $tests = $this->getTests();
+            $allCount = $tests->count();
+            if (\is_object($tests) && $allCount > 0) {
+                foreach ($tests as $test) {
+                    /** @var LogBookTest $test */
+                    if ($test->isDisabled() !== true) {
+                        $verdictStr = $test->getVerdict();
+                        if (strcasecmp($verdictStr, 'PASS') === 0) {
+                            $passCount++;
+                        } else if (strcasecmp($verdictStr, 'FAIL') === 0) {
+                            $failCount++;
+                        } else if (strcasecmp($verdictStr, 'ERROR') === 0) {
+                            $errorCount++;
+                        } else if (strcasecmp($verdictStr, 'WARNING') === 0) {
+                            $warningCount++;
+                        } else if (strcasecmp($verdictStr, 'TEST_NA') === 0) {
+                            $naCount++;
+                        }
                     } else {
-                        $forDeleteCount++;
+                        if ($test->isForDelete() === false) {
+                            $disabledCount++;
+                        } else {
+                            $forDeleteCount++;
+                        }
                     }
                 }
             }
-        }
 
-        $this->setTestsPass($passCount);
-        $this->setTestsFail($failCount);
-        $this->setTestsError($errorCount);
-        $this->setTestsWarning($warningCount);
-        $this->setTestsNa($naCount);
-        $allCount -= ($disabledCount + $forDeleteCount);
-        $unknown = $allCount - ($passCount + $failCount + $errorCount + $warningCount + $naCount);
-        $this->setTestsUnknown($unknown);
-        $this->setTestsCount($allCount);
-        $this->setTestsDisabled($disabledCount);
+            $this->setTestsPass($passCount);
+            $this->setTestsFail($failCount);
+            $this->setTestsError($errorCount);
+            $this->setTestsWarning($warningCount);
+            $this->setTestsNa($naCount);
+            $allCount -= ($disabledCount + $forDeleteCount);
+            $unknown = $allCount - ($passCount + $failCount + $errorCount + $warningCount + $naCount);
+            $this->setTestsUnknown($unknown);
+            $this->setTestsCount($allCount);
+            $this->setTestsDisabled($disabledCount);
 
-        if ($allCount > 0) {
-            $coefficient = 100 / $allCount;
-            $this->setPassRate($this->getTestsPass() * $coefficient);
-            $this->setFailRate($this->getTestsFail() * $coefficient);
-            $this->setErrorRate($this->getTestsError() * $coefficient);
-            $this->setWarningRate($this->getTestsWarning() * $coefficient);
-            $this->setNaRate($this->getTestsNa() * $coefficient);
-            $this->setUnknownRate($this->getTestsUnknown() * $coefficient);
-        } else {
-            $this->setPassRate(0);
-            $this->setFailRate(0);
-            $this->setErrorRate(0);
-            $this->setWarningRate(0);
-            $this->setNaRate(0);
-            $this->setUnknownRate(0);
+            if ($allCount > 0) {
+                $coefficient = 100 / $allCount;
+                $this->setPassRate($this->getTestsPass() * $coefficient);
+                $this->setFailRate($this->getTestsFail() * $coefficient);
+                $this->setErrorRate($this->getTestsError() * $coefficient);
+                $this->setWarningRate($this->getTestsWarning() * $coefficient);
+                $this->setNaRate($this->getTestsNa() * $coefficient);
+                $this->setUnknownRate($this->getTestsUnknown() * $coefficient);
+            } else {
+                $this->setPassRate(0);
+                $this->setFailRate(0);
+                $this->setErrorRate(0);
+                $this->setWarningRate(0);
+                $this->setNaRate(0);
+                $this->setUnknownRate(0);
+            }
         }
     }
 

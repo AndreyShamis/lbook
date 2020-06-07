@@ -675,9 +675,11 @@ class LogBookUploaderController extends AbstractController
             }
             if ($continue) {
                 $t_count = $cycle->getTestsCount();
-                if ($t_count >= 10000) {
-                    if (rand(1, 100) >= 97) {
-                        $cycle->setCalculateStatistic(false);
+                if (strpos($cycle->getName(), 'SST_') !== false) {
+                    if ($t_count >= 10000) {
+                        if (rand(1, 1000) >= 990) {
+                            $cycle->setCalculateStatistic(false);
+                        }
                     }
                 }
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);

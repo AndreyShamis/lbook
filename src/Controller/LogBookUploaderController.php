@@ -674,11 +674,13 @@ class LogBookUploaderController extends AbstractController
                 }
             }
             if ($continue) {
+                $calculateStat = true;
                 $t_count = $cycle->getTestsCount();
                 if (strpos($setup->getName(), 'SST_') !== false) {
                     if ($t_count >= 10000) {
                         if (rand(1, 1000) >= 990) {
                             $cycle->setCalculateStatistic(false);
+                            $calculateStat = false;
                         }
                     }
                 }
@@ -725,6 +727,9 @@ class LogBookUploaderController extends AbstractController
                 $this->em->flush();
                 $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
                 $this->em->refresh($cycle);
+                if (!$calculateStat) {
+                    $cycle->setCalculateStatistic(false);
+                }
                 $this->calculateAndSetBuild($build_name, $cycle);
 
                 $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
@@ -763,7 +768,7 @@ class LogBookUploaderController extends AbstractController
                     if ($current_cuite_execution !== null) {
                         if (strpos($setup->getName(), 'SST_') !== false) {
                             if (rand(1, 100) >= 93) {
-                                $current_cuite_execution->calculateStatistic();
+                                // $current_cuite_execution->calculateStatistic();
                                 $this->em->persist($current_cuite_execution);
                             }
                         } else {

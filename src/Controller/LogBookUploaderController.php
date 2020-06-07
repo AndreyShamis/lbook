@@ -638,13 +638,7 @@ class LogBookUploaderController extends AbstractController
                     $obj->addMessage('WARNING: cycle name changed, updating to new one ['. $cycle_name .']');
                     $cycle->setName($cycle_name);
                 }
-                $t_count = $cycle->getTestsCount();
-                if ($t_count >= 10000) {
-                    if (rand(1, 100) >= 97) {
-                        $cycle->setCalculateStatistic(false);
-                    }
 
-                }
             } else if ($cycle === null) {
                 $obj->addMessage('Cycle not created/found.');
                 $continue = false;
@@ -680,6 +674,12 @@ class LogBookUploaderController extends AbstractController
                 }
             }
             if ($continue) {
+                $t_count = $cycle->getTestsCount();
+                if ($t_count >= 10000) {
+                    if (rand(1, 100) >= 97) {
+                        $cycle->setCalculateStatistic(false);
+                    }
+                }
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
                 $remote_ip = $request->getClientIp();
                 $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger, $remote_ip);
@@ -759,8 +759,16 @@ class LogBookUploaderController extends AbstractController
                     /** @var SuiteExecution $current_cuite_execution */
                     $current_cuite_execution = $test->getSuiteExecution();
                     if ($current_cuite_execution !== null) {
-                        $current_cuite_execution->calculateStatistic();
-                        $this->em->persist($current_cuite_execution);
+                        if (strpos($cycle->getName(), 'SST_') !== false) {
+                            if (rand(1, 100) >= 93) {
+                                $current_cuite_execution->calculateStatistic();
+                                $this->em->persist($current_cuite_execution);
+                            }
+                        } else {
+                            $current_cuite_execution->calculateStatistic();
+                            $this->em->persist($current_cuite_execution);
+                        }
+
                     }
 
                 } catch (\Throwable $ex) {}

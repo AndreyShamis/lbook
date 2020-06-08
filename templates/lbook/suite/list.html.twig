@@ -20,7 +20,7 @@
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>
             <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>
             <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true">Executed</th>
-            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>
+{#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
             <th data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true">PR</th>
             <th data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true">P</th>
             <th data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true">F</th>
@@ -82,7 +82,7 @@
                 <td>{{ suiteExecution.testsCount }}</td>
                 <td>{{ suiteExecution.testsCountEnabled }}</td>
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
-                <td>{{ suiteExecution.tests | length}}</td>
+{#                <td>{{ suiteExecution.tests | length}}</td>#}
                 <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>

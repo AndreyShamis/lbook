@@ -781,8 +781,8 @@ class LogBookUploaderController extends AbstractController
                     $current_cuite_execution = $test->getSuiteExecution();
                     if ($current_cuite_execution !== null) {
                         if (strpos($setup->getName(), 'SST_') !== false) {
-                            if (rand(1, 100) >= 93) {
-                                // $current_cuite_execution->calculateStatistic();
+                            if (rand(1, 100) >= 90) {
+                                $current_cuite_execution->calculateStatistic();
                                 $this->em->persist($current_cuite_execution);
                             }
                         } else {

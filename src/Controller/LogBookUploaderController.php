@@ -662,7 +662,7 @@ class LogBookUploaderController extends AbstractController
             $parseFileName = true;
             $parseTestVerdict = true;
             if ($req_test_result !== '') {
-                $parseTestVerdict = false;
+                //$parseTestVerdict = false;
                 if ($req_test_result === 'PASSED') {
                     $req_test_result = 'PASS';
                 } else if ($req_test_result === 'FAILED') {

@@ -604,6 +604,17 @@ class LogBookUploaderController extends AbstractController
                 $setup = $this->bringSetup($obj, $setup_name);
             }
             $cycle = $this->cycleRepo->findByToken($cycle_token, $setup);
+            try {
+                if ($cycle !== null) {
+                    if ($cycle->getTestsCount() > 20000) {
+                        $cycle->setTokenExpiration(new \DateTime("-1 hour"));
+                        $logger->alert('Close cycle ID:' . $cycle->getId());
+                        $this->em->flush();
+                        $cycle = null;
+                    }
+                }
+            } catch (\Throwable $ex) {}
+
             if ($cycle === null) {
                 $obj->addMessage('INFO: -1- Cycle not found by token. Parsing Setup.');
                 /* create new cycle -> Need Parse Setup  */

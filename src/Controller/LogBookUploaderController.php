@@ -710,6 +710,9 @@ class LogBookUploaderController extends AbstractController
                 try {
                     $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
                     $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                    if (!$parseTestVerdict) {
+                        $test->setVerdict($testVerdictDefault);
+                    }
                 } catch (Exception $ex) {
                     $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }

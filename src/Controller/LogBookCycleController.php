@@ -155,11 +155,6 @@ class LogBookCycleController extends AbstractController
                     ->orWhere($qb->expr()->like('suite.uuid', $qb->expr()->literal('%' . $cycle_name . '%')));
 
 
-                if ($setups !== null && \count($setups) > 0) {
-                    $qb->andWhere('t.setup IN (:setups)')
-                        ->setParameter('setups', $setups);
-                    $enableSearch = True;
-                }
 
                 if ($leftDate === true && $rightDate === true) {
                     $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
@@ -175,6 +170,12 @@ class LogBookCycleController extends AbstractController
                         ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
                     $enableSearch = True;
                 }
+                if ($setups !== null && \count($setups) > 0) {
+                    $qb->andWhere('t.setup IN (:setups)')
+                        ->setParameter('setups', $setups);
+                    $enableSearch = True;
+                }
+
 
 //                $qb_suites = $suitesRepo->createQueryBuilder('s')
 //                    ->where('s.cycle > 0')

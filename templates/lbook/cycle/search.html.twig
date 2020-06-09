@@ -126,6 +126,11 @@
                 setDatePicker("#cycle_search_toDate");
             }
         );
+
+        function testsFormatter(value, row) {
+            var icon = parseInt(row.id) % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
+            return '<i class="glyphicon ' + icon + '"></i>' + value;
+        }
     </script>
 
 
@@ -176,11 +181,18 @@
                                 <th data-sortable="true" title="Rate">Rate</th>
                                 <th data-sortable="true"  data-switchable="true">Setup Name</th>
                                 <th data-sortable="true"  data-switchable="true">Cycle Name</th>
-                                <th data-sorter="htmlSorter" data-visible="false" data-sortable="true"  data-switchable="true">Cycle Build</th>
+                                <th data-sorter="htmlSorter" data-visible="true" data-sortable="true"  data-switchable="true">Cycle Build</th>
+
+                                <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
+                                <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
+                                <th data-field="Build" data-sortable="true" data-sorter="htmlSorter" title="Build Name" data-footer-formatter="totalFormatter">Build</th>
+                                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>
+                                <th data-field="User" data-sortable="true" title="User Name">User</th>
+
                                 <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
                                 <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
-                                <th data-sortable="true">Period</th>
-                                <th data-sortable="true">Total Time</th>
+                                <th data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
+                                <th data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
 {#                                <th data-sortable="true">Verdict</th>#}
@@ -199,6 +211,12 @@
                                             <a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id  }) }}">{{ cycle.build }}</a>
                                         {% endif %}
                                     </td>
+                                    <td>{{ cycle.testsCount }}</td>
+                                    <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                                    <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
+                                    <td>{{ cycle.passRate }}:{{ cycle.errorRate }}:{{ cycle.failRate }}:{{ cycle.warningRate }}:{{ cycle.unknownRate }}:{{ cycle.naRate }}</td>
+                                    <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
+
                                     <td>{% if cycle.timeStart %}<span data-title="{{ cycle.timeStart|date('ymdHis') }}">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{% if cycle.timeEnd %}<span data-title="{{ cycle.timeEnd|date('ymdHis') }}">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>

@@ -8,7 +8,9 @@ use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
 use App\Form\CycleSearchType;
 use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\SuiteExecutionRepository;
 use Doctrine\ORM\Query;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormInterface;
@@ -43,7 +45,7 @@ class LogBookCycleController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function search(Request $request, LogBookCycleRepository $cycleRepo): Response
+    public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): Response
     {
         set_time_limit(30);
         $tests = $new_tests = array();
@@ -52,10 +54,10 @@ class LogBookCycleController extends AbstractController
         $leftDate = $rightDate = false;
         $startDate = $endDate = null;
         $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
-        $test = new CycleSearch();
+        $cycles = new CycleSearch();
 
 
-        $form = $this->createForm(CycleSearchType::class, $test, array());
+        $form = $this->createForm(CycleSearchType::class, $cycles, array());
         try {
             $form->handleRequest($request);
         } catch (\Exception $ex) {}
@@ -72,7 +74,7 @@ class LogBookCycleController extends AbstractController
                 if ($limit > 10000) {
                     $limit = 500;
                 }
-                $test->setLimit($limit);
+                $cycles->setLimit($limit);
             }
             $cycle_name = $post['name'];
             $fromDate = $post['fromDate'];
@@ -80,7 +82,7 @@ class LogBookCycleController extends AbstractController
 
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.disabled = 0')
-                ->setMaxResults($test->getLimit());
+                ->setMaxResults($cycles->getLimit());
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
                 $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
                 if ($startDate !== false) {
@@ -93,20 +95,6 @@ class LogBookCycleController extends AbstractController
                     $rightDate = true;
                 }
             }
-            if ($leftDate === true && $rightDate === true) {
-                $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
-                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
-                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
-                $enableSearch = True;
-            } else if ($leftDate === true) {
-                $qb->andWhere('t.timeStart >= :fromDate')
-                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
-                $enableSearch = True;
-            } else if ($rightDate === true) {
-                $qb->andWhere('t.timeEnd <= :endDate')
-                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
-                $enableSearch = True;
-            }
 
 //            if ($verdict !== null && \count($verdict) > 0) {
 //                $qb->andWhere('t.verdict IN (:verdict)')
@@ -114,11 +102,7 @@ class LogBookCycleController extends AbstractController
 //                $enableSearch = True;
 //            }
 
-            if ($setups !== null && \count($setups) > 0) {
-                $qb->andWhere('t.setup IN (:setups)')
-                    ->setParameter('setups', $setups);
-                $enableSearch = True;
-            }
+
 
             if ($cycle_name !== null && \mb_strlen($cycle_name) >= 2) {
 //                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
@@ -150,11 +134,65 @@ class LogBookCycleController extends AbstractController
                 $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
                 $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
 
+                $qb->leftJoin('t.targetUploader', 'targetUploader')->orWhere($qb->expr()->like('targetUploader.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.controller', 'controller')->orWhere($qb->expr()->like('controller.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.dut', 'dut')->orWhere($qb->expr()->like('dut.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.user', 'userExecutor')
+                    ->orWhere($qb->expr()->like('userExecutor.username', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('userExecutor.email', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('userExecutor.fullName', $qb->expr()->literal('%' . $cycle_name . '%')));
+
+                $qb->leftJoin('t.suiteExecution', 'suite')
+                    ->orWhere($qb->expr()->like('suite.summary', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.description', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.productVersion', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.jobName', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.buildTag', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.testingLevel', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.platform', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.chip', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.name', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.uuid', $qb->expr()->literal('%' . $cycle_name . '%')));
+
+
+                if ($setups !== null && \count($setups) > 0) {
+                    $qb->andWhere('t.setup IN (:setups)')
+                        ->setParameter('setups', $setups);
+                    $enableSearch = True;
+                }
+
+                if ($leftDate === true && $rightDate === true) {
+                    $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
+                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                        ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                } else if ($leftDate === true) {
+                    $qb->andWhere('t.timeStart >= :fromDate')
+                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                } else if ($rightDate === true) {
+                    $qb->andWhere('t.timeEnd <= :endDate')
+                        ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                }
+
+//                $qb_suites = $suitesRepo->createQueryBuilder('s')
+//                    ->where('s.cycle > 0')
+//                    ->andWhere('s.summary LIKE :sum')
+//                    ->leftJoin('s.cycle', 'cycle')
+//                    ->setMaxResults($cycles->getLimit());
+//                $qb_suites->setParameter('sum', '%' . $cycle_name . '%');
+//                $queryCycle = $qb_suites->getQuery()->getResult();
+//                print(count($queryCycle));
+//                $qb->orWhere('t.suiteExecution in  (:suites)')
+//                ->setParameter('suites', $queryCycle);
+
                 $qb->setParameter('search_str', $cycle_name_match);
                 $cycle_name_search = $cycle_name;
                 if (mb_strlen($cycle_name_search) > 3) {
                     $cycle_name_search = '%' . $cycle_name_search . '%';
                 }
+
                 $qb->setParameter('cycle_name', $cycle_name_search);
                 $qb->setParameter('cycle_id', (int)$cycle_name);
 

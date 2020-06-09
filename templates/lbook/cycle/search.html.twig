@@ -177,11 +177,11 @@
                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
                             <thead>
                             <tr>
+                                <th data-sortable="false" title="S">-</th>
                                 <th data-sortable="true" title="Test ID">ID</th>
                                 <th data-sortable="true" title="Rate">Rate</th>
                                 <th data-sortable="true"  data-switchable="true">Setup Name</th>
                                 <th data-sortable="true"  data-switchable="true">Cycle Name</th>
-                                <th data-sorter="htmlSorter" data-visible="true" data-sortable="true"  data-switchable="true">Cycle Build</th>
 
                                 <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
                                 <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
@@ -202,18 +202,15 @@
                             <tbody class="searchable">
                             {% for cycle in iterator | slice(0, 10000) %}
                                 <tr class="{% if cycle.isDisabled == 1 %}test-disabled{% endif %}">
+                                    <td></td>
                                     <td>{{ cycle.id }}</td>
                                     <td>{{ cycle.rate }}</td>
                                     <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup.name }}</a></td>
                                     <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
-                                    <td>
-                                        {% if cycle.build.id is defined %}
-                                            <a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id  }) }}">{{ cycle.build }}</a>
-                                        {% endif %}
-                                    </td>
+
                                     <td>{{ cycle.testsCount }}</td>
                                     <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                                    <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
+                                    <td>{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id  }) }}">{{ cycle.build }}</a>{% endif %}</td>
                                     <td>{{ cycle.passRate }}:{{ cycle.errorRate }}:{{ cycle.failRate }}:{{ cycle.warningRate }}:{{ cycle.unknownRate }}:{{ cycle.naRate }}</td>
                                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
 

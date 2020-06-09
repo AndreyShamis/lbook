@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Controller\LogBookUploaderController;
+use Doctrine\ORM\Mapping\Index;
 use App\Utils\RandomString;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,7 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookCycleRepository")
- * @ORM\Table(name="lbook_cycles")
+ * @ORM\Table(name="lbook_cycles", indexes={
+ *     @Index(name="full_text", columns={"name", "meta_data"}, flags={"fulltext"})}))
  * @ORM\HasLifecycleCallbacks()
  */
 class LogBookCycle

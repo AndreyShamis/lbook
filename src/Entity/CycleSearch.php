@@ -1,19 +1,19 @@
 <?php
 /**
  * User: Andrey Shamis
- * Date: 02.07.18
- * Time: 12:30
+ * Date: 09.05.20
+ * Time: 12:43
  */
 
 namespace App\Entity;
 
 
-class TestSearch
+class CycleSearch
 {
 
     protected $name = '';
 
-    protected $verdicts;
+//    protected $verdicts;
 
     protected $setups;
 
@@ -22,7 +22,7 @@ class TestSearch
     protected $toDate;
 
     /** @var int  */
-    protected $limit = 1000;
+    protected $limit = 200;
 
     public static $MAX_LIMIT = 10000;
 

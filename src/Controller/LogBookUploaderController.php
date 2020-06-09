@@ -685,9 +685,13 @@ class LogBookUploaderController extends AbstractController
                 }
             }
             if ($continue) {
+                $is_sst = false;
+                if (strpos($setup->getName(), 'SST_') !== false) {
+                    $is_sst = true;
+                }
                 $calculateStat = true;
                 $t_count = $cycle->getTestsCount();
-                if (strpos($setup->getName(), 'SST_') !== false) {
+                if ($is_sst) {
                     if ($t_count >= 10000) {
                         if (rand(1, 1000) >= 990) {
                             $cycle->setCalculateStatistic(false);
@@ -780,7 +784,7 @@ class LogBookUploaderController extends AbstractController
                     /** @var SuiteExecution $current_cuite_execution */
                     $current_cuite_execution = $test->getSuiteExecution();
                     if ($current_cuite_execution !== null) {
-                        if (strpos($setup->getName(), 'SST_') !== false) {
+                        if ($is_sst) {
                             if (rand(1, 100) >= 90) {
                                 $current_cuite_execution->calculateStatistic();
                                 $this->em->persist($current_cuite_execution);

@@ -1,0 +1,230 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    <h1>Cycle search</h1>
+    {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
+    <table>
+        <tr>
+            <td>{{ form_label(form.name, 'Cycle Name/ID/substring', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.name) }}</td>
+            <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Cycle Name'}}) }}</td>
+        </tr>
+{#        <tr>#}
+{#            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>#}
+{#            <td>{{ form_errors(form.verdict) }}</td>#}
+{#            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>#}
+{#        </tr>#}
+        <tr>
+            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.setup) }}</td>
+            <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.fromDate) }}
+                /
+                {{ form_label(form.toDate) }}
+            </td>
+            <td>
+                {{ form_errors(form.fromDate) }}
+                {{ form_errors(form.toDate) }}
+            </td>
+            <td>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
+                            {{ form_widget(form.fromDate) }}
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
+                            {{ form_widget(form.toDate) }}
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.limit) }}</td>
+            <td>{{ form_errors(form.limit) }}</td>
+            <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
+        </tr>
+        {#<tr>#}
+        {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
+        {#<td>{{ form_errors(form.cycle) }}</td>#}
+        {#<td>#}
+        {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
+        {#</td>#}
+        {#</tr>#}
+    </table>
+
+    {{ form_widget(form) }}
+    <input type="submit" value="Search" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>Found {{ tests_count }} tests</li>
+        <li>{{ sql }}</li>
+    </ul>
+
+    <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+        function setDatePicker(obj){
+            $(obj).datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: false,
+                // isRTL:true,
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                beforeShow: function() {
+                    //change button colors
+                    var datepicker = $(this).datepicker( "widget" );
+                    setTimeout(function(){
+                        var buttons = datepicker.find('.ui-datepicker-buttonpane')
+                            .find('button');
+                        buttons.eq(0).addClass('btn btn-xs');
+                        buttons.eq(1).addClass('btn btn-xs btn-success');
+                        buttons.wrapInner('<span class="bigger-110" />');
+                    }, 10);
+                }
+
+            });
+        }
+
+        function setMultiSelect(){
+            $('.multiselect').multiselect({
+                enableFiltering: true,
+                enableHTML: true,
+                buttonClass: 'btn btn-white btn-primary',
+                templates: {
+                    button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> &nbsp;<b class="fa fa-caret-down"></b></button>',
+                    ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+                    filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+                    filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default btn-white btn-grey multiselect-clear-filter" type="button"><i class="fa fa-times-circle red2"></i></button></span>',
+                    li: '<li><a tabindex="0"><label></label></a></li>',
+                    divider: '<li class="multiselect-item divider"></li>',
+                    liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+                }
+            });
+        }
+
+        $(document).ready(
+            function($){
+                setMultiSelect();
+                setDatePicker("#cycle_search_fromDate");
+                setDatePicker("#cycle_search_toDate");
+            }
+        );
+    </script>
+
+
+
+    <div class="row">
+        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
+            <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
+                <div class="widget-header">
+                    <h4 class="widget-title lighter">Search results</h4>
+
+                    <div class="widget-toolbar no-border">
+                        {#<a href="#" data-action="settings">#}
+                        {#<i class="ace-icon fa fa-cog"></i>#}
+                        {#</a>#}
+
+                        <a href="#" data-action="reload">
+                            <i class="ace-icon fa fa-refresh"></i>
+                        </a>
+
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+
+                        <a href="#" data-action="close">
+                            <i class="ace-icon fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main padding-6 no-padding-left no-padding-right">
+                        {% include "lbook/search.html.twig" %}
+                        {% set pagePath = "cycle_search" %}
+                        {#{% include "lbook/paginator.html.twig" %}#}
+                        <div id="testsList">
+                        </div>
+                        <table class="records_list table table-condensed table-hover" data-classes="table table-no-bordered" id="testsListTable"
+                               data-pagination="true" data-search="true" data-toggle="table"
+                               data-show-columns="true"
+                                {#data-detail-view="true"#}
+                                {#data-detail-formatter="detailFormatter"#}
+                                {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+                               data-toolbar="#testsList"
+                               data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
+                            <thead>
+                            <tr>
+                                <th data-sortable="true" title="Test ID">ID</th>
+                                <th data-sortable="true" title="Rate">Rate</th>
+                                <th data-sortable="true"  data-switchable="true">Setup Name</th>
+                                <th data-sortable="true"  data-switchable="true">Cycle Name</th>
+                                <th data-sorter="htmlSorter" data-visible="false" data-sortable="true"  data-switchable="true">Cycle Build</th>
+                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
+                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+                                <th data-sortable="true">Period</th>
+                                <th data-sortable="true">Total Time</th>
+                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
+                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
+{#                                <th data-sortable="true">Verdict</th>#}
+                                {#<th data-sortable="false" data-visible="false">Actions</th>#}
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+                            {% for cycle in iterator | slice(0, 10000) %}
+                                <tr class="{% if cycle.isDisabled == 1 %}test-disabled{% endif %}">
+                                    <td>{{ cycle.id }}</td>
+                                    <td>{{ cycle.rate }}</td>
+                                    <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup.name }}</a></td>
+                                    <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
+                                    <td>
+                                        {% if cycle.build.id is defined %}
+                                            <a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id  }) }}">{{ cycle.build }}</a>
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if cycle.timeStart %}<span data-title="{{ cycle.timeStart|date('ymdHis') }}">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                                    <td>{% if cycle.timeEnd %}<span data-title="{{ cycle.timeEnd|date('ymdHis') }}">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                                    <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
+                                    <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
+                                    {#<td>{{ test.dutUpTimeStart }}</td>#}
+                                    {#<td>{{ test.dutUpTimeEnd }}</td>#}
+{#                                    <td>#}
+{#                                        <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>#}
+{#                                    </td>#}
+                                    {#<td>#}
+                                    {#{% if is_granted('edit', test.cycle.setup) %}#}
+                                    {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
+                                    {#{% endif %}#}
+                                    {#</td>#}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+{% endblock %}

@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\CycleSearch;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
+use App\Form\CycleSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use Doctrine\ORM\Query;
@@ -34,6 +36,162 @@ class LogBookCycleController extends AbstractController
 {
     protected $index_size = 1000;
     protected $show_tests_size = 5000;
+
+    /**
+     * @Route("/search", name="cycle_search", methods={"GET|POST"})
+     * @param Request $request
+     * @param LogBookCycleRepository $cycleRepo
+     * @return Response
+     */
+    public function search(Request $request, LogBookCycleRepository $cycleRepo): Response
+    {
+        set_time_limit(30);
+        $tests = $new_tests = array();
+        $setups = null;
+        $sql = '';
+        $leftDate = $rightDate = false;
+        $startDate = $endDate = null;
+        $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
+        $test = new CycleSearch();
+
+
+        $form = $this->createForm(CycleSearchType::class, $test, array());
+        try {
+            $form->handleRequest($request);
+        } catch (\Exception $ex) {}
+
+        $addOrder = true;
+        $post = $request->request->get('cycle_search');
+        if ($post !== null) {
+            $enableSearch = false;
+            if (array_key_exists('setup', $post)) {
+                $setups = $post['setup']['name'];
+            }
+            if (array_key_exists('limit', $post)) {
+                $limit = (int)$post['limit'];
+                if ($limit > 10000) {
+                    $limit = 500;
+                }
+                $test->setLimit($limit);
+            }
+            $cycle_name = $post['name'];
+            $fromDate = $post['fromDate'];
+            $toDate = $post['toDate'];
+
+            $qb = $cycleRepo->createQueryBuilder('t')
+                ->where('t.disabled = 0')
+                ->setMaxResults($test->getLimit());
+            if ($fromDate !== null && mb_strlen($fromDate) > 7) {
+                $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
+                if ($startDate !== false) {
+                    $leftDate = true;
+                }
+            }
+            if ($toDate !== null && mb_strlen($toDate) > 7) {
+                $endDate = \DateTime::createFromFormat('m/d/Y H:i', $toDate . '23:59');
+                if ($endDate !== false) {
+                    $rightDate = true;
+                }
+            }
+            if ($leftDate === true && $rightDate === true) {
+                $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($leftDate === true) {
+                $qb->andWhere('t.timeStart >= :fromDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($rightDate === true) {
+                $qb->andWhere('t.timeEnd <= :endDate')
+                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            }
+
+//            if ($verdict !== null && \count($verdict) > 0) {
+//                $qb->andWhere('t.verdict IN (:verdict)')
+//                    ->setParameter('verdict', $verdict);
+//                $enableSearch = True;
+//            }
+
+            if ($setups !== null && \count($setups) > 0) {
+                $qb->andWhere('t.setup IN (:setups)')
+                    ->setParameter('setups', $setups);
+                $enableSearch = True;
+            }
+
+            if ($cycle_name !== null && \mb_strlen($cycle_name) >= 2) {
+//                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
+//                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
+//                        ->setParameter('test_id', (int)$test_name);
+//                } else {
+//                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata');
+//                }
+//                $qb->setParameter('test_name', '%'.$test_name.'%')
+//                    ->setParameter('metadata', $test_name.'%');
+//                if (\is_numeric($cycle_name) && (string)(int)$cycle_name === $cycle_name) {
+//                    $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) != 0 OR t.id = :cycle_id OR t.name LIKE :cycle_name')
+//                        ->addSelect('MATCH_AGAINST(t.name, t.meta_data, :search_str) as rate')
+//                        ->orderBy('rate', 'DESC')
+//                        ->addOrderBy('t.id', 'DESC')
+//                        ->setParameter('cycle_id', (int)$cycle_name);
+//                } else {
+                $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) > 1 OR t.name LIKE :cycle_name OR t.id = :cycle_id OR t.uploadToken LIKE :cycle_name');
+                $qb->addSelect('MATCH_AGAINST(t.name, t.meta_data, :search_str) as rate');
+                $qb->orderBy('rate', 'DESC');
+                $qb->addOrderBy('t.id', 'DESC');
+                $addOrder = false;
+//                }
+                $cycle_name = trim($cycle_name);
+                $cycle_name_match = str_replace('%', ' ', $cycle_name);
+                $cycle_name_match = str_replace('?', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace('  ', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace(' ', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
+
+                $qb->setParameter('search_str', $cycle_name_match);
+                $cycle_name_search = $cycle_name;
+                if (mb_strlen($cycle_name_search) > 3) {
+                    $cycle_name_search = '%' . $cycle_name_search . '%';
+                }
+                $qb->setParameter('cycle_name', $cycle_name_search);
+                $qb->setParameter('cycle_id', (int)$cycle_name);
+
+                $enableSearch = True;
+            }
+            $enableSearch = True;
+            if ($addOrder) {
+                $qb->orderBy('t.id', 'DESC');
+            }
+
+            if ($enableSearch) {
+                $query = $qb->getQuery();
+                $sql = $query->getSQL();
+                $tests = $query->execute();
+                if (!$addOrder){
+                    foreach($tests as $tmp_test) {
+                        /** @var LogBookCycle $t_t */
+                        $t_t = $tmp_test[0];
+                        $t_t->setRate($tmp_test['rate']);
+                        $new_tests[] = $t_t;
+                    }
+                } else {
+                    $new_tests = $tests;
+                }
+            }
+        }
+
+        return $this->render('lbook/cycle/search.html.twig', array(
+            //'tests' => $tests,
+            'iterator' => $new_tests,
+            'tests_count' => \count($new_tests),
+            'sql' => $sql,
+//            'thisPage'      => 1,
+//            'maxPages'      => 1,
+            'form' => $form->createView(),
+        ));
+    }
 
     /**
      * Tests exporter to JSON file

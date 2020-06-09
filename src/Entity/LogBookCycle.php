@@ -288,6 +288,16 @@ class LogBookCycle
 
     protected $calculateStatistic = true;
 
+
+    protected $rate = 0;
+
+    public function setRate(float $r) {
+        $this->rate = round($r, 2);
+    }
+
+    public function getRate(): float{
+        return $this->rate;
+    }
     /**
      * LogBookCycle constructor.
      * @throws \Exception

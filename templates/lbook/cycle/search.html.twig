@@ -1,6 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 
 {% block content %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
     <h1>Cycle search</h1>
     {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
     <table>
@@ -134,7 +135,11 @@
     </script>
 
 
-
+<style>
+    .selected {
+        background: lightBlue
+    }
+</style>
     <div class="row">
         <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
             <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
@@ -165,23 +170,32 @@
                         {% include "lbook/search.html.twig" %}
                         {% set pagePath = "cycle_search" %}
                         {#{% include "lbook/paginator.html.twig" %}#}
-                        <div id="testsList">
-                        </div>
-                        <table class="records_list table table-condensed table-hover" data-classes="table table-no-bordered" id="testsListTable"
-                               data-pagination="true" data-search="true" data-toggle="table"
+                        <div id="cyclesList"></div>
+                                                                <input type="button" name="exportButton" value="Export" id="exportButton" class="exportButton" />
+
+                        <table
+                               id="table"
+                               data-toggle="table"
                                data-show-columns="true"
+                               data-multiple-select-row="true"
+                               data-click-to-select="true"
+                               data-pagination="true"
+                               data-search="true"
+
+                               class="datatable records_list table table-condensed table-hover" data-classes="table table-no-bordered"
+                               data-pagination="true"
                                 {#data-detail-view="true"#}
                                 {#data-detail-formatter="detailFormatter"#}
                                 {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
-                               data-toolbar="#testsList"
+                               data-toolbar="#cyclesList"
                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
                             <thead>
                             <tr>
-                                <th data-sortable="false" title="S">-</th>
-                                <th data-sortable="true" title="Test ID">ID</th>
-                                <th data-sortable="true" title="Rate">Rate</th>
-                                <th data-sortable="true"  data-switchable="true">Setup Name</th>
-                                <th data-sortable="true"  data-switchable="true">Cycle Name</th>
+                                <th data-field="state" data-sortable="false" title="S" data-checkbox="true"></th>
+                                <th data-field="id"  data-sortable="true" title="Test ID">ID</th>
+                                <th data-field="rate" data-sortable="true" title="Rate">Rate</th>
+                                <th data-field="Setupname" data-sortable="true"  data-switchable="true">Setup Name</th>
+                                <th data-field="CycleName" data-sortable="true"  data-switchable="true">Cycle Name</th>
 
                                 <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
                                 <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
@@ -189,10 +203,10 @@
                                 <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>
                                 <th data-field="User" data-sortable="true" title="User Name">User</th>
 
-                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
-                                <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
-                                <th data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
-                                <th data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>
+                                <th data-field="timeStart" data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
+                                <th data-field="timeEnd" data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+                                <th data-field="Period" data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
+                                <th data-field="TotalTime" data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
 {#                                <th data-sortable="true">Verdict</th>#}
@@ -202,7 +216,9 @@
                             <tbody class="searchable">
                             {% for cycle in iterator | slice(0, 10000) %}
                                 <tr class="{% if cycle.isDisabled == 1 %}test-disabled{% endif %}">
-                                    <td></td>
+                                    <td>
+{#                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}" />#}
+                                    </td>
                                     <td>{{ cycle.id }}</td>
                                     <td>{{ cycle.rate }}</td>
                                     <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup.name }}</a></td>
@@ -241,5 +257,28 @@
     </div>
 
 
-
+    <script type="text/javascript">
+    $(document).ready(
+        function($) {
+            var arr;
+            $('#exportButton').click(function(){
+                arr = $('.bs-checkbox').find('[type="checkbox"]:checked').map(function(){
+                    return $(this).closest('tr').find('td:nth-child(2)').text();
+                }).get();
+                if (arr.length >= 200) {
+                    alert('Max 200 cycles at once')
+                    return false;
+                }
+                var url = '{{ path('test_multi_exporter') }}';
+                url = url + '?cycles=' + arr.join(';')
+                try {
+                    console.log(url);
+                } catch (e) {
+                    
+                }
+                window.location = url;
+            });
+        }
+    );
+</script>
 {% endblock %}

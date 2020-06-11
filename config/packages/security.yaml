@@ -82,7 +82,7 @@ security:
         - { path: ^/suites/cycle/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/filters/(.*), role: ROLE_FILTER_CREATOR }
         - { path: ^/filters, role: ROLE_FILTER_CREATOR }
-        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
+        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }
 #        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

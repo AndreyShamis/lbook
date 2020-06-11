@@ -12,6 +12,7 @@ use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\ORM\Query;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -313,6 +314,7 @@ class LogBookCycleController extends AbstractController
      */
     public function multiExport(Request $request, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo): Response
     {
+        //http://10.185.176.14:8080/cycle/multiexport?cycles=271340;271333;271328;271327;271326;271325;271324;271323;271299;271259;271255;271252;271250;271229;271197;271185;271178;271174;271169;
         $cycles = [];
         $ret_cycle_arr = [];
         $cycle_ids = [];
@@ -347,25 +349,45 @@ class LogBookCycleController extends AbstractController
 //            echo "<pre>";
 //            print_r($data);
 //            exit();
+        $time_start = microtime(true);
+
         $qb = $testRepo->createQueryBuilder('t')
             ->where('t.cycle IN (:cycles)')
             ->andWhere('t.disabled = :disabled')
-            ->orderBy('t.executionOrder', 'ASC')
+            ->innerJoin('t.verdict', 'verdict')
+//            ->orderBy('t.executionOrder', 'ASC')
             //->setParameter('cycle', $cycle->getId());
+            ->setMaxResults(300000)
             ->setParameters(['cycles'=> $cycles, 'disabled' => 0]);
-        $paginator = $pagePaginator->paginate($qb, 1, 400000); //$this->show_tests_size);
-        $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
+//        $paginator = $pagePaginator->paginate($qb, 1, 300000);
+//        $totalPosts = $paginator->count();
+//        $iterator = $paginator->getIterator(); # ArrayIterator
         $fin_res = array();
-        $iterator->rewind();
+//        $iterator->rewind();
+        $q = $qb->getQuery();
+        $tests = $q->execute(null, Query::HYDRATE_ARRAY);
+        //if ($totalPosts > 0) {
+        $time_end = microtime(true);
+        $query_time = ($time_end - $time_start);
+        $time_start = microtime(true);
 
-        if ($totalPosts > 0) {
-            for ($x = 0; $x < $totalPosts; $x++) {
+        //for ($x = 0; $x < $totalPosts; $x++) {
+            foreach ($tests as $test) {
                 /** @var LogBookTest $test */
-                $test = $iterator->current();
+//                $test = $iterator->current();
                 if ($test !== null) {
                     $cycle_info = [];
-                    $ret_test = [];
+                    echo "<pre>";
+                    print_r($test);
+                    $ret_test = $test;
+                    $ret_test['timeStart'] = $ret_test['timeStart']->getTimestamp();
+                    $ret_test['timeEnd'] = $ret_test['timeEnd']->getTimestamp();
+                    print_r($ret_test);
+
+                    exit();
+                    $ret_test = $test;
+                    $ret_test['timeStart'] =$ret_test['timeStart']->getTimestamp();
+                    $ret_test['timeEnd'] = $ret_test['timeEnd']->getTimestamp();
                     $ret_test['id'] = $test->getId();
                     $ret_test['name'] = $test->getName();
                     $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
@@ -426,22 +448,36 @@ class LogBookCycleController extends AbstractController
                     }
                     $fin_res[] = $ret_test;
                 }
-                $iterator->next();
+//                $iterator->next();
             }
-        }
+
+
+        //}
 
         $fin_resp = [
             "tests" => $fin_res,
             "cycles" => $ret_cycle_arr,
             "cycle_ids" => $cycle_ids,
             "cycle_count" => count($cycle_ids),
+            "query_time" => $query_time,
             "cycle_requested" => count($cycles_requested)
         ];
 
         $response = $this->json([]);
 
-        $response->setJson(json_encode($fin_resp));
-        $response->headers->set('Content-Type', 'text/json');
+        //json_encode($fin_resp);
+        $time_end = microtime(true);
+        $loop_time = ($time_end - $time_start);
+        $time_start = microtime(true);
+
+        $resp = json_encode($fin_resp);
+        $time_end = microtime(true);
+        $json_encode = ($time_end - $time_start);
+
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $response->setJson(json_encode(['hi' => $loop_time, 'json_encode' => $json_encode, 'query_time' => $query_time]));
+        $response->headers->set('Content-Type', 'application/json');
+        //$response->setEncodingOptions(JSON_PRETTY_PRINT);
         $file_name = '';
         try {
             $file_name = implode('_', $cycle_ids);
@@ -458,7 +494,16 @@ class LogBookCycleController extends AbstractController
         } catch (\Throwable $ex) {
 
         }
+
+        $response->headers->set('Accept-Encoding', 'gzip,compress');
         $response->headers->set('Content-Disposition', 'attachment; filename="'. $file_name . '"');
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+
+        try {
+            $fs->dumpFile('/var/www/lbook/downloads/' . $file_name, $resp);
+        }
+        catch(IOException $e) {
+        }
         return $response;
 }
 

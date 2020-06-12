@@ -363,6 +363,7 @@ class LogBookCycleController extends AbstractController
             $time_end = microtime(true);
             $query_time = ($time_end - $time_start);
             $time_start = microtime(true);
+            $em = $this->getDoctrine()->getManager();
             foreach ($tests as $test)  {
                 /** @var LogBookTest $test */
                 try {
@@ -433,6 +434,7 @@ class LogBookCycleController extends AbstractController
 
                         }
                         $fin_res[] = $ret_test;
+                        $em->detach($test);
                     }
                 } catch (\Throwable $ex) {
                     $logger->critical('MULTI_EXPORT_LOOP:' . $ex->getMessage(), [$ex->getLine(), $ex->getTraceAsString()]);

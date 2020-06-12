@@ -965,7 +965,7 @@ class LogBookUploaderController extends AbstractController
             'logFile' => $file->getFilename(),
             'logFileSize' => $file->getSize(),
             'verdict' => $verdict,
-            'executionOrder' => $this->getTestNewExecutionOrder($cycle),
+            'executionOrder' => $cycle->getTestsCount() + 1,
         );
     }
 
@@ -1011,7 +1011,7 @@ class LogBookUploaderController extends AbstractController
                     /** sleep for 0.2-0.5 second */
                     usleep(\random_int(200000, 500000));
                 } catch (Exception $e) {}
-                $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
             } catch (ORMException $ex) {
                 $logger->alert('[insertTest] Found ORMException', array('ex' => $ex));
                 $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
@@ -1019,7 +1019,7 @@ class LogBookUploaderController extends AbstractController
                     /** sleep for 0.2-0.5 second */
                     usleep(\random_int(200000, 500000));
                 } catch (Exception $e) {}
-                $test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
                 $this->testsRepo  = $this->em->getRepository('App:LogBookTest');
             }
 

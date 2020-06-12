@@ -29,7 +29,7 @@ class LogBookSelectableSetupType extends AbstractType
      */
     protected function getAllSetups(): array
     {
-        return $this->entityManager->getRepository(LogBookSetup::class)->findAll();
+        return $this->entityManager->getRepository(LogBookSetup::class)->findBy([], ['updatedAt' => 'DESC']);
     }
     /**
      * @param FormBuilderInterface $builder

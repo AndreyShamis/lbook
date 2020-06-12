@@ -12,6 +12,7 @@ use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\ORM\Query;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -305,13 +306,12 @@ class LogBookCycleController extends AbstractController
      *
      * @Route("/multiexport", name="test_multi_exporter", methods={"GET", "POST"})
      * @param Request $request
-     * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @param LogBookTestRepository $testRepo
      * @return Response
      * @throws \Exception
      */
-    public function multiExport(Request $request, PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo): Response
+    public function multiExport(Request $request, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo): Response
     {
         $cycles = [];
         $ret_cycle_arr = [];
@@ -322,7 +322,6 @@ class LogBookCycleController extends AbstractController
         $data['query'] = $request->query->all();
         if (count($data['query']) > 0) {
             // WORK with GET method
-//                echo "WORK with GET method<br/>";
             $work_arr = $data['query'];
             $work_str_of_lists = $work_arr['cycles'];
             $work_list = explode(';', $work_str_of_lists);
@@ -331,118 +330,117 @@ class LogBookCycleController extends AbstractController
                 foreach ($work_list as $cycle_id_str) {
                     $cycle_id = intval($cycle_id_str);
                     if ($cycle_id > 0) {
-//                            print_r($cycle_id_str);
                         $cycle = $cycleRepo->findOneBy(['id' => $cycle_id]);
                         if ($cycle !== null) {
                             $cycles[] = $cycle;
                             $cycle_ids[] = $cycle_id;
                         }
-//                            echo "<br/>";
                     }
 
                 }
             }
 //                print_r($cycles);
         }
-//            echo "<pre>";
-//            print_r($data);
-//            exit();
+
+        $time_start = microtime(true);
+
         $qb = $testRepo->createQueryBuilder('t')
             ->where('t.cycle IN (:cycles)')
             ->andWhere('t.disabled = :disabled')
-            ->orderBy('t.executionOrder', 'ASC')
-            //->setParameter('cycle', $cycle->getId());
+//            ->orderBy('t.executionOrder', 'ASC')
+            ->setMaxResults(400000)
             ->setParameters(['cycles'=> $cycles, 'disabled' => 0]);
-        $paginator = $pagePaginator->paginate($qb, 1, 400000); //$this->show_tests_size);
-        $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
         $fin_res = array();
-        $iterator->rewind();
-
-        if ($totalPosts > 0) {
-            for ($x = 0; $x < $totalPosts; $x++) {
-                /** @var LogBookTest $test */
-                $test = $iterator->current();
-                if ($test !== null) {
-                    $cycle_info = [];
-                    $ret_test = [];
-                    $ret_test['id'] = $test->getId();
-                    $ret_test['name'] = $test->getName();
-                    $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
-                    $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
-                    $ret_test['duration'] = $test->getTimeRun();
-                    if ($test->getVerdict() !== null) {
-                        $ret_test['verdict'] = $test->getVerdict()->getName();
-                    } else {
-                        $ret_test['verdict'] = 'WIP';
-                    }
-                    $ret_test['order'] = $test->getExecutionOrder();
-                    $ret_test['chip'] = $test->getChip();
-                    $ret_test['platform'] = $test->getPlatform();
-                    $ret_test['test_type'] = $test->getTestType();
-                    $ret_test['metadata'] = $test->getMetaData(); //array();
-                    try {
-                        unset($ret_test['metadata']['TEST_FILENAME']);
-                        unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
-                        unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
-                        unset($ret_test['metadata']['SUITE_SHOW']);
-                        unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
-                        unset($ret_test['metadata']['CHIP']);
-                        unset($ret_test['metadata']['PLATFORM']);
-                        unset($ret_test['metadata']['TIMEOUT']);
-                        $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                        unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                        $ret_test['metadata']['CONTROL'] = $control_path;
-                    } catch (\Throwable $ex) {}
-                    $suite = $test->getSuiteExecution();
-                    if ($suite !== null) {
-                        $ret_test['suite_id'] = $suite->getId();
-                        $ret_test['suite_name'] = $suite->getName();
-                        $ret_test['suite_uuid'] = $suite->getUuid();
-                    }
-
-                    $cycle = $test->getCycle();
-                    if ( $cycle !== null ) {
-                        if (!array_key_exists($cycle->getId(), $ret_cycle_arr)) {
-                            $cycle_info['id'] = $cycle->getId();
-                            $cycle_info['name'] = $cycle->getName();
-                            $cycle_info['build_project'] = $cycle->getBuild()->getName();
-                            $cycle_info['setup'] = $cycle->getSetup()->getName();
-                            $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
-                            $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
-                            $cycle_info['period'] = $cycle->getPeriod();
-                            $cycle_info['run_time'] = $cycle->getTestsTimeSum();
-                            $cycle_info['tests_fail'] = $cycle->getTestsFail();
-                            $cycle_info['tests_error'] = $cycle->getTestsError();
-                            $cycle_info['tests_pass'] = $cycle->getTestsPass();
-                            $cycle_info['tests_na'] = $cycle->getTestsNa();
-                            $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
-                            $cycle_info['tests_warning'] = $cycle->getTestsWarning();
-                            $cycle_info['tests_total'] = $cycle->getTestsCount();
-                            $cycle_info['metadata'] = $cycle->getMetaData();
-                            $ret_cycle_arr[$cycle->getId()] = $cycle_info;
-                        }
-                        $ret_test['cycle_id'] = $cycle->getId();
-                    }
-                    $fin_res[] = $ret_test;
+        $q = $qb->getQuery();
+        $tests = $q->execute(); //null, Query::HYDRATE_ARRAY);
+        //if ($totalPosts > 0) {
+        $time_end = microtime(true);
+        $query_time = ($time_end - $time_start);
+        $time_start = microtime(true);
+        foreach ($tests as $test)  {
+            /** @var LogBookTest $test */
+            if ($test !== null) {
+                $cycle_info = [];
+                $ret_test = [];
+                $ret_test['id'] = $test->getId();
+                $ret_test['name'] = $test->getName();
+                $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
+                $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
+                $ret_test['duration'] = $test->getTimeRun();
+                if ($test->getVerdict() !== null) {
+                    $ret_test['verdict'] = $test->getVerdict()->getName();
+                } else {
+                    $ret_test['verdict'] = 'WIP';
                 }
-                $iterator->next();
+                $ret_test['order'] = $test->getExecutionOrder();
+                $ret_test['chip'] = $test->getChip();
+                $ret_test['platform'] = $test->getPlatform();
+                $ret_test['test_type'] = $test->getTestType();
+                $ret_test['metadata'] = $test->getMetaData(); //array();
+                try {
+                    unset($ret_test['metadata']['TEST_FILENAME']);
+                    unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
+                    unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
+                    unset($ret_test['metadata']['SUITE_SHOW']);
+                    unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
+                    unset($ret_test['metadata']['CHIP']);
+                    unset($ret_test['metadata']['PLATFORM']);
+                    unset($ret_test['metadata']['TIMEOUT']);
+                    $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                    unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                    $ret_test['metadata']['CONTROL'] = $control_path;
+                } catch (\Throwable $ex) {}
+                $suite = $test->getSuiteExecution();
+                if ($suite !== null) {
+                    $ret_test['suite_id'] = $suite->getId();
+                    $ret_test['suite_name'] = $suite->getName();
+                    $ret_test['suite_uuid'] = $suite->getUuid();
+                }
+
+                $cycle = $test->getCycle();
+                if ( $cycle !== null ) {
+                    if (!array_key_exists($cycle->getId(), $ret_cycle_arr)) {
+                        $cycle_info['id'] = $cycle->getId();
+                        $cycle_info['name'] = $cycle->getName();
+                        $cycle_info['build_project'] = $cycle->getBuild()->getName();
+                        $cycle_info['setup'] = $cycle->getSetup()->getName();
+                        $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
+                        $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
+                        $cycle_info['period'] = $cycle->getPeriod();
+                        $cycle_info['run_time'] = $cycle->getTestsTimeSum();
+                        $cycle_info['tests_fail'] = $cycle->getTestsFail();
+                        $cycle_info['tests_error'] = $cycle->getTestsError();
+                        $cycle_info['tests_pass'] = $cycle->getTestsPass();
+                        $cycle_info['tests_na'] = $cycle->getTestsNa();
+                        $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
+                        $cycle_info['tests_warning'] = $cycle->getTestsWarning();
+                        $cycle_info['tests_total'] = $cycle->getTestsCount();
+                        $cycle_info['metadata'] = $cycle->getMetaData();
+                        $ret_cycle_arr[$cycle->getId()] = $cycle_info;
+                    }
+                    $ret_test['cycle_id'] = $cycle->getId();
+                }
+                $fin_res[] = $ret_test;
             }
         }
-
+        $time_end = microtime(true);
+        $loop_time = ($time_end - $time_start);
         $fin_resp = [
             "tests" => $fin_res,
             "cycles" => $ret_cycle_arr,
             "cycle_ids" => $cycle_ids,
             "cycle_count" => count($cycle_ids),
-            "cycle_requested" => count($cycles_requested)
+            "cycle_requested" => count($cycles_requested),
+            "query_time" => $query_time,
+            "loop_time" => $loop_time
         ];
 
         $response = $this->json([]);
+        $resp = json_encode($fin_resp);
+        $response->setJson($resp);
+        $response->headers->set('Content-Type', 'application/json');
 
-        $response->setJson(json_encode($fin_resp));
-        $response->headers->set('Content-Type', 'text/json');
-        $file_name = '';
+        $file_name = 'DUMP';
         try {
             $file_name = implode('_', $cycle_ids);
         } catch (\Throwable $ex) {
@@ -458,7 +456,14 @@ class LogBookCycleController extends AbstractController
         } catch (\Throwable $ex) {
 
         }
+        $response->headers->set('Accept-Encoding', 'gzip,compress');
         $response->headers->set('Content-Disposition', 'attachment; filename="'. $file_name . '"');
+
+        try {
+            $fs = new \Symfony\Component\Filesystem\Filesystem();
+            $fs->dumpFile('/var/www/lbook/downloads/' . $file_name, $resp);
+        }
+        catch(IOException $e) {}
         return $response;
 }
 

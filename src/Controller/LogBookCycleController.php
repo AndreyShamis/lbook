@@ -343,16 +343,18 @@ class LogBookCycleController extends AbstractController
 
                     }
                 }
-    //                print_r($cycles);
+                //                print_r($cycles);
             }
 
             $time_start = microtime(true);
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle IN (:cycles)')
-    //            ->andWhere('t.disabled = :disabled')
-    //            ->orderBy('t.executionOrder', 'ASC')
+                //            ->andWhere('t.disabled = :disabled')
+                //            ->orderBy('t.executionOrder', 'ASC')
                 ->setMaxResults(400000)
+                ->setCacheable(true)
+                ->setLifetime(3000)
                 ->setParameters(['cycles'=> $cycles]); //, 'disabled' => 0]
 
             $q = $qb->getQuery();
@@ -404,26 +406,31 @@ class LogBookCycleController extends AbstractController
 
                         $cycle = $test->getCycle();
                         if ( $cycle !== null ) {
-                            if (!array_key_exists($cycle->getId(), $ret_cycle_arr)) {
-                                $cycle_info['id'] = $cycle->getId();
-                                $cycle_info['name'] = $cycle->getName();
-                                $cycle_info['build_project'] = $cycle->getBuild()->getName();
-                                $cycle_info['setup'] = $cycle->getSetup()->getName();
-                                $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
-                                $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
-                                $cycle_info['period'] = $cycle->getPeriod();
-                                $cycle_info['run_time'] = $cycle->getTestsTimeSum();
-                                $cycle_info['tests_fail'] = $cycle->getTestsFail();
-                                $cycle_info['tests_error'] = $cycle->getTestsError();
-                                $cycle_info['tests_pass'] = $cycle->getTestsPass();
-                                $cycle_info['tests_na'] = $cycle->getTestsNa();
-                                $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
-                                $cycle_info['tests_warning'] = $cycle->getTestsWarning();
-                                $cycle_info['tests_total'] = $cycle->getTestsCount();
-                                $cycle_info['metadata'] = $cycle->getMetaData();
-                                $ret_cycle_arr[$cycle->getId()] = $cycle_info;
+                            $cycle_id = $cycle->getId();
+                            if ($cycle_id > 0) {
+                                if (!array_key_exists($cycle_id, $ret_cycle_arr)) {
+                                    $cycle_info['id'] = $cycle_id;
+                                    $cycle_info['name'] = $cycle->getName();
+                                    $cycle_info['build_project'] = $cycle->getBuild()->getName();
+                                    $cycle_info['setup'] = $cycle->getSetup()->getName();
+                                    $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
+                                    $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
+                                    $cycle_info['period'] = $cycle->getPeriod();
+                                    $cycle_info['run_time'] = $cycle->getTestsTimeSum();
+                                    $cycle_info['tests_fail'] = $cycle->getTestsFail();
+                                    $cycle_info['tests_error'] = $cycle->getTestsError();
+                                    $cycle_info['tests_pass'] = $cycle->getTestsPass();
+                                    $cycle_info['tests_na'] = $cycle->getTestsNa();
+                                    $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
+                                    $cycle_info['tests_warning'] = $cycle->getTestsWarning();
+                                    $cycle_info['tests_total'] = $cycle->getTestsCount();
+                                    $cycle_info['metadata'] = $cycle->getMetaData();
+                                    $ret_cycle_arr[$cycle->getId()] = $cycle_info;
+
+                                }
+                                $ret_test['cycle_id'] = $cycle_id;
                             }
-                            $ret_test['cycle_id'] = $cycle->getId();
+
                         }
                         $fin_res[] = $ret_test;
                     }
@@ -478,7 +485,7 @@ class LogBookCycleController extends AbstractController
         }
         catch(IOException $e) {}
         return $response;
-}
+    }
 
     /**
      * Displays a form to edit an existing cycle entity.
@@ -730,12 +737,12 @@ class LogBookCycleController extends AbstractController
             }
 
             $qb = $testRepo->createQueryBuilder('t')
-              // ->select('t')
-               ->addSelect('v.name as verdict')
+                // ->select('t')
+                ->addSelect('v.name as verdict')
                 //->addSelect('v.name ')
-              //  ->from('App:LogBookVerdict', 'ver')
+                //  ->from('App:LogBookVerdict', 'ver')
                 ->innerJoin('App:LogBookVerdict', 'v', 'WITH', 'v.id = t.verdict')
-              //  ->leftJoin('t.verdict', 'v')
+                //  ->leftJoin('t.verdict', 'v')
                 ->where('t.cycle = :cycle')
                 ->andWhere('t.disabled = :disabled')
                 ->orderBy('t.executionOrder', 'ASC')

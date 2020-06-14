@@ -29,6 +29,11 @@ class QueryLimitType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $range = range(500, TestSearch::$MAX_LIMIT, 500);
+        array_unshift($range, 200);
+        array_unshift($range, 100);
+        array_unshift($range, 50);
+        array_unshift($range, 20);
+        array_unshift($range, 10);
         $resolver->setDefaults([
             'choices' => array_combine($range, $range),
             'label' => 'Limit',

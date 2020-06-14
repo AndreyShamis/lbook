@@ -19,11 +19,12 @@ class LogBookMessageRepository extends ServiceEntityRepository
     /**
      * @param array $criteria
      * @param bool $flush
+     * @param bool $persist
      * @return LogBookMessage
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function create(array $criteria, $flush = true): LogBookMessage
+    public function create(array $criteria, $flush = true, $persist = true): LogBookMessage
     {
         $entity = new LogBookMessage();
         $entity->setMessage($criteria['message']);
@@ -31,9 +32,11 @@ class LogBookMessageRepository extends ServiceEntityRepository
         $entity->setMsgType($criteria['msgType']);
         $entity->setLogTime($criteria['logTime']);
         $entity->setTest($criteria['test']);
-        $this->_em->persist($entity);
-        if ($flush) {
-            $this->_em->flush($entity);
+        if ($persist) {
+            $this->_em->persist($entity);
+            if ($flush) {
+                $this->_em->flush($entity);
+            }
         }
         return $entity;
     }

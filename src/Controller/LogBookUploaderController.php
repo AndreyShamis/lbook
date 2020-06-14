@@ -1299,8 +1299,10 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 /** @var LogBookMessage $log */
-                $log = $this->logsRepo->create($ret_data[$counter], false);
-                $objectsToClear[] = $log;
+                $log = $this->logsRepo->create($ret_data[$counter], false, $insertTests);
+                if ($insertTests) {
+                    $objectsToClear[] = $log;
+                }
 
                 /** Test Name section */
                 if ($search_test_name) {
@@ -1384,6 +1386,7 @@ class LogBookUploaderController extends AbstractController
         if ($controlVersion === '') {
             unset($mt_data['CONTROL_VERSION_SHOW_OPT']);
         }
+
         if (count($mt_data)) {
             $test->addMetaData($mt_data);
         }
@@ -1405,18 +1408,18 @@ class LogBookUploaderController extends AbstractController
         if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
-        if (!$insertTests) {
-            foreach ($objectsToClear as $tmp_obj) {
-                $this->em->remove($tmp_obj);
-            }
-        }
+//        if (!$insertTests) {
+//            foreach ($objectsToClear as $tmp_obj) {
+//                $this->em->remove($tmp_obj);
+//            }
+//        }
         $this->em->flush();
-        if ($insertTests) {
-            foreach ($objectsToClear as $tmp_obj) {
-                // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-                $this->em->detach($tmp_obj);
-            }
+//        if ($insertTests) {
+        foreach ($objectsToClear as $tmp_obj) {
+            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+            $this->em->detach($tmp_obj);
         }
+//        }
         return $ret_data;
     }
 

@@ -262,7 +262,11 @@ class LogBookTest
 
     public function getSuiteName(): string
     {
-        return $this->getFromMetaData('SUITE_SHOW', '');
+        $suite = $this->getSuiteExecution();
+        if ($suite !== null) {
+            return $suite->getName();
+        }
+        return '';
     }
 
     public function getChip(): string

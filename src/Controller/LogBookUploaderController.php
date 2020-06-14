@@ -1162,7 +1162,7 @@ class LogBookUploaderController extends AbstractController
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger, bool $search_test_name = true, bool $search_test_verdict = true): array
+    protected function parseFile(string $filePath, LogBookTest $test, LogBookUpload $uploadObj, LoggerInterface $logger, bool $search_test_name = true, bool $search_test_verdict = true, bool $insertTests = true): array
     {
         $debug = 0;
         if ($debug) {
@@ -1296,7 +1296,6 @@ class LogBookUploaderController extends AbstractController
                 $log = $this->logsRepo->create($ret_data[$counter], false);
                 $objectsToClear[] = $log;
 
-
                 /** Test Name section */
                 if ($search_test_name) {
                     if (!$testNameFound && $log->getMsgType()->getName() === 'INFO') {
@@ -1400,12 +1399,18 @@ class LogBookUploaderController extends AbstractController
         if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
-        $this->em->flush();
-        foreach ($objectsToClear as $tmp_obj) {
-            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-            $this->em->detach($tmp_obj);
+        if (!$insertTests) {
+            foreach ($objectsToClear as $tmp_obj) {
+                $this->em->remove($tmp_obj);
+            }
         }
-
+        $this->em->flush();
+        if ($insertTests) {
+            foreach ($objectsToClear as $tmp_obj) {
+                // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+                $this->em->detach($tmp_obj);
+            }
+        }
         return $ret_data;
     }
 

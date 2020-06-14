@@ -743,6 +743,9 @@ class LogBookUploaderController extends AbstractController
                     }
                 }
                 $this->em->flush();
+                if ($is_sst) {
+                    $this->addBlackListLevel('DEBUG');
+                }
                 $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
                 $this->em->refresh($cycle);
                 if (!$calculateStat) {
@@ -1273,7 +1276,10 @@ class LogBookUploaderController extends AbstractController
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
                         // In case this log LEVEL ignored for DB insert
-                        if ($skip_counter > 90) {
+                        if ($skip_counter > 40) {
+                            continue;
+                        }
+                        if ($preparedLevelName === 'DEBUG' && $skip_counter > 5) {
                             continue;
                         }
                         $skip_counter++;

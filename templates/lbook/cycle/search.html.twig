@@ -185,17 +185,13 @@
                                 <th data-field="timeEnd" data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
                                 <th data-field="Period" data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>
                                 <th data-field="TotalTime" data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>
-                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
-                                {#<th data-sortable="true" data-visible="false">Uptime</th>#}
-{#                                <th data-sortable="true">Verdict</th>#}
-                                {#<th data-sortable="false" data-visible="false">Actions</th>#}
                             </tr>
                             </thead>
                             <tbody class="searchable">
-                            {% for cycle in iterator | slice(0, 10000) %}
+                            {% for cycle in iterator | slice(0, 20000) %}
                                 <tr class="{% if cycle.isDisabled == 1 %}test-disabled{% endif %}">
                                     <td>
-{#                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}" />#}
+                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}"  />
                                     </td>
                                     <td>{{ cycle.id }}</td>
                                     <td>{{ cycle.rate }}</td>
@@ -207,21 +203,10 @@
                                     <td>{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': cycle.build.id  }) }}">{{ cycle.build }}</a>{% endif %}</td>
                                     <td>{{ cycle.passRate }}:{{ cycle.errorRate }}:{{ cycle.failRate }}:{{ cycle.warningRate }}:{{ cycle.unknownRate }}:{{ cycle.naRate }}</td>
                                     <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>
-
                                     <td>{% if cycle.timeStart %}<span data-title="{{ cycle.timeStart|date('ymdHis') }}">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{% if cycle.timeEnd %}<span data-title="{{ cycle.timeEnd|date('ymdHis') }}">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>
                                     <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>
-                                    {#<td>{{ test.dutUpTimeStart }}</td>#}
-                                    {#<td>{{ test.dutUpTimeEnd }}</td>#}
-{#                                    <td>#}
-{#                                        <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>#}
-{#                                    </td>#}
-                                    {#<td>#}
-                                    {#{% if is_granted('edit', test.cycle.setup) %}#}
-                                    {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
-                                    {#{% endif %}#}
-                                    {#</td>#}
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -244,17 +229,18 @@
                 arr = $('.bs-checkbox').find('[type="checkbox"]:checked').map(function(){
                     return $(this).closest('tr').find('td:nth-child(2)').text();
                 }).get();
-                if (arr.length >= 200) {
-                    alert('Max 200 cycles at once')
-                    return false;
-                }
                 var url = '{{ path('test_multi_exporter') }}';
                 url = url + '?cycles=' + arr.join(';')
                 try {
                     console.log(url);
                 } catch (e) {
-                    
+
                 }
+                if (arr.length >= 501) {
+                    alert('Max 500 cycles at once')
+                    return false;
+                }
+
                 window.location = url;
             });
         }

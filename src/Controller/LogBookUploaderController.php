@@ -745,6 +745,7 @@ class LogBookUploaderController extends AbstractController
                 $this->em->flush();
                 if ($is_sst) {
                     $this->addBlackListLevel('DEBUG');
+                    $this->addBlackListLevel('INFO');
                 }
                 $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
                 $this->em->refresh($cycle);
@@ -1279,7 +1280,10 @@ class LogBookUploaderController extends AbstractController
                         if ($skip_counter > 40) {
                             continue;
                         }
-                        if ($preparedLevelName === 'DEBUG' && $skip_counter > 5) {
+                        if ($preparedLevelName === 'DEBUG' && $skip_counter > 8) {
+                            continue;
+                        }
+                        if ($preparedLevelName === 'INFO' && $skip_counter > 8) {
                             continue;
                         }
                         $skip_counter++;

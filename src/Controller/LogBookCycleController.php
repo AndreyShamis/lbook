@@ -492,12 +492,12 @@ class LogBookCycleController extends AbstractController
 //            "QUERY_TIME" => round($query_time, 4),
 //            "LOOP_TIME" => round($loop_time, 4),
             "TOTAL_TIME" => round($total_time, 4),
-            "URL" => $uri,
-            "cycle_ids" => $cycle_ids,
             "cycle_count" => count($cycle_ids),
             "cycle_requested" => count($cycles_requested),
+            "cycle_ids" => $cycle_ids,
             "cycles" => $ret_cycle_arr,
-            "tests" => $fin_res
+            "tests" => $fin_res,
+            "URL" => $uri
         ];
 
         $response = $this->json([]);

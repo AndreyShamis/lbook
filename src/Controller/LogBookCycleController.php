@@ -301,7 +301,89 @@ class LogBookCycleController extends AbstractController
         }
     }
 
+    /**
+     * @param LogBookCycle $cycle
+     * @return array
+     */
+    private function buildExportCycleArray(LogBookCycle $cycle, LoggerInterface $logger): array
+    {
+        $arr = [];
+        try {
+            $arr['id'] = $cycle->getId();
+            $arr['name'] = $cycle->getName();
+            $arr['build_project'] = $cycle->getBuild()->getName();
+            $arr['setup'] = $cycle->getSetup()->getName();
+            $arr['time_start'] = $cycle->getTimeStart()->getTimestamp();
+            $arr['time_end'] = $cycle->getTimeEnd()->getTimestamp();
+            $arr['period'] = $cycle->getPeriod();
+            $arr['run_time'] = $cycle->getTestsTimeSum();
+            $arr['tests_fail'] = $cycle->getTestsFail();
+            $arr['tests_error'] = $cycle->getTestsError();
+            $arr['tests_pass'] = $cycle->getTestsPass();
+            $arr['tests_na'] = $cycle->getTestsNa();
+            $arr['tests_unknown'] = $cycle->getTestsUnknown();
+            $arr['tests_warning'] = $cycle->getTestsWarning();
+            $arr['tests_total'] = $cycle->getTestsCount();
+            $arr['metadata'] = $cycle->getMetaData();
+        } catch (\Throwable $ex) {
+            $this->keep_critical_log('MULTI_EXPORT[buildExportCycleArray]', $logger, $ex);
+        }
+        return $arr;
+    }
 
+    private function buildExportTestArray(LogBookTest $test, int $cycle_id, LoggerInterface $logger): array
+    {
+        $ret_test = [];
+        try {
+            $ret_test['id'] = $test->getId();
+            $ret_test['name'] = $test->getName();
+            $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
+            $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
+            $ret_test['duration'] = $test->getTimeRun();
+            if ($test->getVerdict() !== null) {
+                $ret_test['verdict'] = $test->getVerdict()->getName();
+            } else {
+                $ret_test['verdict'] = 'WIP';
+            }
+            $ret_test['order'] = $test->getExecutionOrder();
+            $ret_test['chip'] = $test->getChip();
+            $ret_test['platform'] = $test->getPlatform();
+            $ret_test['test_type'] = $test->getTestType();
+            $ret_test['metadata'] = $test->getMetaData(); //array();
+            try {
+                unset($ret_test['metadata']['TEST_FILENAME']);
+                unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
+                unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
+                unset($ret_test['metadata']['SUITE_SHOW']);
+                unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
+                unset($ret_test['metadata']['CHIP']);
+                unset($ret_test['metadata']['PLATFORM']);
+                unset($ret_test['metadata']['TIMEOUT']);
+                $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                $ret_test['metadata']['CONTROL'] = $control_path;
+            } catch (\Throwable $ex) {}
+            $suite = $test->getSuiteExecution();
+            if ($suite !== null) {
+                $ret_test['suite_id'] = $suite->getId();
+                $ret_test['suite_name'] = $suite->getName();
+                $ret_test['suite_uuid'] = $suite->getUuid();
+            }
+            $ret_test['cycle_id'] = $cycle_id;
+
+        } catch (\Throwable $ex) {
+            $this->keep_critical_log('MULTI_EXPORT[buildExportTestArray]', $logger, $ex);
+        }
+        return $ret_test;
+    }
+
+    private function keep_critical_log($msg, LoggerInterface $logger, \Throwable $ex): void
+    {
+        $logger->critical($msg . ':' . $ex->getMessage(), [
+            $ex->getLine(),
+            $ex->getTraceAsString()
+        ]);
+    }
     /**
      * Tests exporter to JSON file
      *
@@ -314,16 +396,19 @@ class LogBookCycleController extends AbstractController
      */
     public function multiExport(Request $request, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, LoggerInterface $logger): Response
     {
+        $time_start = microtime(true);
         $cycles = [];
         $ret_cycle_arr = [];
         $cycle_ids = [];
-        $cycle_info = [];
         $cycles_requested = [];
+        $uri = $request->getUri();
         $data['request'] = $request->request->all();
         $data['query'] = $request->query->all();
         $fin_res = array();
         $query_time = 0;
         try {
+
+            $em = $this->getDoctrine()->getManager();
             if (count($data['query']) > 0) {
                 // WORK with GET method
                 $work_arr = $data['query'];
@@ -332,129 +417,87 @@ class LogBookCycleController extends AbstractController
                 $cycles_requested = $work_list;
                 if (count($work_list) > 0) {
                     foreach ($work_list as $cycle_id_str) {
-                        $cycle_id = intval($cycle_id_str);
-                        if ($cycle_id > 0) {
-                            $cycle = $cycleRepo->findOneBy(['id' => $cycle_id]);
-                            if ($cycle !== null) {
-                                $cycles[] = $cycle;
-                                $cycle_ids[] = $cycle_id;
-                            }
-                        }
-
-                    }
-                }
-                //                print_r($cycles);
-            }
-
-            $time_start = microtime(true);
-
-            $qb = $testRepo->createQueryBuilder('t')
-                ->where('t.cycle IN (:cycles)')
-                //            ->andWhere('t.disabled = :disabled')
-                //            ->orderBy('t.executionOrder', 'ASC')
-                ->setMaxResults(400000)
-                ->setCacheable(true)
-                ->setLifetime(3000)
-                ->setParameters(['cycles'=> $cycles]); //, 'disabled' => 0]
-
-            $q = $qb->getQuery();
-            $tests = $q->execute(); //null, Query::HYDRATE_ARRAY);
-            //if ($totalPosts > 0) {
-            $time_end = microtime(true);
-            $query_time = ($time_end - $time_start);
-            $time_start = microtime(true);
-            $em = $this->getDoctrine()->getManager();
-            foreach ($tests as $test)  {
-                /** @var LogBookTest $test */
-                try {
-                    if ($test !== null) {
-                        $cycle_info = [];
-                        $ret_test = [];
-                        $ret_test['id'] = $test->getId();
-                        $ret_test['name'] = $test->getName();
-                        $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
-                        $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
-                        $ret_test['duration'] = $test->getTimeRun();
-                        if ($test->getVerdict() !== null) {
-                            $ret_test['verdict'] = $test->getVerdict()->getName();
-                        } else {
-                            $ret_test['verdict'] = 'WIP';
-                        }
-                        $ret_test['order'] = $test->getExecutionOrder();
-                        $ret_test['chip'] = $test->getChip();
-                        $ret_test['platform'] = $test->getPlatform();
-                        $ret_test['test_type'] = $test->getTestType();
-                        $ret_test['metadata'] = $test->getMetaData(); //array();
                         try {
-                            unset($ret_test['metadata']['TEST_FILENAME']);
-                            unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
-                            unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
-                            unset($ret_test['metadata']['SUITE_SHOW']);
-                            unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
-                            unset($ret_test['metadata']['CHIP']);
-                            unset($ret_test['metadata']['PLATFORM']);
-                            unset($ret_test['metadata']['TIMEOUT']);
-                            $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                            unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                            $ret_test['metadata']['CONTROL'] = $control_path;
-                        } catch (\Throwable $ex) {}
-                        $suite = $test->getSuiteExecution();
-                        if ($suite !== null) {
-                            $ret_test['suite_id'] = $suite->getId();
-                            $ret_test['suite_name'] = $suite->getName();
-                            $ret_test['suite_uuid'] = $suite->getUuid();
-                        }
-
-                        $cycle = $test->getCycle();
-                        if ( $cycle !== null ) {
-                            $cycle_id = $cycle->getId();
+                            $cycle_id = intval($cycle_id_str);
                             if ($cycle_id > 0) {
-                                if (!array_key_exists($cycle_id, $ret_cycle_arr)) {
-                                    $cycle_info['id'] = $cycle_id;
-                                    $cycle_info['name'] = $cycle->getName();
-                                    $cycle_info['build_project'] = $cycle->getBuild()->getName();
-                                    $cycle_info['setup'] = $cycle->getSetup()->getName();
-                                    $cycle_info['time_start'] = $cycle->getTimeStart()->getTimestamp();
-                                    $cycle_info['time_end'] = $cycle->getTimeEnd()->getTimestamp();
-                                    $cycle_info['period'] = $cycle->getPeriod();
-                                    $cycle_info['run_time'] = $cycle->getTestsTimeSum();
-                                    $cycle_info['tests_fail'] = $cycle->getTestsFail();
-                                    $cycle_info['tests_error'] = $cycle->getTestsError();
-                                    $cycle_info['tests_pass'] = $cycle->getTestsPass();
-                                    $cycle_info['tests_na'] = $cycle->getTestsNa();
-                                    $cycle_info['tests_unknown'] = $cycle->getTestsUnknown();
-                                    $cycle_info['tests_warning'] = $cycle->getTestsWarning();
-                                    $cycle_info['tests_total'] = $cycle->getTestsCount();
-                                    $cycle_info['metadata'] = $cycle->getMetaData();
-                                    $ret_cycle_arr[$cycle->getId()] = $cycle_info;
+                                /** @var LogBookCycle $cycle */
+                                $cycle = $cycleRepo->findOneBy(['id' => $cycle_id]);
+                                if ($cycle !== null) {
+                                    $cycles[] = $cycle;
+                                    $cycle_ids[] = $cycle_id;
 
+                                    if (!array_key_exists($cycle_id, $ret_cycle_arr)) {
+                                        $ret_cycle_arr[$cycle->getId()] = $this->buildExportCycleArray($cycle, $logger);
+                                        $tests = $cycle->getTests();
+                                        try {
+                                            foreach ($tests as $test) {
+                                                try {
+                                                    /** @var LogBookTest $test */
+                                                    $fin_res[] = $this->buildExportTestArray($test, $cycle_id, $logger);
+                                                } catch (\Throwable $ex) {
+                                                    $this->keep_critical_log('MULTI_EXPORT[IN_LOOP]', $logger, $ex);
+                                                }
+                                            }
+                                        } catch (\Throwable $ex) {
+                                            $this->keep_critical_log('MULTI_EXPORT[ON_LOOP]', $logger, $ex);
+                                        }
+                                    }
+                                    $em->clear();
                                 }
-                                $ret_test['cycle_id'] = $cycle_id;
                             }
-
+                        } catch (\Throwable $ex) {
+                            $this->keep_critical_log('MULTI_EXPORT[CYCLE_LOOP]', $logger, $ex);
                         }
-                        $fin_res[] = $ret_test;
-                        $em->detach($test);
                     }
-                } catch (\Throwable $ex) {
-                    $logger->critical('MULTI_EXPORT_LOOP:' . $ex->getMessage(), [$ex->getLine(), $ex->getTraceAsString()]);
                 }
-
             }
-        } catch (\Throwable $ex) {
-            $logger->critical('MULTI_EXPORT:' . $ex->getMessage(), [$ex->getLine(), $ex->getTraceAsString()]);
-        }
 
+
+//            $qb = $testRepo->createQueryBuilder('t')
+//                ->where('t.cycle IN (:cycles)')
+//                //            ->andWhere('t.disabled = :disabled')
+//                //            ->orderBy('t.executionOrder', 'ASC')
+//                ->setMaxResults(40000)
+//                ->setCacheable(true)
+//                ->setLifetime(3000)
+//                ->setParameters(['cycles'=> $cycles]); //, 'disabled' => 0]
+//
+//            $q = $qb->getQuery();
+//            $tests = $q->execute(); //null, Query::HYDRATE);
+//            //if ($totalPosts > 0) {
+//            $time_end = microtime(true);
+//            $query_time = ($time_end - $time_start);
+//            $time_start = microtime(true);
+//
+//            foreach ($tests as $test)  {
+//                /** @var LogBookTest $test */
+//                try {
+//                    if ($test !== null) {
+//                        $fin_res[] = $this->buildExportTestArray($test);
+//                        $em->detach($test);
+//                    }
+//                } catch (\Throwable $ex) {
+//                    $logger->critical('MULTI_EXPORT_LOOP:' . $ex->getMessage(), [$ex->getLine(), $ex->getTraceAsString()]);
+//                }
+//
+//            }
+        } catch (\Throwable $ex) {
+            $this->keep_critical_log('MULTI_EXPORT', $logger, $ex);
+        }
         $time_end = microtime(true);
-        $loop_time = ($time_end - $time_start);
+        $total_time = ($time_end - $time_start);
+//        $time_end = microtime(true);
+//        $loop_time = ($time_end - $time_start);
         $fin_resp = [
-            "tests" => $fin_res,
-            "cycles" => $ret_cycle_arr,
+//            "QUERY_TIME" => round($query_time, 4),
+//            "LOOP_TIME" => round($loop_time, 4),
+            "TOTAL_TIME" => round($total_time, 4),
+            "URL" => $uri,
             "cycle_ids" => $cycle_ids,
             "cycle_count" => count($cycle_ids),
             "cycle_requested" => count($cycles_requested),
-            "query_time" => $query_time,
-            "loop_time" => $loop_time
+            "cycles" => $ret_cycle_arr,
+            "tests" => $fin_res
         ];
 
         $response = $this->json([]);
@@ -464,12 +507,8 @@ class LogBookCycleController extends AbstractController
 
         $file_name = 'DUMP';
         try {
-            $file_name = implode('_', $cycle_ids);
-        } catch (\Throwable $ex) {
-
-        }
-        try {
-            $file_name = 'DUMP-' . count($cycle_ids) . '.Tests-' . count($fin_res) . '.Cycles-' . $file_name;
+            $datetime = new \DateTime();
+            $file_name = 'DUMP-' . count($cycle_ids) . '.Tests-' . count($fin_res) . '_' .  $datetime->getTimestamp();
         } catch (\Throwable $ex) {
 
         }

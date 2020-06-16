@@ -236,6 +236,16 @@ class SuiteExecution
      */
     private $host;
 
+
+    protected $rate = 0;
+
+    public function setRate(float $r) {
+        $this->rate = round($r, 2);
+    }
+
+    public function getRate(): float{
+        return $this->rate;
+    }
     /**
      * SuiteExecution constructor.
      */

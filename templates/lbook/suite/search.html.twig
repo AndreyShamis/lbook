@@ -1,0 +1,256 @@
+{% extends 'lbook/default/index.html.twig' %}
+
+{% block content %}
+    {#    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>#}
+    <h4>Suite execution search</h4>
+    {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
+    <table>
+        <tr>
+            <td>{{ form_label(form.name, 'Suite Name/ID/substring', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.name) }}</td>
+            <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Cycle Name'}}) }}</td>
+        </tr>
+        {#        <tr>#}
+        {#            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>#}
+        {#            <td>{{ form_errors(form.verdict) }}</td>#}
+        {#            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>#}
+        {#        </tr>#}
+        <tr>
+            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.setup) }}</td>
+            <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.fromDate) }}
+                /
+                {{ form_label(form.toDate) }}
+            </td>
+            <td>
+                {{ form_errors(form.fromDate) }}
+                {{ form_errors(form.toDate) }}
+            </td>
+            <td>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
+                            {{ form_widget(form.fromDate) }}
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group input-group-sm">
+                            {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
+                            {{ form_widget(form.toDate) }}
+                            <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.limit) }}</td>
+            <td>{{ form_errors(form.limit) }}</td>
+            <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
+        </tr>
+        {#<tr>#}
+        {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
+        {#<td>{{ form_errors(form.cycle) }}</td>#}
+        {#<td>#}
+        {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
+        {#</td>#}
+        {#</tr>#}
+    </table>
+
+    {{ form_widget(form) }}
+    <input type="submit" value="Search" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>Found {{ tests_count }} cycles</li>
+        {#        <li>{{ sql }}</li>#}
+    </ul>
+
+    <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
+
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+        function setDatePicker(obj){
+            $(obj).datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: false,
+                // isRTL:true,
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                beforeShow: function() {
+                    //change button colors
+                    var datepicker = $(this).datepicker( "widget" );
+                    setTimeout(function(){
+                        var buttons = datepicker.find('.ui-datepicker-buttonpane')
+                            .find('button');
+                        buttons.eq(0).addClass('btn btn-xs');
+                        buttons.eq(1).addClass('btn btn-xs btn-success');
+                        buttons.wrapInner('<span class="bigger-110" />');
+                    }, 10);
+                }
+
+            });
+        }
+
+        function setMultiSelect(){
+            $('.multiselect').multiselect({
+                enableFiltering: true,
+                enableHTML: true,
+                buttonClass: 'btn btn-white btn-primary',
+                templates: {
+                    button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span> &nbsp;<b class="fa fa-caret-down"></b></button>',
+                    ul: '<ul class="multiselect-container dropdown-menu"></ul>',
+                    filter: '<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+                    filterClearBtn: '<span class="input-group-btn"><button class="btn btn-default btn-white btn-grey multiselect-clear-filter" type="button"><i class="fa fa-times-circle red2"></i></button></span>',
+                    li: '<li><a tabindex="0"><label></label></a></li>',
+                    divider: '<li class="multiselect-item divider"></li>',
+                    liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+                }
+            });
+        }
+
+        $(document).ready(
+            function($){
+                setMultiSelect();
+                setDatePicker("#suite_execution_search_fromDate");
+                setDatePicker("#suite_execution_search_toDate");
+            }
+        );
+
+        function testsFormatter(value, row) {
+            var icon = parseInt(row.id) % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
+            return '<i class="glyphicon ' + icon + '"></i>' + value;
+        }
+    </script>
+    <div class="row">
+        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
+            <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
+                <div class="widget-header">
+                    <h4 class="widget-title lighter">Search results</h4>
+                    <div class="widget-toolbar no-border">
+                        {#                        <a href="#" data-action="settings"><i class="ace-icon fa fa-cog"></i></a>#}
+                        <a href="#" data-action="reload"><i class="ace-icon fa fa-refresh"></i></a>
+                        <a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
+                        <a href="#" data-action="close"><i class="ace-icon fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main padding-6 no-padding-left no-padding-right">
+                        {% include "lbook/search.html.twig" %}
+                        {% set pagePath = "cycle_search" %}
+                        {#{% include "lbook/paginator.html.twig" %}#}
+                        <div id="cyclesList"></div>
+                        <table
+                                id="table"
+                                data-toggle="table"
+                                data-show-columns="true"
+                                data-multiple-select-row="true"
+                                data-click-to-select="true"
+                                data-pagination="true"
+                                data-search="true"
+
+                                class="datatable records_list table table-condensed table-hover" data-classes="table table-no-bordered"
+                                data-pagination="true"
+                                {#data-detail-view="true"#}
+                                {#data-detail-formatter="detailFormatter"#}
+                                {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+                                data-toolbar="#cyclesList"
+                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
+                            <thead>
+                            <tr>
+                                <th data-field="state" data-sortable="false" title="S" data-checkbox="true"></th>
+                                <th data-field="id"  data-sortable="true" title="Test ID">ID</th>
+                                <th data-field="rate" data-sortable="true" title="Rate">Rate</th>
+                                <th data-field="UUID" data-sortable="true"  data-switchable="true">UUID</th>
+                                <th data-field="SuiteName" data-sortable="true"  data-switchable="true">Suite Name</th>
+                                <th data-field="TestingLevel" data-sortable="true"  data-switchable="true">Level</th>
+                                <th data-field="ProductVersion" data-sortable="true"  data-switchable="true">ProdVers</th>
+                                <th data-field="Host" data-sortable="true"  data-switchable="true">Host</th>
+                                <th data-field="Components" data-sortable="true"  data-switchable="true">Components</th>
+
+                                <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
+                                <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
+                                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>
+{#                                <th data-field="User" data-sortable="true" title="User Name">User</th>#}
+
+                                <th data-field="timeStart" data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
+                                <th data-field="timeEnd" data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+{#                                <th data-field="Period" data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>#}
+{#                                <th data-field="TotalTime" data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>#}
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+                            {% for cycle in iterator | slice(0, 20000) %}
+                                <tr class="{% if cycle.closed == 1 %}test-disabled{% endif %}">
+                                    <td>
+                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}"  />
+                                    </td>
+                                    <td>{{ cycle.id }}</td>
+                                    <td>{{ cycle.rate }}</td>
+{#                                    <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup.name }}</a></td>#}
+                                    <td>{{ cycle.uuid }}</td>
+                                    <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
+                                    <td>{{ cycle.testingLevel }}</a></td>
+                                    <td>{{ cycle.productVersion }}</a></td>
+                                    <td>{{ cycle.host.name }}</a></td>
+                                    <td>{{ cycle.components | join('|') }}</td>
+
+                                    <td>{{ cycle.testsCount }}</td>
+                                    <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                                    <td>{{ cycle.passRate }}</td>
+{#                                    <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>#}
+                                    <td>{% if cycle.startedAt %}<span data-title="{{ cycle.startedAt|date('ymdHis') }}">{{ cycle.startedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+                                    <td>{% if cycle.finishedAt %}<span data-title="{{ cycle.finishedAt|date('ymdHis') }}">{{ cycle.finishedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+{#                                    <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>#}
+{#                                    <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>#}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <input type="button" name="exportButton" value="Export to JSON [SST Mode]" id="exportButton" class="exportButton" />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script type="text/javascript">
+        $(document).ready(
+            function($) {
+                var arr;
+                $('#exportButton').click(function(){
+                    arr = $('.bs-checkbox').find('[type="checkbox"]:checked').map(function(){
+                        return $(this).closest('tr').find('td:nth-child(2)').text();
+                    }).get();
+                    var url = '{{ path('test_multi_exporter') }}';
+                    url = url + '?cycles=' + arr.join(';')
+                    try {
+                        console.log(url);
+                    } catch (e) {
+
+                    }
+                    if (arr.length >= 501) {
+                        alert('Max 500 cycles at once')
+                        return false;
+                    }
+
+                    window.location = url;
+                });
+            }
+        );
+    </script>
+{% endblock %}

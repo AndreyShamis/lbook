@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\SuiteExecution;
+use App\Entity\SuiteExecutionSearch;
+use App\Form\SuiteExecutionSearchType;
+use App\Repository\LogBookCycleRepository;
 use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
 use Exception;
+use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +24,142 @@ class LogBookSuiteExecutionController extends AbstractController
 {
     protected $index_size = 500;
 
+
+    /**
+     * @Route("/search", name="cycle_search", methods={"GET|POST"})
+     * @param Request $request
+     * @param LogBookCycleRepository $cycleRepo
+     * @return Response
+     */
+    public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): Response
+    {
+        set_time_limit(30);
+        $tests = $new_tests = array();
+        $setups = null;
+        $sql = '';
+        $leftDate = $rightDate = false;
+        $startDate = $endDate = null;
+        $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
+        $suites = new SuiteExecutionSearch();
+
+        $form = $this->createForm(SuiteExecutionSearchType::class, $suites, array());
+        try {
+            $form->handleRequest($request);
+        } catch (\Exception $ex) {}
+
+        $addOrder = true;
+        $post = $request->request->get('suite_execution_search');
+        if ($post !== null) {
+            $enableSearch = false;
+            if (array_key_exists('setup', $post)) {
+                $setups = $post['setup']['name'];
+            }
+            if (array_key_exists('limit', $post)) {
+                $limit = (int)$post['limit'];
+                if ($limit > 15000) {
+                    $limit = 500;
+                }
+                $suites->setLimit($limit);
+            }
+            $name = $post['name'];
+            $fromDate = $post['fromDate'];
+            $toDate = $post['toDate'];
+
+            $qb = $suitesRepo->createQueryBuilder('s')
+                ->setMaxResults($suites->getLimit());
+            if ($fromDate !== null && mb_strlen($fromDate) > 7) {
+                $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
+                if ($startDate !== false) {
+                    $leftDate = true;
+                }
+            }
+            if ($toDate !== null && mb_strlen($toDate) > 7) {
+                $endDate = \DateTime::createFromFormat('m/d/Y H:i', $toDate . '23:59');
+                if ($endDate !== false) {
+                    $rightDate = true;
+                }
+            }
+
+            if ($name !== null && \mb_strlen($name) >= 2) {
+
+                $qb->andWhere('MATCH_AGAINST(s.name, s.productVersion, s.platform, s.chip, s.summary, s.jobName, s.buildTag, :search_str) > 1 OR s.name LIKE :cycle_name OR s.id = :cycle_id OR s.uuid LIKE :cycle_id');
+                $qb->addSelect('MATCH_AGAINST(s.name, s.productVersion, s.platform, s.chip, s.summary, s.jobName, s.buildTag, :search_str) as rate');
+                $qb->orderBy('rate', 'DESC');
+                $qb->addOrderBy('s.id', 'DESC');
+                $addOrder = false;
+//                }
+                $name = trim($name);
+                $cycle_name_match = str_replace('%', ' ', $name);
+                $cycle_name_match = str_replace('?', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace('  ', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace(' ', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
+
+                if ($leftDate === true && $rightDate === true) {
+                    $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
+                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                        ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                } else if ($leftDate === true) {
+                    $qb->andWhere('s.startedAt >= :fromDate')
+                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                } else if ($rightDate === true) {
+                    $qb->andWhere('s.finishedAt <= :endDate')
+                        ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                    $enableSearch = True;
+                }
+//                if ($setups !== null && \count($setups) > 0) {
+//                    $qb->andWhere('s.setup IN (:setups)')
+//                        ->setParameter('setups', $setups);
+//                    $enableSearch = True;
+//                }
+
+                $qb->setParameter('search_str', $cycle_name_match);
+                $cycle_name_search = $name;
+                $str_len = mb_strlen($cycle_name_search);
+                if ($str_len >= 3) {
+                    $cycle_name_search = '%' . $cycle_name_search . '%';
+                } elseif ($str_len < 3) {
+                    $cycle_name_search .= '%';
+                }
+
+                $qb->setParameter('cycle_name', $cycle_name_search);
+                $qb->setParameter('cycle_id', (int)$name);
+
+                $enableSearch = True;
+            }
+            $enableSearch = True;
+            if ($addOrder) {
+                $qb->orderBy('t.id', 'DESC');
+            }
+
+            if ($enableSearch) {
+                $query = $qb->getQuery();
+                $sql = $query->getSQL();
+                $tests = $query->execute();
+                if (!$addOrder){
+                    foreach($tests as $tmp_test) {
+                        /** @var LogBookCycle $t_t */
+                        $t_t = $tmp_test[0];
+                        $t_t->setRate($tmp_test['rate']);
+                        $new_tests[] = $t_t;
+                    }
+                } else {
+                    $new_tests = $tests;
+                }
+            }
+        }
+
+        return $this->render('lbook/suite/search.html.twig', array(
+            //'tests' => $tests,
+            'iterator' => $new_tests,
+            'tests_count' => \count($new_tests),
+            'sql' => $sql,
+            'form' => $form->createView(),
+        ));
+    }
     /**
      * @Route("/", name="suite_index")
      * @Route("/{page}", name="suite_index")

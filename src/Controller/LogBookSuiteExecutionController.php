@@ -48,11 +48,9 @@ class LogBookSuiteExecutionController extends AbstractController
         } catch (\Exception $ex) {}
 
         $addOrder = true;
-        $testingLevel = [];
+        $testingLevel = $publish = $platforms = $chips = [];
         $post = $request->request->get('suite_execution_search');
-//        echo "<pre>";
-//        print_r($post);
-//        //exit();
+
         if ($post !== null) {
             $enableSearch = false;
             if (array_key_exists('setup', $post)) {
@@ -66,9 +64,21 @@ class LogBookSuiteExecutionController extends AbstractController
                 $suites->setLimit($limit);
             }
             if (array_key_exists('testingLevel', $post)) {
-                $post['testingLevel'];
                 $suites->setTestingLevel($post['testingLevel']);
                 $testingLevel = $post['testingLevel'];
+            }
+            if (array_key_exists('publish', $post)) {
+                $suites->setPublish($post['publish']);
+                $publish = $post['publish'];
+            }
+
+            if (array_key_exists('platforms', $post)) {
+                $suites->setPlatforms($post['platforms']);
+                $platforms = $post['platforms'];
+            }
+            if (array_key_exists('chips', $post)) {
+                $suites->setChips($post['chips']);
+                $chips = $post['chips'];
             }
             $name = $post['name'];
             $fromDate = $post['fromDate'];
@@ -108,6 +118,18 @@ class LogBookSuiteExecutionController extends AbstractController
                 if (count($testingLevel)) {
                     $qb->andWhere('s.testingLevel IN (:testingLevels)')
                         ->setParameter('testingLevels', $testingLevel);
+                }
+                if (count($publish)) {
+                    $qb->andWhere('s.publish IN (:publish)')
+                        ->setParameter('publish', $publish);
+                }
+                if (count($platforms)) {
+                    $qb->andWhere('s.platform IN (:platforms)')
+                        ->setParameter('platforms', $platforms);
+                }
+                if (count($chips)) {
+                    $qb->andWhere('s.chip IN (:chips)')
+                        ->setParameter('chips', $chips);
                 }
                 if ($leftDate === true && $rightDate === true) {
                     $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
@@ -154,7 +176,7 @@ class LogBookSuiteExecutionController extends AbstractController
                 $tests = $query->execute();
                 if (!$addOrder){
                     foreach($tests as $tmp_test) {
-                        /** @var LogBookCycle $t_t */
+                        /** @var SuiteExecution $t_t */
                         $t_t = $tmp_test[0];
                         $t_t->setRate($tmp_test['rate']);
                         $new_tests[] = $t_t;

@@ -6,6 +6,7 @@ use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
 
 /**
  * @method SuiteExecution|null find($id, $lockMode = null, $lockVersion = null)
@@ -130,6 +131,60 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $this->_em->flush($entity);
         }
         return $entity;
+    }
+
+    /**
+     * @param int $state
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqPlatforms()
+    {
+        $reset = function ($input) {
+            return $input['platform'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.platform')->distinct()
+            ->orderBy('s.updatedAt', 'DESC')
+            ->setMaxResults(1000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            return array_combine($map, $map);
+        }
+        return null;
+
+    }
+
+    /**
+     * @param int $state
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqChips()
+    {
+        $reset = function ($input) {
+            return $input['chip'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.chip')->distinct()
+            ->orderBy('s.chip', 'ASC')
+            ->setMaxResults(1000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            return array_combine($map, $map);
+        }
+        return null;
+
     }
 
     /**

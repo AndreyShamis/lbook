@@ -16,6 +16,82 @@ class SuiteExecutionSearch
     /** @var array  */
     protected $testingLevel = [];
 
+    /** @var array  */
+    protected $publish = [];
+
+    /** @var array  */
+    protected $platforms = [];
+
+    /** @var array  */
+    protected $chips = [];
+
+    protected $setups;
+
+    protected $fromDate;
+
+    protected $toDate;
+
+    /** @var int  */
+    protected $limit = 200;
+
+    public static $MAX_LIMIT = 10000;
+
+    public static $DEFAULT_LIMIT = 2000;
+
+    public function __construct()
+    {
+        $d = new \DateTime('- 7 days');
+        $this->fromDate = $d->format('m/d/Y');
+    }
+
+    /**
+     * @return array
+     */
+    public function getPublish(): array
+    {
+        return $this->publish;
+    }
+
+    /**
+     * @param array $publish
+     */
+    public function setPublish(array $publish): void
+    {
+        $this->publish = $publish;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPlatforms(): array
+    {
+        return $this->platforms;
+    }
+
+    /**
+     * @param array $platforms
+     */
+    public function setPlatforms(array $platforms): void
+    {
+        $this->platforms = $platforms;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChips(): array
+    {
+        return $this->chips;
+    }
+
+    /**
+     * @param array $chips
+     */
+    public function setChips(array $chips): void
+    {
+        $this->chips = $chips;
+    }
+
     /**
      * @return array
      */
@@ -46,25 +122,6 @@ class SuiteExecutionSearch
     public function setSetups($setups): void
     {
         $this->setups = $setups;
-    }
-
-    protected $setups;
-
-    protected $fromDate;
-
-    protected $toDate;
-
-    /** @var int  */
-    protected $limit = 200;
-
-    public static $MAX_LIMIT = 10000;
-
-    public static $DEFAULT_LIMIT = 2000;
-
-    public function __construct()
-    {
-        $d = new \DateTime('- 7 days');
-        $this->fromDate = $d->format('m/d/Y');
     }
 
     /**

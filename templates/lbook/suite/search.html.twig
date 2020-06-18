@@ -28,6 +28,24 @@
 {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
         </tr>
         <tr>
+            <td>{{ form_label(form.platforms, 'Platforms', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.platforms) }}</td>
+            <td>{{ form_widget(form.platforms) }}</td>
+            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+        </tr>
+        <tr>
+            <td>{{ form_label(form.chips, 'Chip/s', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.chips) }}</td>
+            <td>{{ form_widget(form.chips) }}</td>
+            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+        </tr>
+        <tr>
+            <td>{{ form_label(form.publish, 'Publish', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.publish) }}</td>
+            <td>{{ form_widget(form.publish) }}</td>
+            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+        </tr>
+        <tr>
             <td>
                 {{ form_label(form.fromDate) }}
                 /
@@ -80,7 +98,7 @@
 
     <ul>
         <li>Found {{ tests_count }} cycles</li>
-        {#        <li>{{ sql }}</li>#}
+                <li>{{ sql }}</li>
     </ul>
 
     <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>

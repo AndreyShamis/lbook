@@ -115,42 +115,6 @@ class LogBookSuiteExecutionController extends AbstractController
                 $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
                 $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
 
-                if (count($testingLevel)) {
-                    $qb->andWhere('s.testingLevel IN (:testingLevels)')
-                        ->setParameter('testingLevels', $testingLevel);
-                }
-                if (count($publish)) {
-                    $qb->andWhere('s.publish IN (:publish)')
-                        ->setParameter('publish', $publish);
-                }
-                if (count($platforms)) {
-                    $qb->andWhere('s.platform IN (:platforms)')
-                        ->setParameter('platforms', $platforms);
-                }
-                if (count($chips)) {
-                    $qb->andWhere('s.chip IN (:chips)')
-                        ->setParameter('chips', $chips);
-                }
-                if ($leftDate === true && $rightDate === true) {
-                    $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
-                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
-                        ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                } else if ($leftDate === true) {
-                    $qb->andWhere('s.startedAt >= :fromDate')
-                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                } else if ($rightDate === true) {
-                    $qb->andWhere('s.finishedAt <= :endDate')
-                        ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                }
-//                if ($setups !== null && \count($setups) > 0) {
-//                    $qb->andWhere('s.setup IN (:setups)')
-//                        ->setParameter('setups', $setups);
-//                    $enableSearch = True;
-//                }
-
                 $qb->setParameter('search_str', $cycle_name_match);
                 $cycle_name_search = $name;
                 $str_len = mb_strlen($cycle_name_search);
@@ -163,11 +127,46 @@ class LogBookSuiteExecutionController extends AbstractController
                 $qb->setParameter('cycle_name', $cycle_name_search);
                 $qb->setParameter('cycle_id', (int)$name);
 
-                $enableSearch = True;
             }
+            if (count($testingLevel)) {
+                $qb->andWhere('s.testingLevel IN (:testingLevels)')
+                    ->setParameter('testingLevels', $testingLevel);
+            }
+            if (count($publish)) {
+                $qb->andWhere('s.publish IN (:publish)')
+                    ->setParameter('publish', $publish);
+            }
+            if (count($platforms)) {
+                $qb->andWhere('s.platform IN (:platforms)')
+                    ->setParameter('platforms', $platforms);
+            }
+            if (count($chips)) {
+                $qb->andWhere('s.chip IN (:chips)')
+                    ->setParameter('chips', $chips);
+            }
+            if ($leftDate === true && $rightDate === true) {
+                $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+            } else if ($leftDate === true) {
+                $qb->andWhere('s.startedAt >= :fromDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+            } else if ($rightDate === true) {
+                $qb->andWhere('s.finishedAt <= :endDate')
+                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+            }
+
+            if ($setups !== null && \count($setups) > 0) {
+                $qb->leftJoin('s.cycle', 'cycle')->andWhere('cycle.setup  IN (:setups)')->setParameter('setups', $setups);
+                //leftJoin('cycle.setup', 'setup')->andWhere($qb->expr()->like('setup.name', 'in '));
+//
+//                $qb->andWhere('s.setup IN (:setups)')
+//                    ->setParameter('setups', $setups);
+            }
+
             $enableSearch = True;
             if ($addOrder) {
-                $qb->orderBy('t.id', 'DESC');
+                $qb->orderBy('s.id', 'DESC');
             }
 
             if ($enableSearch) {

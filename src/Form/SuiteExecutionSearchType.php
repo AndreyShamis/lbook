@@ -10,6 +10,7 @@ namespace App\Form;
 use App\Entity\SuiteExecution;
 use App\Entity\SuiteExecutionSearch;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,6 +44,26 @@ class SuiteExecutionSearchType extends AbstractType
 //            ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
             ->add('setup', LogBookSelectableSetupType::class, array('required' => false))
             ->add('limit', QueryLimitType::class)
+            ->add('testingLevel', ChoiceType::class,
+                array(
+                    'required' => false,
+                    //             // false will convert to checkbox
+//                    'expanded' => false,
+                    'label' => ' ',
+                    'choices' => [
+                        'sanity' => 'sanity',
+                        'integration' => 'integration',
+                        'nightly' => 'nightly',
+                        'weekly' => 'weekly'
+                    ],
+//                    'choice_label' => 'TestingLevel',
+//                    'choice_value' => 'Id',
+                    'multiple'=> true,
+                    'attr' => array(
+                        'style' => 'width:400px;display: none;', // min-height:180px;
+                        'class' => 'LogBookSelectableTestingLevelType multiselect')
+                )
+            );
             //->add('executionOrder')
 //            ->add('cycle')
             //->add('disabled')

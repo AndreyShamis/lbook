@@ -26,7 +26,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
 
     /**
-     * @Route("/search", name="cycle_search", methods={"GET|POST"})
+     * @Route("/search", name="suite_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
@@ -48,7 +48,11 @@ class LogBookSuiteExecutionController extends AbstractController
         } catch (\Exception $ex) {}
 
         $addOrder = true;
+        $testingLevel = [];
         $post = $request->request->get('suite_execution_search');
+//        echo "<pre>";
+//        print_r($post);
+//        //exit();
         if ($post !== null) {
             $enableSearch = false;
             if (array_key_exists('setup', $post)) {
@@ -60,6 +64,11 @@ class LogBookSuiteExecutionController extends AbstractController
                     $limit = 500;
                 }
                 $suites->setLimit($limit);
+            }
+            if (array_key_exists('testingLevel', $post)) {
+                $post['testingLevel'];
+                $suites->setTestingLevel($post['testingLevel']);
+                $testingLevel = $post['testingLevel'];
             }
             $name = $post['name'];
             $fromDate = $post['fromDate'];
@@ -96,6 +105,10 @@ class LogBookSuiteExecutionController extends AbstractController
                 $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
                 $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
 
+                if (count($testingLevel)) {
+                    $qb->andWhere('s.testingLevel IN (:testingLevels)')
+                        ->setParameter('testingLevels', $testingLevel);
+                }
                 if ($leftDate === true && $rightDate === true) {
                     $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
                         ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)

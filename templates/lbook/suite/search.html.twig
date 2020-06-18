@@ -15,10 +15,17 @@
         {#            <td>{{ form_errors(form.verdict) }}</td>#}
         {#            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>#}
         {#        </tr>#}
+
         <tr>
-            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
             <td>{{ form_errors(form.setup) }}</td>
             <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+        </tr>
+        <tr>
+            <td>{{ form_label(form.testingLevel, 'Testing Level', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+            <td>{{ form_errors(form.testingLevel) }}</td>
+            <td>{{ form_widget(form.testingLevel) }}</td>
+{#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
         </tr>
         <tr>
             <td>
@@ -133,99 +140,100 @@
             return '<i class="glyphicon ' + icon + '"></i>' + value;
         }
     </script>
-    <div class="row">
-        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
-            <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
-                <div class="widget-header">
-                    <h4 class="widget-title lighter">Search results</h4>
-                    <div class="widget-toolbar no-border">
-                        {#                        <a href="#" data-action="settings"><i class="ace-icon fa fa-cog"></i></a>#}
-                        <a href="#" data-action="reload"><i class="ace-icon fa fa-refresh"></i></a>
-                        <a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>
-                        <a href="#" data-action="close"><i class="ace-icon fa fa-times"></i></a>
-                    </div>
-                </div>
-                <div class="widget-body">
-                    <div class="widget-main padding-6 no-padding-left no-padding-right">
-                        {% include "lbook/search.html.twig" %}
-                        {% set pagePath = "cycle_search" %}
-                        {#{% include "lbook/paginator.html.twig" %}#}
-                        <div id="cyclesList"></div>
-                        <table
-                                id="table"
-                                data-toggle="table"
-                                data-show-columns="true"
-                                data-multiple-select-row="true"
-                                data-click-to-select="true"
-                                data-pagination="true"
-                                data-search="true"
+    {% include "lbook/suite/list.html.twig" %}
+{#    <div class="row">#}
+{#        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">#}
+{#            <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">#}
+{#                <div class="widget-header">#}
+{#                    <h4 class="widget-title lighter">Search results</h4>#}
+{#                    <div class="widget-toolbar no-border">#}
+{#                        #}{#                        <a href="#" data-action="settings"><i class="ace-icon fa fa-cog"></i></a>#}
+{#                        <a href="#" data-action="reload"><i class="ace-icon fa fa-refresh"></i></a>#}
+{#                        <a href="#" data-action="collapse"><i class="ace-icon fa fa-chevron-up"></i></a>#}
+{#                        <a href="#" data-action="close"><i class="ace-icon fa fa-times"></i></a>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div class="widget-body">#}
+{#                    <div class="widget-main padding-6 no-padding-left no-padding-right">#}
+{#                        {% include "lbook/search.html.twig" %}#}
+{#                        {% set pagePath = "cycle_search" %}#}
+{#                        #}{#{% include "lbook/paginator.html.twig" %}#}
+{#                        <div id="cyclesList"></div>#}
+{#                        <table#}
+{#                                id="table"#}
+{#                                data-toggle="table"#}
+{#                                data-show-columns="true"#}
+{#                                data-multiple-select-row="true"#}
+{#                                data-click-to-select="true"#}
+{#                                data-pagination="true"#}
+{#                                data-search="true"#}
 
-                                class="datatable records_list table table-condensed table-hover" data-classes="table table-no-bordered"
-                                data-pagination="true"
-                                {#data-detail-view="true"#}
-                                {#data-detail-formatter="detailFormatter"#}
-                                {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
-                                data-toolbar="#cyclesList"
-                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">
-                            <thead>
-                            <tr>
-                                <th data-field="state" data-sortable="false" title="S" data-checkbox="true"></th>
-                                <th data-field="id"  data-sortable="true" title="Test ID">ID</th>
-                                <th data-field="rate" data-sortable="true" title="Rate">Rate</th>
-                                <th data-field="UUID" data-sortable="true"  data-switchable="true">UUID</th>
-                                <th data-field="SuiteName" data-sortable="true"  data-switchable="true">Suite Name</th>
-                                <th data-field="TestingLevel" data-sortable="true"  data-switchable="true">Level</th>
-                                <th data-field="ProductVersion" data-sortable="true"  data-switchable="true">ProdVers</th>
-                                <th data-field="Host" data-sortable="true"  data-switchable="true">Host</th>
-                                <th data-field="Components" data-sortable="true"  data-switchable="true">Components</th>
+{#                                class="datatable records_list table table-condensed table-hover" data-classes="table table-no-bordered"#}
+{#                                data-pagination="true"#}
+{#                                #}{#data-detail-view="true"#}
+{#                                #}{#data-detail-formatter="detailFormatter"#}
+{#                                #}{#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
+{#                                data-toolbar="#cyclesList"#}
+{#                                data-page-size="1000" data-page-list="[200, 500, 1000, 'ALL']" data-sort-order="desc">#}
+{#                            <thead>#}
+{#                            <tr>#}
+{#                                <th data-field="state" data-sortable="false" title="S" data-checkbox="true"></th>#}
+{#                                <th data-field="id"  data-sortable="true" title="Test ID">ID</th>#}
+{#                                <th data-field="rate" data-sortable="true" title="Rate">Rate</th>#}
+{#                                <th data-field="UUID" data-sortable="true"  data-switchable="true">UUID</th>#}
+{#                                <th data-field="SuiteName" data-sortable="true"  data-switchable="true">Suite Name</th>#}
+{#                                <th data-field="TestingLevel" data-sortable="true"  data-switchable="true">Level</th>#}
+{#                                <th data-field="ProductVersion" data-sortable="true"  data-switchable="true">ProdVers</th>#}
+{#                                <th data-field="Host" data-sortable="true"  data-switchable="true">Host</th>#}
+{#                                <th data-field="Components" data-sortable="true"  data-switchable="true">Components</th>#}
 
-                                <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>
-                                <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>
-                                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>
+{#                                <th data-field="Tests" data-sortable="true" title="Tests count in the cycle" data-formatter="testsFormatter" data-footer-formatter="sumFormatter">Tests</th>#}
+{#                                <th data-field="PassRate" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-footer-formatter="avgPercentFormatter">PR</th>#}
+{#                                <th data-field="Status" data-sortable="true" title="Status" class="cycle_index_status" data-formatter="statusCellStyle">Status</th>#}
 {#                                <th data-field="User" data-sortable="true" title="User Name">User</th>#}
 
-                                <th data-field="timeStart" data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
-                                <th data-field="timeEnd" data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
+{#                                <th data-field="timeStart" data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>#}
+{#                                <th data-field="timeEnd" data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>#}
 {#                                <th data-field="Period" data-sorter="dataTitleIntSorter" data-sortable="true">Period</th>#}
 {#                                <th data-field="TotalTime" data-sorter="dataTitleIntSorter" data-sortable="true">Total Time</th>#}
-                            </tr>
-                            </thead>
-                            <tbody class="searchable">
-                            {% for cycle in iterator | slice(0, 20000) %}
-                                <tr class="{% if cycle.closed == 1 %}test-disabled{% endif %}">
-                                    <td>
-                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}"  />
-                                    </td>
-                                    <td>{{ cycle.id }}</td>
-                                    <td>{{ cycle.rate }}</td>
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody class="searchable">#}
+{#                            {% for cycle in iterator | slice(0, 20000) %}#}
+{#                                <tr class="{% if cycle.closed == 1 %}test-disabled{% endif %}">#}
+{#                                    <td>#}
+{#                                        <input type="checkbox" name="row-check" value="{{ cycle.id }}"  />#}
+{#                                    </td>#}
+{#                                    <td>{{ cycle.id }}</td>#}
+{#                                    <td>{{ cycle.rate }}</td>#}
 {#                                    <td><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ cycle.setup.name }}</a></td>#}
-                                    <td>{{ cycle.uuid }}</td>
-                                    <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>
-                                    <td>{{ cycle.testingLevel }}</a></td>
-                                    <td>{{ cycle.productVersion }}</a></td>
-                                    <td>{{ cycle.host.name }}</a></td>
-                                    <td>{{ cycle.components | join('|') }}</td>
+{#                                    <td>{{ cycle.uuid }}</td>#}
+{#                                    <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td>#}
+{#                                    <td>{{ cycle.testingLevel }}</a></td>#}
+{#                                    <td>{{ cycle.productVersion }}</a></td>#}
+{#                                    <td>{{ cycle.host.name }}</a></td>#}
+{#                                    <td>{{ cycle.components | join('|') }}</td>#}
 
-                                    <td>{{ cycle.testsCount }}</td>
-                                    <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                                    <td>{{ cycle.passRate }}</td>
+{#                                    <td>{{ cycle.testsCount }}</td>#}
+{#                                    <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>#}
+{#                                    <td>{{ cycle.passRate }}</td>#}
 {#                                    <td title="{{ cycle.user.fullName }}">{{ cycle.user.userNameMedium}}</td>#}
-                                    <td>{% if cycle.startedAt %}<span data-title="{{ cycle.startedAt|date('ymdHis') }}">{{ cycle.startedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
-                                    <td>{% if cycle.finishedAt %}<span data-title="{{ cycle.finishedAt|date('ymdHis') }}">{{ cycle.finishedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
+{#                                    <td>{% if cycle.startedAt %}<span data-title="{{ cycle.startedAt|date('ymdHis') }}">{{ cycle.startedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>#}
+{#                                    <td>{% if cycle.finishedAt %}<span data-title="{{ cycle.finishedAt|date('ymdHis') }}">{{ cycle.finishedAt|date('Y-m-d H:i:s') }}</span>{% endif %}</td>#}
 {#                                    <td><span data-title="{{ cycle.period}}">{{ cycle.period |  executionTimeGenericShort}}</span></td>#}
 {#                                    <td><span data-title="{{ cycle.testsTimeSum}}">{{ cycle.testsTimeSum |  executionTimeGenericShort}}</span></td>#}
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <input type="button" name="exportButton" value="Export to JSON [SST Mode]" id="exportButton" class="exportButton" />
+{#                                </tr>#}
+{#                            {% endfor %}#}
+{#                            </tbody>#}
+{#                        </table>#}
+{#                        <input type="button" name="exportButton" value="Export to JSON [SST Mode]" id="exportButton" class="exportButton" />#}
 
-                    </div>
-                </div>
-            </div>
-        </div>
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
 
-    </div>
+{#    </div>#}
 
 
     <script type="text/javascript">

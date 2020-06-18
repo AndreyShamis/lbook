@@ -31,7 +31,8 @@
         "symfony/web-link": "^4.4",
         "symfony/webpack-encore-pack": "*",
         "symfony/yaml": "4.4.*",
-        "twig/extensions": "^1.5"
+        "twig/extensions": "^1.5",
+        "doctrine/doctrine-migrations-bundle": "2.1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^7",

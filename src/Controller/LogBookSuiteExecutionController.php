@@ -317,7 +317,7 @@ class LogBookSuiteExecutionController extends AbstractController
                     /** @var SuiteExecution $suite */
                     $suite = $iterator->current();
                     if ($suite !== null) {
-                        $suite->calculateStatistic();
+                        //$suite->calculateStatistic();
                         $suite->setClosed(true);
                         $closed++;
                         $em->persist($suite);

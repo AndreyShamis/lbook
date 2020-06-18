@@ -108,6 +108,12 @@ th.meta_data_column{
     width: 400px;
     height: 32px;
 }
+
+.suiteExSearchSelection button[class~="multiselect"]{
+    width: 400px;
+    height: 32px;
+}
+
 #cycle_index_table td{
     font-size: 11px;
     line-height: 1.0;

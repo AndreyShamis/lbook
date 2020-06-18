@@ -13,7 +13,40 @@ class SuiteExecutionSearch
 
     protected $name = '';
 
-//    protected $verdicts;
+    /** @var array  */
+    protected $testingLevel = [];
+
+    /**
+     * @return array
+     */
+    public function getTestingLevel(): array
+    {
+        return $this->testingLevel;
+    }
+
+    /**
+     * @param array $testingLevel
+     */
+    public function setTestingLevel(array $testingLevel): void
+    {
+        $this->testingLevel = $testingLevel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSetups()
+    {
+        return $this->setups;
+    }
+
+    /**
+     * @param mixed $setups
+     */
+    public function setSetups($setups): void
+    {
+        $this->setups = $setups;
+    }
 
     protected $setups;
 

@@ -14,8 +14,13 @@
         <tr>
             <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
             <th data-sortable="true" data-switchable="false">ID</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false">Name</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle</th>
+            <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false">Suite Name</th>
+            <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
+            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
+
+            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle Name</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">Cycle ID</th>
             <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>
             <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>
@@ -26,22 +31,19 @@
             <th data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true">F</th>
             <th data-sortable="true" title="Error Count" data-switchable="true" data-visible="true">E</th>
             <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
-            <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
             <th data-sortable="true" title="Components" data-switchable="true">Components</th>
-            <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI</th>
-            <th data-sortable="true" title="CI TAG" data-switchable="true">CI tag</th>
-            <th data-sortable="true" title="Jira Test Set URL" data-switchable="true">TS</th>
+            <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI URL</th>
+            <th data-sortable="true" title="CI TAG" data-switchable="true" data-visible="false">CI tag</th>
+            <th data-sortable="true" title="Jira Test Set URL" data-switchable="true" data-visible="false">TS</th>
             <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>
-            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
-            <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="false">Updated</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time diff">Updated</th>
             <th data-sortable="true" title="Node" data-switchable="true">Node</th>
             <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true">S</th>
-            <th data-sortable="true" title="Publish" data-switchable="true">Pub</th>
+            <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true">Pub</th>
 {#            <th class="suite_list_options_column">Options</th>#}
         </tr>
         </thead>
@@ -70,14 +72,18 @@
                     {% endif %}
                 </td>
                 <td class="font8">{{ suiteExecution.id }}</td>
+                <td>{{ suiteExecution.uuid }}</td>
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
-                <td>
+                <td class="font9">{{ suiteExecution.productVersion }}</td>
+                <td class="font10">{{ suiteExecution.testingLevel }}</td>
+                <td class="font9">
                     {% if suiteExecution.cycle.id is defined and suiteExecution.cycle.name is defined %}
-                        {{ suiteExecution.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
+                        <a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
                     {% else %}
                         NOT_FOUND
                     {% endif %}
                 </td>
+                <td class="font9">{% if suiteExecution.cycle.id is defined %}{{ suiteExecution.cycle.id }}{% endif %}</td>
                 <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime |  executionTimeGenericShort}}</span></td>
                 <td>{{ suiteExecution.testsCount }}</td>
                 <td>{{ suiteExecution.testsCountEnabled }}</td>
@@ -88,7 +94,6 @@
                 <td class="failClass">{{ suiteExecution.failCount }}</td>
                 <td class="errorClass">{{ suiteExecution.errorCount }}</td>
                 <td>{{ suiteExecution.summary }}</td>
-                <td>{{ suiteExecution.uuid }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
                 <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
@@ -96,14 +101,12 @@
                 <td class="font9">{{ suiteExecution.buildTag }}</td>
                 <td>{% if suiteExecution.testSetUrl != '' %}<a href="{{ suiteExecution.testSetUrl }}" target="_blank">{{ suiteExecution.testSetUrl | jiraKey }}</a>{% endif %}</td>
                 <td>{% if suiteExecution.testPlanUrl != '' %}<a href="{{ suiteExecution.testPlanUrl }}" target="_blank">{{ suiteExecution.testPlanUrl | jiraKey }}</a>{% endif %}</td>
-                <td>{{ suiteExecution.testingLevel }}</td>
-                <td class="font9">{{ suiteExecution.productVersion }}</td>
+                <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
                 <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|date('Y/m/d H:i:s')}}</span></td>
                 <td><span class="font8" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
-                <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
                 <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
-                <td>{{ suiteExecution.closed ? 'X':'O'  }}</td>
-                <td>{{ suiteExecution.publish }}</td>
+                <td class="font6">{{ suiteExecution.closed ? 'X':'O'  }}</td>
+                <td class="font6">{{ suiteExecution.publish }}</td>
 {#                <td>#}
 {#                    <div class="hidden-sm hidden-xs action-buttons">#}
 {#                        <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">#}
@@ -122,5 +125,11 @@
             </tr>
         {% endfor %}
         </tbody>
+    </table>
+    <table>
+        <tr>
+            <td style="width: 100px;" class="suite_wip">SUITE WIP</td>
+            <td style="width: 100px;" class="suiteSelected">Current suite</td>
+        </tr>
     </table>
 {% endapply %}

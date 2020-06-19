@@ -105,13 +105,17 @@ th.meta_data_column{
 }
 
 .testSearchSelection button[class~="multiselect"]{
-    width: 400px;
-    height: 32px;
+    width: 400px !important;
+    height: 32px !important;
 }
 
+button[class~="multiselect"]{
+    width: 400px !important;
+    height: 32px !important;
+}
 .suiteExSearchSelection button[class~="multiselect"]{
-    width: 400px;
-    height: 32px;
+    width: 400px !important;
+    height: 32px !important;
 }
 
 #cycle_index_table td{

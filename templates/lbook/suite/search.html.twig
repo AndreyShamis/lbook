@@ -2,105 +2,133 @@
 
 {% block content %}
     {#    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>#}
-    <h4>Suite execution search</h4>
-    {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
+    <h6>Suite execution search</h6>
+    {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}, 'method': 'POST'}) }}
     <table>
         <tr>
-            <td>{{ form_label(form.name, 'Suite Name/ID/substring', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.name) }}</td>
-            <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Suite Name/ID/substring/other'}}) }}</td>
+            <td>
+
+                <table>
+                    <tr>
+                        <td>{{ form_label(form.name, 'Suite Name/substring', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:180px;'}}) }}</td>
+                        <td>{{ form_errors(form.name) }}</td>
+                        <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Suite Name/ID/substring/other'}}) }}</td>
+                    </tr>
+                    {#        <tr> #}
+                    {#            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:120px;'}}) }}</td>#}
+                    {#            <td>{{ form_errors(form.verdict) }}</td>#}
+                    {#            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>#}
+                    {#        </tr>#}
+
+                    <tr>
+                        <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:180px;'}}) }}</td>
+                        <td>{{ form_errors(form.setup) }}</td>
+                        <td>{{ form_widget(form.setup) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.testingLevel, 'Testing Level', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:180px;'}}) }}</td>
+                        <td>{{ form_errors(form.testingLevel) }}</td>
+                        <td>{{ form_widget(form.testingLevel) }}</td>
+                        {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+                    </tr>
+
+                    <tr>
+                        <td>
+                            {{ form_label(form.fromDate) }}
+                            /
+                            {{ form_label(form.toDate) }}
+                        </td>
+                        <td>
+                            {{ form_errors(form.fromDate) }}
+                            {{ form_errors(form.toDate) }}
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="input-group input-group-sm">
+                                        {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
+                                        {{ form_widget(form.fromDate) }}
+                                        <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group input-group-sm">
+                                        {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
+                                        {{ form_widget(form.toDate) }}
+                                        <span class="input-group-addon">
+                                <i class="ace-icon fa fa-calendar"></i>
+                            </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {#<tr>#}
+                    {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
+                    {#<td>{{ form_errors(form.cycle) }}</td>#}
+                    {#<td>#}
+                    {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
+                    {#</td>#}
+                    {#</tr>#}
+                </table>
+            </td>
+            <td>
+&nbsp;
+            </td>
+            <td>
+
+                <table>
+                    <tr>
+                        <td>{{ form_label(form.platforms, 'Platforms', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_errors(form.platforms) }}</td>
+                        <td>{{ form_widget(form.platforms) }}</td>
+                        {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.chips, 'Chip/s', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_errors(form.chips) }}</td>
+                        <td>{{ form_widget(form.chips)  }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.publish, 'Publish', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_errors(form.publish) }}</td>
+                        <td>{{ form_widget(form.publish) }}</td>
+                        {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+                    </tr>
+
+                    <tr>
+                        <td>{{ form_label(form.limit) }}</td>
+                        <td>{{ form_errors(form.limit) }}</td>
+                        <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
+                    </tr>
+
+                </table>
+
+            </td>
         </tr>
-        {#        <tr>#}
-        {#            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>#}
-        {#            <td>{{ form_errors(form.verdict) }}</td>#}
-        {#            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>#}
-        {#        </tr>#}
 
         <tr>
-            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.setup) }}</td>
-            <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+            <td></td>
+            <td></td>
         </tr>
-        <tr>
-            <td>{{ form_label(form.testingLevel, 'Testing Level', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.testingLevel) }}</td>
-            <td>{{ form_widget(form.testingLevel) }}</td>
-{#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
-        </tr>
-        <tr>
-            <td>{{ form_label(form.platforms, 'Platforms', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.platforms) }}</td>
-            <td>{{ form_widget(form.platforms) }}</td>
-            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
-        </tr>
-        <tr>
-            <td>{{ form_label(form.chips, 'Chip/s', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.chips) }}</td>
-            <td>{{ form_widget(form.chips) }}</td>
-            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
-        </tr>
-        <tr>
-            <td>{{ form_label(form.publish, 'Publish', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.publish) }}</td>
-            <td>{{ form_widget(form.publish) }}</td>
-            {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
-        </tr>
-        <tr>
-            <td>
-                {{ form_label(form.fromDate) }}
-                /
-                {{ form_label(form.toDate) }}
-            </td>
-            <td>
-                {{ form_errors(form.fromDate) }}
-                {{ form_errors(form.toDate) }}
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="input-group input-group-sm">
-                            {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
-                            {{ form_widget(form.fromDate) }}
-                            <span class="input-group-addon">
-                                <i class="ace-icon fa fa-calendar"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="input-group input-group-sm">
-                            {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
-                            {{ form_widget(form.toDate) }}
-                            <span class="input-group-addon">
-                                <i class="ace-icon fa fa-calendar"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>{{ form_label(form.limit) }}</td>
-            <td>{{ form_errors(form.limit) }}</td>
-            <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
-        </tr>
-        {#<tr>#}
-        {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
-        {#<td>{{ form_errors(form.cycle) }}</td>#}
-        {#<td>#}
-        {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
-        {#</td>#}
-        {#</tr>#}
     </table>
 
+
     {{ form_widget(form) }}
-    <input type="submit" value="Search" />
+
+    <div class="row">
+        <div class="col-xs-2">
+            <input type="submit" value="Search" style="width: 200px;" />
+        </div>
+        <div class="col-xs-10">
+            <span class="font7 ">{{ sql }}</span>
+        </div>
+    </div>
+    <h6>Found {{ tests_count }} cycles</h6>
     {{ form_end(form) }}
-
-    <ul>
-        <li>Found {{ tests_count }} cycles</li>
-                <li>{{ sql }}</li>
-    </ul>
-
     <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
 
     <!-- inline scripts related to this page -->
@@ -148,16 +176,16 @@
         $(document).ready(
             function($){
                 setMultiSelect();
-                setDatePicker("#suite_execution_search_fromDate");
-                setDatePicker("#suite_execution_search_toDate");
+                setDatePicker("#{{ form.vars.id  }}_fromDate");
+                setDatePicker("#{{ form.vars.id  }}_toDate");
             }
         );
-
         function testsFormatter(value, row) {
             var icon = parseInt(row.id) % 2 === 0 ? 'glyphicon-star' : 'glyphicon-star-empty'
             return '<i class="glyphicon ' + icon + '"></i>' + value;
         }
     </script>
+
     {% include "lbook/suite/list.html.twig" %}
 {#    <div class="row">#}
 {#        <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">#}

@@ -1,4 +1,5 @@
 {% apply spaceless %}
+    <input type="button" id="btnCurrentSuitesToPivot" value="Build Pivot from current table" />
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="suiteTable" data-pagination="true" data-search="true" data-toggle="table"
            data-toolbar="#suiteExecutionToolBar"
@@ -10,30 +11,31 @@
            data-show-columns="true"
            data-advanced-search="true"
             {#data-id-table="advancedTable"#}
-           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 5000]" data-sort-order="desc">
+           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
         <tr>
-            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
+{#            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>#}
             <th data-sortable="true" data-switchable="false">ID</th>
-            <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false" data-footer-formatter="totalFormatter">Suite Name</th>
-            <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
+            <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="true">UUID</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false" data-footer-formatter="totalFormatter">SuiteName</th>
+            <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
             <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
 
-            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle Name</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">Cycle ID</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">CycleID</th>
             <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false" data-footer-formatter="totalFormatter">Tests</th>
             <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>
             <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>
 {#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
-            <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PR</th>
-            <th data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">P</th>
-            <th data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">F</th>
-            <th data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">E</th>
+            <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PassRate</th>
+            <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
+            <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fails</th>
+            <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Errors</th>
             <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
+            <th data-sortable="true" title="Job Name" data-switchable="true">Jobname</th>
             <th data-sortable="true" title="Components" data-switchable="true">Components</th>
             <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI URL</th>
             <th data-sortable="true" title="CI TAG" data-switchable="true" data-visible="false">CI tag</th>
@@ -68,19 +70,19 @@
                 {% set suite_css = suite_css ~ ' suiteSelected ' %}
             {% endif %}
             <tr class="{{ suite_css }}">
-                <td class="font6" title="Updated {{ suiteExecution.updatedAt|time_diff }}">
-                    {% if date(suiteExecution.updatedAt) > date('-5 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
-                    {% elseif date(suiteExecution.updatedAt) > date('-30 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
-                    {% elseif date(suiteExecution.updatedAt) > date('-60 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
-                    {% elseif date(suiteExecution.updatedAt) > date('-12 hours') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
-                    {% endif %}
-                </td>
-                <td class="font8">{{ suiteExecution.id }}</td>
-                <td>{{ suiteExecution.uuid }}</td>
+{#                <td class="font6" title="Updated {{ suiteExecution.updatedAt|time_diff }}">#}
+{#                    {% if date(suiteExecution.updatedAt) > date('-5 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>#}
+{#                    {% elseif date(suiteExecution.updatedAt) > date('-30 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>#}
+{#                    {% elseif date(suiteExecution.updatedAt) > date('-60 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>#}
+{#                    {% elseif date(suiteExecution.updatedAt) > date('-12 hours') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>#}
+{#                    {% endif %}#}
+{#                </td>#}
+                <td class="font7">{{ suiteExecution.id }}</td>
+                <td class="font8">{{ suiteExecution.uuid }}</td>
                 <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
                 <td class="font9">{{ suiteExecution.productVersion }}</td>
                 <td class="font10">{{ suiteExecution.testingLevel }}</td>
@@ -104,6 +106,7 @@
                 <td>{{ suiteExecution.summary }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
+                <td class="font9">{{ suiteExecution.jobName }}</td>
                 <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>
@@ -164,4 +167,57 @@
             <td style="width: 100px;" class="suiteSelected">Current suite</td>
         </tr>
     </table>
+    <input type="button" id="btnCurrentSuitesToPivotDown" value="Build Pivot from current table" />
+    <div id="output"></div>
+    <script type="text/javascript">
+        $(function(){
+            function buildPivotTable() {
+                $(function(){
+                    var renderers = $.extend($.pivotUtilities.renderers, $.pivotUtilities.export_renderers, $.pivotUtilities.gchart_renderers, $.pivotUtilities.derivers);
+
+                    var tpl = $.pivotUtilities.aggregatorTemplates;
+                    $("#output").pivotUI($("#suiteTable"),
+                        {
+                            renderers: renderers,
+                            rows: ["Platform", "Chip"],
+                            cols: ["ProductVersion"],
+                            vals: ["PassRate"],
+                            aggregatorName: ["Average"],
+                            // aggregators: {
+                            //     "PassRate": function() { return tpl.average()(["PassRate"])}
+                            // },
+                        });
+                });
+                window.scrollTo(0,document.body.scrollHeight);
+            }
+            $( "#btnCurrentSuitesToPivot" ).bind( "click", buildPivotTable);
+            $( "#btnCurrentSuitesToPivotDown" ).bind( "click", buildPivotTable);
+            // var testTable = $('#suiteTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+            // This example loads data from the HTML table below.
+
+
+            // var derivers = $.pivotUtilities.derivers;
+
+            // $.getJSON("mps.json", function(mps) {
+            //     $("#output").pivotUI(mps, {
+            //         derivedAttributes: {
+            //             "Age Bin": derivers.bin("Age", 10),
+            //             "Gender Imbalance": function(mp) {
+            //                 return mp["Gender"] == "Male" ? 1 : -1;
+            //             }
+            //         },
+            //         rows: ["Province"],
+            //         cols: ["Party"],
+            //         aggregatorName: "Integer Sum",
+            //         vals: ["Age"],
+            //         rendererName: "Heatmap"
+            //     });
+            // });
+        });
+
+</script>
 {% endapply %}

@@ -35,92 +35,69 @@ class SuiteExecutionSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class,
-                array(
-                    'required' => false,
-                    'attr' =>
-                        array(
-                            'style' => 'width:400px;'
-                        )
-                ))
-            ->add('fromDate', TextType::class, array(
+            ->add('name', TextType::class, [
                 'required' => false,
-                'attr' => array('class' => 'form-control')))
-            ->add('toDate', TextType::class, array(
+                'attr' => [
+                    'style' => 'width:400px;'
+                ]])
+            ->add('fromDate', TextType::class, [
                 'required' => false,
-                'attr' => array('class' => 'form-control')))
-            //->add('timeRun')
+                'attr' => [
+                    'class' => 'form-control'
+                ]])
+            ->add('toDate', TextType::class, [
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control'
+                ]])
 //            ->add('verdict', LogBookSelectableVerdictType::class, array('required' => false))
-            ->add('setup', LogBookSelectableSetupType::class, array('required' => false))
+            ->add('setup', LogBookSelectableSetupType::class, ['required' => false])
             ->add('limit', QueryLimitType::class)
-            ->add('testingLevel', ChoiceType::class,
-                array(
+            ->add('testingLevel', ChoiceType::class, [
+                'required' => false,
+                'label' => ' ',
+                'choices' => [
+                    'sanity' => 'sanity',
+                    'integration' => 'integration',
+                    'nightly' => 'nightly',
+                    'weekly' => 'weekly'
+                ],
+//              'choice_label' => 'TestingLevel',
+//              'choice_value' => 'Id',
+//              'expanded' => false, //             // false will convert to checkbox
+                'multiple'=> true,
+                'attr' => [
+                    'style' => 'width:400px;display: none;',
+                    'class' => 'LogBookSelectableTestingLevelType multiselect']
+            ])
+            ->add('publish', ChoiceType::class, [
                     'required' => false,
-                    //             // false will convert to checkbox
-//                    'expanded' => false,
-                    'label' => ' ',
-                    'choices' => [
-                        'sanity' => 'sanity',
-                        'integration' => 'integration',
-                        'nightly' => 'nightly',
-                        'weekly' => 'weekly'
-                    ],
-//                    'choice_label' => 'TestingLevel',
-//                    'choice_value' => 'Id',
-                    'multiple'=> true,
-                    'attr' => array(
-                        'style' => 'width:400px;display: none;', // min-height:180px;
-                        'class' => 'LogBookSelectableTestingLevelType multiselect')
-                )
-            )
-            ->add('publish', ChoiceType::class,
-                array(
-                    'required' => false,
-                    //             // false will convert to checkbox
-        //                    'expanded' => false,
-                    'label' => ' ',
                     'choices' => [
                         'Not Publish' => '0',
                         'Publish' => '1'
                     ],
-        //                    'choice_label' => 'TestingLevel',
-        //                    'choice_value' => 'Id',
                     'multiple'=> true,
-                    'attr' => array(
-                        'style' => 'width:400px;display: none;', // min-height:180px;
-                        'class' => 'LogBookSelectablePublishType multiselect')
-                )
-            )
-            ->add('platforms', ChoiceType::class,
-                array(
+                    'attr' => [
+                        'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectablePublishType multiselect']
+                ])
+            ->add('platforms', ChoiceType::class, [
                     'required' => false,
-                    //             // false will convert to checkbox
-                    //                    'expanded' => false,
-                    'label' => ' ',
                     'choices' => $this->getUniqPlatforms(),
-//                    'choice_label' => 'platform',
-//                    'choice_value' => ,
                     'multiple'=> true,
-                    'attr' => array(
-                        'style' => 'width:400px;display: none;', // min-height:180px;
-                        'class' => 'LogBookSelectablePlatfromsType multiselect')
-                )
+                    'attr' => [
+                        'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectablePlatformsType multiselect']
+                ]
             )
-            ->add('chips', ChoiceType::class,
-                array(
+            ->add('chips', ChoiceType::class, [
                     'required' => false,
-                    //             // false will convert to checkbox
-                    //                    'expanded' => false,
-                    'label' => ' ',
                     'choices' => $this->getUniqChips(),
-//                    'choice_label' => 'platform',
-//                    'choice_value' => ,
                     'multiple'=> true,
-                    'attr' => array(
-                        'style' => 'width:400px;display: none;', // min-height:180px;
-                        'class' => 'LogBookSelectableChipsType multiselect')
-                )
-            );
+                    'attr' => [
+                        'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectableChipsType multiselect']
+                ]);
             //->add('executionOrder')
 //            ->add('cycle')
             //->add('disabled')

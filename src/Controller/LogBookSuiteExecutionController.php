@@ -8,6 +8,7 @@ use App\Form\SuiteExecutionSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
+use Doctrine\DBAL\Types\Type;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -33,59 +34,57 @@ class LogBookSuiteExecutionController extends AbstractController
      */
     public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): Response
     {
-        set_time_limit(30);
-        $tests = $new_tests = array();
-        $setups = null;
+        $new_tests = array();
         $sql = '';
         $leftDate = $rightDate = false;
         $startDate = $endDate = null;
-        $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
-        $suites = new SuiteExecutionSearch();
+        $suiteSearch = new SuiteExecutionSearch();
 
-        $form = $this->createForm(SuiteExecutionSearchType::class, $suites, array());
+        $form = $this->createForm(SuiteExecutionSearchType::class, $suiteSearch, array());
         try {
             $form->handleRequest($request);
         } catch (\Exception $ex) {}
 
         $addOrder = true;
-        $testingLevel = $publish = $platforms = $chips = [];
+
         $post = $request->request->get('suite_execution_search');
+
+        if ($post === null) {
+            $post = $request->query->get('suite_execution_search');
+        }
 
         if ($post !== null) {
             $enableSearch = false;
             if (array_key_exists('setup', $post)) {
-                $setups = $post['setup']['name'];
+                echo "<pre>";
+                print_r($post['setup']['name']);
+                $suiteSearch->setSetup($post['setup']['name']);
             }
             if (array_key_exists('limit', $post)) {
                 $limit = (int)$post['limit'];
-                if ($limit > 15000) {
-                    $limit = 500;
+                if ($limit > 30000) {
+                    $limit = 1;
                 }
-                $suites->setLimit($limit);
+                $suiteSearch->setLimit($limit);
             }
             if (array_key_exists('testingLevel', $post)) {
-                $suites->setTestingLevel($post['testingLevel']);
-                $testingLevel = $post['testingLevel'];
+                $suiteSearch->setTestingLevel($post['testingLevel']);
             }
             if (array_key_exists('publish', $post)) {
-                $suites->setPublish($post['publish']);
-                $publish = $post['publish'];
+                $suiteSearch->setPublish($post['publish']);
             }
-
             if (array_key_exists('platforms', $post)) {
-                $suites->setPlatforms($post['platforms']);
-                $platforms = $post['platforms'];
+                $suiteSearch->setPlatforms($post['platforms']);
             }
             if (array_key_exists('chips', $post)) {
-                $suites->setChips($post['chips']);
-                $chips = $post['chips'];
+                $suiteSearch->setChips($post['chips']);
             }
             $name = $post['name'];
             $fromDate = $post['fromDate'];
             $toDate = $post['toDate'];
 
             $qb = $suitesRepo->createQueryBuilder('s')
-                ->setMaxResults($suites->getLimit());
+                ->setMaxResults($suiteSearch->getLimit());
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
                 $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
                 if ($startDate !== false) {
@@ -128,40 +127,38 @@ class LogBookSuiteExecutionController extends AbstractController
                 $qb->setParameter('cycle_id', (int)$name);
 
             }
-            if (count($testingLevel)) {
+            if (count($suiteSearch->getTestingLevel())) {
                 $qb->andWhere('s.testingLevel IN (:testingLevels)')
-                    ->setParameter('testingLevels', $testingLevel);
+                    ->setParameter('testingLevels', $suiteSearch->getTestingLevel());
             }
-            if (count($publish)) {
+            if (count($suiteSearch->getPublish())) {
                 $qb->andWhere('s.publish IN (:publish)')
-                    ->setParameter('publish', $publish);
+                    ->setParameter('publish',  $suiteSearch->getPublish());
             }
-            if (count($platforms)) {
+            if (count($suiteSearch->getPlatforms())) {
                 $qb->andWhere('s.platform IN (:platforms)')
-                    ->setParameter('platforms', $platforms);
+                    ->setParameter('platforms',  $suiteSearch->getPlatforms());
             }
-            if (count($chips)) {
+            if (count($suiteSearch->getChips())) {
                 $qb->andWhere('s.chip IN (:chips)')
-                    ->setParameter('chips', $chips);
+                    ->setParameter('chips',  $suiteSearch->getChips());
             }
             if ($leftDate === true && $rightDate === true) {
                 $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
-                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
-                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                    ->setParameter('fromDate', $startDate, Type::DATETIME)
+                    ->setParameter( 'toDate', $endDate, Type::DATETIME);
             } else if ($leftDate === true) {
                 $qb->andWhere('s.startedAt >= :fromDate')
-                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                    ->setParameter('fromDate', $startDate, Type::DATETIME);
             } else if ($rightDate === true) {
                 $qb->andWhere('s.finishedAt <= :endDate')
-                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                    ->setParameter('endDate', $endDate, Type::DATETIME);
             }
 
-            if ($setups !== null && \count($setups) > 0) {
-                $qb->leftJoin('s.cycle', 'cycle')->andWhere('cycle.setup  IN (:setups)')->setParameter('setups', $setups);
-                //leftJoin('cycle.setup', 'setup')->andWhere($qb->expr()->like('setup.name', 'in '));
-//
-//                $qb->andWhere('s.setup IN (:setups)')
-//                    ->setParameter('setups', $setups);
+            if (count($suiteSearch->getSetup()) > 0) {
+                $qb->leftJoin('s.cycle', 'cycle')
+                    ->andWhere('cycle.setup  IN (:setups)')
+                    ->setParameter('setups',  $suiteSearch->getSetup());
             }
 
             $enableSearch = True;
@@ -187,7 +184,6 @@ class LogBookSuiteExecutionController extends AbstractController
         }
 
         return $this->render('lbook/suite/search.html.twig', array(
-            //'tests' => $tests,
             'iterator' => $new_tests,
             'tests_count' => \count($new_tests),
             'sql' => $sql,
@@ -245,7 +241,7 @@ class LogBookSuiteExecutionController extends AbstractController
         $query = $suites->createQueryBuilder('suite_execution')
             ->orderBy($needed_row , $orders[array_rand($orders)])
             ->andWhere('suite_execution.startedAt >= :started')
-        ->setParameter('started', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME);
+        ->setParameter('started', new \DateTime('-'. $days. ' days'), Type::DATETIME);
 
         $paginator = $pagePaginator->paginate($query, 1, 5000);
         $totalPosts = $paginator->count();
@@ -319,7 +315,7 @@ class LogBookSuiteExecutionController extends AbstractController
             ->orderBy('suite_execution.id' , $orders[array_rand($orders)])
             ->andWhere('suite_execution.finishedAt <= :finishedAt')
             ->andWhere('suite_execution.closed = :state')
-            ->setParameter('finishedAt', new \DateTime('-'. $days. ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->setParameter('finishedAt', new \DateTime('-'. $days. ' days'), Type::DATETIME)
             ->setParameter('state', false);
 
         $paginator = $pagePaginator->paginate($query, 1, 1000);

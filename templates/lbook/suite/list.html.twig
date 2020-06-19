@@ -10,7 +10,7 @@
            data-show-columns="true"
            data-advanced-search="true"
             {#data-id-table="advancedTable"#}
-           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 5000]" data-sort-order="desc">
+           data-page-size="5000" data-page-list="[10, 15, 20, 50, 100, 500, 1000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
         <tr>
             <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
@@ -28,9 +28,9 @@
             <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>
 {#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
             <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PR</th>
-            <th data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">P</th>
-            <th data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">F</th>
-            <th data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">E</th>
+            <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
+            <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fails</th>
+            <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Errors</th>
             <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
@@ -164,4 +164,41 @@
             <td style="width: 100px;" class="suiteSelected">Current suite</td>
         </tr>
     </table>
+    <div id="output"></div>
+    <script type="text/javascript">
+        $(function(){
+            // var testTable = $('#suiteTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+            // This example loads data from the HTML table below.
+
+            $(function(){
+                $("#output").pivotUI($("#suiteTable"),
+                    {
+                        rows: ["Platform", "Chip"],
+                        cols: ["Product Version"]
+                    });
+            });
+            // var derivers = $.pivotUtilities.derivers;
+
+            // $.getJSON("mps.json", function(mps) {
+            //     $("#output").pivotUI(mps, {
+            //         derivedAttributes: {
+            //             "Age Bin": derivers.bin("Age", 10),
+            //             "Gender Imbalance": function(mp) {
+            //                 return mp["Gender"] == "Male" ? 1 : -1;
+            //             }
+            //         },
+            //         rows: ["Province"],
+            //         cols: ["Party"],
+            //         aggregatorName: "Integer Sum",
+            //         vals: ["Age"],
+            //         rendererName: "Heatmap"
+            //     });
+            // });
+        });
+
+</script>
 {% endapply %}

@@ -25,7 +25,7 @@ class SuiteExecutionSearch
     /** @var array  */
     protected $chips = [];
 
-    protected $setups;
+    protected $setups = [];
 
     protected $fromDate;
 
@@ -111,7 +111,7 @@ class SuiteExecutionSearch
     /**
      * @return mixed
      */
-    public function getSetups()
+    public function getSetup()
     {
         return $this->setups;
     }
@@ -119,7 +119,7 @@ class SuiteExecutionSearch
     /**
      * @param mixed $setups
      */
-    public function setSetups($setups): void
+    public function setSetup($setups): void
     {
         $this->setups = $setups;
     }
@@ -210,23 +210,5 @@ class SuiteExecutionSearch
     {
         $this->name = $name;
     }
-
-
-    /**
-     * @return LogBookSetup[]
-     */
-    public function getSetup(): ?array
-    {
-        return $this->setups;
-    }
-
-    /**
-     * @param LogBookSetup[] $setups
-     */
-    public function setSetup(LogBookSetup $setups = null): void
-    {
-        $this->setups = $setups;
-    }
-
 
 }

@@ -103,7 +103,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
             if ($name !== null && \mb_strlen($name) >= 2) {
 
-                $qb->andWhere('MATCH_AGAINST(s.name, s.productVersion, s.platform, s.chip, s.summary, s.jobName, s.buildTag, :search_str) > 1 OR s.name LIKE :cycle_name OR s.id = :cycle_id OR s.uuid LIKE :cycle_id');
+                $qb->andWhere('MATCH_AGAINST(s.name, s.productVersion, s.platform, s.chip, s.summary, s.jobName, s.buildTag, :search_str) > 1 OR s.name LIKE :cycle_name OR s.id = :cycle_id OR s.uuid LIKE :cycle_name_src OR s.components LIKE :cycle_name_src');
                 $qb->addSelect('MATCH_AGAINST(s.name, s.productVersion, s.platform, s.chip, s.summary, s.jobName, s.buildTag, :search_str) as rate');
                 $qb->orderBy('rate', 'DESC');
                 $qb->addOrderBy('s.id', 'DESC');
@@ -128,6 +128,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
                 $qb->setParameter('cycle_name', $cycle_name_search);
                 $qb->setParameter('cycle_id', (int)$name);
+                $qb->setParameter('cycle_name_src', $name);
 
             }
             if (count($suiteSearch->getTestingLevel())) {
@@ -193,7 +194,7 @@ class LogBookSuiteExecutionController extends AbstractController
             'form' => $form->createView(),
         ));
     }
-    
+
     /**
      * @Route("/", name="suite_index")
      * @Route("/{page}", name="suite_index")

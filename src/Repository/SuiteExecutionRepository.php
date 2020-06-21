@@ -134,7 +134,6 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $state
      * @return SuiteExecution[]|null
      */
     public function getUniqPlatforms()
@@ -160,6 +159,58 @@ class SuiteExecutionRepository extends ServiceEntityRepository
 
     }
 
+
+    /**
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqJobNames()
+    {
+        $reset = function ($input) {
+            return $input['jobName'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.jobName')->distinct()
+            ->orderBy('s.updatedAt', 'DESC')
+            ->setMaxResults(10000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            return array_combine($map, $map);
+        }
+        return null;
+
+    }
+
+    /**
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqComponents()
+    {
+        $reset = function ($input) {
+            return $input['components'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.components')->distinct()
+            ->orderBy('s.updatedAt', 'DESC')
+            ->setMaxResults(10000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            return array_combine($map, $map);
+        }
+        return null;
+
+    }
     /**
      * @param int $state
      * @return SuiteExecution[]|null

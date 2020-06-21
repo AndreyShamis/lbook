@@ -59,7 +59,7 @@
         {% set suite_done = 0 %}
         {% set suitesCount = 0 %}
         {% set suitesCount = iterator|length  %}
-        {% for suiteExecution in iterator | slice(0, 5000)%}
+        {% for suiteExecution in iterator | slice(0, 50000)%}
             {% set suite_css = '' %}
             {% if not suiteExecution.closed %}
                 {% set suite_css = ' suite_wip ' %}

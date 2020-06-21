@@ -40,22 +40,22 @@ class StorageString
     private $updatedAt;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=150)
      */
     private $key1 = '';
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=100)
      */
     private $key2 = '';
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $key3;
 
     /**
-     * @ORM\Column(name="vname", type="string", length=255)
+     * @ORM\Column(name="vname", type="string", length=191)
      */
     private $vname = '';
 

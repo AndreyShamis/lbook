@@ -1,8 +1,6 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Edit StorageString{% endblock %}
-
-{% block body %}
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}Edit Storage Strings{% endblock %}
+{% block content %}
     <h1>Edit StorageString</h1>
 
     {{ include('storage_string/_form.html.twig', {'button_label': 'Update'}) }}

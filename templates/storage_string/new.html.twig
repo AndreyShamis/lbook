@@ -1,9 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}New Storage Strings{% endblock %}
+{% block content %}
 
-{% block title %}New StorageString{% endblock %}
-
-{% block body %}
-    <h1>Create new StorageString</h1>
+    <h3>Create new StorageString</h3>
 
     {{ include('storage_string/_form.html.twig') }}
 

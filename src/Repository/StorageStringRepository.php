@@ -39,7 +39,7 @@ class StorageStringRepository extends ServiceEntityRepository
             ->where('s.key1 = :key1')
             ->andWhere('s.key2 = :key2')
             ->andWhere('s.key3 = :key3')
-            ->andWhere('s.name = :name')
+            ->andWhere('s.vname = :name')
             ->setParameters([
                 'key1'=> $key1,
                 'key2'=> $key2,
@@ -73,7 +73,7 @@ class StorageStringRepository extends ServiceEntityRepository
                 'key2'=> $key2,
                 'key3'=> $key3
             ])
-            ->orderBy('s.name', 'ASC')
+            ->orderBy('s.vname', 'ASC')
             ->setMaxResults($maxResults)
             ->getQuery()
             ->getResult();
@@ -93,14 +93,16 @@ class StorageStringRepository extends ServiceEntityRepository
         if (array_key_exists('value', $tmpCriteria)) {
             unset($tmpCriteria['value']);
         }
-        $entity = $this->findOneBy([$tmpCriteria]);
+        $entity = $this->findOneBy($tmpCriteria);
         if (null === $entity) {
             $entity = new StorageString();
-            $entity->setName($criteria['name']);
-            $entity->setValue($criteria['value']);
+            $entity->setName($criteria['vname']);
+            if (array_key_exists('value', $criteria)) {
+                $entity->setValue($criteria['value']);
+            }
             $entity->setKey1($criteria['key1']);
             if (array_key_exists('key2', $criteria)) {
-                $entity->setKey3($criteria['key2']);
+                $entity->setKey2($criteria['key2']);
             }
             if (array_key_exists('key3', $criteria)) {
                 $entity->setKey3($criteria['key3']);
@@ -110,6 +112,8 @@ class StorageStringRepository extends ServiceEntityRepository
         }
         return $entity;
     }
+
+
     /*
     public function findOneBySomeField($value): ?StorageString
     {

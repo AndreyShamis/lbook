@@ -145,7 +145,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         $ret = $this->createQueryBuilder('s')
             ->select('s.platform')->distinct()
             ->orderBy('s.updatedAt', 'DESC')
-            ->setMaxResults(1000)
+            ->setMaxResults(10000)
             ->setLifetime(7200)
             ->setCacheable(true);
 
@@ -172,7 +172,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         $ret = $this->createQueryBuilder('s')
             ->select('s.chip')->distinct()
             ->orderBy('s.chip', 'ASC')
-            ->setMaxResults(1000)
+            ->setMaxResults(10000)
             ->setLifetime(7200)
             ->setCacheable(true);
 

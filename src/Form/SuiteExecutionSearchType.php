@@ -8,9 +8,13 @@
 namespace App\Form;
 
 use App\Entity\LogBookSetup;
+use App\Entity\StorageString;
 use App\Entity\SuiteExecution;
 use App\Entity\SuiteExecutionSearch;
+use App\Repository\StorageStringRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -83,7 +87,9 @@ class SuiteExecutionSearchType extends AbstractType
                 ])
             ->add('platforms', ChoiceType::class, [
                     'required' => false,
-                    'choices' => $this->getUniqPlatforms(),
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
                     'multiple'=> true,
                     'attr' => [
                         'style' => 'width:400px;display: none;',
@@ -92,7 +98,9 @@ class SuiteExecutionSearchType extends AbstractType
             )
             ->add('chips', ChoiceType::class, [
                     'required' => false,
-                    'choices' => $this->getUniqChips(),
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
                     'multiple'=> true,
                     'attr' => [
                         'style' => 'width:400px;display: none;',
@@ -119,11 +127,46 @@ class SuiteExecutionSearchType extends AbstractType
 //        $builder->get('verdict')->addModelTransformer($nulTransformer);
         $builder->get('setup')->addModelTransformer($nulTransformer);
 
-    }
+        $prob = rand(1, 100);
+        if ($prob == 69 || $prob == 16) {
+            $chips = $this->getUniqChips();
+            /** @var StorageStringRepository $storage */
+            $storage = $this->entityManager->getRepository(StorageString::class);
+            foreach ($chips as $chip) {
+                try {
+                    $storage->findOneOrCreate(
+                        [
+                            'vname' => $chip,
+                            'key1' => 'lbk',
+                            'key2' => 'suites',
+                            'key3' => 'chips',
+                        ]
+                    );
+                } catch (OptimisticLockException $e) {
+                } catch (ORMException $e) {
+                }
+            }
 
-    public function test($aa) {
-        echo "<pre>";
-        print_r($aa);
+            $platforms = $this->getUniqPlatforms();
+            /** @var StorageStringRepository $storage */
+            $storage = $this->entityManager->getRepository(StorageString::class);
+            foreach ($platforms as $platform) {
+                try {
+                    $storage->findOneOrCreate(
+                        [
+                            'vname' => $platform,
+                            'key1' => 'lbk',
+                            'key2' => 'suites',
+                            'key3' => 'platforms',
+                        ]
+                    );
+                } catch (OptimisticLockException $e) {
+                } catch (ORMException $e) {
+                }
+            }
+        }
+
+
     }
 
     /**

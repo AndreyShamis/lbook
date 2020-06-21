@@ -23,7 +23,13 @@ class SuiteExecutionSearch
     protected $platforms = [];
 
     /** @var array  */
+    protected $jobNames = [];
+
+    /** @var array  */
     protected $chips = [];
+
+    /** @var array  */
+    protected $components = [];
 
     protected $setups = [];
 
@@ -42,6 +48,39 @@ class SuiteExecutionSearch
     {
         $d = new \DateTime('- 7 days');
         $this->fromDate = $d->format('m/d/Y');
+    }
+
+    /**
+     * @return array
+     */
+    public function getJobNames(): array
+    {
+        return $this->jobNames;
+    }
+
+    /**
+     * @param array $jobNames
+     */
+    public function setJobNames(array $jobNames): void
+    {
+        $this->jobNames = $jobNames;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getComponents(): array
+    {
+        return $this->components;
+    }
+
+    /**
+     * @param array $components
+     */
+    public function setComponents(array $components): void
+    {
+        $this->components = $components;
     }
 
     /**

@@ -1,0 +1,47 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Storage Strings{% endblock %}
+{% block content %}
+
+    <h1>StorageString index</h1>
+
+    <table class="table records_list table table-striped table-condensed table-hover">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Key1</th>
+                <th>Key2</th>
+                <th>Key3</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for storage_string in storage_strings %}
+            <tr>
+                <td>{{ storage_string.id }}</td>
+
+                <td>{{ storage_string.name }}</td>
+                <td>{{ storage_string.value }}</td>
+                <td>{{ storage_string.key1 }}</td>
+                <td>{{ storage_string.key2 }}</td>
+                <td>{{ storage_string.key3 }}</td>
+                <td>{{ storage_string.createdAt ? storage_string.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ storage_string.updatedAt ? storage_string.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('storage_string_show', {'id': storage_string.id}) }}">show</a>
+                    <a href="{{ path('storage_string_edit', {'id': storage_string.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('storage_string_new') }}">Create new</a>
+{% endblock %}

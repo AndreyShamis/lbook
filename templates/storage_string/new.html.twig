@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New StorageString{% endblock %}
+
+{% block body %}
+    <h1>Create new StorageString</h1>
+
+    {{ include('storage_string/_form.html.twig') }}
+
+    <a href="{{ path('storage_string_index') }}">back to list</a>
+{% endblock %}

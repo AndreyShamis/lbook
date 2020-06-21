@@ -399,6 +399,20 @@ class SuiteExecution
         return $this;
     }
 
+    public function getBranch(): string
+    {
+        try {
+            $desc = $this->getDescription();
+            $patt = '/\"MANIFEST_REVISION\"\:\s*\"(.*)\",/';
+            $res = preg_match($patt, $desc, $match);
+            if ($res) {
+                return $match[1];
+            }
+        } catch (\Throwable $ex) {}
+
+        return '';
+    }
+
     /**
      * @return string
      */

@@ -31,7 +31,12 @@
                         <td>{{ form_widget(form.testingLevel) }}</td>
                         {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
                     </tr>
-
+                    <tr>
+                        <td>{{ form_label(form.jobNames, 'Job Name', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:180px;'}}) }}</td>
+                        <td>{{ form_errors(form.jobNames) }}</td>
+                        <td>{{ form_widget(form.jobNames) }}</td>
+                        {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+                    </tr>
                     <tr>
                         <td>
                             {{ form_label(form.fromDate) }}
@@ -91,6 +96,11 @@
                         <td>{{ form_label(form.chips, 'Chip/s', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
                         <td>{{ form_errors(form.chips) }}</td>
                         <td>{{ form_widget(form.chips)  }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.components, 'Components', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_errors(form.components) }}</td>
+                        <td>{{ form_widget(form.components) }}</td>
                     </tr>
                     <tr>
                         <td>{{ form_label(form.publish, 'Publish', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>

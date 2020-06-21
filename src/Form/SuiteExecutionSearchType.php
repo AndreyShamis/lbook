@@ -105,7 +105,27 @@ class SuiteExecutionSearchType extends AbstractType
                     'attr' => [
                         'style' => 'width:400px;display: none;',
                         'class' => 'LogBookSelectableChipsType multiselect']
-                ]);
+                ])
+            ->add('components', ChoiceType::class, [
+                'required' => false,
+                'choice_label' => 'name',
+                'choice_value' => 'name',
+                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
+                'multiple'=> true,
+                'attr' => [
+                    'style' => 'width:400px;display: none;',
+                    'class' => 'LogBookSelectableChipsType multiselect']
+            ])
+            ->add('jobNames', ChoiceType::class, [
+                'required' => false,
+                'choice_label' => 'name',
+                'choice_value' => 'name',
+                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'jobNames'),
+                'multiple'=> true,
+                'attr' => [
+                    'style' => 'width:400px;display: none;',
+                    'class' => 'LogBookSelectableChipsType multiselect']
+            ]);
             //->add('executionOrder')
 //            ->add('cycle')
             //->add('disabled')
@@ -129,7 +149,7 @@ class SuiteExecutionSearchType extends AbstractType
 
         $prob = rand(1, 100);
         if ($prob == 69 || $prob == 16) {
-            $chips = $this->getUniqChips();
+            $chips = $this->entityManager->getRepository(SuiteExecution::class)->getUniqChips();
             /** @var StorageStringRepository $storage */
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($chips as $chip) {
@@ -147,7 +167,7 @@ class SuiteExecutionSearchType extends AbstractType
                 }
             }
 
-            $platforms = $this->getUniqPlatforms();
+            $platforms = $this->entityManager->getRepository(SuiteExecution::class)->getUniqPlatforms();
             /** @var StorageStringRepository $storage */
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($platforms as $platform) {
@@ -164,26 +184,45 @@ class SuiteExecutionSearchType extends AbstractType
                 } catch (ORMException $e) {
                 }
             }
+
+            $components = $this->entityManager->getRepository(SuiteExecution::class)->getUniqComponents();
+            /** @var StorageStringRepository $storage */
+            $storage = $this->entityManager->getRepository(StorageString::class);
+            foreach ($components as $component) {
+                try {
+                    $storage->findOneOrCreate(
+                        [
+                            'vname' => $component,
+                            'key1' => 'lbk',
+                            'key2' => 'suites',
+                            'key3' => 'components',
+                        ]
+                    );
+                } catch (OptimisticLockException $e) {
+                } catch (ORMException $e) {
+                }
+            }
+
+            $jobNames = $this->entityManager->getRepository(SuiteExecution::class)->getUniqJobNames();
+            /** @var StorageStringRepository $storage */
+            $storage = $this->entityManager->getRepository(StorageString::class);
+            foreach ($jobNames as $jobName) {
+                try {
+                    $storage->findOneOrCreate(
+                        [
+                            'vname' => $jobName,
+                            'key1' => 'lbk',
+                            'key2' => 'suites',
+                            'key3' => 'jobNames',
+                        ]
+                    );
+                } catch (OptimisticLockException $e) {
+                } catch (ORMException $e) {
+                }
+            }
         }
 
 
-    }
-
-    /**
-     * @return SuiteExecution[]|
-     */
-    protected function getUniqPlatforms(): array
-    {
-        return $this->entityManager->getRepository(SuiteExecution::class)->getUniqPlatforms();
-    }
-
-
-    /**
-     * @return SuiteExecution[]|
-     */
-    protected function getUniqChips(): array
-    {
-        return $this->entityManager->getRepository(SuiteExecution::class)->getUniqChips();
     }
 
     /**

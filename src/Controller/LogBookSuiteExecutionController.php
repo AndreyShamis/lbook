@@ -82,6 +82,12 @@ class LogBookSuiteExecutionController extends AbstractController
             if (array_key_exists('chips', $post)) {
                 $suiteSearch->setChips($post['chips']);
             }
+            if (array_key_exists('components', $post)) {
+                $suiteSearch->setComponents($post['components']);
+            }
+            if (array_key_exists('jobNames', $post)) {
+                $suiteSearch->setJobNames($post['jobNames']);
+            }
             $name = $post['name'];
             $fromDate = $post['fromDate'];
             $toDate = $post['toDate'];
@@ -146,6 +152,14 @@ class LogBookSuiteExecutionController extends AbstractController
             if (count($suiteSearch->getChips())) {
                 $qb->andWhere('s.chip IN (:chips)')
                     ->setParameter('chips',  $suiteSearch->getChips());
+            }
+            if (count($suiteSearch->getComponents())) {
+                $qb->andWhere('s.components IN (:components)')
+                    ->setParameter('components',  $suiteSearch->getComponents());
+            }
+            if (count($suiteSearch->getJobNames())) {
+                $qb->andWhere('s.jobName IN (:jobNames)')
+                    ->setParameter('jobNames',  $suiteSearch->getJobNames());
             }
             if ($leftDate === true && $rightDate === true) {
                 $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')

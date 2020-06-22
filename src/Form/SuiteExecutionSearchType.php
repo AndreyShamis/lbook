@@ -74,6 +74,21 @@ class SuiteExecutionSearchType extends AbstractType
                     'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectableTestingLevelType multiselect']
             ])
+//            ->add('modes', ChoiceType::class, [
+//                'required' => false,
+//                'label' => ' ',
+//                'choices' => [
+//                    'regular_mode' => 'regular_mode',
+//                    'package_mode' => 'package_mode'
+//                ],
+////              'choice_label' => 'TestingLevel',
+////              'choice_value' => 'Id',
+////              'expanded' => false, //             // false will convert to checkbox
+//                'multiple'=> true,
+//                'attr' => [
+//                    'style' => 'width:400px;display: none;',
+//                    'class' => 'LogBookSelectablePackageModeType multiselect']
+//            ])
             ->add('publish', ChoiceType::class, [
                     'required' => false,
                     'choices' => [

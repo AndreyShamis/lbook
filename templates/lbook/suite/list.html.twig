@@ -37,6 +37,7 @@
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
             <th data-sortable="true" title="Job Name" data-switchable="true">Jobname</th>
             <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>
+            <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
             <th data-sortable="true" title="Components" data-switchable="true">Components</th>
             <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI URL</th>
             <th data-sortable="true" title="CI TAG" data-switchable="true" data-visible="false">CI tag</th>
@@ -109,6 +110,7 @@
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
                 <td class="font9">{{ suiteExecution.jobName }}</td>
                 <td class="font9">{{ suiteExecution.branch }}</td>
+                <td class="font9">{{ suiteExecution.mode }}</td>
                 <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>

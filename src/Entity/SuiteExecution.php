@@ -413,6 +413,25 @@ class SuiteExecution
         return '';
     }
 
+    public function getMode(): string
+    {
+        try {
+            $desc = $this->getDescription();
+            $patt = '/\"MODE\"\:\s*\"(.*)\",/';
+            $res = preg_match($patt, $desc, $match);
+            if ($res) {
+                return $match[1];
+            }
+
+            $patt = '/\"IS_PACKAGE_MODE\"\:\s*\"(true)\",/';
+            $res = preg_match($patt, $desc, $match);
+            if ($res) {
+                return 'package_mode';
+            }
+        } catch (\Throwable $ex) {}
+
+        return 'regular_mode';
+    }
     /**
      * @return string
      */

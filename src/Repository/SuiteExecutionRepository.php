@@ -41,10 +41,11 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         }
         $entity = null;
 
-        $job_name = $build_tag = $target_arch = $arch = '';
+        $job_name = $build_tag = $target_arch = $arch = $package_mode = '';
         if (array_key_exists('job_name', $criteria)) {
             $job_name = $criteria['job_name'];
         }
+
         if (array_key_exists('build_tag', $criteria)) {
             $build_tag = $criteria['build_tag'];
         }
@@ -104,7 +105,9 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setTestsCountEnabled($criteria['tests_count_enabled']);
             $entity->setUuid($criteria['uuid']);
             $entity->setHost($criteria['host']);
-
+            if (array_key_exists('package_mode', $criteria)) {
+                $entity->setPackageMode($criteria['package_mode']);
+            }
             if (array_key_exists('description', $criteria)) {
                 $entity->setDescription($criteria['description']);
             }

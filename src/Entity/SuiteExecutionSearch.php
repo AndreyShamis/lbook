@@ -29,6 +29,9 @@ class SuiteExecutionSearch
     protected $chips = [];
 
     /** @var array  */
+    protected $modes = [];
+
+    /** @var array  */
     protected $components = [];
 
     protected $setups = [];
@@ -48,6 +51,22 @@ class SuiteExecutionSearch
     {
         $d = new \DateTime('- 7 days');
         $this->fromDate = $d->format('m/d/Y');
+    }
+
+    /**
+     * @return array
+     */
+    public function getModes(): array
+    {
+        return $this->modes;
+    }
+
+    /**
+     * @param array $modes
+     */
+    public function setModes(array $modes): void
+    {
+        $this->modes = $modes;
     }
 
     /**

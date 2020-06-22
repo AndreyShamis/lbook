@@ -103,7 +103,12 @@
                         <td>{{ form_widget(form.components) }}</td>
                     </tr>
                     <tr>
-                        <td>{{ form_label(form.publish, 'Publish', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_label(form.modes, 'Package Mode', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
+                        <td>{{ form_errors(form.modes) }}</td>
+                        <td>{{ form_widget(form.modes) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.publish, 'Official', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>
                         <td>{{ form_errors(form.publish) }}</td>
                         <td>{{ form_widget(form.publish) }}</td>
                         {#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}

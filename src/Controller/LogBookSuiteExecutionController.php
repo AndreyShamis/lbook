@@ -39,7 +39,6 @@ class LogBookSuiteExecutionController extends AbstractController
         $leftDate = $rightDate = false;
         $startDate = $endDate = null;
         $suiteSearch = new SuiteExecutionSearch();
-
         $form = $this->get('form.factory')->createNamed('frmss', SuiteExecutionSearchType::class, $suiteSearch);
 
         //$form = $this->createForm(SuiteExecutionSearchType::class, $suiteSearch, array());
@@ -68,7 +67,7 @@ class LogBookSuiteExecutionController extends AbstractController
                 if ($limit > 30000) {
                     $limit = 1;
                 }
-                $suiteSearch->setLimit($limit);
+                $suiteSearch->setLimit($limit * 10);
             }
             if (array_key_exists('testingLevel', $post)) {
                 $suiteSearch->setTestingLevel($post['testingLevel']);
@@ -87,6 +86,9 @@ class LogBookSuiteExecutionController extends AbstractController
             }
             if (array_key_exists('jobNames', $post)) {
                 $suiteSearch->setJobNames($post['jobNames']);
+            }
+            if (array_key_exists('modes', $post)) {
+                $suiteSearch->setModes($post['modes']);
             }
             $name = $post['name'];
             $fromDate = $post['fromDate'];
@@ -161,6 +163,10 @@ class LogBookSuiteExecutionController extends AbstractController
                 $qb->andWhere('s.jobName IN (:jobNames)')
                     ->setParameter('jobNames',  $suiteSearch->getJobNames());
             }
+            if (count($suiteSearch->getModes())) {
+                $qb->andWhere('s.packageMode IN (:modes)')
+                    ->setParameter('modes',  $suiteSearch->getModes());
+            }
             if ($leftDate === true && $rightDate === true) {
                 $qb->andWhere('s.startedAt BETWEEN :fromDate AND :toDate')
                     ->setParameter('fromDate', $startDate, Type::DATETIME)
@@ -200,7 +206,6 @@ class LogBookSuiteExecutionController extends AbstractController
                 }
             }
         }
-
         return $this->render('lbook/suite/search.html.twig', array(
             'iterator' => $new_tests,
             'tests_count' => \count($new_tests),

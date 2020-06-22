@@ -110,7 +110,7 @@
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
                 <td class="font9">{{ suiteExecution.jobName }}</td>
                 <td class="font9">{{ suiteExecution.branch }}</td>
-                <td class="font9">{{ suiteExecution.mode }}</td>
+                <td class="font9">{{ suiteExecution.packageMode | replace({'_mode': ''}) }}</td>
                 <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
                 <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
                 <td class="font9">{{ suiteExecution.buildTag }}</td>

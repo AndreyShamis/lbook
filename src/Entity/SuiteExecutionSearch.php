@@ -43,9 +43,9 @@ class SuiteExecutionSearch
     /** @var int  */
     protected $limit = 200;
 
-    public static $MAX_LIMIT = 10000;
+    public static $MAX_LIMIT = 50000;
 
-    public static $DEFAULT_LIMIT = 2000;
+    public static $DEFAULT_LIMIT = 200;
 
     public function __construct()
     {

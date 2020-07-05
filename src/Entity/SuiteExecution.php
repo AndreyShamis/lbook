@@ -138,7 +138,7 @@ class SuiteExecution
     private $testSetUrl;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="suite_execution")
+     * @ORM\OneToMany(targetEntity="App\Entity\LogBookTest", mappedBy="suite_execution", fetch="LAZY")
      */
     private $tests;
 

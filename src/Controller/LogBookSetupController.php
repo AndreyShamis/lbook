@@ -4,9 +4,13 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
+use App\Entity\LogBookTest;
 use App\Entity\LogBookUser;
+use App\Entity\SuiteExecution;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookSetupRepository;
+use App\Repository\LogBookTestRepository;
+use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -36,6 +40,94 @@ class LogBookSetupController extends AbstractController
 {
     protected $index_size = 250;
     protected $show_cycle_size = 500;
+
+
+    /**
+     * Finds and displays a setup entity.
+     *
+     * @Route("indicator/{id}/size/{size}", name="setup_indicator", methods={"GET"})
+     * @param LogBookSetup $setup
+     * @param int $size
+     * @param LogBookCycleRepository $cycleRepo
+     * @param SuiteExecutionRepository $suiteRepo
+     * @return Response
+     */
+    public function indicator(LogBookSetup $setup = null, int $size= 10,
+                              LogBookCycleRepository $cycleRepo = null,
+                              LogBookTestRepository $testRepo = null,
+                              SuiteExecutionRepository $suiteRepo = null): ?Response
+    {
+        try {
+            $productVersions = [];
+            $suiteNames = [];
+            if ($setup === null || $cycleRepo === null ) {
+                throw new \RuntimeException('');
+            }
+            $qb = $cycleRepo->createQueryBuilder('t')
+                ->where('t.setup = :setup')
+                ->orderBy('t.timeEnd', 'DESC')
+                ->addOrderBy('t.updatedAt', 'DESC')
+                ->setMaxResults($size)
+                ->setParameter('setup', $setup->getId());
+            $cycles = $qb->getQuery()->execute();
+
+            $qb_s = $suiteRepo->createQueryBuilder('s')
+                ->where('s.cycle IN (:cycles)')
+                ->orderBy('s.id', 'DESC')
+                ->setParameter('cycles', $cycles);
+            $suites = $qb_s->getQuery()->execute();
+
+            $qb_t = $testRepo->createQueryBuilder('tests')
+                ->where('tests.suite_execution IN (:suites)')
+                ->orderBy('tests.timeEnd', 'ASC')
+                ->setParameter('suites', $suites);
+            $tests = $qb_t->getQuery()->execute();
+
+            $work_arr = [];
+            /** @var LogBookCycle $cycle */
+            foreach ($cycles as $cycle) {
+                $cycle_build = $cycle->getBuild()->getName();
+                $cycleSuites = $cycle->getSuiteExecution();
+                /** @var SuiteExecution $tmpSuite */
+                foreach ($cycleSuites as $tmpSuite) {
+                    //$tmpSuite->getPlatform() . '_'. $tmpSuite->getChip() . '_' .
+                    $firstKey = $tmpSuite->getName();
+                    $work_arr[$firstKey][$tmpSuite->getProductVersion()][] = $tmpSuite;
+                    if (!in_array($tmpSuite->getProductVersion(), $productVersions)){
+                        $productVersions[] = $tmpSuite->getProductVersion();
+                    }
+                    if (!in_array($firstKey, $suiteNames)){
+                        $suiteNames[] = $firstKey;
+                    }
+//                    $tmpTests = $tmpSuite->getTests();
+//                    /** @var LogBookTest $test */
+//                    foreach ($tmpTests as $test) {
+//                        $work_arr[$test->getName()][$test->getSuiteExecution()->getProductVersion()][] = $test;
+//                    }
+                }
+            }
+            /** @var LogBookTest $test */
+            foreach ($tests as $test) {
+                $work_arr[$test->getName()][$test->getSuiteExecution()->getProductVersion()][] = $test;
+
+            }
+
+            return $this->render('lbook/setup/indicator.html.twig', array(
+                'setup'          => $setup,
+                'iterator'          => $suites,
+                'suites'          => $suites,
+                'cycles'          => $cycles,
+                'size'          => $size,
+                'productVersions'          => $productVersions,
+                'suiteNames'          => $suiteNames,
+                'work_arr'          => $work_arr,
+                'show_build'          => 1,
+                'show_user'          => 1,
+            ));
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($ex, $setup);
+        }
+    }
 
     /**
      * Lists all setup entities.

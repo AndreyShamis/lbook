@@ -76,6 +76,9 @@
                             <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">
                                 <i class="ace-icon fa fa-search-plus bigger-130"></i>
                             </a>
+                            <a class="blue" href="{{ path('setup_indicator', { 'id': setup.id }) }}" title="Indicators">
+                                <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                            </a>
                             {% if is_granted('edit', setup) %}
                             <a class="green" href="{{ path('setup_edit', { 'id': setup.id }) }}" title="Edit">
                                 <i class="ace-icon fa fa-pencil bigger-130"></i>

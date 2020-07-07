@@ -151,12 +151,9 @@ class LogBookTest
     private $testKey = '';
 
     /**
-     * @var string
+     * @ORM\Column(name="fail_description", type="string", length=250, options={"default"=""})
      */
     protected $failDescription = '';
-
-
-    // * @O R M \ C olumn(name="fail_description", type="string", length=500, options={"default"=""})
 
 
     protected $rate = 0;
@@ -195,6 +192,7 @@ class LogBookTest
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
         $this->meta_data = [];
+        $this->failDescription = '';
     }
 
     /**

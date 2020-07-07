@@ -109,6 +109,8 @@ class LogBookSetupController extends AbstractController
                 }
             }
 
+            $em = $this->getDoctrine()->getManager();
+
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
                 $firstKey = $test->getName();
@@ -117,8 +119,7 @@ class LogBookSetupController extends AbstractController
                 }
                 $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
                 if ($test->getVerdict()->getName() !== 'PASS') {
-                    $test->getFailDescription();
-                    $em = $this->getDoctrine()->getManager();
+                    $test->parseFailDescription();
                     $em->persist($test);
                 }
             }

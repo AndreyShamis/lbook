@@ -150,8 +150,13 @@ class LogBookTest
      */
     private $testKey = '';
 
-    /** @var string  */
+    /**
+     * @var string
+     */
     protected $failDescription = '';
+
+
+    // * @O R M \ C olumn(name="fail_description", type="string", length=500, options={"default"=""})
 
 
     protected $rate = 0;
@@ -221,6 +226,30 @@ class LogBookTest
         return $ret_val;
     }
 
+    public function parseFailDescription()
+    {
+        try {
+            if ($this->getVerdict()->getName() !== 'PASS' && $this->getVerdict()->getName() !== 'UNKNOWN') {
+                $errors = '';
+                $logs = $this->getLogs();
+                foreach ($logs as $log) {
+                    if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                        $errors = $log->getMessage();
+                    } elseif ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                        $errors = $log->getMessage();
+                    } elseif ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                        $errors = $log->getMessage();
+                    } elseif ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
+                        $errors = $log->getMessage();
+                    }
+                }
+                $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
+            }
+            $this->failDescription = $ret_val;
+            return $ret_val;
+        } catch (\Throwable $ex) {}
+        return '';
+    }
     /**
      * @return string
      */
@@ -232,32 +261,10 @@ class LogBookTest
             return $this->failDescription;
         }
 
-        $ret_val = '';
         try {
-
-            if ($this->getVerdict()->getName() !== 'PASS') {
-                $errors = '';
-                $logs = $this->getLogs();
-                foreach ($logs as $log) {
-                    if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
-                        $errors = $log->getMessage();
-                    }
-                    if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
-                        $errors = $log->getMessage();
-                    }
-                    if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
-                        $errors = $log->getMessage();
-                    }
-                    if ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
-                        $errors = $log->getMessage();
-                    }
-                }
-                $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
-            }
-            $this->failDescription = $ret_val;
+            return $this->parseFailDescription();
         } catch (\Throwable $ex) {}
-
-        return $ret_val;
+        return 'Failed To Parse';
     }
 
     public function getSuiteName(): string

@@ -52,7 +52,7 @@ class LogBookSetupController extends AbstractController
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 10,
+    public function indicator(LogBookSetup $setup = null, int $size= 7,
                               LogBookCycleRepository $cycleRepo = null,
                               LogBookTestRepository $testRepo = null,
                               SuiteExecutionRepository $suiteRepo = null): ?Response
@@ -60,6 +60,8 @@ class LogBookSetupController extends AbstractController
         try {
             $productVersions = [];
             $suiteNames = [];
+            $testNames = [];
+            $testNamesRemoved = [];
             if ($setup === null || $cycleRepo === null ) {
                 throw new \RuntimeException('');
             }
@@ -106,12 +108,46 @@ class LogBookSetupController extends AbstractController
 //                    }
                 }
             }
+
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
-                $work_arr[$test->getName()][$test->getSuiteExecution()->getProductVersion()][] = $test;
-
+                $firstKey = $test->getName();
+                if (!in_array($firstKey, $testNames)){
+                    $testNames[] = $firstKey;
+                }
+                $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
+                if ($test->getVerdict()->getName() !== 'PASS') {
+                    $test->getFailDescription();
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($test);
+                }
             }
+            $em->flush();
+            $removed_tests_counter = 0;
+            foreach ($testNames as $testName) {
+                $issue_found = false;
+                foreach ($productVersions as $pv) {
+                    try {
+                        $tests_in_cell = $work_arr[$testName][$pv];
+                        /** @var LogBookTest $tTest */
 
+                        foreach ($tests_in_cell as $tTest) {
+                            if ($tTest->getVerdict()->getName() !== 'PASS') {
+                                $issue_found = true;
+                                break;
+                            }
+                        }
+
+                    } catch (\Throwable $ex) {}
+
+                }
+                if ($issue_found) {
+                    $testNamesRemoved[] = $testName;
+                } else {
+                    $removed_tests_counter++;
+                    unset($work_arr[$testName][$pv]);
+                }
+            }
             return $this->render('lbook/setup/indicator.html.twig', array(
                 'setup'          => $setup,
                 'iterator'          => $suites,
@@ -120,7 +156,10 @@ class LogBookSetupController extends AbstractController
                 'size'          => $size,
                 'productVersions'          => $productVersions,
                 'suiteNames'          => $suiteNames,
+                'testNames'          => $testNames,
                 'work_arr'          => $work_arr,
+                'removed_tests_counter'          => $removed_tests_counter,
+                'testNamesRemoved'          => $testNamesRemoved,
                 'show_build'          => 1,
                 'show_user'          => 1,
             ));

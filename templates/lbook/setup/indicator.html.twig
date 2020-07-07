@@ -100,7 +100,8 @@
                 <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="testInfoNav">
                     <li class="active"><a data-toggle="tab" href="#main">Main</a></li>
                     <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
-                    <li class=""><a data-toggle="tab" href="#suitesTable">Suites Rates</a></li>
+                    <li class=""><a data-toggle="tab" href="#suitesTable">Suite Rates</a></li>
+                    <li class=""><a data-toggle="tab" href="#testsTable">Test Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -213,7 +214,7 @@
 
                     </div>
                     <div id="suitesTable" class="tab-pane">
-                    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+                    <table class="records_list table table-striped table-condensed table-hover table-bordered" data-classes="table table-bordered"
                            id="suiteRatingTable" data-pagination="true" data-search="true" data-toggle="table"
                            data-toolbar="#suiteExecutionToolBar"
                            data-show-refresh="true"
@@ -250,6 +251,55 @@
                         </tbody>
                     </table>
 
+                    </div>
+                    <div id="testsTable" class="tab-pane">
+                        Number of removed tests from this table {{ removed_tests_counter }}
+                        <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered"
+                               id="suiteRatingTable" data-pagination="true" data-search="true" data-toggle="table"
+                               data-toolbar="#suiteExecutionToolBar"
+                               data-show-refresh="true"
+                               data-key-events="true"
+                               data-show-footer="true"
+                               data-show-toggle="true"
+                               data-show-export="true"
+                               data-show-columns="true"
+                               data-advanced-search="true"
+                               data-page-size="1000" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+                            <thead>
+                            <tr>
+                                <th data-sortable="true" data-switchable="false">Test Name</th>
+                                {% for productVersion in productVersions | slice(0, 50000)%}
+                                    <th style="font-size: 10px !important;font-weight: lighter !important;" data-sortable="true" data-switchable="true" >{{ productVersion }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+{#                            {% for testName in testNames | slice(0, 50000)%}#}
+                            {% for testName in testNamesRemoved | slice(0, 50000)%}
+                                <tr>
+                                    <td>{{ testName }}</td>
+                                    {% for productVersion in productVersions | slice(0, 500)%}
+                                        <td>
+                                            {% if productVersion in work_arr[testName]| keys%}
+                                                {% for cellTest in work_arr[testName][productVersion] | slice(0, 50000)%}
+                                                    {% set failure = 'EMPTY' %}
+                                                    {% if cellTest.verdict != 'PASS' and cellTest.verdict != 'UNKNOWN' %}
+{#                                                    {% if cellTest.verdict == 'FAIL' or cellTest.verdict == 'ERROR' %}#}
+{#                                                        or   cellTest.verdict == 'ERROR' %}#}
+{#                                                        {% set failure = '' %}#}
+                                                        {% set failure = cellTest.failDescription %}
+                                                    {% endif %}
+                                                    <a target="_blank" href="{{ path('test_show_first', {'id': cellTest.id}) }}" title="Cycle: {{ cellTest.cycle }}&#013;Suite:&#013; - {{ cellTest.suiteExecution.name }}&#013; - {{ cellTest.suiteExecution }}&#013;&#013;{{ failure }}">
+                                                        <span  class="badge {{verdictToBadge(cellTest.verdict)}}">{{ cellTest.verdict }}</span>
+                                                    </a>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                     <div id="other" class="tab-pane">
 

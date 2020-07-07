@@ -152,11 +152,9 @@ class LogBookTest
 
     /**
      * @var string
+     * @ORM\Column (name="fail_description", type="string", length=250, options={"default"=""})
      */
     protected $failDescription = '';
-
-
-    // * @O R M \ C olumn(name="fail_description", type="string", length=500, options={"default"=""})
 
 
     protected $rate = 0;

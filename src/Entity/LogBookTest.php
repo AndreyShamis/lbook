@@ -151,12 +151,9 @@ class LogBookTest
     private $testKey = '';
 
     /**
-     * @var string
+     * @ORM\Column(name="fail_description", type="string", length=250, options={"default"=""})
      */
     protected $failDescription = '';
-
-
-    // * @O R M \ C olumn(name="fail_description", type="string", length=500, options={"default"=""})
 
 
     protected $rate = 0;
@@ -195,6 +192,7 @@ class LogBookTest
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
         $this->meta_data = [];
+        $this->failDescription = '';
     }
 
     /**
@@ -226,20 +224,24 @@ class LogBookTest
         return $ret_val;
     }
 
-    public function parseFailDescription()
+    public function parseFailDescription(): string
     {
         try {
+            $ret_val = '';
             if ($this->getVerdict()->getName() !== 'PASS' && $this->getVerdict()->getName() !== 'UNKNOWN') {
                 $errors = '';
                 $logs = $this->getLogs();
                 foreach ($logs as $log) {
                     if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                    }
+                    if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                    }
+                    if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
+                    }
+                    if ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
                         $errors = $log->getMessage();
                     }
                 }
@@ -250,6 +252,15 @@ class LogBookTest
         } catch (\Throwable $ex) {}
         return '';
     }
+
+    /**
+     * @param string $newValue
+     */
+    public function setFailDescription(string $newValue):void
+    {
+        $this->failDescription = $newValue;
+    }
+
     /**
      * @return string
      */

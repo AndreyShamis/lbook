@@ -119,7 +119,7 @@ class LogBookSetupController extends AbstractController
                 }
                 $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
                 if ($test->getVerdict()->getName() !== 'PASS') {
-                    $test->parseFailDescription();
+                    $test->getFailDescription();
                     $em->persist($test);
                 }
             }

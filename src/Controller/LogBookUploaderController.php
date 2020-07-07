@@ -591,9 +591,9 @@ class LogBookUploaderController extends AbstractController
             $req_test_result = $request->request->get('test_result', '');
             $cycle_name = $request->request->get('cycle', '');
             $setup_name = $request->request->get('setup', '');
-            if ($setup_name === 'SST_SETUP_TEST') {
-                return $this->render('lbook/upload/curl.html.twig', []);
-            }
+//            if ($setup_name === 'SST_SETUP_TEST') {
+//                return $this->render('lbook/upload/curl.html.twig', []);
+//            }
             $cycle_token = $request->request->get('token', '');
             $build_name = $request->request->get('build', '');
             $test_dut = $request->request->get('dut', '');

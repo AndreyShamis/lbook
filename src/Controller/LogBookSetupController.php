@@ -68,7 +68,6 @@ class LogBookSetupController extends AbstractController
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
                 ->orderBy('t.timeEnd', 'DESC')
-                ->addOrderBy('t.updatedAt', 'DESC')
                 ->setMaxResults($size)
                 ->setParameter('setup', $setup->getId());
             $cycles = $qb->getQuery()->execute();

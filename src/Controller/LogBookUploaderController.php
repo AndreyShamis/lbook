@@ -1412,9 +1412,9 @@ class LogBookUploaderController extends AbstractController
         if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
-//        try {
-//            $fDesc = $test->getFailDescription();
-//        } catch (\Throwable $ex) {}
+        try {
+            $test->parseFailDescription();
+        } catch (\Throwable $ex) {}
 
 //        if (!$insertTests) {
 //            foreach ($objectsToClear as $tmp_obj) {

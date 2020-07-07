@@ -247,7 +247,12 @@ class LogBookTest
                 }
                 $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
             }
-            $this->failDescription = $ret_val;
+
+            if ($ret_val !== null && $ret_val !== '') {
+                $this->failDescription = $ret_val;
+            } else {
+                $this->failDescription = ' ';
+            }
             return $ret_val;
         } catch (\Throwable $ex) {}
         return '';

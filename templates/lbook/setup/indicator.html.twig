@@ -92,7 +92,8 @@
     <div>Suites : {{ suites | length }}</div>
 
 
-
+    {% set max_suites_in_cycle = 0 %}
+    {% set max_tests_in_cycle = 0 %}
     <div class="row">
         <div class="col-sm-12">
 
@@ -148,6 +149,8 @@
                                 </thead>
                                 <tbody class="searchable">
                                 {% for cycle in cycles | slice(0, 10000) %}
+                                    {% set max_suites_in_cycle = max(cycle.suiteExecution | length, max_suites_in_cycle) %}
+                                    {% set max_tests_in_cycle = max(cycle.testsCount, max_tests_in_cycle) %}
                                     <tr>
                                         <td title="Updated {{ cycle.updatedAt|time_diff }}">
                                             {% if date(cycle.updatedAt) > date('-5 minutes') %}
@@ -300,10 +303,15 @@
                             {% endfor %}
                             </tbody>
                         </table>
+
+
                     </div>
                     <div id="other" class="tab-pane">
 
                     </div>
+
+                    <div id="dual_x_div" style="width: 100%; height: 500px;"></div>
+
                 </div>
             </div>
         </div>
@@ -345,6 +353,82 @@
         }
 
         $(document).ready(function() {
+
+            try {
+                google.charts.load('current', {'packages':['bar']});
+                google.charts.setOnLoadCallback(drawStuff);
+
+                function drawStuff() {
+                    var data = new google.visualization.arrayToDataTable([
+                        ['Cycle Name', 'Pass Rate', 'Fail Rate', 'Error Rate', 'Tests', 'Suites'],
+                        {% for cycle in cycles | slice(0, 1000) %}
+                        ['{{ shortString(cycle.build, 50, "...") }}', {{ cycle.passRate }}, {{ cycle.failRate }}, {{ cycle.errorRate }}, {{ cycle.testsCount }}, {{ cycle.suiteExecution | length }}],
+                        {% endfor %}
+                        // ['Bootes I', 60000, 13.1]
+                    ]);
+
+                    var options = {
+                        width: 'auto',
+                        chart: {
+                            title: 'Cycles',
+                            subtitle: ''
+                        },
+                        bars: 'vertical', // Required for Material Bar Charts.
+                        //bars: 'horizontal', // Required for Material Bar Charts.
+                        series: {
+                            0: { axis: 'failRate' }, // Bind series 0 to an axis named 'distance'.
+                            1: { axis: 'passRate' }, // Bind series 1 to an axis named 'brightness'.
+                            2: { axis: 'errorRate' },
+                            3: { axis: 'testsCount' },
+                            4: { axis: 'suites' },
+                        },
+                        axes: {
+                            x: {
+                                failRate: {label: 'Fail Rate'}, // Bottom x-axis.
+                                passRate: {side: 'top', label: 'Pass Rate'}  // Top x-axis.
+                            },
+                            y: {
+                                failRate: {
+                                    range: {
+                                        max: 100,
+                                        min: 0
+                                    }
+                                },
+                                passRate: {
+                                    range: {
+                                        max: 100,
+                                        min: 0
+                                    }
+                                },
+                                errorRate: {
+                                    range: {
+                                        max: 100,
+                                        min: 0
+                                    }
+                                },
+                                suites: {
+                                    range: {
+                                        max: {{ max_suites_in_cycle }},
+                                        min: 0
+                                    }
+                                },
+                                testsCount: {
+                                    range: {
+                                        max: {{ max_tests_in_cycle }},
+                                        min: 0
+                                    }
+                                }
+                            }
+                        },
+                        colors: ['#0d9d58', '#db4437', '#f4b400', '#175c67', '#99a9e2'],
+                        theme: 'material'
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('dual_x_div'));
+                    chart.draw(data, options);
+                };
+            } catch (e) {}
+
             $( "#toolbarSetupsList, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
             });

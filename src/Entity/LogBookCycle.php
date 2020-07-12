@@ -1118,7 +1118,9 @@ class LogBookCycle
      */
     public function setUpdatedAt(): void
     {
-        $this->updatedAt = new \DateTime();
+        if ($this->isCalculateStatistic()) {
+            $this->updatedAt = new \DateTime();
+        }
     }
 
     /**

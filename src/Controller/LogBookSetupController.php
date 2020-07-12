@@ -119,8 +119,13 @@ class LogBookSetupController extends AbstractController
                 $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
                 if ($test->getVerdict()->getName() !== 'PASS') {
                     $test->getFailDescription();
-                    $em->persist($test);
+                    if ($test->isFailDescriptionParsed()) {
+                        $em->persist($test);
+                    }
                 }
+            }
+            foreach ($cycles as $cycle) {
+                $cycle->setCalculateStatistic(false);
             }
             $em->flush();
             $removed_tests_counter = 0;

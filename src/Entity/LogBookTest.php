@@ -155,6 +155,7 @@ class LogBookTest
      */
     protected $failDescription = '';
 
+    protected $failDescriptionParsed = false;
 
     protected $rate = 0;
 
@@ -164,6 +165,22 @@ class LogBookTest
 
     public function getRate(): float{
         return $this->rate;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailDescriptionParsed(): bool
+    {
+        return $this->failDescriptionParsed;
+    }
+
+    /**
+     * @param bool $failDescriptionParsed
+     */
+    public function setFailDescriptionParsed(bool $failDescriptionParsed): void
+    {
+        $this->failDescriptionParsed = $failDescriptionParsed;
     }
 
     public function getTestType(): string
@@ -278,6 +295,7 @@ class LogBookTest
         }
 
         try {
+            $this->setFailDescriptionParsed(true);
             return $this->parseFailDescription();
         } catch (\Throwable $ex) {}
         return 'Failed To Parse';

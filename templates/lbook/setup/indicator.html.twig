@@ -282,7 +282,7 @@
                                         <td>
                                             {% if productVersion in work_arr[testName]| keys%}
                                                 {% for cellTest in work_arr[testName][productVersion] | slice(0, 50000)%}
-                                                    {% set failure = 'EMPTY' %}
+                                                    {% set failure = '' %}
                                                     {% if cellTest.verdict != 'PASS' and cellTest.verdict != 'UNKNOWN' %}
 {#                                                    {% if cellTest.verdict == 'FAIL' or cellTest.verdict == 'ERROR' %}#}
 {#                                                        or   cellTest.verdict == 'ERROR' %}#}

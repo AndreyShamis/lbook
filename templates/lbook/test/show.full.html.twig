@@ -108,7 +108,7 @@
                                 <th>Platform</th>
                                 <td>{{ test.platform }}</td>
                                 <th>Verdict</th>
-                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span> {{ test.failDescription(true) }}</td>
                                 <th></th>
                                 <td></td>
                             </tr>

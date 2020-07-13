@@ -752,9 +752,11 @@ class LogBookUploaderController extends AbstractController
                 }
                 $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
                 $this->em->refresh($cycle);
+
                 if (!$calculateStat) {
                     $cycle->setCalculateStatistic(false);
                 }
+                $this->em->refresh($setup);
                 $this->calculateAndSetBuild($build_name, $cycle);
 
                 $uploader = $this->targetRepo->findOneOrCreate(array('name' => $remote_ip));
@@ -1381,17 +1383,17 @@ class LogBookUploaderController extends AbstractController
         }
         $mt_data = array(
             'TEST_FILENAME' => $controlFile,
-            'TEST_VERSION_SHOW_OPT' => $testVersion,
-            'CONTROL_VERSION_SHOW_OPT' => $controlVersion,
+            'TEST_VER' => $testVersion,
+            'CONTROL_VER' => $controlVersion,
         );
         if ($controlFile === '') {
             unset($mt_data['TEST_FILENAME']);
         }
         if ($testVersion === '') {
-            unset($mt_data['TEST_VERSION_SHOW_OPT']);
+            unset($mt_data['TEST_VER']);
         }
         if ($controlVersion === '') {
-            unset($mt_data['CONTROL_VERSION_SHOW_OPT']);
+            unset($mt_data['CONTROL_VER']);
         }
 
         if (count($mt_data)) {
@@ -1415,22 +1417,20 @@ class LogBookUploaderController extends AbstractController
         if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
+
+        $this->em->flush();
+        // Parse Test Fail Description
         try {
             $test->parseFailDescription();
         } catch (\Throwable $ex) {}
 
-//        if (!$insertTests) {
-//            foreach ($objectsToClear as $tmp_obj) {
-//                $this->em->remove($tmp_obj);
-//            }
-//        }
-        $this->em->flush();
 //        if ($insertTests) {
-        foreach ($objectsToClear as $tmp_obj) {
-            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-            $this->em->detach($tmp_obj);
-        }
+//        foreach ($objectsToClear as $tmp_obj) {
+//            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+//            $this->em->detach($tmp_obj);
 //        }
+        $this->em->clear(LogBookTest::class);
+
         return $ret_data;
     }
 

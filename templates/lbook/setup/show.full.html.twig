@@ -11,7 +11,8 @@
                 <i class="ace-icon fa fa-bookmark"></i>
                 {{ setup.nameShown }}
                 /
-                <span class="label label-lg label-yellow">{{ setup.osStr }}</span>
+                <span class="label label-lg label-yellow">{{ setup.osStr }}</span>&nbsp;
+                <a href="{{ path('setup_indicator', { 'id': setup.id }) }}"><span class="label label-lg label-important">Indicators</span></a>
             </td>
             <th>
                 <span style="float: right;">Created / Updated</span>

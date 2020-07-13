@@ -117,9 +117,9 @@ class LogBookSetupController extends AbstractController
                     $testNames[] = $firstKey;
                 }
                 $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
-                if ($test->getVerdict()->getName() !== 'PASS') {
-                    $test->getFailDescription();
-                    if ($test->isFailDescriptionParsed()) {
+                if ($test->getVerdict()->getName() !== 'PASS' && $test->getVerdict()->getName() !== 'UNKNOWN') {
+                    if ($test->getFailDescription() == ' '){
+                        $test->parseFailDescription();
                         $em->persist($test);
                     }
                 }

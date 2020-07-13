@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}Indicator for Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
-    <h3 style="margin-top: 0 !important;">Indicator for Setup [{{ setup.id }}] : {{ setup.name }}</h3>
+    <h3 style="margin-top: 0 !important;">Indicator for Setup [{{ setup.id }}] : <a href="{{ path('setup_show', { 'id': setup.id }) }}">{{ setup.name }}</a></h3>
     {% apply spaceless %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
@@ -292,9 +292,13 @@
 {#                                                        {% set failure = '' %}#}
                                                         {% set failure = cellTest.failDescription %}
                                                     {% endif %}
-                                                    <a target="_blank" href="{{ path('test_show_first', {'id': cellTest.id}) }}" title="Cycle: {{ cellTest.cycle }}&#013;Suite:&#013; - {{ cellTest.suiteExecution.name }}&#013; - {{ cellTest.suiteExecution }}&#013;&#013;{{ failure }}">
+                                                    {% if cellTest.testType != 'TEST' and  cellTest.verdict == 'PASS'%}
+                                                    {% else %}
+
+                                                    <a target="_blank" href="{{ path('test_show_first', {'id': cellTest.id}) }}" title="Test Type: {{ cellTest.testType }}&#013;Cycle: {{ cellTest.cycle }}&#013;Suite:&#013; - {{ cellTest.suiteExecution.name }}&#013; - {{ cellTest.suiteExecution }}&#013;&#013;{{ failure }}">
                                                         <span  class="badge {{verdictToBadge(cellTest.verdict)}}">{{ cellTest.verdict }}</span>
                                                     </a>
+                                                    {% endif %}
                                                 {% endfor %}
                                             {% endif %}
                                         </td>

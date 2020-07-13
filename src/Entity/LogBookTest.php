@@ -35,6 +35,7 @@ class LogBookTest
     protected $id;
 
     public static $MAX_NAME_LEN = 255;
+    public static $MAX_FAIL_DESC_LEN = 245;
     /**
      * @var string
      *
@@ -246,23 +247,23 @@ class LogBookTest
         try {
             $ret_val = '';
             if ($this->getVerdict()->getName() !== 'PASS' && $this->getVerdict()->getName() !== 'UNKNOWN') {
-                $errors = '';
                 $logs = $this->getLogs();
                 foreach ($logs as $log) {
+                    $errors = '';
                     if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
-                    }
-                    if ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                    } elseif ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                        $errors = $log->getMessage();
+                    } elseif ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                        $errors = $log->getMessage();
+                    } elseif ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
                         $errors = $log->getMessage();
                     }
-                    if ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
-                        $errors = $log->getMessage();
+                    if ($errors !== null && $errors != '') {
+                        $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
                     }
-                    if ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
-                        $errors = $log->getMessage();
-                    }
+
                 }
-                $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
 
             }
 
@@ -276,12 +277,21 @@ class LogBookTest
         return '';
     }
 
+    public static function validateFailDescription($newFailDescription): string
+    {
+        if (mb_strlen($newFailDescription) > self::$MAX_FAIL_DESC_LEN) {
+            $newFailDescription = mb_substr($newFailDescription, 0, self::$MAX_FAIL_DESC_LEN);
+        }
+        return $newFailDescription;
+    }
+
+
     /**
      * @param string $newValue
      */
     public function setFailDescription(string $newValue):void
     {
-        $this->failDescription = $newValue;
+        $this->failDescription = LogBookTest::validateFailDescription($newValue);
     }
 
     /**

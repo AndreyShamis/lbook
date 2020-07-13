@@ -1417,15 +1417,15 @@ class LogBookUploaderController extends AbstractController
         if ($testName !== null && $testName !== '') {
             $test->setName($testName);
         }
+        // Parse Test Fail Description
 
         $this->em->flush();
-        // Parse Test Fail Description
-        try {
-            $fdesc = $test->parseFailDescription();
-            $test->setFailDescription($fdesc);
-            $this->em->persist($test);
-        } catch (\Throwable $ex) {}
 
+        try {
+
+            $this->em->refresh($test);
+            $fdesc = $test->parseFailDescription();
+        } catch (\Throwable $ex) {}
 //        if ($insertTests) {
         foreach ($objectsToClear as $tmp_obj) {
             // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes

@@ -75,8 +75,23 @@ class LogBookSetupController extends AbstractController
                 ->orderBy('t.id', 'DESC')
                 ->setMaxResults($size)
                 ->setParameter('setup', $setup->getId());
-            $cycles = $qb->getQuery()->execute();
 
+//            if ($mainCycle !== null && $mainCycle->getId() > 0){
+//                $qb->orWhere('t.id = :mainCycle')
+//                    ->setParameter('mainCycle', $mainCycle->getId())
+//                ->setMaxResults($qb->getMaxResults() + 1);
+//            }
+            $cycles = $qb->getQuery()->execute();
+            if ($mainCycle !== null && $mainCycle->getId() > 0){
+                $qb_cycle = $cycleRepo->createQueryBuilder('t')
+                    ->where('t.id = :mainCycle')
+                    ->setParameter('mainCycle', $mainCycle->getId())
+                    ->setMaxResults(1);
+                $tmp_cycles = $qb_cycle->getQuery()->execute();
+                foreach ($tmp_cycles as $tmpcycle){
+                    array_push($cycles, $tmpcycle);
+                }
+            }
             $qb_s = $suiteRepo->createQueryBuilder('s')
                 ->where('s.cycle IN (:cycles)')
                 ->orderBy('s.id', 'DESC')

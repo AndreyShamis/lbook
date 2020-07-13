@@ -286,12 +286,15 @@ class LogBookTest
     /**
      * @return string
      */
-    public function getFailDescription(): string
+    public function getFailDescription(bool $forceParse=false): string
     {
-        // In cycle show we check twice what is the fail description,
-        // in second time we will get saved value
-        if ($this->failDescription !== null && $this->failDescription !== '') {
-            return $this->failDescription;
+        if (!$forceParse){
+            // In cycle show we check twice what is the fail description,
+            // in second time we will get saved value
+            if ($this->failDescription !== null && $this->failDescription !== '') {
+                return $this->failDescription;
+            }
+
         }
 
         try {

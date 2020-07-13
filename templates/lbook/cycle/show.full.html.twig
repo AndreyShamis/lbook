@@ -28,6 +28,10 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     Load all Tests ({{ testsCount }})
                 </button>
                 {% endif %}
+                <button class="btn btn-white btn-info btn-bold" id="showIndicators">
+                    <i class="ace-icon fa fa-briefcase bigger-120 blue"></i>
+                    Indicator
+                </button>
                 <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
                     <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
                     Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
@@ -600,7 +604,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             $( "#saveCycleAsArchive" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
             });
-
+            $( "#showIndicators" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id }) }}";
+            });
             $( "#go_to_cycle" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_show_first', { 'id': cycle.id}) }}";
             });

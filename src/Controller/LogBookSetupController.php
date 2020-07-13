@@ -45,14 +45,18 @@ class LogBookSetupController extends AbstractController
     /**
      * Finds and displays a setup entity.
      *
-     * @Route("indicator/{id}/size/{size}", name="setup_indicator", methods={"GET"})
+     * @Route("indicator/{id}", name="setup_indicator", methods={"GET"})
+     * @Route("indicator/{id}/main_cycle/{mainCycle}/", name="setup_indicator_with_main_cycle", methods={"GET"})
+     * @Route("indicator/{id}/size/{size}", name="setup_indicator_size_default", methods={"GET"})
      * @param LogBookSetup $setup
      * @param int $size
+     * @param LogBookCycle|null $mainCycle
      * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookTestRepository|null $testRepo
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 7,
+    public function indicator(LogBookSetup $setup = null, int $size= 7, LogBookCycle $mainCycle = null,
                               LogBookCycleRepository $cycleRepo = null,
                               LogBookTestRepository $testRepo = null,
                               SuiteExecutionRepository $suiteRepo = null): ?Response
@@ -60,6 +64,7 @@ class LogBookSetupController extends AbstractController
         try {
             $productVersions = [];
             $suiteNames = [];
+            $testsNotPass = [];
             $testNames = [];
             $testNamesRemoved = [];
             if ($setup === null || $cycleRepo === null ) {
@@ -117,6 +122,16 @@ class LogBookSetupController extends AbstractController
                     $testNames[] = $firstKey;
                 }
                 $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
+                if ($mainCycle !== null) {
+                    if ($test->getCycle()->getId() === $mainCycle->getId() && $test->getVerdict()->getName() !== 'PASS'){
+                        $testsNotPass[] = $test;
+                    }
+                } else {
+                    if ($test->getVerdict()->getName() !== 'PASS'){
+                        $testsNotPass[] = $test;
+                    }
+                }
+
                 if ($test->getVerdict()->getName() !== 'PASS' && $test->getVerdict()->getName() !== 'UNKNOWN') {
                     if ($test->getFailDescription() == ' '){
                         $test->parseFailDescription();
@@ -154,19 +169,21 @@ class LogBookSetupController extends AbstractController
                 }
             }
             return $this->render('lbook/setup/indicator.html.twig', array(
-                'setup'          => $setup,
-                'iterator'          => $suites,
-                'suites'          => $suites,
-                'cycles'          => $cycles,
-                'size'          => $size,
-                'productVersions'          => $productVersions,
-                'suiteNames'          => $suiteNames,
-                'testNames'          => $testNames,
-                'work_arr'          => $work_arr,
-                'removed_tests_counter'          => $removed_tests_counter,
-                'testNamesRemoved'          => $testNamesRemoved,
-                'show_build'          => 1,
-                'show_user'          => 1,
+                'setup' => $setup,
+                'iterator' => $suites,
+                'suites' => $suites,
+                'cycles' => $cycles,
+                'size' => $size,
+                'productVersions' => $productVersions,
+                'suiteNames' => $suiteNames,
+                'testNames' => $testNames,
+                'work_arr' => $work_arr,
+                'removed_tests_counter' => $removed_tests_counter,
+                'testNamesRemoved' => $testNamesRemoved,
+                'testsNotPass' => $testsNotPass,
+                'show_build' => 1,
+                'mainCycle' => $mainCycle,
+                'show_user' => 1,
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);

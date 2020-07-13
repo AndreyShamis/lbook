@@ -34,6 +34,37 @@
                 </span>
             </td>
         </tr>
+        {% if mainCycle is defined and mainCycle.id is defined %}
+        <tr>
+            <th>Main Cycle</th>
+            <td>
+                <i class="ace-icon fa fa-briefcase"></i>
+                {{ mainCycle.id }}
+                /
+                <span class="label label-lg label-yellow">{{ mainCycle.name }}</span>
+            </td>
+            <th>
+                <span style="float: right;">Created / Updated</span>
+            </th>
+            <td>
+                <span style="float: right;">
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ mainCycle.createdAt|date('d/m/Y H:i:s') }}</span>
+                    /
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ mainCycle.updatedAt|date('d/m/Y H:i:s') }}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
+                    {%  if date(mainCycle.updatedAt) > date('-20minutes') %}
+                        {% set updatedClass="red" %}
+                    {% else %}
+                        {% set updatedClass="blue" %}
+                    {% endif %}
+                    <span class="{{ updatedClass }}">{{ mainCycle.updatedAt|time_diff}}</span>
+                </span>
+            </td>
+        </tr>
+        {% endif %}
         <tr>
             <th>Owners</th>
             <td>
@@ -103,6 +134,7 @@
                     <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
                     <li class=""><a data-toggle="tab" href="#suitesTable">Suite Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTable">Test Rates</a></li>
+                    <li class=""><a data-toggle="tab" href="#testsTableFailures">Test Failures</a></li>
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -258,8 +290,7 @@
                     <div id="testsTable" class="tab-pane">
                         Number of removed tests from this table {{ removed_tests_counter }}
                         <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered"
-                               id="suiteRatingTable" data-pagination="true" data-search="true" data-toggle="table"
-                               data-toolbar="#suiteExecutionToolBar"
+                               id="testTable" data-pagination="true" data-search="true" data-toggle="table"
                                data-show-refresh="true"
                                data-key-events="true"
                                data-show-footer="true"
@@ -308,8 +339,48 @@
                             </tbody>
                         </table>
 
-
                     </div>
+
+                    <div id="testsTableFailures" class="tab-pane">
+                        <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered"
+                               id="suiteRatingTable" data-pagination="true" data-search="true" data-toggle="table"
+                               data-toolbar="#suiteExecutionToolBar"
+                               data-show-refresh="true"
+                               data-key-events="true"
+                               data-show-footer="true"
+                               data-show-toggle="true"
+                               data-show-export="true"
+                               data-show-columns="true"
+                               data-advanced-search="true"
+                               data-page-size="1000" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+                            <thead>
+                            <tr>
+                                <th data-sortable="true" data-switchable="false">Test Name</th>
+                                <th data-sortable="true" data-switchable="false">Verdict</th>
+                                <th data-sortable="true" data-switchable="false">Type</th>
+                                <th data-sortable="true" data-switchable="false">Fail description</th>
+                                <th data-sortable="true" data-switchable="false">Cycle</th>
+                                <th data-sortable="true" data-switchable="false">Suite Name</th>
+                                <th data-sortable="true" data-switchable="false">Suite UUID</th>
+                            </tr>
+                            </thead>
+                            <tbody class="searchable">
+                            {#                            {% for testName in testNames | slice(0, 50000)%}#}
+                            {% for test in testsNotPass | slice(0, 50000)%}
+                                <tr>
+                                    <td><a target="_blank" href="{{ path('test_show_first', {'id': test.id}) }}">{{ test.name }}</a></td>
+                                    <td><span  class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
+                                    <td class="font9">{{ test.testType }}</td>
+                                    <td class="font9">{{ test.failDescription }}</td>
+                                    <td class="font10">{{ test.cycle }}</td>
+                                    <td class="font10">{{ test.suiteExecution.name }}</td>
+                                    <td class="font9">{{ test.suiteExecution.uuid }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
                     <div id="other" class="tab-pane">
 
                     </div>

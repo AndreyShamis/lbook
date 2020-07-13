@@ -14,6 +14,11 @@
     max-width:90px !important;
     width:30px !important;
 }
+.setup_cycle_suites_column{
+    min-width:80px !important;
+    width:80px !important;
+    text-align: right !important;
+}
 .setup_cycle_name_column{
     min-width:400px !important;
     width:400px !important;

@@ -47,16 +47,20 @@ class LogBookSetupController extends AbstractController
      *
      * @Route("indicator/{id}", name="setup_indicator", methods={"GET"})
      * @Route("indicator/{id}/main_cycle/{mainCycle}/", name="setup_indicator_with_main_cycle", methods={"GET"})
+     * @Route("indicator/{id}/main_cycle/{mainCycle}/compare_cycle/{compareCycle}", name="setup_indicator_with_main_cycle_and_compare", methods={"GET"})
      * @Route("indicator/{id}/size/{size}", name="setup_indicator_size_default", methods={"GET"})
      * @param LogBookSetup $setup
      * @param int $size
      * @param LogBookCycle|null $mainCycle
+     * @param LogBookCycle|null $compareCycle
      * @param LogBookCycleRepository $cycleRepo
      * @param LogBookTestRepository|null $testRepo
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 7, LogBookCycle $mainCycle = null,
+    public function indicator(LogBookSetup $setup = null, int $size= 7,
+                              LogBookCycle $mainCycle = null,
+                              LogBookCycle $compareCycle = null,
                               LogBookCycleRepository $cycleRepo = null,
                               LogBookTestRepository $testRepo = null,
                               SuiteExecutionRepository $suiteRepo = null): ?Response
@@ -70,24 +74,33 @@ class LogBookSetupController extends AbstractController
             if ($setup === null || $cycleRepo === null ) {
                 throw new \RuntimeException('');
             }
-            $qb = $cycleRepo->createQueryBuilder('t')
-                ->where('t.setup = :setup')
-                ->orderBy('t.id', 'DESC')
-                ->setMaxResults($size)
-                ->setParameter('setup', $setup->getId());
+            if ($compareCycle !== null && $compareCycle->getId() > 0) {
+                $cycles = [];
+            } else {
+                $qb = $cycleRepo->createQueryBuilder('t')
+                    ->where('t.setup = :setup')
+                    ->orderBy('t.id', 'DESC')
+                    ->setMaxResults($size)
+                    ->setParameter('setup', $setup->getId());
+                $cycles = $qb->getQuery()->execute();
+            }
 
-//            if ($mainCycle !== null && $mainCycle->getId() > 0){
-//                $qb->orWhere('t.id = :mainCycle')
-//                    ->setParameter('mainCycle', $mainCycle->getId())
-//                ->setMaxResults($qb->getMaxResults() + 1);
-//            }
-            $cycles = $qb->getQuery()->execute();
             if ($mainCycle !== null && $mainCycle->getId() > 0){
                 $qb_cycle = $cycleRepo->createQueryBuilder('t')
                     ->where('t.id = :mainCycle')
                     ->setParameter('mainCycle', $mainCycle->getId())
                     ->setMaxResults(1);
                 $tmp_cycles = $qb_cycle->getQuery()->execute();
+                foreach ($tmp_cycles as $tmpcycle){
+                    array_push($cycles, $tmpcycle);
+                }
+            }
+            if ($compareCycle !== null && $compareCycle->getId() > 0){
+                $qb_cycle2 = $cycleRepo->createQueryBuilder('t')
+                    ->where('t.id = :compareCycle')
+                    ->setParameter('compareCycle', $compareCycle->getId())
+                    ->setMaxResults(1);
+                $tmp_cycles = $qb_cycle2->getQuery()->execute();
                 foreach ($tmp_cycles as $tmpcycle){
                     array_push($cycles, $tmpcycle);
                 }
@@ -198,6 +211,7 @@ class LogBookSetupController extends AbstractController
                 'testsNotPass' => $testsNotPass,
                 'show_build' => 1,
                 'mainCycle' => $mainCycle,
+                'compareCycle' => $compareCycle,
                 'show_user' => 1,
             ));
         } catch (\Throwable $ex) {

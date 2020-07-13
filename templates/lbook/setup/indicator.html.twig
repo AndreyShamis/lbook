@@ -65,6 +65,38 @@
             </td>
         </tr>
         {% endif %}
+        {% if compareCycle is defined and compareCycle.id is defined %}
+            <tr>
+                <th>Second Cycle to compare</th>
+                <td>
+                    <i class="ace-icon fa fa-briefcase"></i>
+                    {{ compareCycle.id }}
+                    /
+                    <span class="label label-lg label-yellow">{{ compareCycle.name }}</span>
+                </td>
+                <th>
+                    <span style="float: right;">Created / Updated</span>
+                </th>
+                <td>
+                <span style="float: right;">
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ compareCycle.createdAt|date('d/m/Y H:i:s') }}</span>
+                    /
+                    <i class="ace-icon fa fa-calendar"></i>
+                    <span class="blue">{{ compareCycle.updatedAt|date('d/m/Y H:i:s') }}</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
+                    {%  if date(compareCycle.updatedAt) > date('-20minutes') %}
+                        {% set updatedClass="red" %}
+                    {% else %}
+                        {% set updatedClass="blue" %}
+                    {% endif %}
+                    <span class="{{ updatedClass }}">{{ compareCycle.updatedAt|time_diff}}</span>
+                </span>
+                </td>
+            </tr>
+        {% endif %}
+
         <tr>
             <th>Owners</th>
             <td>
@@ -234,6 +266,11 @@
                                                 {#<a class="red" href="#" title="Delete">#}
                                                 {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
                                                 {#</a>#}
+                                                {% if mainCycle is defined and mainCycle.id is defined and mainCycle.id != cycle.id %}
+                                                    <a class="blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id}) }}" title="Compare">
+                                                        <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                                                    </a>
+                                                {% endif %}
                                             </div>
                                         </td>
                                     </tr>

@@ -157,6 +157,10 @@
 
     {% set max_suites_in_cycle = 0 %}
     {% set max_tests_in_cycle = 0 %}
+    {% set compareEnabled = 0 %}
+    {% if mainCycle is defined and mainCycle.id is defined and compareCycle is defined and compareCycle.id is defined %}
+        {% set compareEnabled = 1 %}
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
 
@@ -167,6 +171,9 @@
                     <li class=""><a data-toggle="tab" href="#suitesTable">Suite Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTable">Test Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTableFailures">Test Failures</a></li>
+                    {% if compareEnabled %}
+                    <li class=""><a data-toggle="tab" href="#compareCycles">Compare Cycles</a></li>
+                    {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -280,6 +287,7 @@
                         {% endapply %}
 
                     </div>
+
 
                     <div id="suites" class="tab-pane">
                         {% include "lbook/suite/list.html.twig" %}
@@ -417,7 +425,45 @@
                             </tbody>
                         </table>
                     </div>
+                    {% if compareEnabled %}
+                    <div id="compareCycles" class="tab-pane">
+                        <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>-</th>
+                                <th>{{ mainCycle }}</th>
+                                <th>{{ compareCycle }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th>Suites count</th>
+                                {% set msl = mainCycle.suiteExecution | length %}
+                                {% set csl = compareCycle.suiteExecution | length %}
+                                <td style="text-align: center;" class="font28">{{ msl }}
+                                    {% if msl > csl %} <span class="badge badge-success">+{{ msl - csl }} [{{ getPercentage(msl - csl, csl) }}%]</span>{% endif %}
+                                    {% if msl < csl %} <span class="badge badge-danger">-{{ csl - msl }} [{{ getPercentage(csl - msl, csl) }}%]</span>{% endif %}
+                                </td>
+                                <td style="text-align: center;" class="font28">{{ csl }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tests count</th>
+                                <td>{{ mainCycle.testsCount }}
+                                    {% if mainCycle.testsCount > compareCycle.testsCount %} <span class="badge badge-success">+{{ mainCycle.testsCount - compareCycle.testsCount }} [{{ getPercentage(mainCycle.testsCount - compareCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
+                                    {% if mainCycle.testsCount < compareCycle.testsCount %} <span class="badge badge-danger">-{{ compareCycle.testsCount - mainCycle.testsCount }} [{{ getPercentage(compareCycle.testsCount - mainCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
+                                </td>
+                                <td>{{ compareCycle.testsCount }}</td>
+                            </tr>
+                            <tr>
+                                <th>Pass Rate</th>
+                                <td>{{ mainCycle.passRate }}</td>
+                                <td>{{ compareCycle.passRate }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
+                    {% endif %}
                     <div id="other" class="tab-pane">
 
                     </div>

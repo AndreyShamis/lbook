@@ -751,6 +751,12 @@ class LogBookUploaderController extends AbstractController
                     $this->addBlackListLevel('INFO');
                 }
                 $this->parseFile($new_file, $test, $obj, $logger, $parseFileName, $parseTestVerdict);
+                // Parse Test Fail Description
+                try {
+
+                    $this->em->refresh($test);
+                    $fdesc = $test->parseFailDescription();
+                } catch (\Throwable $ex) {}
                 $this->em->refresh($cycle);
 
                 if (!$calculateStat) {
@@ -806,7 +812,13 @@ class LogBookUploaderController extends AbstractController
                     }
 
                 } catch (\Throwable $ex) {}
-                $this->em->flush();
+                try {
+                    $this->em->flush();
+
+                } catch (\Throwable $ex) {
+                    $logger->alert('[FLUSH] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                }
+
                 $obj->addMessage('TestID is ' . $test->getId() . '.');
             }
         }
@@ -1419,18 +1431,12 @@ class LogBookUploaderController extends AbstractController
         }
 
         $this->em->flush();
-        // Parse Test Fail Description
-        try {
-            $fdesc = $test->parseFailDescription();
-            $test->setFailDescription($fdesc);
-            $this->em->persist($test);
-        } catch (\Throwable $ex) {}
 
 //        if ($insertTests) {
-        foreach ($objectsToClear as $tmp_obj) {
-            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
-            $this->em->detach($tmp_obj);
-        }
+//        foreach ($objectsToClear as $tmp_obj) {
+//            // In order to free used memory; Decrease running time of 400 cycles, from ~15-20 to 2 minutes
+//            $this->em->detach($tmp_obj);
+//        }
 //        $this->em->clear(LogBookTest::class);
 
         return $ret_data;

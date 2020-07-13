@@ -1421,7 +1421,9 @@ class LogBookUploaderController extends AbstractController
         $this->em->flush();
         // Parse Test Fail Description
         try {
-            $test->parseFailDescription();
+            $fdesc = $test->parseFailDescription();
+            $test->setFailDescription($fdesc);
+            $this->em->persist($test);
         } catch (\Throwable $ex) {}
 
 //        if ($insertTests) {

@@ -263,12 +263,13 @@ class LogBookTest
                     }
                 }
                 $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
+
             }
 
-            if ($ret_val !== null && $ret_val !== '') {
-                $this->failDescription = $ret_val;
+            if ($ret_val === null || $ret_val === '') {
+                $this->setFailDescription(' ');
             } else {
-                $this->failDescription = ' ';
+                $this->setFailDescription($ret_val);
             }
             return $ret_val;
         } catch (\Throwable $ex) {}

@@ -217,13 +217,25 @@ class LogBookSetupController extends AbstractController
             $mainCycleSuiteName = [];
             $secondCycleSuiteName = [];
             $a_only = [];
+            $mainCycleTestsDefinedInsuite = 0;
+            $mainCycleTestsEnabledInsuite = 0;
+            $mainCycleTestsExecuted = 0;
+            $secondCycleTestsDefinedInsuite = 0;
+            $secondCycleTestsEnabledInsuite = 0;
+            $secondCycleTestsExecuted = 0;
             $missing_in_a_exist_in_b = [];
             if ($compareMode) {
                 foreach ($mainCycle->getSuiteExecution() as $tmp){
                     $mainCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
+                    $mainCycleTestsDefinedInsuite += $tmp->getTestsCount();
+                    $mainCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
+                    $mainCycleTestsExecuted += $tmp->getTotalExecutedTests();
                 }
                 foreach ($compareCycle->getSuiteExecution() as $tmp){
                     $secondCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
+                    $secondCycleTestsDefinedInsuite += $tmp->getTestsCount();
+                    $secondCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
+                    $secondCycleTestsExecuted += $tmp->getTotalExecutedTests();
                 }
                 $intersect = array_intersect($mainCycleSuiteName, $secondCycleSuiteName);
                 $a_only = array_diff($mainCycleSuiteName, $secondCycleSuiteName);
@@ -249,6 +261,12 @@ class LogBookSetupController extends AbstractController
                 'compareMode' => $compareMode,
                 'newSuitesInMain' => $a_only,
                 'missingSuitesInMain' => $missing_in_a_exist_in_b,
+                'mainCycleTestsDefinedInsuite' => $mainCycleTestsDefinedInsuite,
+                'secondCycleTestsDefinedInsuite' => $secondCycleTestsDefinedInsuite,
+                'mainCycleTestsEnabledInsuite' => $mainCycleTestsEnabledInsuite,
+                'secondCycleTestsEnabledInsuite' => $secondCycleTestsEnabledInsuite,
+                'mainCycleTestsExecuted' => $mainCycleTestsExecuted,
+                'secondCycleTestsExecuted' => $secondCycleTestsExecuted,
                 //'missingSuitesInMain' => array_intersect($mainCycle->getSuiteExecution()->getValues(), $compareCycle->getSuiteExecution()->getValues()),
             ));
         } catch (\Throwable $ex) {

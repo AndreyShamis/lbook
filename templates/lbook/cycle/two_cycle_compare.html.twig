@@ -41,8 +41,11 @@
 
         <td>
             <span class="bigger-150 {{ (mainCycleTestsExecuted  >= secondCycleTestsExecuted) ? 'blue': 'red' }}">{{ mainCycleTestsExecuted }}</span>
-            {% if mainCycleTestsExecuted > secondCycleTestsExecuted %} <span class="label label-success label-white middle">+{{ mainCycleTestsExecuted - secondCycleTestsExecuted }} [{{ getPercentage(mainCycleTestsExecuted - secondCycleTestsExecuted, secondCycleTestsExecuted) }}%]</span>{% endif %}
+            {% if mainCycleTestsExecuted > secondCycleTestsExecuted %} <span class="label label-{{ (mainCycleTestsExecuted < mainCycleTestsEnabledInsuite) ? 'danger': 'success' }} label-white middle">+{{ mainCycleTestsExecuted - secondCycleTestsExecuted }} [{{ getPercentage(mainCycleTestsExecuted - secondCycleTestsExecuted, secondCycleTestsExecuted) }}%]</span>{% endif %}
             {% if mainCycleTestsExecuted < secondCycleTestsExecuted %} <span class="badge badge-danger">-{{ secondCycleTestsExecuted - mainCycleTestsExecuted }} [{{ getPercentage(secondCycleTestsExecuted - mainCycleTestsExecuted, secondCycleTestsExecuted) }}%]</span>{% endif %}
+            {% if mainCycleTestsExecuted < mainCycleTestsEnabledInsuite %}
+                <span class="label label-danger arrowed-in">Not finished suite/s found</span>,  missing ~ {{ mainCycleTestsEnabledInsuite - mainCycleTestsExecuted }} tests
+            {% endif %}
         </td>
         <td><span class="bigger-150 {{ (secondCycleTestsExecuted  >= mainCycleTestsExecuted) ? 'blue': 'red' }}">{{ secondCycleTestsExecuted }}</span></td>
     </tr>
@@ -53,9 +56,6 @@
             <span class="bigger-150 {{ (mainCycleTestsEnabledInsuite  >= secondCycleTestsEnabledInsuite) ? 'blue': 'red' }}">{{ mainCycleTestsEnabledInsuite }}</span>
             {% if mainCycleTestsEnabledInsuite > secondCycleTestsEnabledInsuite %} <span class="label label-success label-white middle">+{{ mainCycleTestsEnabledInsuite - secondCycleTestsEnabledInsuite }} [{{ getPercentage(mainCycleTestsEnabledInsuite - secondCycleTestsEnabledInsuite, secondCycleTestsEnabledInsuite) }}%]</span>{% endif %}
             {% if mainCycleTestsEnabledInsuite < secondCycleTestsEnabledInsuite %} <span class="badge badge-danger">-{{ secondCycleTestsEnabledInsuite - mainCycleTestsEnabledInsuite }} [{{ getPercentage(secondCycleTestsEnabledInsuite - mainCycleTestsEnabledInsuite, secondCycleTestsEnabledInsuite) }}%]</span>{% endif %}
-            {% if mainCycleTestsExecuted > mainCycleTestsEnabledInsuite %}
-                <span class="label label-danger arrowed-in">Not finished suite found</span>,  missing {{ mainCycleTestsEnabledInsuite - mainCycleTestsExecuted }} tests
-            {% endif %}
         </td>
         <td><span class="bigger-150 {{ (secondCycleTestsEnabledInsuite  >= mainCycleTestsEnabledInsuite) ? 'blue': 'red' }}">{{ secondCycleTestsEnabledInsuite }}</span></td>
     </tr>

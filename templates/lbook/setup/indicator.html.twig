@@ -409,11 +409,15 @@
                     ]);
 
                     var options = {
-                        width: 'auto',
                         chart: {
                             title: 'Cycles',
                             subtitle: ''
                         },
+                        bar: {
+                            groupWidth: '95%'
+                        },
+                        width: 'auto',
+
                         bars: 'vertical', // Required for Material Bar Charts.
                         //bars: 'horizontal', // Required for Material Bar Charts.
                         series: {
@@ -466,7 +470,7 @@
                     };
 
                     var chart = new google.charts.Bar(document.getElementById('dual_x_div'));
-                    chart.draw(data, options);
+                    chart.draw(data, google.charts.Bar.convertOptions(options));
                 };
             } catch (e) {}
 

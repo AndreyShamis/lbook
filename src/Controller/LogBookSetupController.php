@@ -58,7 +58,7 @@ class LogBookSetupController extends AbstractController
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 7,
+    public function indicator(LogBookSetup $setup = null, int $size= 9,
                               LogBookCycle $mainCycle = null,
                               LogBookCycle $compareCycle = null,
                               LogBookCycleRepository $cycleRepo = null,

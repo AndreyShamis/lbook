@@ -133,9 +133,14 @@ class LogBookSetupController extends AbstractController
                 foreach ($cycleSuites as $tmpSuite) {
                     //$tmpSuite->getPlatform() . '_'. $tmpSuite->getChip() . '_' .
                     $firstKey = $tmpSuite->getName();
-                    $work_arr[$firstKey][$tmpSuite->getProductVersion()][] = $tmpSuite;
-                    if (!in_array($tmpSuite->getProductVersion(), $productVersions)){
-                        $productVersions[] = $tmpSuite->getProductVersion();
+                    if ($compareMode) {
+                        $secondKey = $tmpSuite->getCycle()->getName();
+                    } else {
+                        $secondKey = $tmpSuite->getProductVersion();
+                    }
+                    $work_arr[$firstKey][$secondKey][] = $tmpSuite;
+                    if (!in_array($secondKey, $productVersions)){
+                        $productVersions[] = $secondKey;
                     }
                     if (!in_array($firstKey, $suiteNames)){
                         $suiteNames[] = $firstKey;
@@ -153,10 +158,16 @@ class LogBookSetupController extends AbstractController
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
                 $firstKey = $test->getName();
+
                 if (!in_array($firstKey, $testNames)){
                     $testNames[] = $firstKey;
                 }
-                $work_arr[$firstKey][$test->getSuiteExecution()->getProductVersion()][] = $test;
+                if ($compareMode) {
+                    $secondKey = $test->getCycle()->getName();
+                } else {
+                    $secondKey = $test->getSuiteExecution()->getProductVersion();
+                }
+                $work_arr[$firstKey][$secondKey][] = $test;
                 if ($mainCycle !== null) {
                     if ($test->getCycle()->getId() === $mainCycle->getId() && $test->getVerdict()->getName() !== 'PASS'){
                         $testsNotPass[] = $test;

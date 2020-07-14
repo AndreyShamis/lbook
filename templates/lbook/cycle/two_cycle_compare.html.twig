@@ -39,5 +39,36 @@
         <td class="bigger-150 {{ passRateToColor(mainCycle.passRate) }}">{{ mainCycle.passRate }}%</td>
         <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%</td>
     </tr>
+    <tr>
+        <th>Product Version</th>
+        <td class="bigger-50 align-right {{ (mainCycle.build.name == compareCycle.build.name) ? 'red': 'green' }}">{{ mainCycle.build.name }}</td>
+        <td class="bigger-50 align-left">{{ compareCycle.build.name }}</td>
+    </tr>
+    <tr>
+        <th>Duration </th>
+        <td class="bigger-50 align-right {{ (mainCycle.period >= compareCycle.period) ? 'green': 'red' }}">{{ mainCycle.period | executionTimeGenericShort }} ({{ mainCycle.period }})</td>
+        <td class="bigger-50 align-left">{{ compareCycle.period | executionTimeGenericShort }} ({{ compareCycle.period }})</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="align-right">Time duration between First test start-time and Last test end-time </td>
+    </tr>
+    <tr>
+        <th>Test Time</th>
+        <td class="bigger-50 align-right {{ (mainCycle.testsTimeSum >= compareCycle.testsTimeSum) ? 'green': 'red' }}">{{ mainCycle.testsTimeSum | executionTimeGenericShort }}</td>
+        <td class="bigger-50 align-left">{{ compareCycle.testsTimeSum | executionTimeGenericShort }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="align-right">Summary over total time in all tests in this cycle</td>
+    </tr>
+    <tr>
+        <th>New Suites relative to second cycle</th>
+        <td class=""></td>
+        <td class=""></td>
+    </tr>
+    <tr>
+        <th>Missing Suites relative to second cycle</th>
+        <td class=""></td>
+        <td class=""></td>
+    </tr>
     </tbody>
 </table>

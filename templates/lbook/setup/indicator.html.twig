@@ -84,9 +84,11 @@
     <tbody>
     {% if mainCycle is defined and mainCycle.id is defined %}
         <tr>
+            {% if compareCycle is defined and compareCycle.id is defined %}
             <td rowspan="2">
                 <a href="#" class="btn btn-app btn-success btn-sm" id="switchComparedCycles"><i class="ace-icon fa fa-refresh bigger-150"></i>Switch</a>
             </td>
+            {% endif %}
             <th>Main Cycle</th>
             <td><i class="ace-icon fa fa-bar-chart-o"></i>{{ mainCycle.id }}/<span class="label label-lg label-yellow">{{ mainCycle.name }}</span></td>
             <th><span style="float: right;">Created / Updated</span></th>

@@ -80,10 +80,13 @@
 
     {% apply spaceless %}
 
-    <table class="records_list table table-striped table-condensed">
+    <table class="records_list table table-condensed">
     <tbody>
     {% if mainCycle is defined and mainCycle.id is defined %}
         <tr>
+            <td rowspan="2">
+                <a href="#" class="btn btn-app btn-success btn-sm" id="switchComparedCycles"><i class="ace-icon fa fa-refresh bigger-150"></i>Switch</a>
+            </td>
             <th>Main Cycle</th>
             <td><i class="ace-icon fa fa-bar-chart-o"></i>{{ mainCycle.id }}/<span class="label label-lg label-yellow">{{ mainCycle.name }}</span></td>
             <th><span style="float: right;">Created / Updated</span></th>
@@ -103,6 +106,7 @@
     {% endif %}
     {% if compareCycle is defined and compareCycle.id is defined %}
         <tr>
+
             <th>Second Cycle to compare</th>
             <td><i class="ace-icon fa fa-bar-chart-o"></i>{{ compareCycle.id }}/<span class="label label-lg label-yellow">{{ compareCycle.name }}</span></td>
             <th><span style="float: right;">Created / Updated</span></th>
@@ -126,8 +130,7 @@
 
     {% endapply %}
 
-    <div>Size : {{ size }}</div>
-    <div>Suites : {{ suites | length }}</div>
+
 
     {% if compareMode %}
         <div id="compareCycles" class="tab-pane">{% include "lbook/cycle/two_cycle_compare.html.twig" %}</div>
@@ -144,9 +147,6 @@
                     <li class=""><a data-toggle="tab" href="#suitesTable">Suite Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTable">Test Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTableFailures">Test Failures</a></li>
-                    {% if compareMode %}
-                    <li class=""><a data-toggle="tab" href="#compareCycles">Compare Cycles</a></li>
-                    {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -343,10 +343,11 @@
                     </div>
 
                     <div id="testsTableFailures" class="tab-pane">{% include "lbook/cycle/tests_not_pass.html.twig" %}</div>
-                    {% if compareMode %}
-                    <div id="compareCycles" class="tab-pane">{% include "lbook/cycle/two_cycle_compare.html.twig" %}</div>
-                    {% endif %}
-                    <div id="other" class="tab-pane"></div>
+                    <div id="other" class="tab-pane">
+                        <div>Size : {{ size }}</div>
+                        <div>Suites : {{ suites | length }}</div>
+
+                    </div>
 
                     <div id="dual_x_div" style="width: 100%; height: 500px;"></div>
 
@@ -477,7 +478,13 @@
             $( "#cancelMainCycle" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_indicator', { 'id': mainCycle.setup.id }) }}";
             });
+                {% if compareCycle.id is defined %}
+                    $( "#switchComparedCycles" ).bind( "click", function() {
+                        window.location.href = "{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': mainCycle.setup.id, 'mainCycle': compareCycle.id, 'compareCycle': mainCycle.id }) }}";
+                    });
+                {% endif %}
             {% endif %}
+
 
             try {
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);

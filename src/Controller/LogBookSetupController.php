@@ -215,6 +215,8 @@ class LogBookSetupController extends AbstractController
                 }
             }
             $mainCycleSuiteName = [];
+            $mainCycleChips = [];
+            $secondCycleChips = [];
             $secondCycleSuiteName = [];
             $a_only = [];
             $mainCycleTestsDefinedInsuite = 0;
@@ -233,6 +235,11 @@ class LogBookSetupController extends AbstractController
                     $mainCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
                     $mainCycleTestsExecuted += $tmp->getTotalExecutedTests();
                     $mainCycleTestsDisabledInSuite += $tmp->getTestsCountDisabled();
+                    if (!array_key_exists($tmp->getChip(),$mainCycleChips)) {
+                        $mainCycleChips[$tmp->getChip()] = 1;
+                    } else {
+                        $mainCycleChips[$tmp->getChip()]++;
+                    }
                 }
                 foreach ($compareCycle->getSuiteExecution() as $tmp){
                     $secondCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
@@ -240,6 +247,11 @@ class LogBookSetupController extends AbstractController
                     $secondCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
                     $secondCycleTestsExecuted += $tmp->getTotalExecutedTests();
                     $secondCycleTestsDisabledInSuite += $tmp->getTestsCountDisabled();
+                    if (!array_key_exists($tmp->getChip(),$secondCycleChips)) {
+                        $secondCycleChips[$tmp->getChip()] = 1;
+                    } else {
+                        $secondCycleChips[$tmp->getChip()]++;
+                    }
                 }
                 $intersect = array_intersect($mainCycleSuiteName, $secondCycleSuiteName);
                 $a_only = array_diff($mainCycleSuiteName, $secondCycleSuiteName);
@@ -273,6 +285,8 @@ class LogBookSetupController extends AbstractController
                 'secondCycleTestsExecuted' => $secondCycleTestsExecuted,
                 'mainCycleTestsDisabledInSuite' => $mainCycleTestsDisabledInSuite,
                 'secondCycleTestsDisabledInSuite' => $secondCycleTestsDisabledInSuite,
+                'mainCycleChips' => $mainCycleChips,
+                'secondCycleChips' => $secondCycleChips,
                 //'missingSuitesInMain' => array_intersect($mainCycle->getSuiteExecution()->getValues(), $compareCycle->getSuiteExecution()->getValues()),
             ));
         } catch (\Throwable $ex) {

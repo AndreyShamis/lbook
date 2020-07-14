@@ -85,6 +85,23 @@
         <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%</td>
     </tr>
     <tr>
+        <th>Chips</th>
+        <td class="">Found {{ mainCycleChips | length }}
+            <ul>
+                {% for x in mainCycleChips|keys %}
+                    <li {{ (mainCycleChips[x]|default(0) < secondCycleChips[x]|default(0)) ? 'class="text-danger"'}}{{ (mainCycleChips[x]|default(0) > secondCycleChips[x]|default(0)) ? 'class="text-primary"'}}>{{  x }} - {{ mainCycleChips[x]}} </li>
+                {% endfor %}
+            </ul>
+        </td>
+        <td class="">Found {{ secondCycleChips | length }}
+            <ul>
+            {% for x in secondCycleChips|keys %}
+                <li>{{  x }} - {{ secondCycleChips[x]}} </li>
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    <tr>
         <th>Product Version</th>
         <td class="bigger-150 align-right {{ (mainCycle.build.name == compareCycle.build.name) ? 'red': 'green' }}">{{ mainCycle.build.name }}</td>
         <td class="bigger-150 align-left">{{ compareCycle.build.name }}</td>

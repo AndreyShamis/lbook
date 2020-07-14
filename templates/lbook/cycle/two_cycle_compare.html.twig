@@ -62,12 +62,25 @@
     </tr>
     <tr>
         <th>New Suites relative to second cycle</th>
-        <td class=""></td>
+        <td class="" >Found {{ newSuitesInMain | length }}
+            <ul>
+                {% for tmp in newSuitesInMain %}
+                    <li>{{ tmp }}</li>
+                {% endfor %}
+            </ul>
+        </td>
         <td class=""></td>
     </tr>
     <tr>
         <th>Missing Suites relative to second cycle</th>
-        <td class=""></td>
+        <td class="" >Found {{ missingSuitesInMain | length }}
+            <ul>
+            {% for tmp in missingSuitesInMain %}
+                <li>{{ tmp }}</li>
+            {% endfor %}
+            </ul>
+
+        </td>
         <td class=""></td>
     </tr>
     </tbody>

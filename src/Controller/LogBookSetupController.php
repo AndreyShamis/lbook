@@ -214,6 +214,22 @@ class LogBookSetupController extends AbstractController
                     unset($work_arr[$testName][$pv]);
                 }
             }
+            $mainCycleSuiteName = [];
+            $secondCycleSuiteName = [];
+            $a_only = [];
+            $missing_in_a_exist_in_b = [];
+            if ($compareMode) {
+                foreach ($mainCycle->getSuiteExecution() as $tmp){
+                    $mainCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
+                }
+                foreach ($compareCycle->getSuiteExecution() as $tmp){
+                    $secondCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
+                }
+                $intersect = array_intersect($mainCycleSuiteName, $secondCycleSuiteName);
+                $a_only = array_diff($mainCycleSuiteName, $secondCycleSuiteName);
+                $missing_in_a_exist_in_b = array_diff($secondCycleSuiteName, $intersect);
+            }
+
             return $this->render('lbook/setup/indicator.html.twig', array(
                 'setup' => $setup,
                 'iterator' => $suites,
@@ -231,6 +247,9 @@ class LogBookSetupController extends AbstractController
                 'compareCycle' => $compareCycle,
                 'show_user' => 0,
                 'compareMode' => $compareMode,
+                'newSuitesInMain' => $a_only,
+                'missingSuitesInMain' => $missing_in_a_exist_in_b,
+                //'missingSuitesInMain' => array_intersect($mainCycle->getSuiteExecution()->getValues(), $compareCycle->getSuiteExecution()->getValues()),
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);

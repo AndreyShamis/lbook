@@ -138,14 +138,10 @@
         {% for cycle in iterator | slice(0, 10000) %}
             <tr>
                 <td title="Updated {{ cycle.updatedAt|time_diff }}">
-                    {% if date(cycle.updatedAt) > date('-5 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
-                    {% elseif date(cycle.updatedAt) > date('-30 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
-                    {% elseif date(cycle.updatedAt) > date('-60 minutes') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
-                    {% elseif date(cycle.updatedAt) > date('-12 hours') %}
-                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
+                    {% if date(cycle.updatedAt) > date('-5 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
+                    {% elseif date(cycle.updatedAt) > date('-30 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
+                    {% elseif date(cycle.updatedAt) > date('-60 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
+                    {% elseif date(cycle.updatedAt) > date('-12 hours') %}<i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                     {% endif %}
                 </td>
                 <td>
@@ -184,9 +180,14 @@
                 <td>{{ cycle.deleteAt|time_diff }}</td>
                 <td>
                     <div class="hidden-sm hidden-xs action-buttons">
-                        <a class="blue" href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" title="Show">
-                            <i class="ace-icon fa fa-search-plus bigger-130"></i>
+{#                        <a class="blue" href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" title="Show">#}
+{#                            <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
+{#                        </a>#}
+
+                        <a class="light-blue2" href="{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id }) }}" title="Compare as Main Cycle">
+                            <i class="ace-icon fa fa-eye bigger-130"></i>
                         </a>
+
                         {% if is_granted('edit', setup) %}
                             <a class="green" href="{{ path('cycle_edit', { 'id': cycle.id }) }}" title="Edit">
                                 <i class="ace-icon fa fa-pencil bigger-130"></i>

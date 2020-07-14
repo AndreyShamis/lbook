@@ -28,15 +28,15 @@
                 <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
                 <th data-sortable="true" data-switchable="false">ID</th>
                 <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false">Name</th>
-                <th data-sortable="true" title="Cycles found">Cycles</th>
+                <th class="setup_cycles_found_col" data-sortable="true" title="Cycles found">Cycles</th>
                 <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time">Updated</th>
                 <th data-sortable="true">OS</th>
                 <th data-sortable="true" title="Owner Name">Owner</th>
                 <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="false">Created</th>
-                <th data-sortable="true" title="Check Uptime" data-visible="false">UPT</th>
+{#                <th data-sortable="true" title="Check Uptime" data-visible="false">UPT</th>#}
                 <th data-sortable="true" title="Moderators cound" data-visible="false">Moderators</th>
-                <th data-sortable="true" title="Shows if the setup is disabled" data-visible="false">Disabled</th>
-                <th data-sortable="true" title="Is it marked as Private" data-visible="false">Private</th>
+{#                <th data-sortable="true" title="Shows if the setup is disabled" data-visible="false">Disabled</th>#}
+{#                <th data-sortable="true" title="Is it marked as Private" data-visible="false">Private</th>#}
                 <th data-sortable="true" title="Retention Policy, new cycle will be deleted after (days)" data-visible="true">Ret Pol</th>
                 <th class="setup_list_options_column">Options</th>
             </tr>
@@ -45,14 +45,10 @@
             {% for setup in iterator | slice(0, 10000)%}
                 <tr>
                     <td title="Updated {{ setup.updatedAt|time_diff }}">
-                        {% if date(setup.updatedAt) > date('-5 minutes') %}
-                            <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
-                        {% elseif date(setup.updatedAt) > date('-30 minutes') %}
-                            <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
-                        {% elseif date(setup.updatedAt) > date('-60 minutes') %}
-                            <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
-                        {% elseif date(setup.updatedAt) > date('-12 hours') %}
-                            <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
+                        {% if date(setup.updatedAt) > date('-1 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
+                        {% elseif date(setup.updatedAt) > date('-5 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
+                        {% elseif date(setup.updatedAt) > date('-1 hours') %}<i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
+                        {% elseif date(setup.updatedAt) > date('-2 hours') %}<i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                         {% endif %}
                     </td>
                     {% set setup_name = setup.name %}
@@ -66,18 +62,18 @@
                     <td>{{ setup.osStr }}</td>
                     <td>{{ setup.owner }}</td>
                     <td><span data-title="{{ setup.createdAt|date('ymdHis') }}" title="Created at {{ setup.createdAt|date('d/m/Y H:i:s') }}">{{ setup.createdAt|time_diff}}</span></td>
-                    <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>
+{#                    <td>{{ setup.checkUpTime ? 'Yes':'No' }}</td>#}
                     <td>{{ setup.moderators|length }}</td>
-                    <td>{{ setup.disabled ? 'Yes':'False' }}</td>
-                    <td>{{ setup.isPrivate ? 'Private':'Public' }}</td>
+{#                    <td>{{ setup.disabled ? 'Yes':'False' }}</td>#}
+{#                    <td>{{ setup.isPrivate ? 'Private':'Public' }}</td>#}
                     <td>{{ setup.retentionPolicy }}</td>
                     <td>
                         <div class="hidden-sm hidden-xs action-buttons">
                             <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">
                                 <i class="ace-icon fa fa-search-plus bigger-130"></i>
                             </a>
-                            <a class="blue" href="{{ path('setup_indicator', { 'id': setup.id }) }}" title="Indicators">
-                                <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                            <a class="light-blue2" href="{{ path('setup_indicator', { 'id': setup.id }) }}" title="Indicators">
+                                <i class="ace-icon fa fa-bar-chart-o bigger-130"></i>
                             </a>
                             {% if is_granted('edit', setup) %}
                             <a class="green" href="{{ path('setup_edit', { 'id': setup.id }) }}" title="Edit">

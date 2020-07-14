@@ -34,77 +34,12 @@
                 </span>
             </td>
         </tr>
-        {% if mainCycle is defined and mainCycle.id is defined %}
-        <tr>
-            <th>Main Cycle</th>
-            <td>
-                <i class="ace-icon fa fa-briefcase"></i>
-                {{ mainCycle.id }}
-                /
-                <span class="label label-lg label-yellow">{{ mainCycle.name }}</span>
-            </td>
-            <th>
-                <span style="float: right;">Created / Updated</span>
-            </th>
-            <td>
-                <span style="float: right;">
-                    <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ mainCycle.createdAt|date('d/m/Y H:i:s') }}</span>
-                    /
-                    <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ mainCycle.updatedAt|date('d/m/Y H:i:s') }}</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
-                    {%  if date(mainCycle.updatedAt) > date('-20minutes') %}
-                        {% set updatedClass="red" %}
-                    {% else %}
-                        {% set updatedClass="blue" %}
-                    {% endif %}
-                    <span class="{{ updatedClass }}">{{ mainCycle.updatedAt|time_diff}}</span>
-                </span>
-            </td>
-        </tr>
-        {% endif %}
-        {% if compareCycle is defined and compareCycle.id is defined %}
-            <tr>
-                <th>Second Cycle to compare</th>
-                <td>
-                    <i class="ace-icon fa fa-briefcase"></i>
-                    {{ compareCycle.id }}
-                    /
-                    <span class="label label-lg label-yellow">{{ compareCycle.name }}</span>
-                </td>
-                <th>
-                    <span style="float: right;">Created / Updated</span>
-                </th>
-                <td>
-                <span style="float: right;">
-                    <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ compareCycle.createdAt|date('d/m/Y H:i:s') }}</span>
-                    /
-                    <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ compareCycle.updatedAt|date('d/m/Y H:i:s') }}</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
-                    {%  if date(compareCycle.updatedAt) > date('-20minutes') %}
-                        {% set updatedClass="red" %}
-                    {% else %}
-                        {% set updatedClass="blue" %}
-                    {% endif %}
-                    <span class="{{ updatedClass }}">{{ compareCycle.updatedAt|time_diff}}</span>
-                </span>
-                </td>
-            </tr>
-        {% endif %}
-
         <tr>
             <th>Owners</th>
             <td>
                 <span>
                     <i class="ace-icon fa fa-key" title="Owner"></i>
-                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <i class="ace-icon fa fa-users" title="Moderators"></i>
+                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<i class="ace-icon fa fa-users" title="Moderators"></i>
                     {% for moderator in setup.moderators %}
                         <a href="{{ path('user_show', { 'id': moderator.id }) }}" target="_blank">
                         {% if moderator.id == setup.owner.id %}
@@ -116,32 +51,23 @@
                     {% endfor %}
                 </span>
             </td>
-            <th>
-                <span style="float:right;">Disabled / Visibility / Check Uptime / Retention Policy</span>
-            </th>
+            <th><span style="float:right;">Disabled / Visibility / Check Uptime / Retention Policy</span></th>
             <td>
                 <span style="float:right;">
-                    <span class="blue">
-                    {{ setup.disabled ? '<i class="ace-icon fa fa-lock" title="Disabled"></i> Disabled':'<i class="ace-icon fa fa-unlock" title="Enabled"></i> Enabled' }}
-                    </span>
+                    <span class="blue">{{ setup.disabled ? '<i class="ace-icon fa fa-lock" title="Disabled"></i> Disabled':'<i class="ace-icon fa fa-unlock" title="Enabled"></i> Enabled' }}</span>
                     /
-                    <span class="green">
-                    {{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}
-                    </span>
+                    <span class="green">{{ setup.private ? '<i class="ace-icon fa fa-eye"></i> Private':'<i class="ace-icon fa fa-globe"></i> Public' }}</span>
                     /
-                    <span class="yellow">
-                    {{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}
-                    </span>
-                    /<span class="label label-info arrowed-right arrowed-in" title="Retention Policy in days">
-                        {{ setup.retentionPolicy }}
-                    </span>
+                    <span class="yellow">{{ setup.checkUpTime ? '<i class="ace-icon fa fa-check-square-o"></i> Yes':'<i class="ace-icon fa fa-ban"></i> No' }}</span>
+                    /
+                    <span class="label label-info arrowed-right arrowed-in" title="Retention Policy in days">{{ setup.retentionPolicy }}</span>
                 </span>
             </td>
         </tr>
 
         {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN', 'retentionPolicy'] %}
         {% for key, value in setup|cast_to_array %}
-            {% if key not in already_printed%}
+            {% if key not in already_printed %}
                 <tr>
                     <th>{{ key | capitalize}}</th>
                     <td>{{ value }}</td>
@@ -151,16 +77,63 @@
         </tbody>
     </table>
     {% endapply %}
+
+    {% apply spaceless %}
+
+    <table class="records_list table table-striped table-condensed">
+    <tbody>
+    {% if mainCycle is defined and mainCycle.id is defined %}
+        <tr>
+            <th>Main Cycle</th>
+            <td><i class="ace-icon fa fa-bar-chart-o"></i>{{ mainCycle.id }}/<span class="label label-lg label-yellow">{{ mainCycle.name }}</span></td>
+            <th><span style="float: right;">Created / Updated</span></th>
+            <td>
+            <span style="float: right;">
+                <i class="ace-icon fa fa-calendar"></i><span class="blue">{{ mainCycle.createdAt|date('d/m/Y H:i:s') }}</span>
+                /
+                <i class="ace-icon fa fa-calendar"></i><span class="blue">{{ mainCycle.updatedAt|date('d/m/Y H:i:s') }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
+                {%  if date(mainCycle.updatedAt) > date('-20minutes') %}{% set updatedClass="red" %}
+                {% else %}{% set updatedClass="blue" %}
+                {% endif %}
+                <span class="{{ updatedClass }}">{{ mainCycle.updatedAt|time_diff}}</span>
+            </span>
+            </td>
+            <td><span style="float: right;"><button class="btn btn-white btn-default btn-round" id="cancelMainCycle"><i class="ace-icon fa fa-times red2"></i>Cancel</button></span></td>
+        </tr>
+    {% endif %}
+    {% if compareCycle is defined and compareCycle.id is defined %}
+        <tr>
+            <th>Second Cycle to compare</th>
+            <td><i class="ace-icon fa fa-bar-chart-o"></i>{{ compareCycle.id }}/<span class="label label-lg label-yellow">{{ compareCycle.name }}</span></td>
+            <th><span style="float: right;">Created / Updated</span></th>
+            <td>
+            <span style="float: right;">
+                <i class="ace-icon fa fa-calendar"></i><span class="blue">{{ compareCycle.createdAt|date('d/m/Y H:i:s') }}</span>
+                /
+                <i class="ace-icon fa fa-calendar"></i><span class="blue">{{ compareCycle.updatedAt|date('d/m/Y H:i:s') }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
+                {%  if date(compareCycle.updatedAt) > date('-20minutes') %}{% set updatedClass="red" %}
+                {% else %}{% set updatedClass="blue" %}
+                {% endif %}
+                <span class="{{ updatedClass }}">{{ compareCycle.updatedAt|time_diff}}</span>
+            </span>
+            </td>
+            <td><span style="float: right;"><button class="btn btn-white btn-default btn-round" id="cancelCompareCycle"><i class="ace-icon fa fa-times red2"></i>Cancel</button></span></td>
+        </tr>
+    {% endif %}
+    </tbody>
+    </table>
+
+    {% endapply %}
+
     <div>Size : {{ size }}</div>
     <div>Suites : {{ suites | length }}</div>
 
-
+    {% if compareMode %}
+        <div id="compareCycles" class="tab-pane">{% include "lbook/cycle/two_cycle_compare.html.twig" %}</div>
+    {% endif %}
     {% set max_suites_in_cycle = 0 %}
     {% set max_tests_in_cycle = 0 %}
-    {% set compareEnabled = 0 %}
-    {% if mainCycle is defined and mainCycle.id is defined and compareCycle is defined and compareCycle.id is defined %}
-        {% set compareEnabled = 1 %}
-    {% endif %}
     <div class="row">
         <div class="col-sm-12">
 
@@ -171,7 +144,7 @@
                     <li class=""><a data-toggle="tab" href="#suitesTable">Suite Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTable">Test Rates</a></li>
                     <li class=""><a data-toggle="tab" href="#testsTableFailures">Test Failures</a></li>
-                    {% if compareEnabled %}
+                    {% if compareMode %}
                     <li class=""><a data-toggle="tab" href="#compareCycles">Compare Cycles</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
@@ -193,21 +166,20 @@
                                 <thead>
                                 <tr>
                                     <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
-                                    <th data-sorter="dataTitleIntSorter" class="setup_cycle_id_column" data-sortable="true">Id</th>
+                                    <th data-sorter="dataTitleIntSorter" class="setup_cycle_id_column" data-sortable="true">ID</th>
                                     <th data-sorter="htmlSorter" data-sortable="true" class="setup_cycle_name_column" data-switchable="false">Name</th>
                                     <th class="setup_cycle_suites_column" data-sortable="true">Suites</th>
+                                    <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-visible="true">Pass Rate</th>
+                                    <th class="setup_cycle_failrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Fail Rate" data-visible="true">Fail Rate</th>
                                     <th class="setup_cycle_tests_column" data-sortable="true">Tests</th>
                                     <th class="setup_cycle_tests_column" data-sortable="true">Pass</th>
                                     <th class="setup_cycle_tests_column" data-sortable="true">Fail</th>
                                     <th class="setup_cycle_tests_column" data-sortable="true">Error</th>
-                                    {%  if show_build %}
-                                        <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
-                                    {% endif %}
+                                    <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
                                     {%  if show_user %}
-                                        <th class="setup_cycle_user" data-sortable="true">User</th>
+                                        <th class="setup_cycle_user" data-sortable="true" data-visible="false">User</th>
                                     {% endif %}
-                                    <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-visible="true">Pass Rate</th>
-                                    <th class="setup_cycle_failrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Fail Rate" data-visible="false">Fail Rate</th>
+
                                     <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
                                     <th class="setup_cycle_testtime_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="The total summary time of all tests in this cycle">Test time</th>
                                     <th class="setup_cycle_updated_column" data-sorter="htmlSorter" data-sortable="true">Updated</th>
@@ -224,35 +196,25 @@
                                     {% set max_tests_in_cycle = max(cycle.testsCount, max_tests_in_cycle) %}
                                     <tr>
                                         <td title="Updated {{ cycle.updatedAt|time_diff }}">
-                                            {% if date(cycle.updatedAt) > date('-5 minutes') %}
-                                                <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
-                                            {% elseif date(cycle.updatedAt) > date('-30 minutes') %}
-                                                <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
-                                            {% elseif date(cycle.updatedAt) > date('-60 minutes') %}
-                                                <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
-                                            {% elseif date(cycle.updatedAt) > date('-12 hours') %}
-                                                <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
+                                            {% if date(cycle.updatedAt) > date('-1 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
+                                            {% elseif date(cycle.updatedAt) > date('-2 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
+                                            {% elseif date(cycle.updatedAt) > date('-1 hours') %}<i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>
+                                            {% elseif date(cycle.updatedAt) > date('-2 hours') %}<i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>
                                             {% endif %}
                                         </td>
                                         <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" data-title="{{ cycle.id }}">{{ cycle.id }}</a></td>
                                         <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a></td>
                                         <td>{{ cycle.suiteExecution | length }}</td>
+                                        <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
+                                        <td><span class="{{ failRateToColor(cycle.failRate) }}" data-percent="{{ cycle.failRate }}">{{ cycle.failRate }}%</span></td>
                                         <td class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.testsCount }}</td>
                                         <td class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.testsPass }}</td>
-                                        <td class="{{ passRateToColor(100 - cycle.failRate) }}">{{ cycle.testsFail }}</td>
-                                        <td class="{{ passRateToColor(100 - cycle.errorRate - cycle.failRate) }}">{{ cycle.testsError }}</td>
-                                        {%  if show_build %}
-                                            <td title="{{ cycle.build }}">
-                                                {% if cycle.build.id is defined %}
-                                                    <a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>
-                                                {% endif %}
-                                            </td>
-                                        {% endif %}
+                                        <td class="{{ failRateToColor(cycle.failRate) }}">{{ cycle.testsFail }}</td>
+                                        <td class="{{ failRateToColor(cycle.errorRate - cycle.failRate) }}">{{ cycle.testsError }}</td>
+                                        <td title="{{ cycle.build }}">{% if cycle.build.id is defined %}<a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>{% endif %}</td>
                                         {%  if show_user %}
                                             <td title="{{ cycle.user.FullName }}">{{ cycle.user.UserNameMedium }}</td>
                                         {% endif %}
-                                        <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
-                                        <td><span class="{{ failRateToColor(cycle.failRate) }}" data-percent="{{ cycle.failRate }}">{{ cycle.failRate }}%</span></td>
                                         <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>
                                         <td><span data-title="{{ cycle.testsTimeSum  }}">{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</span></td>
                                         <td><span title="{{ cycle.updatedAt|time_diff }}">{{ cycle.updatedAt |date('d/m H:i:s') }}</span></td>
@@ -262,20 +224,14 @@
                                         <td>{{ cycle.deleteAt|time_diff }}</td>
                                         <td>
                                             <div class="hidden-sm hidden-xs action-buttons">
-                                                <a class="blue" href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" title="Show">
-                                                    <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                                                {% if mainCycle.id|default(0) != cycle.id and compareCycle.id|default(0) != cycle.id %}
+                                                <a class="light-blue2" href="{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id, 'compareCycle': compareCycle.id|default(null) }) }}" title="Compare as Main Cycle">
+                                                    <i class="ace-icon fa fa-eye bigger-130"></i>
                                                 </a>
-                                                {% if is_granted('edit', setup) %}
-                                                    <a class="green" href="{{ path('cycle_edit', { 'id': cycle.id }) }}" title="Edit">
-                                                        <i class="ace-icon fa fa-pencil bigger-130"></i>
-                                                    </a>
                                                 {% endif %}
-                                                {#<a class="red" href="#" title="Delete">#}
-                                                {#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
-                                                {#</a>#}
                                                 {% if mainCycle is defined and mainCycle.id is defined and mainCycle.id != cycle.id %}
-                                                    <a class="blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id}) }}" title="Compare">
-                                                        <i class="ace-icon fa fa-search-plus bigger-130"></i>
+                                                    <a class="light-blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id }) }}" title="Compare as second Cycle">
+                                                        <i class="ace-icon fa fa-eye-slash bigger-130"></i>
                                                     </a>
                                                 {% endif %}
                                             </div>
@@ -386,87 +342,11 @@
 
                     </div>
 
-                    <div id="testsTableFailures" class="tab-pane">
-                        <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered"
-                               id="suiteRatingTable" data-pagination="true" data-search="true" data-toggle="table"
-                               data-toolbar="#suiteExecutionToolBar"
-                               data-show-refresh="true"
-                               data-key-events="true"
-                               data-show-footer="true"
-                               data-show-toggle="true"
-                               data-show-export="true"
-                               data-show-columns="true"
-                               data-advanced-search="true"
-                               data-page-size="1000" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
-                            <thead>
-                            <tr>
-                                <th data-sortable="true" data-switchable="false">Test Name</th>
-                                <th data-sortable="true" data-switchable="false">Verdict</th>
-                                <th data-sortable="true" data-switchable="false">Type</th>
-                                <th data-sortable="true" data-switchable="false">Fail description</th>
-                                <th data-sortable="true" data-switchable="false">Cycle</th>
-                                <th data-sortable="true" data-switchable="false">Suite Name</th>
-                                <th data-sortable="true" data-switchable="false">Suite UUID</th>
-                            </tr>
-                            </thead>
-                            <tbody class="searchable">
-                            {#                            {% for testName in testNames | slice(0, 50000)%}#}
-                            {% for test in testsNotPass | slice(0, 50000)%}
-                                <tr>
-                                    <td><a target="_blank" href="{{ path('test_show_first', {'id': test.id}) }}">{{ test.name }}</a></td>
-                                    <td><span  class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
-                                    <td class="font9">{{ test.testType }}</td>
-                                    <td class="font9">{{ test.failDescription }}</td>
-                                    <td class="font10">{{ test.cycle }}</td>
-                                    <td class="font10">{{ test.suiteExecution.name }}</td>
-                                    <td class="font9">{{ test.suiteExecution.uuid }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% if compareEnabled %}
-                    <div id="compareCycles" class="tab-pane">
-                        <table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>-</th>
-                                <th>{{ mainCycle }}</th>
-                                <th>{{ compareCycle }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <th>Suites count</th>
-                                {% set msl = mainCycle.suiteExecution | length %}
-                                {% set csl = compareCycle.suiteExecution | length %}
-                                <td style="text-align: center;" class="font28">{{ msl }}
-                                    {% if msl > csl %} <span class="badge badge-success">+{{ msl - csl }} [{{ getPercentage(msl - csl, csl) }}%]</span>{% endif %}
-                                    {% if msl < csl %} <span class="badge badge-danger">-{{ csl - msl }} [{{ getPercentage(csl - msl, csl) }}%]</span>{% endif %}
-                                </td>
-                                <td style="text-align: center;" class="font28">{{ csl }}</td>
-                            </tr>
-                            <tr>
-                                <th>Tests count</th>
-                                <td>{{ mainCycle.testsCount }}
-                                    {% if mainCycle.testsCount > compareCycle.testsCount %} <span class="badge badge-success">+{{ mainCycle.testsCount - compareCycle.testsCount }} [{{ getPercentage(mainCycle.testsCount - compareCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
-                                    {% if mainCycle.testsCount < compareCycle.testsCount %} <span class="badge badge-danger">-{{ compareCycle.testsCount - mainCycle.testsCount }} [{{ getPercentage(compareCycle.testsCount - mainCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
-                                </td>
-                                <td>{{ compareCycle.testsCount }}</td>
-                            </tr>
-                            <tr>
-                                <th>Pass Rate</th>
-                                <td>{{ mainCycle.passRate }}</td>
-                                <td>{{ compareCycle.passRate }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
+                    <div id="testsTableFailures" class="tab-pane">{% include "lbook/cycle/tests_not_pass.html.twig" %}</div>
+                    {% if compareMode %}
+                    <div id="compareCycles" class="tab-pane">{% include "lbook/cycle/two_cycle_compare.html.twig" %}</div>
                     {% endif %}
-                    <div id="other" class="tab-pane">
-
-                    </div>
+                    <div id="other" class="tab-pane"></div>
 
                     <div id="dual_x_div" style="width: 100%; height: 500px;"></div>
 
@@ -590,6 +470,14 @@
             $( "#toolbarSetupsList, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
             });
+            {% if mainCycle.id is defined %}
+            $( "#cancelCompareCycle" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': mainCycle.setup.id, 'mainCycle': mainCycle.id }) }}";
+            });
+            $( "#cancelMainCycle" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_indicator', { 'id': mainCycle.setup.id }) }}";
+            });
+            {% endif %}
 
             try {
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);

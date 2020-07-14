@@ -1,0 +1,43 @@
+<table class="records_list table table-striped table-bordered table-condensed table-hover" data-classes="table table-bordered">
+    <thead>
+    <tr>
+        <th>-</th>
+        <th>{{ mainCycle }}</th>
+        <th>{{ compareCycle }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Suites count</th>
+        {% set msl = mainCycle.suiteExecution | length %}
+        {% set csl = compareCycle.suiteExecution | length %}
+        <td style="text-align: center;">
+{#            <span class="btn btn-app btn-sm btn-light no-hover">#}
+{#                <span class="line-height-1 bigger-170 blue">{{ msl }}</span>#}
+{#                <br>#}
+{#                <span class="line-height-1 smaller-90"> Views </span>#}
+{#            </span>#}
+            <span class="bigger-300 {{ (msl >= csl) ? 'blue': 'red' }}">{{ msl }}</span>
+            {% if msl > csl %}
+                <i class="ace-icon fa fa-bell-o bigger-110 purple"></i>
+                <span class="badge badge-success">+{{ msl - csl }} [{{ getPercentage(msl - csl, csl) }}%]</span>{% endif %}
+            {% if msl < csl %} <span class="badge badge-danger">-{{ csl - msl }} [{{ getPercentage(csl - msl, csl) }}%]</span>{% endif %}
+        </td>
+        <td style="text-align: center;"><span class="bigger-300 {{ (csl >= msl) ? 'blue': 'red' }}">{{ csl }}</span></td>
+    </tr>
+    <tr>
+        <th>Tests count</th>
+        <td>
+            <span class="bigger-150 {{ (mainCycle.testsCount  >= compareCycle.testsCount) ? 'blue': 'red' }}">{{ mainCycle.testsCount }}</span>
+            {% if mainCycle.testsCount > compareCycle.testsCount %} <span class="badge badge-success">+{{ mainCycle.testsCount - compareCycle.testsCount }} [{{ getPercentage(mainCycle.testsCount - compareCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
+            {% if mainCycle.testsCount < compareCycle.testsCount %} <span class="badge badge-danger">-{{ compareCycle.testsCount - mainCycle.testsCount }} [{{ getPercentage(compareCycle.testsCount - mainCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
+        </td>
+        <td><span class="bigger-150 {{ (compareCycle.testsCount  >= mainCycle.testsCount) ? 'blue': 'red' }}">{{ compareCycle.testsCount }}</span></td>
+    </tr>
+    <tr>
+        <th>Pass Rate</th>
+        <td class="bigger-150 {{ passRateToColor(mainCycle.passRate) }}">{{ mainCycle.passRate }}%</td>
+        <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%</td>
+    </tr>
+    </tbody>
+</table>

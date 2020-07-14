@@ -71,10 +71,13 @@ class LogBookSetupController extends AbstractController
             $testsNotPass = [];
             $testNames = [];
             $testNamesRemoved = [];
+            $compareMode = false;
             if ($setup === null || $cycleRepo === null ) {
                 throw new \RuntimeException('');
             }
-            if ($compareCycle !== null && $compareCycle->getId() > 0) {
+
+            if ($compareCycle !== null && $compareCycle->getId() > 0 && $mainCycle !== null && $mainCycle->getId() >0 && $mainCycle->getId() !== $compareCycle->getId()) {
+                $compareMode = true;
                 $cycles = [];
             } else {
                 $qb = $cycleRepo->createQueryBuilder('t')
@@ -92,7 +95,11 @@ class LogBookSetupController extends AbstractController
                     ->setMaxResults(1);
                 $tmp_cycles = $qb_cycle->getQuery()->execute();
                 foreach ($tmp_cycles as $tmpcycle){
-                    array_push($cycles, $tmpcycle);
+                    // Add only what not exist in cycles
+                    if(!in_array($tmpcycle, $cycles)) {
+                        array_push($cycles, $tmpcycle);
+
+                    }
                 }
             }
             if ($compareCycle !== null && $compareCycle->getId() > 0){
@@ -209,10 +216,10 @@ class LogBookSetupController extends AbstractController
                 'removed_tests_counter' => $removed_tests_counter,
                 'testNamesRemoved' => $testNamesRemoved,
                 'testsNotPass' => $testsNotPass,
-                'show_build' => 1,
                 'mainCycle' => $mainCycle,
                 'compareCycle' => $compareCycle,
-                'show_user' => 1,
+                'show_user' => 0,
+                'compareMode' => $compareMode,
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);

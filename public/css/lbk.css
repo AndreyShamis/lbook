@@ -15,9 +15,9 @@
     width:30px !important;
 }
 .setup_cycle_suites_column{
-    min-width:80px !important;
-    width:80px !important;
-    text-align: right !important;
+    min-width:20px !important;
+    width:20px !important;
+    text-align: center !important;
 }
 .setup_cycle_name_column{
     min-width:400px !important;
@@ -25,12 +25,12 @@
     text-align: left !important;
 }
 .setup_cycle_passrate_column{
-    max-width:65px !important;
-    width:50px !important;
+    max-width:55px !important;
+    width:40px !important;
 }
 .setup_cycle_failrate_column{
-    max-width:65px !important;
-    width:50px !important;
+    max-width:55px !important;
+    width:40px !important;
 }
 .setup_cycle_uploader_column{
     max-width:80px !important;
@@ -54,7 +54,9 @@
 }
 .setup_cycle_tests_column{
     max-width:75px !important;
-    width:70px !important;
+    width:30px !important;
+    text-align: center !important;
+    font-family: Tahoma, serif;
 }
 .setup_cycle_options_column{
     max-width:80px !important;
@@ -66,9 +68,14 @@
     width:70px !important;
     text-align: center !important;
 }
+.setup_cycles_found_col{
+    max-width:100px !important;
+    width:80px !important;
+    text-align: center !important;
+}
 .setup_list_options_column{
-    max-width:90px !important;
-    width:70px !important;
+    max-width:100px !important;
+    width:80px !important;
     text-align: center !important;
 }
 .test_show_full_time{

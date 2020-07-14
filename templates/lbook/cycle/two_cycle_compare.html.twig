@@ -19,14 +19,16 @@
 {#            </span>#}
             <span class="bigger-300 {{ (msl >= csl) ? 'blue': 'red' }}">{{ msl }}</span>
             {% if msl > csl %}
-                <i class="ace-icon fa fa-bell-o bigger-110 purple"></i>
                 <span class="badge badge-success">+{{ msl - csl }} [{{ getPercentage(msl - csl, csl) }}%]</span>{% endif %}
-            {% if msl < csl %} <span class="badge badge-danger">-{{ csl - msl }} [{{ getPercentage(csl - msl, csl) }}%]</span>{% endif %}
+            {% if msl < csl %}
+                <i class="ace-icon fa fa-bell-o bigger-110 purple"></i>
+
+                <span class="badge badge-danger">-{{ csl - msl }} [{{ getPercentage(csl - msl, csl) }}%]</span>{% endif %}
         </td>
         <td style="text-align: center;"><span class="bigger-300 {{ (csl >= msl) ? 'blue': 'red' }}">{{ csl }}</span></td>
     </tr>
     <tr>
-        <th>Tests count</th>
+        <th>Tests count [include POST/PRE/HEALTH/RECOVERY] in cycle</th>
         <td>
             <span class="bigger-150 {{ (mainCycle.testsCount  >= compareCycle.testsCount) ? 'blue': 'red' }}">{{ mainCycle.testsCount }}</span>
             {% if mainCycle.testsCount > compareCycle.testsCount %} <span class="badge badge-success">+{{ mainCycle.testsCount - compareCycle.testsCount }} [{{ getPercentage(mainCycle.testsCount - compareCycle.testsCount, compareCycle.testsCount) }}%]</span>{% endif %}
@@ -35,27 +37,70 @@
         <td><span class="bigger-150 {{ (compareCycle.testsCount  >= mainCycle.testsCount) ? 'blue': 'red' }}">{{ compareCycle.testsCount }}</span></td>
     </tr>
     <tr>
+        <th>Test Executed count in suites</th>
+
+        <td>
+            <span class="bigger-150 {{ (mainCycleTestsExecuted  >= secondCycleTestsExecuted) ? 'blue': 'red' }}">{{ mainCycleTestsExecuted }}</span>
+            {% if mainCycleTestsExecuted > secondCycleTestsExecuted %} <span class="label label-success label-white middle">+{{ mainCycleTestsExecuted - secondCycleTestsExecuted }} [{{ getPercentage(mainCycleTestsExecuted - secondCycleTestsExecuted, secondCycleTestsExecuted) }}%]</span>{% endif %}
+            {% if mainCycleTestsExecuted < secondCycleTestsExecuted %} <span class="badge badge-danger">-{{ secondCycleTestsExecuted - mainCycleTestsExecuted }} [{{ getPercentage(secondCycleTestsExecuted - mainCycleTestsExecuted, secondCycleTestsExecuted) }}%]</span>{% endif %}
+        </td>
+        <td><span class="bigger-150 {{ (secondCycleTestsExecuted  >= mainCycleTestsExecuted) ? 'blue': 'red' }}">{{ secondCycleTestsExecuted }}</span></td>
+    </tr>
+    <tr>
+        <th>Enabled Tests count in suites</th>
+
+        <td>
+            <span class="bigger-150 {{ (mainCycleTestsEnabledInsuite  >= secondCycleTestsEnabledInsuite) ? 'blue': 'red' }}">{{ mainCycleTestsEnabledInsuite }}</span>
+            {% if mainCycleTestsEnabledInsuite > secondCycleTestsEnabledInsuite %} <span class="label label-success label-white middle">+{{ mainCycleTestsEnabledInsuite - secondCycleTestsEnabledInsuite }} [{{ getPercentage(mainCycleTestsEnabledInsuite - secondCycleTestsEnabledInsuite, secondCycleTestsEnabledInsuite) }}%]</span>{% endif %}
+            {% if mainCycleTestsEnabledInsuite < secondCycleTestsEnabledInsuite %} <span class="badge badge-danger">-{{ secondCycleTestsEnabledInsuite - mainCycleTestsEnabledInsuite }} [{{ getPercentage(secondCycleTestsEnabledInsuite - mainCycleTestsEnabledInsuite, secondCycleTestsEnabledInsuite) }}%]</span>{% endif %}
+            {% if mainCycleTestsExecuted > mainCycleTestsEnabledInsuite %}
+                <span class="label label-danger arrowed-in">Not finished suite found</span>,  missing {{ mainCycleTestsEnabledInsuite - mainCycleTestsExecuted }} tests
+            {% endif %}
+        </td>
+        <td><span class="bigger-150 {{ (secondCycleTestsEnabledInsuite  >= mainCycleTestsEnabledInsuite) ? 'blue': 'red' }}">{{ secondCycleTestsEnabledInsuite }}</span></td>
+    </tr>
+    <tr>
+        <th>Tests count in suites [total defined include disabled] </th>
+
+        <td>
+            <span class="bigger-150 {{ (mainCycleTestsDefinedInsuite  >= secondCycleTestsDefinedInsuite) ? 'blue': 'red' }}">{{ mainCycleTestsDefinedInsuite }}</span>
+            {% if mainCycleTestsDefinedInsuite > secondCycleTestsDefinedInsuite %} <span class="label label-success label-white middle">+{{ mainCycleTestsDefinedInsuite - secondCycleTestsDefinedInsuite }} [{{ getPercentage(mainCycleTestsDefinedInsuite - secondCycleTestsDefinedInsuite, secondCycleTestsDefinedInsuite) }}%]</span>{% endif %}
+            {% if mainCycleTestsDefinedInsuite < secondCycleTestsDefinedInsuite %} <span class="badge badge-danger">-{{ secondCycleTestsDefinedInsuite - mainCycleTestsDefinedInsuite }} [{{ getPercentage(secondCycleTestsDefinedInsuite - mainCycleTestsDefinedInsuite, secondCycleTestsDefinedInsuite) }}%]</span>{% endif %}
+        </td>
+        <td><span class="bigger-150 {{ (secondCycleTestsDefinedInsuite  >= mainCycleTestsDefinedInsuite) ? 'blue': 'red' }}">{{ secondCycleTestsDefinedInsuite }}</span></td>
+    </tr>
+    <tr>
+        <th>Tests disabled in suites </th>
+
+        <td>
+            <span class="bigger-150 {{ (mainCycleTestsDisabledInSuite  >= secondCycleTestsDisabledInSuite) ? 'red': 'yellow' }}">{{ mainCycleTestsDisabledInSuite }}</span>
+            {% if mainCycleTestsDisabledInSuite > secondCycleTestsDisabledInSuite %} <span class="label label-lg label-yellow arrowed-in arrowed-in-right">+{{ mainCycleTestsDisabledInSuite - secondCycleTestsDisabledInSuite }} [{{ getPercentage(mainCycleTestsDisabledInSuite - secondCycleTestsDisabledInSuite, secondCycleTestsDisabledInSuite) }}%]</span>{% endif %}
+            {% if mainCycleTestsDisabledInSuite < secondCycleTestsDisabledInSuite %} <span class="label label-xlg label-light arrowed-in-right">-{{ secondCycleTestsDisabledInSuite - mainCycleTestsDisabledInSuite }} [{{ getPercentage(secondCycleTestsDisabledInSuite - mainCycleTestsDisabledInSuite, secondCycleTestsDisabledInSuite) }}%]</span>{% endif %}
+        </td>
+        <td><span class="bigger-150 {{ (secondCycleTestsDisabledInSuite  >= mainCycleTestsDisabledInSuite) ? 'red': 'yellow' }}">{{ secondCycleTestsDisabledInSuite }}</span></td>
+    </tr>
+    <tr>
         <th>Pass Rate</th>
         <td class="bigger-150 {{ passRateToColor(mainCycle.passRate) }}">{{ mainCycle.passRate }}%</td>
         <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%</td>
     </tr>
     <tr>
         <th>Product Version</th>
-        <td class="bigger-50 align-right {{ (mainCycle.build.name == compareCycle.build.name) ? 'red': 'green' }}">{{ mainCycle.build.name }}</td>
-        <td class="bigger-50 align-left">{{ compareCycle.build.name }}</td>
+        <td class="bigger-150 align-right {{ (mainCycle.build.name == compareCycle.build.name) ? 'red': 'green' }}">{{ mainCycle.build.name }}</td>
+        <td class="bigger-150 align-left">{{ compareCycle.build.name }}</td>
     </tr>
     <tr>
         <th>Duration </th>
-        <td class="bigger-50 align-right {{ (mainCycle.period >= compareCycle.period) ? 'green': 'red' }}">{{ mainCycle.period | executionTimeGenericShort }} ({{ mainCycle.period }})</td>
-        <td class="bigger-50 align-left">{{ compareCycle.period | executionTimeGenericShort }} ({{ compareCycle.period }})</td>
+        <td class="bigger-80 align-right {{ (mainCycle.period >= compareCycle.period) ? 'green': 'red' }}">{{ mainCycle.period | executionTimeGenericShort }} ({{ mainCycle.period }})</td>
+        <td class="bigger-80 align-left">{{ compareCycle.period | executionTimeGenericShort }} ({{ compareCycle.period }})</td>
     </tr>
     <tr>
         <td colspan="3" class="align-right">Time duration between First test start-time and Last test end-time </td>
     </tr>
     <tr>
         <th>Test Time</th>
-        <td class="bigger-50 align-right {{ (mainCycle.testsTimeSum >= compareCycle.testsTimeSum) ? 'green': 'red' }}">{{ mainCycle.testsTimeSum | executionTimeGenericShort }}</td>
-        <td class="bigger-50 align-left">{{ compareCycle.testsTimeSum | executionTimeGenericShort }}</td>
+        <td class="bigger-80 align-right {{ (mainCycle.testsTimeSum >= compareCycle.testsTimeSum) ? 'green': 'red' }}">{{ mainCycle.testsTimeSum | executionTimeGenericShort }}</td>
+        <td class="bigger-80 align-left">{{ compareCycle.testsTimeSum | executionTimeGenericShort }}</td>
     </tr>
     <tr>
         <td colspan="3" class="align-right">Summary over total time in all tests in this cycle</td>

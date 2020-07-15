@@ -82,7 +82,29 @@
     <tr>
         <th>Pass Rate</th>
         <td class="bigger-150 {{ passRateToColor(mainCycle.passRate) }}">{{ mainCycle.passRate }}%</td>
-        <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%</td>
+        <td class="bigger-150 {{ passRateToColor(compareCycle.passRate) }}">{{ compareCycle.passRate }}%
+        </td>
+    </tr>
+    <tr>
+        <th>Verdicts</th>
+        <td class="{{ passRateToColor(mainCycle.passRate) }}" colspan="2">
+            <table style="width: 99%;">
+                <tr>
+                    <th style="width: 200px;vertical-align: top;text-align: center;">{{ mainCycle.name }}</th>
+                    <td>
+                        {% set wCycle = mainCycle %}
+                        {% include "lbook/cycle/progress.bar.html.twig" %}
+                    </td>
+                </tr>
+                <tr>
+                    <th style="width: 200px;vertical-align: top;text-align: center;">{{ compareCycle.name }}</th>
+                    <td>
+                        {% set wCycle = compareCycle %}
+                        {% include "lbook/cycle/progress.bar.html.twig" %}
+                    </td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
         <th>Chips</th>

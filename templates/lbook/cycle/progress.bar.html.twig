@@ -1,0 +1,13 @@
+{% if wCycle.id|default(0) > 0 %}
+<div class="progress">
+    {% set tot = wCycle.testsPass + wCycle.testsFail + wCycle.testsError + wCycle.testsNa + wCycle.testsUnknown + wCycle.testsWarning %}
+    {% set loss = wCycle.testsCount - tot %}
+    <div class="progress-bar progress-bar-success" style="width: {{ wCycle.passRate }}%;" title="{{ wCycle.testsCount }}/{{ wCycle.testsPass }} - {{ wCycle.passRate }}%">{{ wCycle.passRate }}%({{ wCycle.testsPass }})</div>
+    <div class="progress-bar progress-bar-danger" style="width: {{ wCycle.failRate }}%;" title="Total/Fail: {{ wCycle.testsCount }}/{{ wCycle.testsFail }} - {{ wCycle.failRate }}%">{{ wCycle.failRate }}%({{ wCycle.testsFail }})</div>
+    <div class="progress-bar progress-bar-warning" style="width: {{ wCycle.errorRate }}%;" title="Total/Errors: {{ wCycle.testsCount }}/{{ wCycle.testsError }} - {{ wCycle.errorRate }}%">{{ wCycle.errorRate }}%({{ wCycle.testsError }})</div>
+    <div class="progress-bar progress-bar-grey" style="width: {{ wCycle.naRate }}%;" title="Total/NA: {{ wCycle.testsCount }}/{{ wCycle.testsNa }} - {{ wCycle.naRate }}%">{{ wCycle.naRate }}%({{ wCycle.testsNa }})</div>
+    <div class="progress-bar progress-bar-purple" style="width: {{ wCycle.unknownRate }}%;" title="Total/Unknown: {{ wCycle.testsCount }}/{{ wCycle.testsUnknown }} - {{ wCycle.unknownRate }}%">{{ wCycle.unknownRate }}%({{ wCycle.testsUnknown }})</div>
+    <div class="progress-bar progress-bar-pink" style="width: {{ wCycle.warningRate }}%;" title="Total/Warnings: {{ wCycle.testsCount }}/{{ wCycle.testsWarning }} - {{ wCycle.warningRate }}%">{{ wCycle.warningRate }}%({{ wCycle.testsWarning }})</div>
+    <div class="progress-bar progress-striped" style="width: {{ getPercentage(loss, wCycle.testsCount ) }}%;" title="Total/Other: {{ wCycle.testsCount }}/{{ loss }} - {{ getPercentage(loss, wCycle.testsCount ) }}%">({{ loss }})</div>
+</div>
+{% endif %}

@@ -237,9 +237,9 @@
                                                     <i class="ace-icon fa fa-eye bigger-130"></i>
                                                 </a>
                                                 {% endif %}
-                                                {% if mainCycle is defined and mainCycle.id is defined and mainCycle.id != cycle.id %}
+                                                {% if mainCycle is defined and mainCycle.id is defined and mainCycle.id != cycle.id and compareCycle.id|default(0) == 0 %}
                                                     <a class="light-blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id, 'size': size }) }}" title="Compare as second Cycle">
-                                                        <i class="ace-icon fa fa-eye-slash bigger-130"></i>
+                                                        <i class="ace-icon fa fa-files-o bigger-130"></i>
                                                     </a>
                                                 {% endif %}
                                             </div>

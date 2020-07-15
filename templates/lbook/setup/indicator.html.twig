@@ -227,12 +227,12 @@
                                         <td>
                                             <div class="hidden-sm hidden-xs action-buttons">
                                                 {% if mainCycle.id|default(0) != cycle.id and compareCycle.id|default(0) != cycle.id %}
-                                                <a class="light-blue2" href="{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id, 'compareCycle': compareCycle.id|default(null) }) }}" title="Compare as Main Cycle">
+                                                <a class="light-blue2" href="{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id, 'size': size, 'compareCycle': compareCycle.id|default(null) }) }}" title="Compare as Main Cycle">
                                                     <i class="ace-icon fa fa-eye bigger-130"></i>
                                                 </a>
                                                 {% endif %}
                                                 {% if mainCycle is defined and mainCycle.id is defined and mainCycle.id != cycle.id %}
-                                                    <a class="light-blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id }) }}" title="Compare as second Cycle">
+                                                    <a class="light-blue" href="{{ path('setup_indicator_with_main_cycle_and_compare', { 'id': cycle.setup.id, 'mainCycle': mainCycle.id , 'compareCycle': cycle.id, 'size': size }) }}" title="Compare as second Cycle">
                                                         <i class="ace-icon fa fa-eye-slash bigger-130"></i>
                                                     </a>
                                                 {% endif %}
@@ -479,10 +479,10 @@
             });
             {% if mainCycle.id is defined %}
             $( "#cancelCompareCycle" ).bind( "click", function() {
-                window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': mainCycle.setup.id, 'mainCycle': mainCycle.id }) }}";
+                window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': mainCycle.setup.id, 'mainCycle': mainCycle.id, 'size': size }) }}";
             });
             $( "#cancelMainCycle" ).bind( "click", function() {
-                window.location.href = "{{ path('setup_indicator', { 'id': mainCycle.setup.id }) }}";
+                window.location.href = "{{ path('setup_indicator_size_default', { 'id': mainCycle.setup.id, 'size': size }) }}";
             });
                 {% if compareCycle.id is defined %}
                     $( "#switchComparedCycles" ).bind( "click", function() {

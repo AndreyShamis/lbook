@@ -46,9 +46,9 @@ class LogBookSetupController extends AbstractController
      * Finds and displays a setup entity.
      *
      * @Route("indicator/{id}", name="setup_indicator", methods={"GET"})
-     * @Route("indicator/{id}/main_cycle/{mainCycle}/", name="setup_indicator_with_main_cycle", methods={"GET"})
-     * @Route("indicator/{id}/main_cycle/{mainCycle}/compare_cycle/{compareCycle}", name="setup_indicator_with_main_cycle_and_compare", methods={"GET"})
-     * @Route("indicator/{id}/size/{size}", name="setup_indicator_size_default", methods={"GET"})
+     * @Route("indicator/{id}/mc/{mainCycle}/s/{size}", name="setup_indicator_with_main_cycle", methods={"GET"})
+     * @Route("indicator/{id}/mc/{mainCycle}/cc/{compareCycle}/s/{size}", name="setup_indicator_with_main_cycle_and_compare", methods={"GET"})
+     * @Route("indicator/{id}/s/{size}", name="setup_indicator_size_default", methods={"GET"})
      * @param LogBookSetup $setup
      * @param int $size
      * @param LogBookCycle|null $mainCycle
@@ -58,7 +58,7 @@ class LogBookSetupController extends AbstractController
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 9,
+    public function indicator(LogBookSetup $setup = null, int $size= 10,
                               LogBookCycle $mainCycle = null,
                               LogBookCycle $compareCycle = null,
                               LogBookCycleRepository $cycleRepo = null,
@@ -66,6 +66,9 @@ class LogBookSetupController extends AbstractController
                               SuiteExecutionRepository $suiteRepo = null): ?Response
     {
         try {
+            if ($size > 100) {
+                $size = 5;
+            }
             $productVersions = [];
             $suiteNames = [];
             $testsNotPass = [];

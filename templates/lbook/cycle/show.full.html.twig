@@ -431,6 +431,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {#{% endif %}#}
             <th data-sortable="true" data-field="verdict">Verdict</th>
             <th data-sortable="true" data-field="fileSize" title="Test run time" data-visible="false">File Size</th>
+            <th data-sortable="true" data-field="failDesc" title="Parsed from log fail description" data-visible="false">Fail description</th>
             {#<th>Actions</th>#}
         </tr>
         </thead>
@@ -543,6 +544,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% endif %}
                 <td><span class="badge {{verdictToBadge(test.verdict)}}" title="{{ title }}">{{ test.verdict }}</span></td>
                 <td>{{ test.logFileSize }}</td>
+                <td>{{ (test.failDescription|length > 0) ? test.failDescription : '' }}</td>
                 {#<td>#}
                     {#<a href="{{ path('test_show_first', { 'id': test.id }) }}">show</a>#}
                     {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}

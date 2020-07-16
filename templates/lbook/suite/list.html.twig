@@ -183,7 +183,8 @@
                         {
                             renderers: $.extend(
                                 $.pivotUtilities.renderers,
-                                $.pivotUtilities.c3_renderers,
+                                // $.pivotUtilities.c3_renderers,
+                                // $.pivotUtilities.d3_renderers,
                                 $.pivotUtilities.plotly_renderers,
                                 $.pivotUtilities.export_renderers,
                                 $.pivotUtilities.gchart_renderers,
@@ -200,6 +201,7 @@
                 });
                 //window.scrollTo(0,document.body.scrollHeight);
                 //window.scrollTo(0, 0);
+                document.getElementById("suitePivotTableOutput").scrollIntoView();
             }
             $( "#btnCurrentSuitesToPivot" ).bind( "click", buildPivotTable);
             $( "#btnCurrentSuitesToPivotDown" ).bind( "click", buildPivotTable);

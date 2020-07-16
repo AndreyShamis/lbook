@@ -1,3 +1,5 @@
+<div id="suitePivotTableOutput"></div>
+
 {% apply spaceless %}
     <input type="button" id="btnCurrentSuitesToPivot" value="Build Pivot from current table" />
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
@@ -172,19 +174,23 @@
         </tr>
     </table>
     <input type="button" id="btnCurrentSuitesToPivotDown" value="Build Pivot from current table" />
-    <div id="output"></div>
     <script type="text/javascript">
         $(function(){
             function buildPivotTable() {
                 $(function(){
-                    var renderers = $.extend($.pivotUtilities.renderers, $.pivotUtilities.export_renderers, $.pivotUtilities.gchart_renderers, $.pivotUtilities.derivers);
-
-                    var tpl = $.pivotUtilities.aggregatorTemplates;
-                    $("#output").pivotUI($("#suiteTable"),
+                    // var tpl = $.pivotUtilities.aggregatorTemplates;
+                    $("#suitePivotTableOutput").pivotUI($("#suiteTable"),
                         {
-                            renderers: renderers,
-                            rows: ["Platform", "Chip"],
-                            cols: ["ProductVersion"],
+                            renderers: $.extend(
+                                $.pivotUtilities.renderers,
+                                $.pivotUtilities.c3_renderers,
+                                $.pivotUtilities.plotly_renderers,
+                                $.pivotUtilities.export_renderers,
+                                $.pivotUtilities.gchart_renderers,
+                                // $.pivotUtilities.derivers
+                            ),
+                            cols: ["Platform", "Chip"],
+                            rows: ["ProductVersion"],
                             vals: ["PassRate"],
                             aggregatorName: ["Average"],
                             // aggregators: {
@@ -192,7 +198,8 @@
                             // },
                         });
                 });
-                window.scrollTo(0,document.body.scrollHeight);
+                //window.scrollTo(0,document.body.scrollHeight);
+                //window.scrollTo(0, 0);
             }
             $( "#btnCurrentSuitesToPivot" ).bind( "click", buildPivotTable);
             $( "#btnCurrentSuitesToPivotDown" ).bind( "click", buildPivotTable);

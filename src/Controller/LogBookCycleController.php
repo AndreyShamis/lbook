@@ -133,26 +133,6 @@ class LogBookCycleController extends AbstractController
                     ->orWhere($qb->expr()->like('suite.name', $qb->expr()->literal('%' . $cycle_name . '%')))
                     ->orWhere($qb->expr()->like('suite.uuid', $qb->expr()->literal('%' . $cycle_name . '%')));
 
-                if ($leftDate === true && $rightDate === true) {
-                    $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
-                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
-                        ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                } else if ($leftDate === true) {
-                    $qb->andWhere('t.timeStart >= :fromDate')
-                        ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                } else if ($rightDate === true) {
-                    $qb->andWhere('t.timeEnd <= :endDate')
-                        ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
-                    $enableSearch = True;
-                }
-                if ($setups !== null && \count($setups) > 0) {
-                    $qb->andWhere('t.setup IN (:setups)')
-                        ->setParameter('setups', $setups);
-                    $enableSearch = True;
-                }
-
                 $qb->setParameter('search_str', $cycle_name_match);
                 $cycle_name_search = $cycle_name;
                 $str_len = mb_strlen($cycle_name_search);
@@ -164,9 +144,32 @@ class LogBookCycleController extends AbstractController
 
                 $qb->setParameter('cycle_name', $cycle_name_search);
                 $qb->setParameter('cycle_id', (int)$cycle_name);
-
+            }
+            if ($leftDate === true && $rightDate === true) {
+                $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($leftDate === true) {
+                $qb->andWhere('t.timeStart >= :fromDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($rightDate === true) {
+                $qb->andWhere('t.timeEnd <= :endDate')
+                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
                 $enableSearch = True;
             }
+            if ($setups !== null && \count($setups) > 0) {
+                $qb->andWhere('t.setup IN (:setups)')
+                    ->setParameter('setups', $setups);
+                $enableSearch = True;
+            }
+
+
+
+
+            $enableSearch = True;
+
             $enableSearch = True;
             if ($addOrder) {
                 $qb->orderBy('t.id', 'DESC');

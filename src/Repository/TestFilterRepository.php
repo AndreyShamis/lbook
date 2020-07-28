@@ -52,16 +52,23 @@ class TestFilterRepository extends ServiceEntityRepository
                     ->setParameter('project', [$project, '*']);
             }
             if ($clusters !== null && count($clusters)) {
-                $clusters[] = '*';
+                $new_clusters[] = '*';
+                foreach ($clusters as $c) {
+                    $new_clusters[] = strtoupper($c);
+                }
                 $qb->andWhere('f.cluster IN (:cluster)')
-                    ->setParameter('cluster', $clusters);
+                    ->setParameter('cluster', $new_clusters);
             }
             $qb->andWhere('f.enabled = 1')
                 ->setMaxResults(200)
             ;
         } catch (\Exception $e) {
         }
-        return $qb->getQuery()->execute();
+        $q = $qb->getQuery();
+        $res = $q->execute();
+        $sql = $q->getSQL();
+        $params = $qb->getParameters();
+        return [$res, $sql, $params];
     }
 //    /**
 //     * @return TestFilter[] Returns an array of TestFilter objects

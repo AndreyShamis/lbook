@@ -536,7 +536,10 @@ class LogBookUploaderController extends AbstractController
         $fin_res['FILTERS'] = array();
         if ($suiteExecution !== null && $suiteExecution->getId()) {
             $fin_res['SUITE_EXECUTION_ID'] = $suiteExecution->getId();
-            $filters = $filtersRepo->findRelevantFiltersTo($suiteExecution, $data['GERRIT_BRANCH'], $data['GERRIT_PROJECT'], $data['clusters']);
+            $tmp_arr = $filtersRepo->findRelevantFiltersTo($suiteExecution, $data['GERRIT_BRANCH'], $data['GERRIT_PROJECT'], $data['clusters']);
+            $filters = $tmp_arr[0];
+            $fin_res['FILTERS_SQL'] = $tmp_arr[1];
+            $fin_res['FILTERS_SQL_PARAMETERS'] = $tmp_arr[2];
             /** @var TestFilter $filter */
             foreach ($filters as $filter) {
                 try{

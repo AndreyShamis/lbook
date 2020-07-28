@@ -35,7 +35,12 @@ class TestFilter
     private $cluster = '*';
 
     /**
-     * @ORM\Column(type="string", length=320, options={"default"=""})
+     * @ORM\Column(type="string", length=50, options={"default"="*"})
+     */
+    private $clusterPackage = '*';
+
+    /**
+     * @ORM\Column(type="string", length=16000, options={"default"=""})
      */
     private $testList = '';
 
@@ -116,6 +121,7 @@ class TestFilter
      * @ORM\OrderBy({"id" = "DESC"})
      */
     private $filterEditHistories;
+
 
     public function __construct()
     {
@@ -420,6 +426,18 @@ class TestFilter
                 $filterEditHistory->setTestFilter(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getClusterPackage(): ?string
+    {
+        return $this->clusterPackage;
+    }
+
+    public function setClusterPackage(string $clusterPackage): self
+    {
+        $this->clusterPackage = $clusterPackage;
 
         return $this;
     }

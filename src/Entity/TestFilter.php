@@ -353,6 +353,7 @@ class TestFilter
             'suiteUuid' => $this->getSuiteUuid(),
             'tests' => $this->getTestList(),
             'cluster' => $this->getCluster(),
+            'clusterPackage' => $this->getClusterPackage(),
             'platform' => $this->getPlatform(),
             'chip' => $this->getChip(),
             'testing_level' => $this->getTestingLevel(),

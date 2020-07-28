@@ -54,6 +54,10 @@ class TestFilterType extends AbstractType
                 'label' => 'Cluster',
                 'help' => 'Cluster name, example: "cluster_lbk"'
             ])
+            ->add('clusterPackage', null, [
+                'label' => 'Cluster Package',
+                'help' => 'Cluster Package (PROMOTE_*_PACKAGE), example: "cpp"'
+            ])
             ->add('chip', null, [
                 'required' => false
             ])

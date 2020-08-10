@@ -467,12 +467,13 @@ class TestFilter
      */
     public function setExclusions(array $exclusions): self
     {
-        if ($this->exclusions === null || \count($this->exclusions) === 0) {
-            $this->exclusions = $exclusions;
-        } else {
-            $this->addExclusions($exclusions);
-        }
-
+//        if ($this->exclusions === null || \count($this->exclusions) === 0) {
+//            $this->exclusions = $exclusions;
+//        } else {
+//            $this->addExclusions($exclusions);
+//        }
+        $this->exclusions = [];
+        $this->addExclusions($exclusions);
         return $this;
     }
 

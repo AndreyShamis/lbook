@@ -368,7 +368,8 @@ class TestFilter
             'owner' => $this->getUser()->getFullName(),
             'contact' => $this->getIssueContact(),
             'description' => $this->getDescription(),
-            'defectUrl' => $this->getDefectUrl()
+            'defectUrl' => $this->getDefectUrl(),
+            'exclusions' => $this->getExclusions()
         ];
     }
 
@@ -466,8 +467,8 @@ class TestFilter
      */
     public function setExclusions(array $exclusions): self
     {
-        if ($this->$exclusions === null || \count($this->$exclusions) === 0) {
-            $this->$exclusions = $exclusions;
+        if ($this->exclusions === null || \count($this->exclusions) === 0) {
+            $this->exclusions = $exclusions;
         } else {
             $this->addExclusions($exclusions);
         }
@@ -480,6 +481,6 @@ class TestFilter
      */
     public function addExclusions(array $exclusions): void
     {
-        $this->$exclusions = array_merge($this->$exclusions, $exclusions);
+        $this->exclusions = array_merge($this->exclusions, $exclusions);
     }
 }

@@ -94,6 +94,14 @@
             <th>Branch Name (GERRIT_BRANCH/MANIFEST_REVISION)</th>
             <td>{{ test_filter.branchName }}</td>
         </tr>
+        <tr>
+            <th>Exclusions</th>
+            <td>
+                {% for key, val in test_filter.exclusions | slice(0, 10000) %}
+                    {{ key }}=={{ val }}<br/>
+                {% endfor %}
+            </td>
+        </tr>
         </tbody>
     </table>
     <br/>

@@ -89,7 +89,11 @@ class TestFilterType extends AbstractType
 //            ->add('createdAt')
 //            ->add('updatedAt')
             ->add('issueContact')
-            ->add('exclusions')
+            ->add('exclusions',TextareaType::class, [
+                'attr' => array('class' => 'filterTestList', 'rows' => '10'),
+                'label' => 'Exclusions',
+                'help' => 'Format like [GERRIT_CHANGE_OWNER_EMAIL==user@email.com] or [GERRIT_CHANGE_OWNER_EMAIL==user1@email.com||user2@email.com]'
+            ])
 //            ->add('user')
         ;
 
@@ -102,6 +106,27 @@ class TestFilterType extends AbstractType
                 function ($input) {
                     // transform the string back to an array
                     return str_replace("\n", ',', $input);
+                }
+            ))
+        ;
+        $builder->get('exclusions')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($input) {
+                    $ret = '';
+                    foreach ($input as $key => $val){
+                        $ret .= $key . '==' . $val . "\n";
+                    }
+                    return $ret;
+                },
+                function ($input) {
+                    // transform the string back to an array
+                    $ret = [];
+                    $tmp = explode("\n", $input);
+                    foreach ($tmp as $line){
+                        $tmp_arr = explode('==', $line);
+                        $ret[$tmp_arr[0]] = $tmp_arr[1];
+                    }
+                    return $ret;
                 }
             ))
         ;

@@ -122,6 +122,11 @@ class TestFilter
      */
     private $filterEditHistories;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $exclusions = [];
+
 
     public function __construct()
     {
@@ -129,6 +134,7 @@ class TestFilter
         $this->setCreatedAt(new \DateTime());
         $this->setUpdatedAt(new \DateTime());
         $this->filterEditHistories = new ArrayCollection();
+        $this->exclusions = [];
     }
 
     public function getId(): ?int
@@ -441,5 +447,39 @@ class TestFilter
         $this->clusterPackage = $clusterPackage;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExclusions(): array
+    {
+        if ($this->exclusions === null) {
+            $this->exclusions = array();
+        }
+        return $this->exclusions;
+    }
+
+    /**
+     * @param array $exclusions
+     * @return $this
+     */
+    public function setExclusions(array $exclusions): self
+    {
+        if ($this->$exclusions === null || \count($this->$exclusions) === 0) {
+            $this->$exclusions = $exclusions;
+        } else {
+            $this->addExclusions($exclusions);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $exclusions
+     */
+    public function addExclusions(array $exclusions): void
+    {
+        $this->$exclusions = array_merge($this->$exclusions, $exclusions);
     }
 }

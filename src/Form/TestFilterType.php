@@ -89,6 +89,7 @@ class TestFilterType extends AbstractType
 //            ->add('createdAt')
 //            ->add('updatedAt')
             ->add('issueContact')
+            ->add('exclusions')
 //            ->add('user')
         ;
 

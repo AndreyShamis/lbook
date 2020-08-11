@@ -114,8 +114,10 @@ class TestFilterType extends AbstractType
             ->addModelTransformer(new CallbackTransformer(
                 function ($input) {
                     $ret = '';
-                    foreach ($input as $key => $val){
-                        $ret .= $key . '==' . $val . "\n";
+                    if (count($input)) {
+                        foreach ($input as $key => $val){
+                            $ret .= $key . '==' . $val . "\n";
+                        }
                     }
                     return $ret;
                 },
@@ -125,7 +127,9 @@ class TestFilterType extends AbstractType
                     $tmp = explode("\n", $input);
                     foreach ($tmp as $line){
                         $tmp_arr = explode('==', $line);
-                        $ret[$tmp_arr[0]] = $tmp_arr[1];
+                        if (count($tmp_arr) >= 2) {
+                            $ret[$tmp_arr[0]] = $tmp_arr[1];
+                        }
                     }
                     return $ret;
                 }

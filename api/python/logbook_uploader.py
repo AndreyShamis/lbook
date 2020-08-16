@@ -18,6 +18,10 @@ except:
     pass
 try:
     import psutil
+except:
+    pass
+try:
+    import psutil
     import typing
 except:
     pass
@@ -38,61 +42,44 @@ WAIT_TIME_BEFORE_START_UPLOAD = 10   # Time to wait for MAX_UPLOADS_SAME_TIME ex
 MAX_UPLOAD_SIZE = 15  # type: int   # max file size in megabytes
 
 
-def get_cpu_load():
-    # type: () -> float
+def get_cpu_load() -> float:
     try:
-        import psutil
         return psutil.cpu_percent()
-    except Exception as ex:
+    except:
         pass
     try:
         proc_number = multiprocessing.cpu_count()
         _value = float(os.getloadavg()[0] * proc_number)
         if _value > 100:
-            _value = 100
+            return 100
         if _value < 0:
-            _value = 0
+            return 0
         return _value
-    except Exception as ex:
+    except:
         pass
 
-    return 11.0
+    return 0.0
 
 
-def get_hostname():
-    # type: () -> str
-    ret = ''
+def get_hostname() -> str:
     try:
-        ret = f'{socket.gethostname()}'
-    except Exception as ex:
-        try:
-            ret = f'{os.uname()[1]}'
-        except Exception as ex:
-            pass
-    return ret.strip()
-
-
-def get_cpu_load_avg(avg_counter=10):
-    # type: (int) -> float
-    summary = 0
-    if avg_counter < 1:
-        avg_counter = 1
-    for x in range(0, avg_counter):
-        summary += get_cpu_load()
-        time.sleep(0.001)
-    return round(summary/avg_counter, 2)
-
-
-def is_jenkins():
-    # type: () -> bool
-    ret = False
+        return f'{socket.gethostname()}'.strip()
+    except:
     try:
-        ret_str = os.environ.get('BUILD_ID', '')
-        if ret_str != '':
-            ret = True
-    except Exception as ex:
-        print(ex)
-    return ret
+        return f'{os.uname()[1]}'.strip()
+    except:
+        pass
+    return 'UNKNOWN'
+
+
+def get_cpu_load_avg(count = 5: int) -> float:
+    if count < 1:
+        count = 3
+    sum = 0
+    for tmp_counter in range(0, count):
+        time.sleep(0.002)
+        sum += get_cpu_load()
+    return round(sum/count, 2)
 
 
 class LogBookUploader(object):
@@ -459,8 +446,11 @@ class LogBookUploader(object):
                 se['GERRIT_BRANCH'] = gb
             elif mr and len(mr) > 3:
                 se['GERRIT_BRANCH'] = mr
-            se['is_jenkins'] = is_jenkins()
-            if is_jenkins():
+            on_jenkins = False
+            if os.environ.get('BUILD_ID', '') != '':
+                on_jenkins = True
+            se['is_jenkins'] = on_jenkins
+            if on_jenkins:
                 try:
                     gpsn = os.environ.get('GERRIT_PATCHSET_NUMBER', '')  # type: str
                     gcn = os.environ.get('GERRIT_CHANGE_NUMBER', '')  # type: str

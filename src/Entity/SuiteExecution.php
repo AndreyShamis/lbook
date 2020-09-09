@@ -838,6 +838,17 @@ class SuiteExecution
     }
 
     /**
+     * @param float $passRate
+     * @return $this
+     */
+    public function setPassRate(float $passRate): self
+    {
+        $this->passRate = $passRate;
+
+        return $this;
+    }
+
+    /**
      * @return float
      */
     public function getPassRate(): float
@@ -845,11 +856,28 @@ class SuiteExecution
         return $this->passRate;
     }
 
-    public function setPassRate(float $passRate): self
+    /**
+     * @return float
+     */
+    public function getFailRate(): float
     {
-        $this->passRate = $passRate;
+        $executed = $this->getTotalExecutedTests();
+        if ($this->failCount === 0) {
+            return 0;
+        }
+        return round($executed * $this->failCount, 2);
+    }
 
-        return $this;
+    /**
+     * @return float
+     */
+    public function getErrorRate(): float
+    {
+        $executed = $this->getTotalExecutedTests();
+        if ($this->errorCount === 0) {
+            return 0;
+        }
+        return round($executed * $this->errorCount, 2);
     }
 
     public function getStartedAt(): ?\DateTimeInterface

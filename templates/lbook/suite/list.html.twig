@@ -22,24 +22,25 @@
             <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false" data-footer-formatter="totalFormatter">SuiteName</th>
             <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
             <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
-
             <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
             <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">CycleID</th>
             <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false" data-footer-formatter="totalFormatter">Tests</th>
-            <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>
+            <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="false">Enabled</th>
             <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>
 {#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
             <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PassRate</th>
             <th data-field="FailRate" data-sortable="true" data-sorter="dataPercentSorter" title="Fail Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">FR</th>
             <th data-field="ErrorRate" data-sortable="true" data-sorter="dataPercentSorter" title="Error Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">ER</th>
+            <th data-field="OtherRate" data-sortable="true" data-sorter="dataPercentSorter" title="Other Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">OR</th>
             <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
             <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fail</th>
             <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Error</th>
+            <th data-field="Other" data-sortable="true" title="Other Count[NA,etc]" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Other</th>
             <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
-            <th data-sortable="true" title="Job Name" data-switchable="true">Jobname</th>
+            <th data-sortable="true" title="Job Name" data-switchable="true">JobName</th>
             <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>
             <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
             <th data-sortable="true" title="Components" data-switchable="true">Components</th>
@@ -106,11 +107,13 @@
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
 {#                <td>{{ suiteExecution.tests | length}}</td>#}
                 <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.failRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.errorRate - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.failRate - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.failRate - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.otherRate }}">{{ suiteExecution.otherRate }}%</span></td>
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>
                 <td class="errorClass">{{ suiteExecution.errorCount }}</td>
+                <td class="errorClass">{{ suiteExecution.otherCount }}</td>
                 <td>{{ suiteExecution.summary }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>

@@ -862,10 +862,10 @@ class SuiteExecution
     public function getFailRate(): float
     {
         $executed = $this->getTotalExecutedTests();
-        if ($this->failCount === 0) {
+        if ($this->failCount === 0 || $executed === 0) {
             return 0;
         }
-        return round($executed * $this->failCount, 2);
+        return round(100 * $this->failCount / $executed, 2);
     }
 
     /**
@@ -874,10 +874,28 @@ class SuiteExecution
     public function getErrorRate(): float
     {
         $executed = $this->getTotalExecutedTests();
-        if ($this->errorCount === 0) {
+        if ($this->errorCount === 0|| $executed === 0) {
             return 0;
         }
-        return round($executed * $this->errorCount, 2);
+        return round(100 * $this->errorCount / $executed, 2);
+    }
+
+    public function getOtherCount(): int
+    {
+        return $this->getTotalExecutedTests() - ($this->errorCount + $this->passCount + $this->failCount);
+    }
+
+    /**
+     * @return float
+     */
+    public function getOtherRate(): float
+    {
+        $executed = $this->getTotalExecutedTests();
+        $other =$this->getOtherCount();
+        if ($other === 0) {
+            return 0;
+        }
+        return round(100 * $other / $executed, 2);
     }
 
     public function getStartedAt(): ?\DateTimeInterface

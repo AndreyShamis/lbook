@@ -107,9 +107,9 @@
                 <td>{{ suiteExecution.totalExecutedTests}}</td>
 {#                <td>{{ suiteExecution.tests | length}}</td>#}
                 <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.errorRate - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.failRate - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.passRate - suiteExecution.failRate - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.otherRate }}">{{ suiteExecution.otherRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.failRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.otherRate }}">{{ suiteExecution.otherRate }}%</span></td>
                 <td class="passClass">{{ suiteExecution.passCount }}</td>
                 <td class="failClass">{{ suiteExecution.failCount }}</td>
                 <td class="errorClass">{{ suiteExecution.errorCount }}</td>

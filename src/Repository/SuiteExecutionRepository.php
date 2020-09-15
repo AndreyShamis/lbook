@@ -69,8 +69,11 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $criteria['build_flavor'] = 'dev';
         } else {
             $criteria['build_flavor'] = trim($criteria['build_flavor']);
-            if ( $criteria['build_flavor'] === 'development' || strtolower($criteria['build_flavor']) === 'development' ) {
+            if  (strtolower($criteria['build_flavor']) === 'development' || strtolower($criteria['build_flavor']) === 'devel' ) {
                 $criteria['build_flavor'] = 'dev';
+            }
+            if ( strtolower($criteria['build_flavor']) === 'production' || strtolower($criteria['build_flavor']) === 'product' ) {
+                $criteria['build_flavor'] = 'prod';
             }
         }
         if (!array_key_exists('platform_hw_ver', $criteria)) {

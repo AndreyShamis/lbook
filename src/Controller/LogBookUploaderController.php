@@ -403,7 +403,9 @@ class LogBookUploaderController extends AbstractController
         if (!array_key_exists('components', $data)) {
             $data['components'] = array();
         }
-
+        if (!array_key_exists('owners', $data)) {
+            $data['owners'] = array();
+        }
         if (!array_key_exists('GERRIT_PROJECT', $data)) {
             $data['GERRIT_PROJECT'] = null;
         }

@@ -60,6 +60,21 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         } else {
             $criteria['tests_count'] = (int)$criteria['tests_count'];
         }
+
+        if (!array_key_exists('build_flavor', $criteria)) {
+            $criteria['build_flavor'] = 'dev';
+        } else {
+            $criteria['build_flavor'] = trim($criteria['build_flavor']);
+            if ( $criteria['build_flavor'] === 'development' || strtolower($criteria['build_flavor']) === 'development' ) {
+                $criteria['build_flavor'] = 'dev';
+            }
+        }
+        if (!array_key_exists('platform_hw_ver', $criteria)) {
+            $criteria['platform_hw_ver'] = '';
+        } else {
+            $criteria['platform_hw_ver'] = trim($criteria['platform_hw_ver']);
+        }
+
         if (!array_key_exists('tests_count_enabled', $criteria)) {
             $criteria['tests_count_enabled'] = 0;
         } else {
@@ -75,6 +90,8 @@ class SuiteExecutionRepository extends ServiceEntityRepository
                     'productVersion' => $criteria['product_version'],
                     'platform' => $criteria['platform'],
                     'chip' => $criteria['chip'],
+                    'buildType' => $criteria['build_flavor'],
+                    'platformHardwareVersion' => $criteria['platform_hw_ver'],
                     'publish' => $publish,
                     'jobName' => $job_name,
                     'buildTag' => $build_tag,
@@ -95,6 +112,8 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setProductVersion($criteria['product_version']);
             $entity->setPlatform($criteria['platform']);
             $entity->setChip($criteria['chip']);
+            $entity->setBuildType($criteria['build_flavor']);
+            $entity->setPlatformHardwareVersion($criteria['platform_hw_ver']);
             $entity->setPublish($publish);
             $entity->setJobName($criteria['job_name']);
             $entity->setBuildTag($criteria['build_tag']);
@@ -127,6 +146,9 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             if (array_key_exists('components', $criteria)) {
                 $entity->setComponents($criteria['components']);
             }
+            if (array_key_exists('owners', $criteria)) {
+                $entity->setOwners($criteria['owners']);
+            }
             if (array_key_exists('jira_key', $criteria) && mb_strlen($criteria['jira_key']) > 5) {
                 $entity->setJiraKey($criteria['jira_key']);
             }
@@ -134,6 +156,32 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $this->_em->flush($entity);
         }
         return $entity;
+    }
+
+    /**
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqOwners()
+    {
+        $reset = function ($input) {
+            return $input['owners'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.owners')->distinct()
+            ->orderBy('s.updatedAt', 'DESC')
+            ->setMaxResults(10000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            return array_combine($map, $map);
+        }
+        return null;
+
     }
 
     /**

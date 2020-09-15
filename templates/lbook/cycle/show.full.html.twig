@@ -196,9 +196,11 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th title="Testing Level">TL</th>
                                     <th>Chip</th>
                                     <th>Platform</th>
+                                    <th title="Build Flavor">BF</th>
                                     <th>Component</th>
                                     <th title="Test Environments">ENV</th>
                                     <th title="Suite Host Name">Host</th>
+                                    <th title="Owners">Owners</th>
                                     <th title="Closed : X= Closed; O= Open">X</th>
                                     <th title="JIRA KEY/Publish">JIRA</th>
                                 </tr>
@@ -240,6 +242,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td>{{ suite.testingLevel }}</td>
                                     <td>{{ suite.chip }}</td>
                                     <td>{{ suite.platform }}</td>
+                                    <td>{{ suite.buildType }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
                                     <td>{{ suite.testEnvironments |join(', ')}}</td>
                                     <td>
@@ -247,6 +250,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                         <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
                                         {% endif %}
                                     </td>
+                                    <td>{{ suite.owners | join(', ') }}</td>
                                     <td>{{ suite.closed ? 'X':'O' }}</td>
                                     <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
                                 </tr>
@@ -259,6 +263,8 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th></th>
                                     <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>
                                     <th>{{ tests_pass }}</th>
+                                    <th></th>
+                                    <th></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>

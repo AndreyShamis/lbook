@@ -595,7 +595,11 @@ class SuiteExecution
      */
     public function setOwners(array $owners): self
     {
-        $this->owners = $owners;
+        if ($owners === null) {
+            $this->owners = [];
+        } else {
+            $this->owners = array_filter($owners);
+        }
         return $this;
     }
 

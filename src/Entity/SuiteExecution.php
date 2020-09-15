@@ -113,6 +113,25 @@ class SuiteExecution
     private $chip;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=30, options={"default"="dev"})
+     */
+    private $buildType = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=10, options={"default"=""})
+     */
+    private $platformHardwareVersion = '';
+
+    /**
+     * @ORM\Column(name="owners", type="simple_array")
+     */
+    private $owners = [];
+
+    /**
      * @ORM\Column(type="simple_array")
      */
     private $components;
@@ -265,6 +284,7 @@ class SuiteExecution
         $this->finishedAt = new \DateTime();
         $this->tests = new ArrayCollection();
         $this->setClosed(false);
+        $this->owners = [];
         $this->components = [];
         $this->testEnvironments = [];
     }
@@ -561,11 +581,36 @@ class SuiteExecution
         return $this;
     }
 
-    public function getComponents(): ?array
+    /**
+     * @return array
+     */
+    public function getOwners(): array
+    {
+        return $this->owners;
+    }
+
+    /**
+     * @param array $owners
+     * @return $this
+     */
+    public function setOwners(array $owners): self
+    {
+        $this->owners = $owners;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getComponents(): array
     {
         return $this->components;
     }
 
+    /**
+     * @param array $components
+     * @return $this
+     */
     public function setComponents(array $components): self
     {
         $this->components = $components;
@@ -1005,5 +1050,38 @@ class SuiteExecution
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getBuildType(): string
+    {
+        return $this->buildType;
+    }
+
+    /**
+     * @param string $buildType
+     */
+    public function setBuildType(string $buildType): void
+    {
+        $this->buildType = $buildType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlatformHardwareVersion(): string
+    {
+        return $this->platformHardwareVersion;
+    }
+
+    /**
+     * @param string $platformHardwareVersion
+     */
+    public function setPlatformHardwareVersion(string $platformHardwareVersion): void
+    {
+        $this->platformHardwareVersion = $platformHardwareVersion;
+    }
+
 
 }

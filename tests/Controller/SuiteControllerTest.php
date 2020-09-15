@@ -90,6 +90,7 @@ class SuiteControllerTest extends LogBookApplicationTestCase
             'platform' => 'Platform',
             'chip' => 'Chip',
             'publish' => '0',
+            'owners' => ['FirstOwner@owner.com'],
             'job_name' => 'JobName',
             'build_tag' => '',
             'target_arch' => 'x86',

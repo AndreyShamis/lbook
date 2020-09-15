@@ -150,6 +150,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             if (array_key_exists('components', $criteria)) {
                 $entity->setComponents($criteria['components']);
             }
+            $entity->setOwners(['andrey']);
             if (array_key_exists('owners', $criteria)) {
                 $entity->setOwners($criteria['owners']);
             } elseif (array_key_exists('assignees', $suite_dict)){

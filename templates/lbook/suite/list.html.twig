@@ -40,6 +40,7 @@
             <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
             <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
             <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
+            <th data-sortable="true" title="Build Flavor" data-switchable="true">BF</th>
             <th data-sortable="true" title="Job Name" data-switchable="true">JobName</th>
             <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>
             <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
@@ -53,6 +54,7 @@
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time diff">UpdDiff</th>
             <th data-sortable="true" title="Node" data-switchable="true">Node</th>
             <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true" data-visible="false">S</th>
+            <th data-sortable="true" title="Owners" data-switchable="true" data-visible="true">Owner</th>
             <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true" data-footer-formatter="totalFormatter">Pub</th>
 {#            <th class="suite_list_options_column">Options</th>#}
         </tr>
@@ -117,6 +119,7 @@
                 <td>{{ suiteExecution.summary }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
                 <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
+                <td class="font9">{{ suiteExecution.buildType }}</td>
                 <td class="font9">{{ suiteExecution.jobName }}</td>
                 <td class="font9">{{ suiteExecution.branch }}</td>
                 <td class="font9">{{ suiteExecution.packageMode | replace({'_mode': ''}) }}</td>
@@ -130,6 +133,7 @@
                 <td><span class="font8" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
                 <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
                 <td class="font6">{{ suiteExecution.closed ? 'X':'O'  }}</td>
+                <td class="font8">{{ suiteExecution.owners | arrayToString(', ') }}</td>
                 <td class="font6">{{ suiteExecution.publish }}</td>
 {#                <td>#}
 {#                    <div class="hidden-sm hidden-xs action-buttons">#}

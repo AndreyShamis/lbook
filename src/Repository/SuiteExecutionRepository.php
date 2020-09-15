@@ -151,12 +151,12 @@ class SuiteExecutionRepository extends ServiceEntityRepository
                 $entity->setComponents($criteria['components']);
             }
             $entity->setOwners(['andrey']);
-            if (array_key_exists('owners', $criteria)) {
+            if (array_key_exists('owners', $criteria) && $criteria['owners'] !== null) {
                 $entity->setOwners($criteria['owners']);
-            } elseif (array_key_exists('assignees', $suite_dict)){
+            } elseif (array_key_exists('assignees', $suite_dict) && $suite_dict['assignees'] !== null){
                     $entity->setOwners($suite_dict['assignees']);
             } else {
-                $entity->setOwners([]);
+                $entity->setOwners(['NoOwner']);
             }
             if (array_key_exists('jira_key', $criteria) && mb_strlen($criteria['jira_key']) > 5) {
                 $entity->setJiraKey($criteria['jira_key']);

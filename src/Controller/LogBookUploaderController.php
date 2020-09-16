@@ -22,6 +22,7 @@ use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterRepository;
+use App\Repository\TestEventCmuRepository;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -73,6 +74,8 @@ class LogBookUploaderController extends AbstractController
     protected $userRepo;
     /** @var SuiteExecutionRepository $suiteExecutionRepo */
     protected $suiteExecutionRepo;
+    /** @var TestEventCmuRepository $cmuRepo */
+    protected $cmuRepo;
 
     private $blackListLevels = array();
 
@@ -109,6 +112,7 @@ class LogBookUploaderController extends AbstractController
         $this->targetRepo = $this->em->getRepository('App:LogBookTarget');
         $this->userRepo = $this->em->getRepository('App:LogBookUser');
         $this->suiteExecutionRepo = $this->em->getRepository('App:SuiteExecution');
+        $this->cmuRepo = $this->em->getRepository('App:TestEventCmu');
     }
 
     /**
@@ -575,6 +579,12 @@ class LogBookUploaderController extends AbstractController
         /** @var SuiteExecution $suite_execution */
         $suite_execution = null;
         $p_data = $request->request;
+        $eventsCMU = [];
+        try {
+            $eventsCMU = $request->request->get('fcmu_errors', '{}');
+            $eventsCMU = json_decode($eventsCMU, true);
+        } catch (\Throwable $ex) {}
+
         /** @var LogBookTest $test */
         $test = null;
         /** @var LogBookCycle $cycle */
@@ -743,6 +753,17 @@ class LogBookUploaderController extends AbstractController
 ////                        $lock->release();
 ////                    }
 //                }
+//                try {
+//                    if (count($eventsCMU) > 0) {
+//                        foreach ($eventsCMU as $tmpEventJson) {
+////                            echo "<pre>";
+////                            print_r($tmpEventJson);
+////                            $tmpEventJson['test'] = $test;
+////                            $tmpEvent = $this->cmuRepo->findOneOrCreate($tmpEventJson);
+//                        }
+//                    }
+//                } catch (\Throwable $ex) {}
+
                 if ($suite_execution_id > 0) {
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
                     if ($suite_execution !== null) {

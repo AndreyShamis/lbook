@@ -27,13 +27,21 @@ class TestEventCmuRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): TestEventCmu
     {
-        $entity = $this->findOneBy($criteria);
+        $entity = $this->findOneBy([
+            'test' => $criteria['test'],
+            'block' => $criteria['block'],
+            'fault' => $criteria['fault'],
+            'a_time' => $criteria['a_time'],
+            'b_time' => $criteria['b_time'],
+        ]);
         if (null === $entity) {
             $entity = new TestEventCmu();
             $entity->setBlock($criteria['block']);
             $entity->setFault($criteria['fault']);
             $entity->setAValue($criteria['a_value']);
             $entity->setBValue($criteria['b_value']);
+            $entity->setATime($criteria['a_time']);
+            $entity->setBTime($criteria['b_time']);
             $entity->setTest($criteria['test']);
             $this->_em->persist($entity);
             $this->_em->flush($entity);

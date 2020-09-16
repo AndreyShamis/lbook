@@ -575,6 +575,12 @@ class LogBookUploaderController extends AbstractController
         /** @var SuiteExecution $suite_execution */
         $suite_execution = null;
         $p_data = $request->request;
+        $eventsCMU = [];
+        try {
+            $eventsCMU = $request->request->get('fcmu_errors', '{}');
+            $eventsCMU = json_decode($eventsCMU);
+        } catch (\Throwable $ex) {}
+
         /** @var LogBookTest $test */
         $test = null;
         /** @var LogBookCycle $cycle */
@@ -743,6 +749,12 @@ class LogBookUploaderController extends AbstractController
 ////                        $lock->release();
 ////                    }
 //                }
+                if (count($eventsCMU) > 0) {
+//                    echo "<pre>";
+//                    print_r($eventsCMU);
+//                    echo count($eventsCMU);
+//                    exit();
+                }
                 if ($suite_execution_id > 0) {
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
                     if ($suite_execution !== null) {

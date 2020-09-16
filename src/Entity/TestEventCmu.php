@@ -51,6 +51,7 @@ class TestEventCmu
     private $b_time = '0';
     /**
      * @ORM\ManyToOne(targetEntity=LogBookTest::class)
+     * @ORM\JoinColumn(name="test_id", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $test;
 

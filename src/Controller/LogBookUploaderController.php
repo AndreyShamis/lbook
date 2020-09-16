@@ -753,16 +753,16 @@ class LogBookUploaderController extends AbstractController
 ////                        $lock->release();
 ////                    }
 //                }
-//                try {
-//                    if (count($eventsCMU) > 0) {
-//                        foreach ($eventsCMU as $tmpEventJson) {
-////                            echo "<pre>";
-////                            print_r($tmpEventJson);
-////                            $tmpEventJson['test'] = $test;
-////                            $tmpEvent = $this->cmuRepo->findOneOrCreate($tmpEventJson);
-//                        }
-//                    }
-//                } catch (\Throwable $ex) {}
+                try {
+                    if (count($eventsCMU) > 0) {
+                        foreach ($eventsCMU as $tmpEventJson) {
+//                            echo "<pre>";
+//                            print_r($tmpEventJson);
+                            $tmpEventJson['test'] = $test;
+                            $tmpEvent = $this->cmuRepo->findOneOrCreate($tmpEventJson);
+                        }
+                    }
+                } catch (\Throwable $ex) {}
 
                 if ($suite_execution_id > 0) {
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);

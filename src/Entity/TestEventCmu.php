@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\TestEventCmuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TestEventCmuRepository::class)
+ * @ORM\Table(name="test_event_cmu", uniqueConstraints={@ORM\UniqueConstraint(name="unique_event", columns={"block", "fault", "test", "a_time", "b_time"})})
  */
 class TestEventCmu
 {
@@ -19,7 +21,7 @@ class TestEventCmu
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100, options={"default"=""})
+     * @ORM\Column(type="string", length=50, options={"default"=""})
      */
     private $block = '';
 
@@ -38,6 +40,15 @@ class TestEventCmu
      */
     private $b_value = '';
 
+    /**
+     * @ORM\Column(type="string", length=30, options={"default"="0"})
+     */
+    private $a_time = '0';
+
+    /**
+     * @ORM\Column(type="string", length=30, options={"default"="0"})
+     */
+    private $b_time = '0';
     /**
      * @ORM\ManyToOne(targetEntity=LogBookTest::class)
      */
@@ -127,4 +138,40 @@ class TestEventCmu
         return $this->createdAt;
     }
 
+    /**
+     * @return string
+     */
+    public function getATime(): string
+    {
+        return $this->a_time;
+    }
+
+    /**
+     * @param string $a_time
+     */
+    public function setATime(string $a_time): void
+    {
+        $this->a_time = $a_time;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBTime(): string
+    {
+        return $this->b_time;
+    }
+
+    /**
+     * @param string $b_time
+     */
+    public function setBTime(string $b_time): void
+    {
+        $this->b_time = $b_time;
+    }
+
+    public function __toString()
+    {
+        return $this->getBlock() . '[' . $this->getFault() . ']' . $this->getATime() . '-' . $this->getBTime();
+    }
 }

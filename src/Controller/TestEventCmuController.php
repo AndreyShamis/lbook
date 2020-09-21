@@ -26,7 +26,7 @@ class TestEventCmuController extends AbstractController
      */
     public function index(PagePaginator $pagePaginator, TestEventCmuRepository $testEventCmuRepository, int $page = 1): Response
     {
-        $index_size = 20000;
+        $index_size = 10000;
         $query = $testEventCmuRepository->createQueryBuilder('events')
             ->orderBy('events.createdAt', 'DESC');
         $paginator = $pagePaginator->paginate($query, $page, $index_size);

@@ -19,9 +19,12 @@
         <thead>
             <tr>
                 <th data-sortable="true" data-switchable="false">ID</th>
-                <th data-sortable="true" data-switchable="false">Test</th>
-                <th data-sortable="true" data-switchable="false">Block</th>
-                <th data-sortable="true" data-switchable="false">Fault</th>
+                <th data-sortable="true" data-switchable="true">Suite</th>
+                <th data-sortable="true" data-switchable="true">Platform</th>
+                <th data-sortable="true" data-switchable="true">Chip</th>
+                <th data-sortable="true" data-switchable="true">Test</th>
+                <th data-sortable="true" data-switchable="true">Block</th>
+                <th data-sortable="true" data-switchable="true">Fault</th>
 {#                <th>A_value</th>#}
 {#                <th>B_value</th>#}
                 <th data-sortable="true" >A_time</th>
@@ -34,6 +37,9 @@
         {% for test_event_cmu in iterator | slice(0, 100000)%}
             <tr>
                 <td>{{ test_event_cmu.id }}</td>
+                <td><a href="{{ path('cycle_suite_show_first', { 'cycle': test_event_cmu.test.suiteExecution.cycle.id, 'suite': test_event_cmu.test.suiteExecution.id }) }}">{{ test_event_cmu.test.suiteExecution }}</a></td>
+                <td>{{ test_event_cmu.test.suiteExecution.platform }}</td>
+                <td>{{ test_event_cmu.test.suiteExecution.chip }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test_event_cmu.test.id  }) }}">{{ test_event_cmu.test }}</a></td>
                 <td>{{ test_event_cmu.block }}</td>
                 <td>{{ test_event_cmu.fault }}</td>

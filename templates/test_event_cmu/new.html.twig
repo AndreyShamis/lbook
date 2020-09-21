@@ -1,0 +1,9 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}New TestEventCmu{% endblock %}
+{% block content %}
+    <h1>Create new TestEventCmu</h1>
+
+    {{ include('test_event_cmu/_form.html.twig') }}
+
+    <a href="{{ path('test_event_cmu_index') }}">back to list</a>
+{% endblock %}

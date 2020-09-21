@@ -1,8 +1,9 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}TestEventCmu index{% endblock %}
 {% block content %}
-    <h1>TestEventCmu index</h1>
-
+    <h4>Events list</h4>
+    {% set pagePath = "test_event_cmu_index" %}
+    {% include "lbook/paginator.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="eventsMcuTable" data-pagination="true" data-search="true" data-toggle="table"
            data-toolbar="#eventsMcuTableToolBar"
@@ -30,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for test_event_cmu in test_event_cmus  | slice(0, 100000)%}
+        {% for test_event_cmu in iterator | slice(0, 100000)%}
             <tr>
                 <td>{{ test_event_cmu.id }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test_event_cmu.test.id  }) }}">{{ test_event_cmu.test }}</a></td>

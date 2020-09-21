@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\TestEventCmu;
 use App\Form\TestEventCmuType;
 use App\Repository\TestEventCmuRepository;
+use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,13 +18,30 @@ class TestEventCmuController extends AbstractController
 {
     /**
      * @Route("/", name="test_event_cmu_index", methods={"GET"})
+     * @param PagePaginator $pagePaginator
      * @param TestEventCmuRepository $testEventCmuRepository
+     * @param int $page
      * @return Response
+     * @throws \Exception
      */
-    public function index(TestEventCmuRepository $testEventCmuRepository): Response
+    public function index(PagePaginator $pagePaginator, TestEventCmuRepository $testEventCmuRepository, int $page = 1): Response
     {
+        $index_size = 20000;
+        $query = $testEventCmuRepository->createQueryBuilder('events')
+            ->orderBy('events.createdAt', 'DESC');
+        $paginator = $pagePaginator->paginate($query, $page, $index_size);
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+
+        $maxPages = ceil($totalPosts / $index_size);
+        $thisPage = $page;
+
         return $this->render('test_event_cmu/index.html.twig', [
-            'test_event_cmus' => $testEventCmuRepository->findAll(),
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
         ]);
     }
 

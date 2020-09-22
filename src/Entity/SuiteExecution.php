@@ -115,7 +115,7 @@ class SuiteExecution
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=30, options={"default"="dev"})
+     * @ORM\Column(type="string", length=30, options={"default"="devel"})
      */
     private $buildType = '';
 

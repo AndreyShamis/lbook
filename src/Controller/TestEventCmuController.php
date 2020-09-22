@@ -17,10 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TestEventCmuController extends AbstractController
 {
+    //, requirements={"block"="\w+\_*\w*\d*", "page"="\d*"}
+    //, requirements={"block"="\w+\_*\w*\d*"}
+    
     /**
      * @Route("/page/{page}", name="event_cmu_index_page", methods={"GET"}, requirements={"page"="\d*"})
-     * @Route("/block/{block}/page/{page}", name="event_cmu_index_block_page", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*", "page"="\d*"})
-     * @Route("/block/{block}", name="event_cmu_index_block", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*"})
+     * @Route("/block/{block}/page/{page}", name="event_cmu_index_block_page", methods={"GET"})
+     * @Route("/block/{block}", name="event_cmu_index_block", methods={"GET"})
      * @Route("/", name="event_cmu_index", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param TestEventCmuRepository $testEventCmuRepository

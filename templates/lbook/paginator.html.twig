@@ -56,7 +56,7 @@
 
             {# `»` arrow #}
             <li {{ thisPage == maxPages ? 'class="disabled"' }}>
-                <a href="{{ path(pagePath, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+                <a href="{{ path(pagePath, req|merge({page: thisPage+1 <= maxPages ? thisPage+1 : thisPage})) }}">»</a>
             </li>
         </ul>
     {% endif %}

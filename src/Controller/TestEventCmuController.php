@@ -6,13 +6,11 @@ use App\Entity\TestEventCmu;
 use App\Form\TestEventCmuType;
 use App\Repository\TestEventCmuRepository;
 use App\Service\PagePaginator;
+use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-//     * @Route("/page/{page}/block/{block}", name="test_event_cmu_index_page_block", methods={"GET", "POST"})
-//     * @Route("/block/{block}/page/{page}", name="test_event_cmu_index_block_page", methods={"GET", "POST"})
 
 /**
  * @Route("/eventcmu")
@@ -20,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class TestEventCmuController extends AbstractController
 {
     /**
-
      * @Route("/page/{page}", name="event_cmu_index_page", methods={"GET"}, requirements={"page"="\d*"})
      * @Route("/block/{block}/page/{page}", name="event_cmu_index_block_page", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*", "page"="\d*"})
      * @Route("/block/{block}", name="event_cmu_index_block", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*"})
@@ -60,6 +57,47 @@ class TestEventCmuController extends AbstractController
             'iterator'  => $iterator,
             'paginator' => $paginator,
             'blocks'    => $testEventCmuRepository->getUniqBlockNames(),
+        ]);
+    }
+
+
+    /**
+     * @Route("/stats", name="event_cmu_stats", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param TestEventCmuRepository $testEventCmuRepository
+     * @return Response
+     * @throws \Exception
+     */
+    public function stats(PagePaginator $pagePaginator, TestEventCmuRepository $testEventCmuRepository): Response
+    {
+//        $index_size = 2000;
+
+//        $query = $testEventCmuRepository->createQueryBuilder('events')
+//            ->orderBy('events.createdAt', 'DESC');
+//
+//        $paginator = $pagePaginator->paginate($query, $page, $index_size);
+//        $totalPosts = $paginator->count();
+//        $iterator = $paginator->getIterator();
+//
+//        $maxPages = ceil($totalPosts / $index_size);
+//        $thisPage = $page;
+        $blocks = $testEventCmuRepository->getUniqBlockNames();
+        $today = new \DateTime();
+        $today = new \DateTime($today->format('Y-m-d'));
+        $days[] = $today->format('Y-m-d');
+        for ( $i = 1; $i <= 14; $i++) {
+            $days[] = $today->add(DateInterval::createFromDateString('-1 days'))->format('Y-m-d');
+        }
+        $data = [];
+        foreach ($days as $day) {
+            foreach ($blocks as $block) {
+                $data[$block][$day] = $testEventCmuRepository->countBlockInDay($block, $day);
+            }
+        }
+        return $this->render('test_event_cmu/stats.html.twig', [
+            'days' => $days,
+            'blocks'    => $blocks,
+            'data'    => $data,
         ]);
     }
 

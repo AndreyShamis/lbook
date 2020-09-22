@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\SuiteExecution;
 use App\Entity\TestEventCmu;
+use DateInterval;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\ORMException;
@@ -54,7 +55,7 @@ class TestEventCmuRepository extends ServiceEntityRepository
 
 
     /**
-     * @return SuiteExecution[]|null
+     * @return string[]|null
      */
     public function getUniqBlockNames()
     {
@@ -78,7 +79,37 @@ class TestEventCmuRepository extends ServiceEntityRepository
             return $ret;
         }
         return null;
+    }
 
+    /**
+     * @param string $block
+     * @param $day
+     * @return \Doctrine\ORM\QueryBuilder
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function countBlockInDay(string $block, $day)
+    {
+        $t1 = new \DateTime($day);
+        $t2 = new \DateTime($day);
+//        $di1 = new \DateInterval('P1D');
+        $di2 = new \DateInterval('P1D');
+//        $di1->invert = true;
+
+        $day1 = $t1->add(DateInterval::createFromDateString('-1 days'));//$t->format('Y-m-d');
+        $day2 = $t2->add($di2);//$t->format('Y-m-d');
+        $ret = $this->createQueryBuilder('s')
+            ->select('count(s.block)')
+            ->where('s.block = :block')
+            ->andWhere('s.createdAt >= :day1')
+            ->andWhere('s.createdAt <= :day2')
+        ->setParameters([
+            'block' => $block,
+            'day1' => $day1,
+            'day2' => $day2 ,
+        ]);
+        //$ret = $ret->getQuery()->getResult();
+        return $ret->getQuery()->getSingleScalarResult();
     }
     // /**
     //  * @return TestEventCmu[] Returns an array of TestEventCmu objects

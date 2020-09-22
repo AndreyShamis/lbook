@@ -1,0 +1,45 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}TestEventCmu index{% endblock %}
+{% block content %}
+{#    {{ dump(data) }}#}
+    <h4>Show All Events</h4>
+    <a href="{{ path('event_cmu_index') }}">All events</a>
+    <h4>Events Stats</h4>
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="eventsMcuTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#eventsMcuTableToolBar"
+           data-show-refresh="true"
+           data-key-events="true"
+           data-show-footer="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="20" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+        <thead>
+        <tr>
+            <th data-sortable="true" data-switchable="false">Block Name</th>
+            {% for day in days %}
+                <th data-sortable="true" data-switchable="true">{{ day }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for block in blocks | slice(0, 100000)%}
+            <tr>
+                <td><a href="{{ path('event_cmu_index_block', { 'block': block }) }}">{{ block }}</a></td>
+                {% for day in days %}
+                    <td>{{ data[block][day] }}</td>
+                {% endfor %}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {#    <a href="{{ path('test_event_cmu_new') }}">Create new</a>#}
+{% endblock %}

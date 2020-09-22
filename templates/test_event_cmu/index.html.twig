@@ -1,6 +1,8 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}TestEventCmu index{% endblock %}
 {% block content %}
+    <h4>See statistic</h4>
+    <a href="{{ path('event_cmu_stats') }}">Stats</a>
     <div style="width: 100%;text-align: center;">
     {% for blockName in blocks %}
         <a href="{{ path('event_cmu_index_block', { 'block': blockName }) }}">{{ blockName }} &nbsp;</a>

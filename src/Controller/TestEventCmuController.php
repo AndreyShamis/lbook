@@ -11,24 +11,40 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+//     * @Route("/page/{page}/block/{block}", name="test_event_cmu_index_page_block", methods={"GET", "POST"})
+//     * @Route("/block/{block}/page/{page}", name="test_event_cmu_index_block_page", methods={"GET", "POST"})
+
 /**
  * @Route("/eventcmu")
  */
 class TestEventCmuController extends AbstractController
 {
     /**
-     * @Route("/", name="test_event_cmu_index", methods={"GET"})
+
+     * @Route("/page/{page}", name="event_cmu_index_page", methods={"GET"}, requirements={"page"="\d*"})
+     * @Route("/block/{block}/page/{page}", name="event_cmu_index_block_page", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*", "page"="\d*"})
+     * @Route("/block/{block}", name="event_cmu_index_block", methods={"GET"}, requirements={"block"="\w+\_*\w*\d*"})
+     * @Route("/", name="event_cmu_index", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param TestEventCmuRepository $testEventCmuRepository
+     * @param string|null $block
      * @param int $page
      * @return Response
      * @throws \Exception
      */
-    public function index(PagePaginator $pagePaginator, TestEventCmuRepository $testEventCmuRepository, int $page = 1): Response
+    public function index(PagePaginator $pagePaginator, TestEventCmuRepository $testEventCmuRepository, string $block = null, int $page = 1): Response
     {
-        $index_size = 10000;
-        $query = $testEventCmuRepository->createQueryBuilder('events')
-            ->orderBy('events.createdAt', 'DESC');
+        $index_size = 2000;
+        if ($block === null || $block === '') {
+            $query = $testEventCmuRepository->createQueryBuilder('events')
+                ->orderBy('events.createdAt', 'DESC');
+        } else {
+            $query = $testEventCmuRepository->createQueryBuilder('events')
+                ->where('events.block = :block')
+                ->orderBy('events.createdAt', 'DESC')
+            ->setParameter('block', $block);
+        }
+
         $paginator = $pagePaginator->paginate($query, $page, $index_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();
@@ -37,11 +53,13 @@ class TestEventCmuController extends AbstractController
         $thisPage = $page;
 
         return $this->render('test_event_cmu/index.html.twig', [
+            'block'     => $block,
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,
             'paginator' => $paginator,
+            'blocks'    => $testEventCmuRepository->getUniqBlockNames(),
         ]);
     }
 

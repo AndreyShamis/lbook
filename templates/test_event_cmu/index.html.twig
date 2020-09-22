@@ -1,8 +1,18 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}TestEventCmu index{% endblock %}
 {% block content %}
+    <div style="width: 100%;text-align: center;">
+    {% for blockName in blocks %}
+        <a href="{{ path('event_cmu_index_block', { 'block': blockName }) }}">{{ blockName }} &nbsp;</a>
+    {% else %}
+        no blocks found
+    {% endfor %}
+    </div>
     <h4>Events list</h4>
-    {% set pagePath = "test_event_cmu_index" %}
+    {% set pagePath = "event_cmu_index" %}
+    {% if block != '' %}
+        {% set pagePath = "event_cmu_index_block" %}
+    {% endif %}
     {% include "lbook/paginator.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="eventsMcuTable" data-pagination="true" data-search="true" data-toggle="table"
@@ -15,7 +25,7 @@
            data-show-columns="true"
            data-advanced-search="true"
             {#data-id-table="advancedTable"#}
-           data-page-size="1000" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+           data-page-size="20" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
             <tr>
                 <th data-sortable="true" data-switchable="false">ID</th>

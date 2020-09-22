@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\SuiteExecution;
 use App\Entity\TestEventCmu;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\ORMException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -49,6 +51,35 @@ class TestEventCmuRepository extends ServiceEntityRepository
         return $entity;
     }
 
+
+
+    /**
+     * @return SuiteExecution[]|null
+     */
+    public function getUniqBlockNames()
+    {
+        $reset = function ($input) {
+            return $input['block'];
+        };
+        $ret = $this->createQueryBuilder('s')
+            ->select('s.block')->distinct()
+            ->orderBy('s.createdAt', 'DESC')
+            ->setMaxResults(200000)
+            ->setLifetime(7200)
+            ->setCacheable(true);
+
+        $ret = $ret->getQuery()
+            ->getResult(AbstractQuery::HYDRATE_SCALAR)
+        ;
+        if (count($ret) > 0) {
+            $map = array_map($reset, $ret);
+            $ret = array_combine($map, $map);
+            sort($ret);
+            return $ret;
+        }
+        return null;
+
+    }
     // /**
     //  * @return TestEventCmu[] Returns an array of TestEventCmu objects
     //  */

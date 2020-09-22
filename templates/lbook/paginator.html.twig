@@ -1,4 +1,6 @@
 {% set currentPath = path(app.request.get('_route'), app.request.get('_route_params')) %}
+{% set req = app.request.get('_route_params') %}
+
     {% set currentPage = thisPage %}
     {% set left     = thisPage-10 %}
     {% set right    = thisPage+10 %}
@@ -18,14 +20,14 @@
         <ul class="pagination pagination-sm">
             {# `«` arrow  #}
             <li {{ thisPage == 1 ? 'class="disabled"' }} >
-                <a href="{{ path(pagePath, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+                <a href="{{ path(pagePath, req|merge({page: thisPage-1 < 1 ? 1 : thisPage-1})) }}">«</a>
             </li>
 
             {% if left < thisPage and  start < left %}
 
                 {% for i in 1..start %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path( pagePath, {page: i}) }}" style="background-color:#EAEAEA;">{{ i }}</a>
+                        <a class="page-link" href="{{ path( pagePath, req|merge({page: i})) }}" style="background-color:#EAEAEA;">{{ i }}</a>
                     </li>
 
                 {% endfor %}
@@ -36,7 +38,7 @@
 
                 {% for i in left..right %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path(pagePath, {page: i}) }}">{{ i }}</a>
+                        <a class="page-link" href="{{ path(pagePath, req|merge({page: i})) }}">{{ i }}</a>
                     </li>
                 {% endfor %}
 
@@ -46,7 +48,7 @@
 
                 {% for i in end..maxPages %}
                     <li class="page-item {{ thisPage == i ? 'active' }}">
-                        <a class="page-link" href="{{ path(pagePath, {page: i}) }}" style="background-color:#EAEAEA">{{ i }}</a>
+                        <a class="page-link" href="{{ path(pagePath, req|merge({page: i})) }}" style="background-color:#EAEAEA">{{ i }}</a>
                     </li>
                 {% endfor %}
 

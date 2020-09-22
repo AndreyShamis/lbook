@@ -410,6 +410,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% endif %}
             {% if suitesCount > 0 %}
             <th data-sortable="true" data-field="Suite" title="Suite Execution">Suite</th>
+            <th data-sortable="true" data-field="BuildFlavor" title="Build Flavor" data-visible="false">BF</th>
             <th data-sortable="true" data-field="Platform" title="Platform">Platform</th>
             <th data-sortable="true" data-field="Chip" title="Chip">Chip</th>
             <th data-sortable="true" data-field="Components" title="Components" data-visible="false">Components</th>
@@ -486,6 +487,11 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     <td>
                         {% if test.suiteExecution.id is defined and test.suiteExecution.name is defined %}
                         <span><a href="{{ path('suite_show', {'id': test.suiteExecution.id}) }}" target="_blank" title="[{{ test.suiteExecution.uuid }}] : PLATFORM::{{ test.suiteExecution.platform }}/{{ test.suiteExecution.chip }}">{{ test.suiteExecution.name }}</a></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if test.suiteExecution.id is defined and test.suiteExecution.name is defined %}
+                            {{ test.suiteExecution.buildType }}
                         {% endif %}
                     </td>
                     <td>{% if test.suiteExecution.id is defined and test.suiteExecution.platform is defined %}<span style="color: {{ stringToColor(test.suiteExecution.platform) }} !important;">{{ test.suiteExecution.platform }}</span>{% endif %}</td>

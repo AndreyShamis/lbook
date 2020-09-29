@@ -784,7 +784,6 @@ class LogBookUploaderController extends AbstractController
                     $fdesc = $test->parseFailDescription();
                 } catch (\Throwable $ex) {}
                 $this->em->refresh($cycle);
-
                 if (!$calculateStat) {
                     $cycle->setCalculateStatistic(false);
                 }

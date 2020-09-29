@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
-use mysql_xdevapi\Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -115,6 +114,14 @@ class LogBookSetup
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
 
+    //      * @ ORM\JoinC olumn(name="favorited_by_user", fieldName="id", referencedColumnName="id")
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", inversedBy="favoriteSetups", fetch="EXTRA_LAZY", indexBy="")
+     * @ORM\JoinTable(name="favorited_by_user")
+     */
+    private $favoritedByUsers;
+
     /**
      * LogBookSetup constructor.
      */
@@ -125,6 +132,7 @@ class LogBookSetup
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
         $this->setRetentionPolicy(15);
+        $this->favoritedByUsers = new ArrayCollection();
     }
 
     /**
@@ -374,5 +382,31 @@ class LogBookSetup
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|LogBookUser[]
+     */
+    public function getFavoritedByUsers(): Collection
+    {
+        return $this->favoritedByUsers;
+    }
+
+    public function addFavoritedByUser(LogBookUser $favoritedByUser): self
+    {
+        if (!$this->favoritedByUsers->contains($favoritedByUser)) {
+            $this->favoritedByUsers[] = $favoritedByUser;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoritedByUser(LogBookUser $favoritedByUser): self
+    {
+        if ($this->favoritedByUsers->contains($favoritedByUser)) {
+            $this->favoritedByUsers->removeElement($favoritedByUser);
+        }
+
+        return $this;
     }
 }

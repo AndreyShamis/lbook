@@ -116,6 +116,11 @@ class LogBookSetup
     public static $MAX_NAME_LEN = 250;
 
     /**
+     * @ORM\ManyToMany(targetEntity=LogBookUser::class, inversedBy="favoriteSetups")
+     */
+    private $favoritedByUsers;
+
+    /**
      * LogBookSetup constructor.
      */
     public function __construct()
@@ -125,6 +130,7 @@ class LogBookSetup
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
         $this->setRetentionPolicy(15);
+        $this->favoritedByUsers = new ArrayCollection();
     }
 
     /**
@@ -374,5 +380,31 @@ class LogBookSetup
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @return Collection|LogBookUser[]
+     */
+    public function getFavoritedByUsers(): Collection
+    {
+        return $this->favoritedByUsers;
+    }
+
+    public function addFavoritedByUser(LogBookUser $favoritedByUser): self
+    {
+        if (!$this->favoritedByUsers->contains($favoritedByUser)) {
+            $this->favoritedByUsers[] = $favoritedByUser;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoritedByUser(LogBookUser $favoritedByUser): self
+    {
+        if ($this->favoritedByUsers->contains($favoritedByUser)) {
+            $this->favoritedByUsers->removeElement($favoritedByUser);
+        }
+
+        return $this;
     }
 }

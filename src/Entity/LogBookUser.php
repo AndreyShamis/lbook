@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -107,6 +109,11 @@ class LogBookUser implements UserInterface, \Serializable
     protected $settings;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\LogBookSetup", mappedBy="favoritedByUsers")
+     */
+    private $favoriteSetups;
+
+    /**
      *
      * LogBookUser constructor.
      */
@@ -114,6 +121,7 @@ class LogBookUser implements UserInterface, \Serializable
     {
         $this->isActive = true;
         $this->roles = array();
+        $this->favoriteSetups = new ArrayCollection();
     }
 
     /**
@@ -512,6 +520,34 @@ class LogBookUser implements UserInterface, \Serializable
         // set the owning side of the relation if necessary
         if ($this !== $settings->getUser()) {
             $settings->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookSetup[]
+     */
+    public function getFavoriteSetups(): Collection
+    {
+        return $this->favoriteSetups;
+    }
+
+    public function addFavoriteSetup(LogBookSetup $favoriteSetup): self
+    {
+        if (!$this->favoriteSetups->contains($favoriteSetup)) {
+            $this->favoriteSetups[] = $favoriteSetup;
+            $favoriteSetup->addFavoritedByUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteSetup(LogBookSetup $favoriteSetup): self
+    {
+        if ($this->favoriteSetups->contains($favoriteSetup)) {
+            $this->favoriteSetups->removeElement($favoriteSetup);
+            $favoriteSetup->removeFavoritedByUser($this);
         }
 
         return $this;

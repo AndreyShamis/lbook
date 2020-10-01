@@ -3,50 +3,34 @@
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
 <script>
+    function ConvertExternal() {
+        var checkedValue = $( "#log_book_defect_isExternal" ).is(":checked");
+        if (checkedValue) {
+            $( "#log_book_defect_ext_url").show();
+            $( "#log_book_defect_ext_url").parent().find("label:first").show();
+            $( "#log_book_defect_ext_id").show();
+            $( "#log_book_defect_ext_id").parent().find("label:first").show();
+
+        } else {
+            $( "#log_book_defect_ext_url").hide();
+            $( "#log_book_defect_ext_url").parent().find("label:first").hide();
+            $( "#log_book_defect_ext_id").hide();
+            $( "#log_book_defect_ext_id").parent().find("label:first").hide();
+
+        }
+    }
+
     $(document).ready(function() {
         $( "#log_book_defect form" ).css( "width", "1000px" );
         $( "#log_book_defect input[type = 'text']" ).css( "width", "900px" );
         $( "#log_book_defect select" ).css( "width", "900px" );
         $( "#log_book_defect textarea" ).css( "width", "900px" );
         $( "#log_book_defect label" ).css( "width", "150px" );
-        $( "#log_book_defect_ext_url").hide();
-        console.log($( "#log_book_defect_ext_url"));
-
 
         $( "#log_book_defect_isExternal" ).bind( "click", function() {
-            console.log(this);
+            ConvertExternal();
         });
-        {#$( "#filterEditForm, button[name = 'cancel'].btn" ).bind( "click", function() {#}
-        {#    window.location.href = "{{ path('cycle_show_first', { 'id': cycle.id }) }}";#}
-        {#});#}
+        ConvertExternal();
 
-        {#$( "#filterEditForm, button[name = 'delete'].btn" ).bind( "click", function() {#}
-        {#    var status = confirm("Are you sure about delete this cycle [{{ cycle.name }}]?");#}
-        {#    if (status === true) {#}
-        {#        $("#cycleEditFormDelete").submit();#}
-        {#    } else {#}
-        {#        return false;#}
-        {#    }#}
-        {#});#}
-        {#$('#test_filter_suiteUuid').keyup(function() {#}
-        {#    var uuid = $(this).val();#}
-        {#    if (uuid !== ''){#}
-        {#        var path = "{ { path('api_suite_uuid_to_info') }}/" + uuid;#}
-        {#        $.ajax({#}
-        {#            url: path,#}
-        {#            type: 'GET',#}
-        {#            success: function(result) {#}
-        {#                if (result) {#}
-        {#                    $('#test_filter_name_help').html('Suite name : <strong class="brown">' + result['name'] + '</strong> with ' + result['tests_count_enabled'] + ' tests enabled.');#}
-        {#                }#}
-        {#            },#}
-        {#            error: function(result) {#}
-        {#                console.log(result);#}
-        {#            },#}
-        {#        });#}
-        {#    }#}
-
-
-        {#});#}
     });
 </script>

@@ -352,47 +352,110 @@ class LogBookSetupController extends AbstractController
      * Lists all setup entities.
      *
      * @Route("/page/{page}", name="setup_index", methods={"GET"})
-     * @Template(template="lbook/setup/index.html.twig")
-     * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
-     * @return array
+     * @param int $page
+     * @param bool $favorite
+     * @return Response
      */
-    public function index(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1): array
+    public function index(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1, $favorite = false): Response
     {
-        $query = $setupRepo->createQueryBuilder('setups')
-            ->where('setups.disabled = 0')
-            ->orderBy('setups.updatedAt', 'DESC')
-            ->addOrderBy('setups.id', 'DESC');
-        $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
-        $totalPosts = $paginator->count();
-        $iterator = $paginator->getIterator();
+        $maxPages = $totalPosts = $thisPage = 0;
+        $iterator = [];
+        $paginator = [];
+        $paginator_size = $this->index_size;
+        try {
+            if ($favorite) {
+                $user = $this->get('security.token_storage')->getToken()->getUser();
+                $paginator_size = 2000;
+                $query = $setupRepo->createQueryBuilder('setups')
+                    ->where('setups.disabled = 0')
+                    ->andWhere('setups.id IN (:user_setups)')
+                    ->orderBy('setups.updatedAt', 'DESC')
+                    ->addOrderBy('setups.id', 'DESC')
+                    ->setParameter('user_setups', $user->getFavoriteSetups()->toArray());
+            } else {
+                $query = $setupRepo->createQueryBuilder('setups')
+                    ->where('setups.disabled = 0')
+                    ->orderBy('setups.updatedAt', 'DESC')
+                    ->addOrderBy('setups.id', 'DESC');
+            }
+            $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
+            $totalPosts = $paginator->count();
+            $iterator = $paginator->getIterator();
 
-        $maxPages = ceil($totalPosts / $this->index_size);
-        $thisPage = $page;
-        return array(
+            $maxPages = ceil($totalPosts / $paginator_size);
+            $thisPage = $page;
+        } catch (\Throwable $ex) {
+            print($ex->getMessage());
+        }
+
+        return $this->render('lbook/setup/index.html.twig', [
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,
             'paginator' => $paginator,
-        );
+            'favorite' => $favorite,
+        ]);
+
+    }
+
+    /**
+     * @Route("/add_favorite/{setup}", name="add_remove_setup_to_favorite", methods={"GET"})
+     * @param LogBookSetup|null $setup
+     * @return Response
+     */
+    public function addUserToFavorite(Request $request, ?LogBookSetup $setup)
+    {
+        /** @var LogBookUser $user */
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        if ($setup->userInFavorite($user)) {
+            $setup->removeFavoritedByUser($user);
+        } else {
+            $setup->addFavoritedByUser($user);
+        }
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($setup);
+        $em->flush();
+        /** @var  $referer */
+        $referer = $request->headers->get('referer');
+        if ($referer === null) {
+            if ($user->getFavoriteSetups()->count() > 0) {
+                return $this->redirectToRoute('show_first_favorite');
+            } else {
+                return $this->redirectToRoute('setup_index_first');
+            }
+        }
+        return $this->redirect($referer);
     }
 
     /**
      * Lists all setup entities.
      *
      * @Route("/", name="setup_index_first", methods={"GET"})
-     * @Template(template="lbook/setup/index.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
-     * @return array
+     * @return Response
      */
-    public function indexFirst(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): array
+    public function indexFirst(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
     {
         return $this->index($pagePaginator, $setupRepo);
     }
 
+
+    /**
+     * Lists all setup entities favorited by user.
+     *
+     * @Route("/favorite", name="show_first_favorite", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookSetupRepository $setupRepo
+     * @return Response
+     */
+    public function showFavoriteIndex(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
+    {
+        return $this->index($pagePaginator, $setupRepo, 1, true);
+    }
     /**
      * Creates a new setup entity.
      *

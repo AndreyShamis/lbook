@@ -392,9 +392,16 @@ class LogBookSetup
         return $this->favoritedByUsers;
     }
 
+    public function userInFavorite(LogBookUser $favoritedByUser): bool
+    {
+        if ($this->favoritedByUsers->contains($favoritedByUser)) {
+            return true;
+        }
+        return false;
+    }
     public function addFavoritedByUser(LogBookUser $favoritedByUser): self
     {
-        if (!$this->favoritedByUsers->contains($favoritedByUser)) {
+        if (!$this->userInFavorite($favoritedByUser)) {
             $this->favoritedByUsers[] = $favoritedByUser;
         }
 
@@ -403,7 +410,7 @@ class LogBookSetup
 
     public function removeFavoritedByUser(LogBookUser $favoritedByUser): self
     {
-        if ($this->favoritedByUsers->contains($favoritedByUser)) {
+        if ($this->userInFavorite($favoritedByUser)) {
             $this->favoritedByUsers->removeElement($favoritedByUser);
         }
 

@@ -114,6 +114,11 @@ class LogBookUser implements UserInterface, \Serializable
     private $favoriteSetups;
 
     /**
+     * @ORM\OneToMany(targetEntity=LogBookDefect::class, mappedBy="reporter")
+     */
+    private $logBookDefects;
+
+    /**
      *
      * LogBookUser constructor.
      */
@@ -122,6 +127,7 @@ class LogBookUser implements UserInterface, \Serializable
         $this->isActive = true;
         $this->roles = array();
         $this->favoriteSetups = new ArrayCollection();
+        $this->logBookDefects = new ArrayCollection();
     }
 
     /**
@@ -548,6 +554,37 @@ class LogBookUser implements UserInterface, \Serializable
         if ($this->favoriteSetups->contains($favoriteSetup)) {
             $this->favoriteSetups->removeElement($favoriteSetup);
             $favoriteSetup->removeFavoritedByUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookDefect[]
+     */
+    public function getLogBookDefects(): Collection
+    {
+        return $this->logBookDefects;
+    }
+
+    public function addLogBookDefect(LogBookDefect $logBookDefect): self
+    {
+        if (!$this->logBookDefects->contains($logBookDefect)) {
+            $this->logBookDefects[] = $logBookDefect;
+            $logBookDefect->setReporter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBookDefect(LogBookDefect $logBookDefect): self
+    {
+        if ($this->logBookDefects->contains($logBookDefect)) {
+            $this->logBookDefects->removeElement($logBookDefect);
+            // set the owning side to null (unless already changed)
+            if ($logBookDefect->getReporter() === $this) {
+                $logBookDefect->setReporter(null);
+            }
         }
 
         return $this;

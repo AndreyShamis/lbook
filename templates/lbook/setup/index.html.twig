@@ -18,7 +18,7 @@
                     Goto Setup list
                     </button>
                 {% else %}
-                    <button class="btn btn-xs" id="favorite_lsit">
+                    <button class="btn btn-xs" id="favorite_list">
                     <i class="ace-icon fa fa-bookmark-o bigger-120 favSetup"></i>
                     Goto Favorites
                     </button>
@@ -139,6 +139,14 @@
         </div>
     {% endif %}
     <script>
+        function bindFavoritor() {
+
+            $( ".AddRemoveSetupFav" ).bind( "click", (function() {
+                var currentSetupId = $(this).parent().parent().find("td:first").next().next().html();
+                window.location.href = '/setup/add_favorite/' + parseInt(currentSetupId)
+            }));
+
+        }
         $(document).ready(function() {
             $( "#setupTableToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
                 location.reload();
@@ -148,19 +156,17 @@
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
 
+            $( ".form-control" ).keyup(function() {
+                setTimeout(bindFavoritor, 1000);
+            });
             $( "#setup_list" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_index_first') }}";
             });
-            $( "#favorite_lsit" ).bind( "click", function() {
+            $( "#favorite_list" ).bind( "click", function() {
                 window.location.href = "{{ path('show_first_favorite') }}";
             });
-            $( ".AddRemoveSetupFav" ).bind( "click", function() {
-                var currentSetupId = $(this).parent().parent().find("td:first").next().next().html();
-                // "{ { path('add_remove_setup_to_favorite', {'setup': 0}) }}/"
-                var right_url = '/setup/add_favorite/' + parseInt(currentSetupId);
-                console.log(right_url);
-                window.location.href = right_url
-            });
+            bindFavoritor();
+
 
         });
     </script>

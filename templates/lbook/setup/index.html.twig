@@ -1,7 +1,32 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LBOOK Setup list{% endblock %}
 {% block content %}
-    <h1 style="margin-top: 0 !important;">Setup list</h1>
+
+    <div class="row">
+        <div class="col-xs-9">
+            {% if favorite %}
+                <h4>Favorite setup list</h4>
+            {% else %}
+                <h1 style="margin-top: 0 !important;">Setup list</h1>
+            {% endif %}
+        </div>
+        <div class="col-xs-3">
+            <span style="float: right;">
+                {% if favorite %}
+                    <button class="btn btn-xs btn-info" id="setup_list">
+                    <i class="ace-icon fa fa-briefcase bigger-120 favSetup"></i>
+                    Goto Setup list
+                    </button>
+                {% else %}
+                    <button class="btn btn-xs" id="favorite_lsit">
+                    <i class="ace-icon fa fa-bookmark-o bigger-120 favSetup"></i>
+                    Goto Favorites
+                    </button>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     {% set pagePath = "setup_index" %}
@@ -25,6 +50,7 @@
                data-page-size="100" data-page-list="[5, 10, 20, 50, 100, 500]" data-sort-order="desc">
             <thead>
             <tr>
+                <th data-sortable="true" title="Favorite" class="time_diff_icon" data-switchable="false">&nbsp;</th>
                 <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>
                 <th data-sortable="true" data-switchable="false">ID</th>
                 <th data-sorter="htmlSorter" data-sortable="true" title="Full setup name" data-switchable="false">Name</th>
@@ -44,6 +70,14 @@
             <tbody class="searchable">
             {% for setup in iterator | slice(0, 10000)%}
                 <tr>
+                    <td><a class="AddRemoveSetupFav" href="#">
+                            {% if app.user is defined and app.user.favoriteSetups is defined and app.user.favoriteSetups.contains(setup) %}
+                            <i class="ace-icon fa fa-bookmark favSetup"></i>
+                        {% else %}
+                                <i class="ace-icon fa fa-bookmark-o"></i>
+                        {% endif %}
+                        </a>
+                    </td>
                     <td title="Updated {{ setup.updatedAt|time_diff }}">
                         {% if date(setup.updatedAt) > date('-1 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
                         {% elseif date(setup.updatedAt) > date('-5 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>
@@ -113,6 +147,21 @@
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
+
+            $( "#setup_list" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_index_first') }}";
+            });
+            $( "#favorite_lsit" ).bind( "click", function() {
+                window.location.href = "{{ path('show_first_favorite') }}";
+            });
+            $( ".AddRemoveSetupFav" ).bind( "click", function() {
+                var currentSetupId = $(this).parent().parent().find("td:first").next().next().html();
+                // "{ { path('add_remove_setup_to_favorite', {'setup': 0}) }}/"
+                var right_url = '/setup/add_favorite/' + parseInt(currentSetupId);
+                console.log(right_url);
+                window.location.href = right_url
+            });
+
         });
     </script>
 {% endblock %}

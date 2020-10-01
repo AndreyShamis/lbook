@@ -78,16 +78,19 @@ class LogBookApplicationTestCase extends WebTestCase
 
     protected function getErrorMessage(Crawler $crawler) :string
     {
+        $url = '';
         $error_message = '';
         $error_file = '';
         $error_line = '';
         try {
+            $url = $crawler->getUri();
             $error_message = $crawler->filter('#errorMessage')->text();
             $error_file = $crawler->filter('#errorFile')->text();
             $error_line = $crawler->filter('#errorLineNumber')->text();
         } catch (\Exception $ex) {}
 
-        $error_message = sprintf('Error Message: %s.%sError File %s.%sError line %s.',
+        $error_message = sprintf('URL: %s.%sError Message: %s.%sError File %s.%sError line %s.',
+            $url, "\n",
             $error_message, "\n",
             $error_file, "\n",
             $error_line);

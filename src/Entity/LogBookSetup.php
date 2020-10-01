@@ -114,7 +114,7 @@ class LogBookSetup
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
 
-    //      * @ ORM\JoinC olumn(name="favorited_by_user", fieldName="id", referencedColumnName="id")
+
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", inversedBy="favoriteSetups", fetch="EXTRA_LAZY", indexBy="")

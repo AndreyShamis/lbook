@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LogBookDefectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -77,10 +79,16 @@ class LogBookDefect
      */
     private $ext_id;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=LogBookCycleReport::class, mappedBy="defects")
+     */
+    private $logBookCycleReports;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->logBookCycleReports = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,6 +234,34 @@ class LogBookDefect
     public function setIsClosed(bool $isClosed): self
     {
         $this->isClosed = $isClosed;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookCycleReport[]
+     */
+    public function getLogBookCycleReports(): Collection
+    {
+        return $this->logBookCycleReports;
+    }
+
+    public function addLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if (!$this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports[] = $logBookCycleReport;
+            $logBookCycleReport->addDefect($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if ($this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports->removeElement($logBookCycleReport);
+            $logBookCycleReport->removeDefect($this);
+        }
 
         return $this;
     }

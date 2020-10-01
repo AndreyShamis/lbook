@@ -68,7 +68,7 @@ class LogBookUser implements UserInterface, \Serializable
     protected $mobile = '';
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="string", length=150)
      */
     private $password;
 

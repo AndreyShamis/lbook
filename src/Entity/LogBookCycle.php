@@ -287,10 +287,17 @@ class LogBookCycle
      */
     private $suiteExecution;
 
+
+    /**
+     * @ORM\ManyToMany(targetEntity=LogBookCycleReport::class, mappedBy="cycles")
+     */
+    private $logBookCycleReports;
+
+
     protected $calculateStatistic = true;
 
-
     protected $rate = 0;
+
 
     public function setRate(float $r) {
         $this->rate = round($r, 2);
@@ -319,6 +326,7 @@ class LogBookCycle
         /**  Other stuff */
         $this->tests = new ArrayCollection();
         $this->suiteExecution = new ArrayCollection();
+        $this->logBookCycleReports = new ArrayCollection();
     }
 
     /**
@@ -1201,6 +1209,34 @@ class LogBookCycle
             if ($suiteExecution->getCycle() === $this) {
                 $suiteExecution->setCycle(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookCycleReport[]
+     */
+    public function getLogBookCycleReports(): Collection
+    {
+        return $this->logBookCycleReports;
+    }
+
+    public function addLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if (!$this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports[] = $logBookCycleReport;
+            $logBookCycleReport->addCycle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if ($this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports->removeElement($logBookCycleReport);
+            $logBookCycleReport->removeCycle($this);
         }
 
         return $this;

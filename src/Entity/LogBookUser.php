@@ -119,6 +119,11 @@ class LogBookUser implements UserInterface, \Serializable
     private $logBookDefects;
 
     /**
+     * @ORM\OneToMany(targetEntity=LogBookCycleReport::class, mappedBy="creator")
+     */
+    private $logBookCycleReports;
+
+    /**
      *
      * LogBookUser constructor.
      */
@@ -128,6 +133,7 @@ class LogBookUser implements UserInterface, \Serializable
         $this->roles = array();
         $this->favoriteSetups = new ArrayCollection();
         $this->logBookDefects = new ArrayCollection();
+        $this->logBookCycleReports = new ArrayCollection();
     }
 
     /**
@@ -584,6 +590,37 @@ class LogBookUser implements UserInterface, \Serializable
             // set the owning side to null (unless already changed)
             if ($logBookDefect->getReporter() === $this) {
                 $logBookDefect->setReporter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookCycleReport[]
+     */
+    public function getLogBookCycleReports(): Collection
+    {
+        return $this->logBookCycleReports;
+    }
+
+    public function addLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if (!$this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports[] = $logBookCycleReport;
+            $logBookCycleReport->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if ($this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports->removeElement($logBookCycleReport);
+            // set the owning side to null (unless already changed)
+            if ($logBookCycleReport->getCreator() === $this) {
+                $logBookCycleReport->setCreator(null);
             }
         }
 

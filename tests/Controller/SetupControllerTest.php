@@ -33,7 +33,7 @@ class SetupControllerTest extends LogBookApplicationTestCase
     protected function checkIndex(Crawler $crawler): void
     {
         $this->assertSame(Response::HTTP_OK, $this->getClient()->getResponse()->getStatusCode(), $this->getErrorMessage($crawler));
-        $this->assertGreaterThan(0, $crawler->filter('h1:contains("Setup list")')->count());
+        $this->assertGreaterThan(0, $crawler->filter('div:div:h1:contains("Setup list")')->count(), 'Bad setup list count.');
     }
 
     public function testSetupIndexPageDefault(): void

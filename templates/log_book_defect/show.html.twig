@@ -1,54 +1,57 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LogBook Defect{% endblock %}
 {% block content %}
-    <h1>LogBookDefect</h1>
+    <h4>Defect :: {{ log_book_defect.id }}</h4>
 
     <table class="table">
         <tbody>
             <tr>
-                <th>ID</th>
-                <td>{{ log_book_defect.id }}</td>
-            </tr>
-            <tr>
                 <th>Name</th>
-                <td>{{ log_book_defect.name }}</td>
+                <td colspan="3">{{ log_book_defect.name }}</td>
             </tr>
             <tr>
                 <th>Description</th>
-                <td>{{ log_book_defect.description }}</td>
+                <td colspan="3">{{ log_book_defect.description }}</td>
             </tr>
-            <tr>
-                <th>IsExternal</th>
-                <td>{{ log_book_defect.isExternal ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>IsClosed</th>
-                <td>{{ log_book_defect.isClosed ? 'Yes' : 'No' }}</td>
-            </tr>
+{#            <tr>#}
+{#                <th>IsExternal</th>#}
+{#                <td>{{ log_book_defect.isExternal ? 'Yes' : 'No' }}</td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>IsClosed</th>#}
+{#                <td>{{ log_book_defect.isClosed ? 'Yes' : 'No' }}</td>#}
+{#            </tr>#}
             <tr>
                 <th>CreatedAt</th>
                 <td>{{ log_book_defect.createdAt ? log_book_defect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
                 <th>UpdatedAt</th>
                 <td>{{ log_book_defect.updatedAt ? log_book_defect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
+            {% if log_book_defect.isClosed %}
+                <tr>
+                    <th>ClosedAt</th>
+                    <td colspan="3">{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
+                </tr>
+            {% endif %}
+
             <tr>
-                <th>ClosedAt</th>
-                <td>{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Reporter</th>
+                <td colspan="3">{{ log_book_defect.reporter }}</td>
             </tr>
-            <tr>
-                <th>AnotherReporter</th>
-                <td>{{ log_book_defect.anotherReporter }}</td>
-            </tr>
-            <tr>
-                <th>Ext_url</th>
-                <td>{{ log_book_defect.extUrl }}</td>
-            </tr>
-            <tr>
-                <th>Ext_id</th>
-                <td>{{ log_book_defect.extId }}</td>
-            </tr>
+
+            {% if log_book_defect.isExternal %}
+
+                <tr>
+                    <th>External ID</th>
+                    <td>{{ log_book_defect.extId }}</td>
+                    <th>AnotherReporter</th>
+                    <td>{{ log_book_defect.anotherReporter }}</td>
+                </tr>
+                <tr>
+                    <th>External URL</th>
+                    <td colspan="3"><a href="{{ log_book_defect.extUrl }}" target="_blank">{{ log_book_defect.extUrl }}</a></td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 

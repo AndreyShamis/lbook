@@ -50,7 +50,7 @@ class LogBookCycleReportType extends AbstractType
                     'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
                     'multiple'=> true,
                     'attr' => [
-                        'style' => 'width:400px;display: none;',
+//                        'style' => 'width:400px;display: none;',
                         'class' => 'LogBookSelectablePlatformsType multiselect']
                 ]
             )
@@ -61,7 +61,7 @@ class LogBookCycleReportType extends AbstractType
                 'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
                 'multiple'=> true,
                 'attr' => [
-                    'style' => 'width:400px;display: none;',
+//                    'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectableChipsType multiselect']
             ])
             ->add('components', ChoiceType::class, [
@@ -71,7 +71,7 @@ class LogBookCycleReportType extends AbstractType
                 'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
                 'multiple'=> true,
                 'attr' => [
-                    'style' => 'width:400px;display: none;',
+//                    'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectableChipsType multiselect']
             ])
             ->add('mode', ChoiceType::class, [
@@ -86,7 +86,7 @@ class LogBookCycleReportType extends AbstractType
 //              'expanded' => false, //             // false will convert to checkbox
                 'multiple'=> false,
                 'attr' => [
-                    'style' => 'width:400px;display: none;',
+//                    'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectablePackageModeType multiselect']
             ])
         ;

@@ -62,8 +62,12 @@ class LogBookCycleReportController extends AbstractController
      */
     public function show(LogBookCycleReport $logBookCycleReport): Response
     {
+
+        $cycle = $logBookCycleReport->getCycles()->first();
+        $suites = $cycle->getSuiteExecution();
         return $this->render('log_book_cycle_report/show.html.twig', [
             'log_book_cycle_report' => $logBookCycleReport,
+            'suites' => $suites,
         ]);
     }
 

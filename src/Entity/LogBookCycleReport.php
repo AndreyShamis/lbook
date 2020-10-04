@@ -105,7 +105,7 @@ class LogBookCycleReport
     private $testsTotal = 0;
 
     /**
-     * @ORM\Column(type="simple_array")
+     * @ORM\Column(type="simple_array", nullable=true)
      */
     private $platforms = [];
 
@@ -120,7 +120,7 @@ class LogBookCycleReport
     private $mode;
 
     /**
-     * @ORM\Column(type="simple_array")
+     * @ORM\Column(type="simple_array", nullable=true)
      */
     private $components = [];
 
@@ -130,6 +130,8 @@ class LogBookCycleReport
     {
         $this->defects = new ArrayCollection();
         $this->cycles = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -164,13 +166,6 @@ class LogBookCycleReport
     public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getUpdatedAt(): \DateTimeInterface

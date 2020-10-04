@@ -1,4 +1,3 @@
-{% extends 'base.html.twig' %}
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LogBook Cycle Report{% endblock %}
 {% block content %}
@@ -60,11 +59,11 @@
             </tr>
             <tr>
                 <th>Platforms</th>
-                <td>{{ log_book_cycle_report.platforms }}</td>
+                <td>{{ log_book_cycle_report.platforms  | join(',')}}</td>
             </tr>
             <tr>
                 <th>Chips</th>
-                <td>{{ log_book_cycle_report.chips }}</td>
+                <td>{{ log_book_cycle_report.chips | join(',') }}</td>
             </tr>
             <tr>
                 <th>Mode</th>
@@ -72,9 +71,113 @@
             </tr>
             <tr>
                 <th>Components</th>
-                <td>{{ log_book_cycle_report.components }}</td>
+                <td>{{ log_book_cycle_report.components | join(',') }}</td>
             </tr>
         </tbody>
+    </table>
+
+
+
+    <table class="records_list table table-striped table-condensed font9">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th title="Name/UUID">Name</th>
+            <th>Summary</th>
+            <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]">Tests</th>
+            <th title="Pass">Pass</th>
+            <th title="Pass Rate">Pass Rate</th>
+            <th title="Testing Level">TL</th>
+            <th>Chip</th>
+            <th>Platform</th>
+            <th title="Build Flavor">BF</th>
+            <th>Component</th>
+            <th title="Test Environments">ENV</th>
+            <th title="Suite Host Name">Host</th>
+            <th title="Owners">Owners</th>
+            <th title="Closed : X= Closed; O= Open">X</th>
+            <th title="JIRA KEY/Publish">JIRA</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set builder = '' %}
+        {% set tests_enabled = 0 %}
+        {% set tests_disabled = 0 %}
+        {% set tests_executed = 0 %}
+        {% set tests_pass = 0 %}
+        {% set suite_progress = 0 %}
+        {% set suite_done = 0 %}
+        {% for suite in suites | slice(0, 200) %}
+            {% set suite_css = '' %}
+            {% set tests_enabled = tests_enabled + suite.testsCountEnabled %}
+            {% set tests_disabled = tests_disabled + suite.testsCountDisabled  %}
+            {% set tests_executed = tests_executed + suite.totalExecutedTests  %}
+            {% set tests_pass = tests_pass + suite.passCount  %}
+            {% if not suite.closed %}
+                {% set suite_css = 'suite_wip' %}
+                {% set suite_progress = suite_progress + 1  %}
+            {% else %}
+                {% set suite_done = suite_done + 1  %}
+            {% endif %}
+            {% set jira_test_set_url = '' %}
+            {% if suite.publish and suite.jiraKey | length > 3 %}
+                {% set jira_domain = parseDomain(suite.testSetUrl) %}
+                {% if jira_domain | length > 0 %}
+                    {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ suite.jiraKey %}
+                {% endif %}
+            {% endif %}
+            <tr class="{{ suite_css }}">
+                <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
+                <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
+                <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
+                <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
+                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
+                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
+                <td>{{ suite.testingLevel }}</td>
+                <td>{{ suite.chip }}</td>
+                <td>{{ suite.platform }}</td>
+                <td>{{ suite.buildType }}</td>
+                <td>{{ suite.components |join(', ')}}</td>
+                <td>{{ suite.testEnvironments |join(', ')}}</td>
+                <td>
+                    {% if suite.host and suite.host.ip is defined %}
+                        <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
+                    {% endif %}
+                </td>
+                <td>{{ suite.owners | join(', ') }}</td>
+                <td>{{ suite.closed ? 'X':'O' }}</td>
+                <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th title="Total suites count">
+                <strong>{{ log_book_cycle_report.suitesCount }}</strong>
+            </th>
+            <th></th>
+            <th></th>
+            <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>
+            <th>{{ tests_pass }}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Host</th>
+            <th></th>
+            <th title="Suites Done/WIP">{{ suite_done }}/
+                {% if suite_progress > 0 %}
+                    <strong>{{ suite_progress }}</strong>
+                {% else %}
+                    {{ suite_progress }}
+                {% endif %}
+            </th>
+            <th></th>
+        </tr>
+        </tfoot>
     </table>
 
     <a href="{{ path('log_book_cycle_report_index') }}">back to list</a>

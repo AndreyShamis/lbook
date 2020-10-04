@@ -44,10 +44,10 @@
                 <td>{{ log_book_cycle_report.testsError }}</td>
                 <td>{{ log_book_cycle_report.testsOther }}</td>
                 <td>{{ log_book_cycle_report.testsTotal }}</td>
-                <td>{{ log_book_cycle_report.platforms }}</td>
-                <td>{{ log_book_cycle_report.chips }}</td>
+                <td>{{ log_book_cycle_report.platforms | join(',') }}</td>
+                <td>{{ log_book_cycle_report.chips | join(',') }}</td>
                 <td>{{ log_book_cycle_report.mode }}</td>
-                <td>{{ log_book_cycle_report.components }}</td>
+                <td>{{ log_book_cycle_report.components | join(',') }}</td>
                 <td>
                     <a href="{{ path('log_book_cycle_report_show', {'id': log_book_cycle_report.id}) }}">show</a>
                     <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>

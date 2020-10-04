@@ -14,15 +14,14 @@
                 <th>Period</th>
                 <th>Duration</th>
                 <th>SuitesCount</th>
-                <th>TestsCount</th>
                 <th>TestsPass</th>
                 <th>TestsFail</th>
                 <th>TestsError</th>
                 <th>TestsOther</th>
                 <th>TestsTotal</th>
+                <th>Mode</th>
                 <th>Platforms</th>
                 <th>Chips</th>
-                <th>Mode</th>
                 <th>Components</th>
                 <th>actions</th>
             </tr>
@@ -31,25 +30,23 @@
         {% for log_book_cycle_report in log_book_cycle_reports %}
             <tr>
                 <td>{{ log_book_cycle_report.id }}</td>
-                <td>{{ log_book_cycle_report.name }}</td>
-                <td>{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td><a href="{{ path('log_book_cycle_report_show', {'id': log_book_cycle_report.id}) }}">{{ log_book_cycle_report.name }}</a></td>
+                <td>{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i') : '' }}</td>
+                <td>{{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i') : '' }}</td>
                 <td>{{ log_book_cycle_report.description }}</td>
                 <td>{{ log_book_cycle_report.period }}</td>
                 <td>{{ log_book_cycle_report.duration }}</td>
                 <td>{{ log_book_cycle_report.suitesCount }}</td>
-                <td>{{ log_book_cycle_report.testsCount }}</td>
                 <td>{{ log_book_cycle_report.testsPass }}</td>
                 <td>{{ log_book_cycle_report.testsFail }}</td>
                 <td>{{ log_book_cycle_report.testsError }}</td>
                 <td>{{ log_book_cycle_report.testsOther }}</td>
                 <td>{{ log_book_cycle_report.testsTotal }}</td>
-                <td>{{ log_book_cycle_report.platforms | join(',') }}</td>
-                <td>{{ log_book_cycle_report.chips | join(',') }}</td>
                 <td>{{ log_book_cycle_report.mode }}</td>
-                <td>{{ log_book_cycle_report.components | join(',') }}</td>
+                <td title="{{ log_book_cycle_report.platforms | join(', ') }}">{{ log_book_cycle_report.platforms | length }}</td>
+                <td title="{{ log_book_cycle_report.chips | join(', ') }}">{{ log_book_cycle_report.chips | length }}</td>
+                <td title="{{ log_book_cycle_report.components | join(', ') }}">{{ log_book_cycle_report.components | length }}</td>
                 <td>
-                    <a href="{{ path('log_book_cycle_report_show', {'id': log_book_cycle_report.id}) }}">show</a>
                     <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
                 </td>
             </tr>

@@ -34,16 +34,17 @@ class LogBookCycleReportController extends AbstractController
     public function new(Request $request, LogBookCycle $cycle=null): Response
     {
         /** @var LogBookUser $user */
-        $user = $this->get('security.token_storage')->getToken()->getUser();
         $logBookCycleReport = new LogBookCycleReport();
-        $logBookCycleReport->setCreator($user);
-        if ($cycle !== null) {
-            $logBookCycleReport->addCycle($cycle);
-        }
+
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $logBookCycleReport->setCreator($user);
+            if ($cycle !== null) {
+                $logBookCycleReport->addCycle($cycle);
+            }
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($logBookCycleReport);
             $entityManager->flush();

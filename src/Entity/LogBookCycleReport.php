@@ -77,11 +77,6 @@ class LogBookCycleReport
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
-    private $testsCount = 0;
-
-    /**
-     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
-     */
     private $testsPass = 0;
 
     /**
@@ -288,18 +283,6 @@ class LogBookCycleReport
     public function setSuitesCount(int $suitesCount): self
     {
         $this->suitesCount = $suitesCount;
-
-        return $this;
-    }
-
-    public function getTestsCount(): int
-    {
-        return $this->testsCount;
-    }
-
-    public function setTestsCount(int $testsCount): self
-    {
-        $this->testsCount = $testsCount;
 
         return $this;
     }

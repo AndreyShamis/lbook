@@ -52,7 +52,77 @@ class LogBookCycleReport
     /**
      * @ORM\Column(type="text")
      */
-    private $description;
+    private $description = '';
+
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookBuild::class, inversedBy="logBookCycleReports")
+     */
+    private $build;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $period = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $duration = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $suitesCount = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsCount = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsPass = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsFail = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsError = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsOther = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testsTotal = 0;
+
+    /**
+     * @ORM\Column(type="simple_array")
+     */
+    private $platforms = [];
+
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $chips = [];
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $mode;
+
+    /**
+     * @ORM\Column(type="simple_array")
+     */
+    private $components = [];
 
 
 
@@ -91,7 +161,7 @@ class LogBookCycleReport
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
     }
@@ -103,7 +173,7 @@ class LogBookCycleReport
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): \DateTimeInterface
     {
         return $this->updatedAt;
     }
@@ -175,6 +245,174 @@ class LogBookCycleReport
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getBuild(): ?LogBookBuild
+    {
+        return $this->build;
+    }
+
+    public function setBuild(?LogBookBuild $build): self
+    {
+        $this->build = $build;
+
+        return $this;
+    }
+
+    public function getPeriod(): int
+    {
+        return $this->period;
+    }
+
+    public function setPeriod(int $period): self
+    {
+        $this->period = $period;
+
+        return $this;
+    }
+
+    public function getDuration(): int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getSuitesCount(): int
+    {
+        return $this->suitesCount;
+    }
+
+    public function setSuitesCount(int $suitesCount): self
+    {
+        $this->suitesCount = $suitesCount;
+
+        return $this;
+    }
+
+    public function getTestsCount(): int
+    {
+        return $this->testsCount;
+    }
+
+    public function setTestsCount(int $testsCount): self
+    {
+        $this->testsCount = $testsCount;
+
+        return $this;
+    }
+
+    public function getTestsPass(): int
+    {
+        return $this->testsPass;
+    }
+
+    public function setTestsPass(int $testsPass): self
+    {
+        $this->testsPass = $testsPass;
+
+        return $this;
+    }
+
+    public function getTestsFail(): int
+    {
+        return $this->testsFail;
+    }
+
+    public function setTestsFail(int $testsFail): self
+    {
+        $this->testsFail = $testsFail;
+
+        return $this;
+    }
+
+    public function getTestsError(): int
+    {
+        return $this->testsError;
+    }
+
+    public function setTestsError(int $testsError): self
+    {
+        $this->testsError = $testsError;
+
+        return $this;
+    }
+
+    public function getTestsOther(): int
+    {
+        return $this->testsOther;
+    }
+
+    public function setTestsOther(int $testsOther): self
+    {
+        $this->testsOther = $testsOther;
+
+        return $this;
+    }
+
+    public function getTestsTotal(): int
+    {
+        return $this->testsTotal;
+    }
+
+    public function setTestsTotal(int $testsTotal): self
+    {
+        $this->testsTotal = $testsTotal;
+
+        return $this;
+    }
+
+    public function getPlatforms(): array
+    {
+        return $this->platforms;
+    }
+
+    public function setPlatforms(array $platforms): self
+    {
+        $this->platforms = $platforms;
+
+        return $this;
+    }
+
+    public function getChips(): ?array
+    {
+        return $this->chips;
+    }
+
+    public function setChips(?array $chips): self
+    {
+        $this->chips = $chips;
+
+        return $this;
+    }
+
+    public function getMode(): ?string
+    {
+        return $this->mode;
+    }
+
+    public function setMode(string $mode): self
+    {
+        $this->mode = $mode;
+
+        return $this;
+    }
+
+    public function getComponents(): ?array
+    {
+        return $this->components;
+    }
+
+    public function setComponents(array $components): self
+    {
+        $this->components = $components;
 
         return $this;
     }

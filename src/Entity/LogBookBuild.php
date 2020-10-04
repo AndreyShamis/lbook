@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -41,6 +43,16 @@ class LogBookBuild
      * @ORM\Column(name="delete_counter", type="smallint", options={"unsigned"=true, "default"="0"})
      */
     protected $deleteCounter = 0;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LogBookCycleReport::class, mappedBy="build")
+     */
+    private $logBookCycleReports;
+
+    public function __construct()
+    {
+        $this->logBookCycleReports = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -131,5 +143,36 @@ class LogBookBuild
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    /**
+     * @return Collection|LogBookCycleReport[]
+     */
+    public function getLogBookCycleReports(): Collection
+    {
+        return $this->logBookCycleReports;
+    }
+
+    public function addLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if (!$this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports[] = $logBookCycleReport;
+            $logBookCycleReport->setBuild($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBookCycleReport(LogBookCycleReport $logBookCycleReport): self
+    {
+        if ($this->logBookCycleReports->contains($logBookCycleReport)) {
+            $this->logBookCycleReports->removeElement($logBookCycleReport);
+            // set the owning side to null (unless already changed)
+            if ($logBookCycleReport->getBuild() === $this) {
+                $logBookCycleReport->setBuild(null);
+            }
+        }
+
+        return $this;
     }
 }

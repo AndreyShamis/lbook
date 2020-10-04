@@ -99,23 +99,23 @@
             <b class="arrow"></b>
         </li>
     {% endif %}
-    {#<li class="{% if route starts with 'log_' %}active{% endif %}">#}
-        {#<a href="{{asset(path('log_index'))}}">#}
-        {#<i class="menu-icon fa fa-file-o"></i>#}
-            {#<span class="menu-text">Logs/Messages#}
-            {#<span class="badge badge-primary">5</span>#}
-        {#</span>#}
-        {#</a>#}
-        {#<b class="arrow"></b>#}
-    {#</li>#}
+    <li class="{% if route starts with 'log_book_defect_' %}active{% endif %}">
+        <a href="{{ asset(path('log_book_defect_index')) }}">
+        <i class="menu-icon fa fa-file-o"></i>
+            <span class="menu-text">Defects
+{#            <span class="badge badge-primary">5</span>#}
+        </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
 
-    {#<li class="{% if route starts with 'msg_type_' %}active{% endif %}">#}
-        {#<a href="{{asset(path('msg_type_index'))}}" >#}
-            {#<i class="menu-icon fa fa-tag"></i>#}
-            {#<span class="menu-text" title="Message/Log types">Log Types</span>#}
-        {#</a>#}
-        {#<b class="arrow"></b>#}
-    {#</li>#}
+{#    <li class="{% if route starts with 'msg_type_' %}active{% endif %}">#}
+{#        <a href="{{asset(path('msg_type_index'))}}" >#}
+{#            <i class="menu-icon fa fa-tag"></i>#}
+{#            <span class="menu-text" title="Message/Log types">Log Types</span>#}
+{#        </a>#}
+{#        <b class="arrow"></b>#}
+{#    </li>#}
 
     {# ################################### Controll ################################### #}
     <li class="{% if route in ['types', 'verdict_index', 'user_index', 'msg_type_index', 'log_index'] %}active{% endif %}">

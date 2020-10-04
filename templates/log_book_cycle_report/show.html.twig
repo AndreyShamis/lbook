@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LogBook Cycle Report{% endblock %}
+{% block content %}
+    <h1>Cycle Report :: {{ log_book_cycle_report.id }}</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Name</th>
+                <td>{{ log_book_cycle_report.name }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ log_book_cycle_report.description }}</td>
+            </tr>
+            <tr>
+                <th>Period</th>
+                <td>{{ log_book_cycle_report.period }}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{ log_book_cycle_report.duration }}</td>
+            </tr>
+            <tr>
+                <th>SuitesCount</th>
+                <td>{{ log_book_cycle_report.suitesCount }}</td>
+            </tr>
+            <tr>
+                <th>TestsCount</th>
+                <td>{{ log_book_cycle_report.testsCount }}</td>
+            </tr>
+            <tr>
+                <th>TestsPass</th>
+                <td>{{ log_book_cycle_report.testsPass }}</td>
+            </tr>
+            <tr>
+                <th>TestsFail</th>
+                <td>{{ log_book_cycle_report.testsFail }}</td>
+            </tr>
+            <tr>
+                <th>TestsError</th>
+                <td>{{ log_book_cycle_report.testsError }}</td>
+            </tr>
+            <tr>
+                <th>TestsOther</th>
+                <td>{{ log_book_cycle_report.testsOther }}</td>
+            </tr>
+            <tr>
+                <th>TestsTotal</th>
+                <td>{{ log_book_cycle_report.testsTotal }}</td>
+            </tr>
+            <tr>
+                <th>Platforms</th>
+                <td>{{ log_book_cycle_report.platforms }}</td>
+            </tr>
+            <tr>
+                <th>Chips</th>
+                <td>{{ log_book_cycle_report.chips }}</td>
+            </tr>
+            <tr>
+                <th>Mode</th>
+                <td>{{ log_book_cycle_report.mode }}</td>
+            </tr>
+            <tr>
+                <th>Components</th>
+                <td>{{ log_book_cycle_report.components }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('log_book_cycle_report_index') }}">back to list</a>
+
+    <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
+
+    {{ include('log_book_cycle_report/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LogBook Report index{% endblock %}
+{% block content %}
+    <h1>LogBookCycleReport index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Description</th>
+                <th>Period</th>
+                <th>Duration</th>
+                <th>SuitesCount</th>
+                <th>TestsCount</th>
+                <th>TestsPass</th>
+                <th>TestsFail</th>
+                <th>TestsError</th>
+                <th>TestsOther</th>
+                <th>TestsTotal</th>
+                <th>Platforms</th>
+                <th>Chips</th>
+                <th>Mode</th>
+                <th>Components</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log_book_cycle_report in log_book_cycle_reports %}
+            <tr>
+                <td>{{ log_book_cycle_report.id }}</td>
+                <td>{{ log_book_cycle_report.name }}</td>
+                <td>{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ log_book_cycle_report.description }}</td>
+                <td>{{ log_book_cycle_report.period }}</td>
+                <td>{{ log_book_cycle_report.duration }}</td>
+                <td>{{ log_book_cycle_report.suitesCount }}</td>
+                <td>{{ log_book_cycle_report.testsCount }}</td>
+                <td>{{ log_book_cycle_report.testsPass }}</td>
+                <td>{{ log_book_cycle_report.testsFail }}</td>
+                <td>{{ log_book_cycle_report.testsError }}</td>
+                <td>{{ log_book_cycle_report.testsOther }}</td>
+                <td>{{ log_book_cycle_report.testsTotal }}</td>
+                <td>{{ log_book_cycle_report.platforms }}</td>
+                <td>{{ log_book_cycle_report.chips }}</td>
+                <td>{{ log_book_cycle_report.mode }}</td>
+                <td>{{ log_book_cycle_report.components }}</td>
+                <td>
+                    <a href="{{ path('log_book_cycle_report_show', {'id': log_book_cycle_report.id}) }}">show</a>
+                    <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="19">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('log_book_cycle_report_new') }}">Create new</a>
+{% endblock %}

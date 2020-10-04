@@ -1,0 +1,43 @@
+{{ form_start(form) }}
+
+{#<table>#}
+{#    <tr>#}
+{#        <td>{{ form_label(form.platforms, 'Platforms', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>#}
+{#        <td>{{ form_errors(form.platforms) }}</td>#}
+{#        <td>{{ form_widget(form.platforms) }}</td>#}
+{#        #}{#            , {'attr': {'class': 'suiteExSearchSelection suiteExecutionSearchTestingLevelSelection'}}) }}#}
+{#    </tr>#}
+{#    <tr>#}
+{#        <td>{{ form_label(form.chips, 'Chip/s', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>#}
+{#        <td>{{ form_errors(form.chips) }}</td>#}
+{#        <td>{{ form_widget(form.chips)  }}</td>#}
+{#    </tr>#}
+{#    <tr>#}
+{#        <td>{{ form_label(form.components, 'Components', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>#}
+{#        <td>{{ form_errors(form.components) }}</td>#}
+{#        <td>{{ form_widget(form.components) }}</td>#}
+{#    </tr>#}
+{#    <tr>#}
+{#        <td>{{ form_label(form.mode, 'Package Mode', {'label_attr': {'class': 'SuiteExecutionSearchFormLabel', 'style' : 'width:120px;'}}) }}</td>#}
+{#        <td>{{ form_errors(form.mode) }}</td>#}
+{#        <td>{{ form_widget(form.mode) }}</td>#}
+{#    </tr>#}
+
+
+{#</table>#}
+
+    {{ form_widget(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}
+<script>
+    $(document).ready(function() {
+        $( "#log_book_cycle_report form" ).css( "width", "1000px" );
+        $( "#log_book_cycle_report input[type = 'text']" ).css( "width", "900px" );
+        $( "#log_book_cycle_report select" ).css( "width", "900px" );
+        $( "#log_book_cycle_report textarea" ).css( "width", "900px" );
+        $( "#log_book_cycle_report label" ).css( "width", "150px" );
+
+        ConvertExternal();
+
+    });
+</script>

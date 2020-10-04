@@ -1,0 +1,9 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LogBook New  Cycle Report{% endblock %}
+{% block content %}
+    <h1>Create new  Cycle Report</h1>
+
+    {{ include('log_book_cycle_report/_form.html.twig') }}
+
+    <a href="{{ path('log_book_cycle_report_index') }}">back to list</a>
+{% endblock %}

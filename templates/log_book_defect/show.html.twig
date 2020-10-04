@@ -11,7 +11,14 @@
             </tr>
             <tr>
                 <th>Description</th>
-                <td colspan="3">{{ log_book_defect.description }}</td>
+                <td colspan="3">{% apply markdown_to_html %}
+Title
+======
+
+Hello!
+
+{{ log_book_defect.description }}{% endapply %}
+                </td>
             </tr>
 {#            <tr>#}
 {#                <th>IsExternal</th>#}

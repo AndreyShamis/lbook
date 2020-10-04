@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookDefect;
+use App\Entity\LogBookUser;
 use App\Form\LogBookDefectType;
 use App\Repository\LogBookDefectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,8 @@ class LogBookDefectController extends AbstractController
 {
     /**
      * @Route("/", name="log_book_defect_index", methods={"GET"})
+     * @param LogBookDefectRepository $logBookDefectRepository
+     * @return Response
      */
     public function index(LogBookDefectRepository $logBookDefectRepository): Response
     {
@@ -35,6 +38,10 @@ class LogBookDefectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var LogBookUser $user */
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $logBookDefect->setReporter($user);
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($logBookDefect);
             $entityManager->flush();
@@ -50,6 +57,8 @@ class LogBookDefectController extends AbstractController
 
     /**
      * @Route("/{id}", name="log_book_defect_show", methods={"GET"})
+     * @param LogBookDefect $logBookDefect
+     * @return Response
      */
     public function show(LogBookDefect $logBookDefect): Response
     {
@@ -60,6 +69,9 @@ class LogBookDefectController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="log_book_defect_edit", methods={"GET","POST"})
+     * @param Request $request
+     * @param LogBookDefect $logBookDefect
+     * @return Response
      */
     public function edit(Request $request, LogBookDefect $logBookDefect): Response
     {
@@ -80,6 +92,9 @@ class LogBookDefectController extends AbstractController
 
     /**
      * @Route("/{id}", name="log_book_defect_delete", methods={"DELETE"})
+     * @param Request $request
+     * @param LogBookDefect $logBookDefect
+     * @return Response
      */
     public function delete(Request $request, LogBookDefect $logBookDefect): Response
     {

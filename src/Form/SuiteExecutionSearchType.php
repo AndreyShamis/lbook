@@ -204,18 +204,37 @@ class SuiteExecutionSearchType extends AbstractType
             /** @var StorageStringRepository $storage */
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($components as $component) {
-                try {
-                    $storage->findOneOrCreate(
-                        [
-                            'vname' => $component,
-                            'key1' => 'lbk',
-                            'key2' => 'suites',
-                            'key3' => 'components',
-                        ]
-                    );
-                } catch (OptimisticLockException $e) {
-                } catch (ORMException $e) {
+                $tmp_arr = explode(',', $component);
+                if (count($tmp_arr) > 1) {
+                    foreach ($tmp_arr as $tmp_component) {
+                        try {
+                            $storage->findOneOrCreate(
+                                [
+                                    'vname' => $tmp_component,
+                                    'key1' => 'lbk',
+                                    'key2' => 'suites',
+                                    'key3' => 'components',
+                                ]
+                            );
+                        } catch (OptimisticLockException $e) {
+                        } catch (ORMException $e) {
+                        }
+                    }
+                } else {
+                    try {
+                        $storage->findOneOrCreate(
+                            [
+                                'vname' => $component,
+                                'key1' => 'lbk',
+                                'key2' => 'suites',
+                                'key3' => 'components',
+                            ]
+                        );
+                    } catch (OptimisticLockException $e) {
+                    } catch (ORMException $e) {
+                    }
                 }
+
             }
 
             $jobNames = $this->entityManager->getRepository(SuiteExecution::class)->getUniqJobNames();

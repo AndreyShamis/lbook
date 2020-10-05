@@ -123,9 +123,9 @@
                 {% endif %}
             {% endif %}
             <tr class="{{ suite_css }}">
-                <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.id }}</a></td>
+                <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.id }}</a></td>
                 <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>
-                <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.summary }}</a></td>
+                <td><a href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.summary }}</a></td>
                 <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>

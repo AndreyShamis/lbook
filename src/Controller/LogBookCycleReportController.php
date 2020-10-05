@@ -10,6 +10,7 @@ use App\Form\LogBookCycleReportType;
 use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,8 +72,10 @@ class LogBookCycleReportController extends AbstractController
     {
         $suites = [];
         $failed_tests = [];
+        $cycles = new ArrayCollection();
         try {
-            $cycle = $logBookCycleReport->getCycles()->first();
+            $cycles = $logBookCycleReport->getCycles();
+            $cycle = $cycles->first();
             if ($cycle !== null) {
                 $suites = $cycle->getSuiteExecution();
             }
@@ -80,12 +83,12 @@ class LogBookCycleReportController extends AbstractController
         $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 
         $qb = $testRepo->createQueryBuilder('t')
-            ->where('t.cycle = :cycle')
+            ->where('t.cycle IN (:cycles)')
             ->andWhere('t.disabled = :disabled')
             ->andWhere('t.verdict != :verdictPass')
             ->orderBy('t.executionOrder', 'ASC')
             //->setParameter('cycle', $cycle->getId());
-            ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0, 'verdictPass' => $verdictPass]);
+            ->setParameters(['cycles'=> $cycles, 'disabled' => 0, 'verdictPass' => $verdictPass]);
         $tests = $qb->getQuery()->execute();
         /** @var LogBookTest $test */
         foreach ($tests as $test) {

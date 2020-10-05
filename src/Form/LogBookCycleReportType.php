@@ -7,6 +7,7 @@ use App\Entity\LogBookCycleReport;
 use App\Entity\StorageString;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,6 +24,7 @@ class LogBookCycleReportType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         try {
             $cycles = $builder->getData()->getCycles();
         } catch (\Throwable $ex) {
@@ -51,17 +53,7 @@ class LogBookCycleReportType extends AbstractType
 //            ->add('defects')
 
 //            ->add('build')
-            ->add('platforms', ChoiceType::class, [
-                    'required' => false,
-                    'choice_label' => 'name',
-                    'choice_value' => 'name',
-                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
-                    'multiple'=> true,
-                    'attr' => [
-//                        'style' => 'width:400px;display: none;',
-                        'class' => 'LogBookSelectablePlatformsType multiselect']
-                ]
-            )
+
             ->add('chips', ChoiceType::class, [
                 'required' => false,
                 'choice_label' => 'name',
@@ -100,7 +92,19 @@ class LogBookCycleReportType extends AbstractType
                     'attr' => [
 //                    'style' => 'width:400px;display: none;',
                         'class' => 'LogBookSelectableChipsType multiselect']
-                ]);
+                ])
+                ->add('platforms', ChoiceType::class, [
+                        'required' => false,
+                        'choice_label' => 'name',
+                        'choice_value' => 'name',
+                        'choices' => $this->getPlatformsFromCycles($cycles),
+                        'multiple'=> true,
+                        'attr' => [
+//                        'style' => 'width:400px;display: none;',
+                            'class' => 'LogBookSelectablePlatformsType multiselect']
+                    ]
+                )
+            ;
         } else {
             $builder->add('components', ChoiceType::class, [
                 'required' => false,
@@ -111,15 +115,44 @@ class LogBookCycleReportType extends AbstractType
                 'attr' => [
 //                    'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectableChipsType multiselect']
-            ]);
+            ])
+            ->add('platforms', ChoiceType::class, [
+                    'required' => false,
+//                    'choice_label' => 'name',
+//                    'choice_value' => 'name',
+                    'choices' => $this->getPlatformsFromCycles($cycles), //$this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
+                    'multiple'=> true,
+                    'attr' => [
+//                        'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectablePlatformsType multiselect']
+                ]
+            )
+            ;
         }
     }
 
     /**
-     * @param ArrayCollection $cycles
+     * @param PersistentCollection $cycles
      * @return array
      */
-    protected function getComponentsFromCycles(ArrayCollection $cycles) {
+    protected function getPlatformsFromCycles(PersistentCollection $cycles) {
+        $ret = [];
+        /** @var LogBookCycle $cycle */
+        foreach ($cycles as $cycle) {
+            $suites = $cycle->getSuiteExecution();
+            foreach ($suites as $suite) {
+                $comp = $suite->getPlatform();
+                $ret[$comp] = $comp;
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * @param PersistentCollection $cycles
+     * @return array
+     */
+    protected function getComponentsFromCycles(PersistentCollection $cycles) {
         $ret = [];
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
@@ -127,8 +160,11 @@ class LogBookCycleReportType extends AbstractType
             foreach ($suites as $suite) {
                 $comps = $suite->getComponents();
                 foreach ($comps as $comp) {
-                    if (!in_array($comp, $ret)) {
-                        $ret[] = $comp;
+                    $tmp_arr = explode(',', $comp);
+                    foreach ($tmp_arr as $tmp_comp) {
+                        if (!in_array($tmp_comp, $ret)) {
+                            $ret[] = $tmp_comp;
+                        }
                     }
                 }
 

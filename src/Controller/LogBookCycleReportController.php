@@ -60,12 +60,16 @@ class LogBookCycleReportController extends AbstractController
 
     /**
      * @Route("/{id}", name="log_book_cycle_report_show", methods={"GET"})
+     * @param LogBookCycleReport $logBookCycleReport
+     * @return Response
      */
     public function show(LogBookCycleReport $logBookCycleReport): Response
     {
-
+        $suites = []
         $cycle = $logBookCycleReport->getCycles()->first();
-        $suites = $cycle->getSuiteExecution();
+        if ($cycle !== null) {
+            $suites = $cycle->getSuiteExecution();
+        }
         return $this->render('log_book_cycle_report/show.html.twig', [
             'log_book_cycle_report' => $logBookCycleReport,
             'suites' => $suites,

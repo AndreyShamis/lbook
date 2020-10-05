@@ -54,17 +54,6 @@ class LogBookCycleReportType extends AbstractType
 
 //            ->add('build')
 
-            ->add('chips', ChoiceType::class, [
-                'required' => false,
-                'choice_label' => 'name',
-                'choice_value' => 'name',
-                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
-                'multiple'=> true,
-                'attr' => [
-//                    'style' => 'width:400px;display: none;',
-                    'class' => 'LogBookSelectableChipsType multiselect']
-            ])
-
             ->add('mode', ChoiceType::class, [
                 'required' => false,
                 'label' => ' ',
@@ -87,7 +76,7 @@ class LogBookCycleReportType extends AbstractType
                     'required' => false,
                     'choice_label' => 'name',
                     'choice_value' => 'name',
-                    'choices' => $this->getComponentsFromCycles($cycles),
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
                     'multiple'=> true,
                     'attr' => [
 //                    'style' => 'width:400px;display: none;',
@@ -97,13 +86,23 @@ class LogBookCycleReportType extends AbstractType
                         'required' => false,
                         'choice_label' => 'name',
                         'choice_value' => 'name',
-                        'choices' => $this->getPlatformsFromCycles($cycles),
+                        'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
                         'multiple'=> true,
                         'attr' => [
 //                        'style' => 'width:400px;display: none;',
                             'class' => 'LogBookSelectablePlatformsType multiselect']
                     ]
                 )
+                ->add('chips', ChoiceType::class, [
+                    'required' => false,
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
+                    'multiple'=> true,
+                    'attr' => [
+//                    'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectableChipsType multiselect']
+                ])
             ;
         } else {
             $builder->add('components', ChoiceType::class, [
@@ -111,6 +110,8 @@ class LogBookCycleReportType extends AbstractType
                 'choice_label' => 'name',
                 'choice_value' => 'name',
                 'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
+                'data' => $this->getComponentsFromCycles($cycles),
+                'empty_data' => $this->getComponentsFromCycles($cycles),
                 'multiple'=> true,
                 'attr' => [
 //                    'style' => 'width:400px;display: none;',
@@ -118,17 +119,48 @@ class LogBookCycleReportType extends AbstractType
             ])
             ->add('platforms', ChoiceType::class, [
                     'required' => false,
-//                    'choice_label' => 'name',
-//                    'choice_value' => 'name',
-                    'choices' => $this->getPlatformsFromCycles($cycles), //$this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
+                    'data' => $this->getPlatformsFromCycles($cycles),
+                    'empty_data' => $this->getPlatformsFromCycles($cycles),
                     'multiple'=> true,
                     'attr' => [
 //                        'style' => 'width:400px;display: none;',
                         'class' => 'LogBookSelectablePlatformsType multiselect']
                 ]
             )
+                ->add('chips', ChoiceType::class, [
+                    'required' => false,
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
+                    'data' => $this->getChipsFromCycles($cycles),
+                    'empty_data' => $this->getChipsFromCycles($cycles),
+                    'multiple'=> true,
+                    'attr' => [
+//                    'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectableChipsType multiselect']
+                ])
             ;
         }
+    }
+
+    /**
+     * @param PersistentCollection $cycles
+     * @return array
+     */
+    protected function getChipsFromCycles(PersistentCollection $cycles) {
+        $ret = [];
+        /** @var LogBookCycle $cycle */
+        foreach ($cycles as $cycle) {
+            $suites = $cycle->getSuiteExecution();
+            foreach ($suites as $suite) {
+                $comp = $suite->getChip();
+                $ret[$comp] = (object)['name' => $comp];
+            }
+        }
+        return $ret;
     }
 
     /**
@@ -142,7 +174,7 @@ class LogBookCycleReportType extends AbstractType
             $suites = $cycle->getSuiteExecution();
             foreach ($suites as $suite) {
                 $comp = $suite->getPlatform();
-                $ret[$comp] = $comp;
+                $ret[$comp] = (object)['name' => $comp];
             }
         }
         return $ret;
@@ -162,9 +194,7 @@ class LogBookCycleReportType extends AbstractType
                 foreach ($comps as $comp) {
                     $tmp_arr = explode(',', $comp);
                     foreach ($tmp_arr as $tmp_comp) {
-                        if (!in_array($tmp_comp, $ret)) {
-                            $ret[] = $tmp_comp;
-                        }
+                        $ret[$tmp_comp] = (object)['name' => $tmp_comp] ;
                     }
                 }
 

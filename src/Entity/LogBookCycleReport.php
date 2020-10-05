@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\LogBookCycleReportRepository;
+use App\Repository\SuiteExecutionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -120,6 +121,19 @@ class LogBookCycleReport
     private $components = [];
 
 
+    public function getSuites(SuiteExecutionRepository $suitesRepo)
+    {
+        $qb = $suitesRepo->createQueryBuilder('s')
+            ->where('s.cycle IN (:cycles)')
+            ->andWhere('s.platform IN (:platforms)')
+            ->andWhere('s.chip IN (:chips)')
+            ->setParameter('cycles', $this->getCycles())
+            ->setParameter('platforms', $this->getPlatforms())
+            ->setParameter('chips', $this->getChips())
+        ;
+        $res = $qb->getQuery()->execute();
+        return $res;
+    }
 
     public function __construct()
     {

@@ -10,6 +10,7 @@ use App\Form\LogBookCycleReportType;
 use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
+use App\Repository\SuiteExecutionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,9 +67,14 @@ class LogBookCycleReportController extends AbstractController
     /**
      * @Route("/{id}", name="log_book_cycle_report_show", methods={"GET"})
      * @param LogBookCycleReport $logBookCycleReport
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookVerdictRepository $verdicts
+     * @param SuiteExecutionRepository $suitesRepo
      * @return Response
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function show(LogBookCycleReport $logBookCycleReport, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts): Response
+    public function show(LogBookCycleReport $logBookCycleReport, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo): Response
     {
         $suites = [];
         $failed_tests = [];
@@ -98,7 +104,7 @@ class LogBookCycleReportController extends AbstractController
         }
         return $this->render('log_book_cycle_report/show.html.twig', [
             'log_book_cycle_report' => $logBookCycleReport,
-            'suites' => $suites,
+            'suites' => $logBookCycleReport->getSuites($suitesRepo),
             'failed_tests' => $failed_tests,
         ]);
     }

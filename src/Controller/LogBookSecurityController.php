@@ -113,18 +113,26 @@ class LogBookSecurityController extends AbstractController
                 $password = $request->request->get('_password');
 
                 if ($use_ldap === 'true') {
-                    $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
-                    if (\is_array($ldapUserArr)) {
-                        $ldapLogin = true;
-                        $user = $userRepo->loadUserByUsername($ldapUserArr['username']);
-                        if ($user === null) {
-                            /** Need to create the user in DataBase **/
-                            $user = $userRepo->create($ldapUserArr);
+                    try {
+                        $user = $userRepo->loadUserByUsername($user_name);
+                    } catch (\Throwable $ex){}
+                    if (!$user !== null && !$user->isLdapUser()) {
+
+                    } else {
+                        $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
+                        if (\is_array($ldapUserArr)) {
+                            $ldapLogin = true;
+                            $user = $userRepo->loadUserByUsername($ldapUserArr['username']);
+                            if ($user === null) {
+                                /** Need to create the user in DataBase **/
+                                $user = $userRepo->create($ldapUserArr);
+                            }
                         }
                     }
                 } else {
                     $user = $userRepo->loadUserByUsername($user_name);
                 }
+
 
                 if ($user !== null) {
                     $active = $user->getIsActive();

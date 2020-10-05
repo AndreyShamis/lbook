@@ -120,6 +120,39 @@ class LogBookCycleReport
      */
     private $components = [];
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $reportNotes;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $cyclesNotes;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $suitesNotes;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $testsNotes;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $bugsNotes;
+
+
+    public function __construct()
+    {
+        $this->defects = new ArrayCollection();
+        $this->cycles = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getSuites(SuiteExecutionRepository $suitesRepo)
     {
@@ -131,16 +164,7 @@ class LogBookCycleReport
             ->setParameter('platforms', $this->getPlatforms())
             ->setParameter('chips', $this->getChips())
         ;
-        $res = $qb->getQuery()->execute();
-        return $res;
-    }
-
-    public function __construct()
-    {
-        $this->defects = new ArrayCollection();
-        $this->cycles = new ArrayCollection();
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+        return $qb->getQuery()->execute();
     }
 
     public function getId(): ?int
@@ -405,6 +429,66 @@ class LogBookCycleReport
     public function setComponents(array $components): self
     {
         $this->components = $components;
+
+        return $this;
+    }
+
+    public function getReportNotes(): ?string
+    {
+        return $this->reportNotes;
+    }
+
+    public function setReportNotes(?string $reportNotes): self
+    {
+        $this->reportNotes = $reportNotes;
+
+        return $this;
+    }
+
+    public function getCyclesNotes(): ?string
+    {
+        return $this->cyclesNotes;
+    }
+
+    public function setCyclesNotes(?string $cyclesNotes): self
+    {
+        $this->cyclesNotes = $cyclesNotes;
+
+        return $this;
+    }
+
+    public function getSuitesNotes(): ?string
+    {
+        return $this->suitesNotes;
+    }
+
+    public function setSuitesNotes(?string $suitesNotes): self
+    {
+        $this->suitesNotes = $suitesNotes;
+
+        return $this;
+    }
+
+    public function getTestsNotes(): ?string
+    {
+        return $this->testsNotes;
+    }
+
+    public function setTestsNotes(?string $testsNotes): self
+    {
+        $this->testsNotes = $testsNotes;
+
+        return $this;
+    }
+
+    public function getBugsNotes(): ?string
+    {
+        return $this->bugsNotes;
+    }
+
+    public function setBugsNotes(?string $bugsNotes): self
+    {
+        $this->bugsNotes = $bugsNotes;
 
         return $this;
     }

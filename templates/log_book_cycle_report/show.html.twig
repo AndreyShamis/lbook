@@ -74,6 +74,14 @@
 
 
 
+    <br/>
+    Report Notes:
+    {% apply markdown_to_html %}{{ log_book_cycle_report.reportNotes }}{% endapply %}
+    <br/>
+    <br/>
+    <br/>
+
+
     <table class="records_list table table-striped table-condensed font9">
         <thead>
         <tr>
@@ -83,7 +91,9 @@
             <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]">Tests</th>
             <th title="Pass">Pass</th>
             <th title="Pass Rate">Pass Rate</th>
-            <th title="Testing Level">TL</th>
+            <th title="Fail">Fail</th>
+            <th title="Fail Rate">Fail Rate</th>
+            <th title="Testing Level">Level</th>
             <th>Chip</th>
             <th>Platform</th>
             <th title="Build Flavor">BF</th>
@@ -91,7 +101,7 @@
             <th title="Test Environments">ENV</th>
             <th title="Suite Host Name">Host</th>
             <th title="Owners">Owners</th>
-            <th title="Closed : X= Closed; O= Open">X</th>
+{#            <th title="Closed : X= Closed; O= Open">X</th>#}
             <th title="JIRA KEY/Publish">JIRA</th>
         </tr>
         </thead>
@@ -129,6 +139,8 @@
                 <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
+                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</td>
+                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate }}%</td>
                 <td>{{ suite.testingLevel }}</td>
                 <td>{{ suite.chip }}</td>
                 <td>{{ suite.platform }}</td>
@@ -141,7 +153,7 @@
                     {% endif %}
                 </td>
                 <td>{{ suite.owners | join(', ') }}</td>
-                <td>{{ suite.closed ? 'X':'O' }}</td>
+{#                <td>{{ suite.closed ? 'X':'O' }}</td>#}
                 <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
             </tr>
         {% endfor %}
@@ -177,7 +189,20 @@
         </tr>
         </tfoot>
     </table>
+    <br/>
+    Suite Notes:
+    {% apply markdown_to_html %}{{ log_book_cycle_report.suitesNotes }}{% endapply %}
+    <br/>
+    <br/>
+    <br/>
 
+
+
+    <h5>Failed tests section</h5>
+    <div>Count {{ failed_tests | length }}</div>
+
+    <br/>
+    <br/>
     <a href="{{ path('log_book_cycle_report_index') }}">back to list</a>
 
     <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>

@@ -33,6 +33,7 @@ class LogBookCycleReportType extends AbstractType
 
         $builder
             ->add('name')
+            ->add('reportNotes')
 //            ->add('createdAt')
 //            ->add('updatedAt')
             ->add('description')

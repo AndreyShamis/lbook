@@ -76,25 +76,18 @@ class LogBookCycleReportController extends AbstractController
      */
     public function show(LogBookCycleReport $logBookCycleReport, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo): Response
     {
-        $suites = [];
         $failed_tests = [];
-        $cycles = new ArrayCollection();
-        try {
-            $cycles = $logBookCycleReport->getCycles();
-            $cycle = $cycles->first();
-            if ($cycle !== null) {
-                $suites = $cycle->getSuiteExecution();
-            }
-        } catch (\Throwable $ex) {}
+        $cycles = $logBookCycleReport->getCycles();
         $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
-
+        $suites = $logBookCycleReport->getSuites($suitesRepo);
         $qb = $testRepo->createQueryBuilder('t')
             ->where('t.cycle IN (:cycles)')
             ->andWhere('t.disabled = :disabled')
             ->andWhere('t.verdict != :verdictPass')
+            ->andWhere('t.suite_execution IN (:suite_executions)')
             ->orderBy('t.executionOrder', 'ASC')
             //->setParameter('cycle', $cycle->getId());
-            ->setParameters(['cycles'=> $cycles, 'disabled' => 0, 'verdictPass' => $verdictPass]);
+            ->setParameters(['cycles'=> $cycles, 'disabled' => 0, 'verdictPass' => $verdictPass, 'suite_executions' => $suites]);
         $tests = $qb->getQuery()->execute();
         /** @var LogBookTest $test */
         foreach ($tests as $test) {
@@ -116,8 +109,9 @@ class LogBookCycleReportController extends AbstractController
     {
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $reportNotes = $request->request->get('reportNotes');
+            $logBookCycleReport->setReportNotes($reportNotes);
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('log_book_cycle_report_index');

@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\LogBookCycle;
 use App\Entity\LogBookCycleReport;
 use App\Entity\StorageString;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,6 +23,12 @@ class LogBookCycleReportType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        try {
+            $cycles = $builder->getData()->getCycles();
+        } catch (\Throwable $ex) {
+
+        }
+
         $builder
             ->add('name')
 //            ->add('createdAt')
@@ -64,16 +72,7 @@ class LogBookCycleReportType extends AbstractType
 //                    'style' => 'width:400px;display: none;',
                     'class' => 'LogBookSelectableChipsType multiselect']
             ])
-            ->add('components', ChoiceType::class, [
-                'required' => false,
-                'choice_label' => 'name',
-                'choice_value' => 'name',
-                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
-                'multiple'=> true,
-                'attr' => [
-//                    'style' => 'width:400px;display: none;',
-                    'class' => 'LogBookSelectableChipsType multiselect']
-            ])
+
             ->add('mode', ChoiceType::class, [
                 'required' => false,
                 'label' => ' ',
@@ -90,9 +89,53 @@ class LogBookCycleReportType extends AbstractType
                     'class' => 'LogBookSelectablePackageModeType multiselect']
             ])
         ;
-//        if ($builder->getData()->getCycles()->count() < 1) {
-//            $builder->add('cycles');
-//        }
+        if ($cycles->count() < 1) {
+            $builder->add('cycles')
+                ->add('components', ChoiceType::class, [
+                    'required' => false,
+                    'choice_label' => 'name',
+                    'choice_value' => 'name',
+                    'choices' => $this->getComponentsFromCycles($cycles),
+                    'multiple'=> true,
+                    'attr' => [
+//                    'style' => 'width:400px;display: none;',
+                        'class' => 'LogBookSelectableChipsType multiselect']
+                ]);
+        } else {
+            $builder->add('components', ChoiceType::class, [
+                'required' => false,
+                'choice_label' => 'name',
+                'choice_value' => 'name',
+                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
+                'multiple'=> true,
+                'attr' => [
+//                    'style' => 'width:400px;display: none;',
+                    'class' => 'LogBookSelectableChipsType multiselect']
+            ]);
+        }
+    }
+
+    /**
+     * @param ArrayCollection $cycles
+     * @return array
+     */
+    protected function getComponentsFromCycles(ArrayCollection $cycles) {
+        $ret = [];
+        /** @var LogBookCycle $cycle */
+        foreach ($cycles as $cycle) {
+            $suites = $cycle->getSuiteExecution();
+            foreach ($suites as $suite) {
+                $comps = $suite->getComponents();
+                foreach ($comps as $comp) {
+                    if (!in_array($comp, $ret)) {
+                        $ret[] = $comp;
+                    }
+                }
+
+            }
+        }
+
+        return $ret;
     }
 
     public function configureOptions(OptionsResolver $resolver)

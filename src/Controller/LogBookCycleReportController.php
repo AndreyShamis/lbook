@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookCycleReport;
+use App\Entity\LogBookTest;
 use App\Entity\LogBookUser;
 use App\Form\LogBookCycleReportType;
 use App\Repository\LogBookCycleReportRepository;
+use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookVerdictRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,6 +47,7 @@ class LogBookCycleReportController extends AbstractController
             $logBookCycleReport->setCreator($user);
             if ($cycle !== null) {
                 $logBookCycleReport->addCycle($cycle);
+                $logBookCycleReport->setBuild($cycle->getBuild());
             }
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($logBookCycleReport);
@@ -63,19 +67,36 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookCycleReport $logBookCycleReport
      * @return Response
      */
-    public function show(LogBookCycleReport $logBookCycleReport): Response
+    public function show(LogBookCycleReport $logBookCycleReport, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts): Response
     {
         $suites = [];
+        $failed_tests = [];
         try {
             $cycle = $logBookCycleReport->getCycles()->first();
             if ($cycle !== null) {
                 $suites = $cycle->getSuiteExecution();
             }
         } catch (\Throwable $ex) {}
+        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 
+        $qb = $testRepo->createQueryBuilder('t')
+            ->where('t.cycle = :cycle')
+            ->andWhere('t.disabled = :disabled')
+            ->andWhere('t.verdict != :verdictPass')
+            ->orderBy('t.executionOrder', 'ASC')
+            //->setParameter('cycle', $cycle->getId());
+            ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0, 'verdictPass' => $verdictPass]);
+        $tests = $qb->getQuery()->execute();
+        /** @var LogBookTest $test */
+        foreach ($tests as $test) {
+            if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
+                $failed_tests[] = $test;
+            }
+        }
         return $this->render('log_book_cycle_report/show.html.twig', [
             'log_book_cycle_report' => $logBookCycleReport,
             'suites' => $suites,
+            'failed_tests' => $failed_tests,
         ]);
     }
 

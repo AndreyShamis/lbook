@@ -42,6 +42,14 @@
         </a>
         <b class="arrow"></b>
     </li>
+
+    <li class="{% if route starts with 'log_book_cycle_report_' %}active{% endif %}">
+        <a href="{{asset(path('log_book_cycle_report_index'))}}">
+            <i class="menu-icon fa fa-book"></i>
+            <span class="menu-text bigger-120" title="Reports"> Reports </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
     <li class="{% if route starts with 'log_book_build_' %}active{% endif %}">
         <a href="{{asset(path('log_book_build_index'))}}" >
             <i class="menu-icon fa fa-pencil-square-o"></i>

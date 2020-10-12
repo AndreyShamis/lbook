@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LogBookCycleReportRepository;
+use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -492,5 +494,12 @@ class LogBookCycleReport
 
         return $this;
     }
+
+
+    public function __toString()
+    {
+        return $this->getName() . ' - ' . $this->getId();
+    }
+
 
 }

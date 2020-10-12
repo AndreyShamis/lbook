@@ -3,106 +3,337 @@
 {% block content %}
     <h1>Cycle Report :: {{ log_book_cycle_report.id }}</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Name</th>
-                <td>{{ log_book_cycle_report.name }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>UpdatedAt</th>
-                <td>{{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ log_book_cycle_report.description }}</td>
-            </tr>
-            <tr>
-                <th>Period</th>
-                <td>{{ log_book_cycle_report.period }}</td>
-            </tr>
-            <tr>
-                <th>Duration</th>
-                <td>{{ log_book_cycle_report.duration }}</td>
-            </tr>
-            <tr>
-                <th>SuitesCount</th>
-                <td>{{ log_book_cycle_report.suitesCount }}</td>
-            </tr>
-            <tr>
-                <th>TestsPass</th>
-                <td>{{ log_book_cycle_report.testsPass }}</td>
-            </tr>
-            <tr>
-                <th>TestsFail</th>
-                <td>{{ log_book_cycle_report.testsFail }}</td>
-            </tr>
-            <tr>
-                <th>TestsError</th>
-                <td>{{ log_book_cycle_report.testsError }}</td>
-            </tr>
-            <tr>
-                <th>TestsOther</th>
-                <td>{{ log_book_cycle_report.testsOther }}</td>
-            </tr>
-            <tr>
-                <th>TestsTotal</th>
-                <td>{{ log_book_cycle_report.testsTotal }}</td>
-            </tr>
-            <tr>
-                <th>Platforms</th>
-                <td>{{ log_book_cycle_report.platforms  | join(',')}}</td>
-            </tr>
-            <tr>
-                <th>Chips</th>
-                <td>{{ log_book_cycle_report.chips | join(',') }}</td>
-            </tr>
-            <tr>
-                <th>Mode</th>
-                <td>{{ log_book_cycle_report.mode }}</td>
-            </tr>
-            <tr>
-                <th>Components</th>
-                <td>{{ log_book_cycle_report.components | join(',') }}</td>
-            </tr>
-        </tbody>
-    </table>
+<table style="width: 95%">
+    <tr>
+        <td style="width: 48%">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Name</th>
+                    <td><strong>{{ log_book_cycle_report.name }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ log_book_cycle_report.description }}</td>
+                </tr>
+                <tr>
+                    <th>Period</th>
+                    <td>{{ log_book_cycle_report.period }}</td>
+                </tr>
+                <tr>
+                    <th>Duration</th>
+                    <td>{{ log_book_cycle_report.duration }}</td>
+                </tr>
+                <tr>
+                    <th>SuitesCount</th>
+                    <td>{{ log_book_cycle_report.suitesCount }}</td>
+                </tr>
+                <tr>
+                    <th>Verdicts</th>
+                    <td>
+                        <table style="width: 100%;font-weight: bolder;">
+                            <tr>
+                                <td style="background-color: #ebf4f8;width: 24%;">Total</td>
+                                <td style="background-color: #82af6f;width: 19%;">Pass</td>
+                                <td style="background-color: #d15b47;width: 19%;">Fail</td>
+                                <td style="background-color: #f89406;width: 19%;">Error</td>
+                                <td style="background-color: #3a87ad;width: 19%;">Other</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: #ebf4f8;text-align: center;">{{ log_book_cycle_report.testsTotal }}</td>
+                                <td style="font-weight: bolder">{{ log_book_cycle_report.testsPass }}</td>
+                                <td>{{ log_book_cycle_report.testsFail }}</td>
+                                <td>{{ log_book_cycle_report.testsError }}</td>
+                                <td>{{ log_book_cycle_report.testsOther }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Platforms</th>
+                    <td>{{ log_book_cycle_report.platforms  | join(',')}}</td>
+                </tr>
+                <tr>
+                    <th>Chips</th>
+                    <td>{{ log_book_cycle_report.chips | join(',') }}</td>
+                </tr>
+                <tr>
+                    <th>Mode</th>
+                    <td>{{ log_book_cycle_report.mode }}</td>
+                </tr>
+                <tr>
+                    <th>Components</th>
+                    <td>{{ log_book_cycle_report.components | join(',') }}</td>
+                </tr>
+                <tr>
+                    <th>URL</th>
+                    <td>SELF_PATH &nbsp;&nbsp; Created:{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}
+                        &nbsp;&nbsp; Updated:
+                        {{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </td>
+        <td style="width: 48%"><div id="piechart_verdicts" style="width: 900px; height: 500px;"></div></td>
+    </tr>
+</table>
+{#    <div class="row">#}
+{#        <div class="space-6"></div>#}
+
+{#        <div class="col-sm-7 infobox-container">#}
+{#            <div class="infobox infobox-green">#}
+{#                <div class="infobox-icon">#}
+{#                    <i class="ace-icon fa-check-square-o"></i>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-data-number">{{ log_book_cycle_report.testsPass  + 10 }}</span>#}
+{#                    <div class="infobox-content">Pass</div>#}
+{#                </div>#}
+
+{#                <div class="stat stat-success">8%</div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-red">#}
+{#                <div class="infobox-icon">#}
+{#                    <i class="ace-icon fa fa-flask"></i>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-data-number">{{ log_book_cycle_report.testsFail  + 10 }}</span>#}
+{#                    <div class="infobox-content">Fail</div>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-blue">#}
+{#                <div class="infobox-icon">#}
+{#                    <i class="ace-icon fa fa-twitter"></i>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-data-number">11</span>#}
+{#                    <div class="infobox-content">new followers</div>#}
+{#                </div>#}
+
+{#                <div class="badge badge-success">#}
+{#                    +32%#}
+{#                    <i class="ace-icon fa fa-arrow-up"></i>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-pink">#}
+{#                <div class="infobox-icon">#}
+{#                    <i class="ace-icon fa fa-shopping-cart"></i>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-data-number">8</span>#}
+{#                    <div class="infobox-content">new orders</div>#}
+{#                </div>#}
+{#                <div class="stat stat-important">4%</div>#}
+{#            </div>#}
+
+
+
+{#            <div class="infobox infobox-orange2">#}
+{#                <div class="infobox-chart">#}
+{#                    <span class="sparkline" data-values="196,128,202,177,154,94,100,170,224"></span>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-data-number">6,251</span>#}
+{#                    <div class="infobox-content">pageviews</div>#}
+{#                </div>#}
+
+{#                <div class="badge badge-success">#}
+{#                    7.2%#}
+{#                    <i class="ace-icon fa fa-arrow-up"></i>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-blue2">#}
+{#                <div class="infobox-progress">#}
+{#                    <div class="easy-pie-chart percentage" data-percent="42" data-size="46">#}
+{#                        <span class="percent">42</span>%#}
+{#                    </div>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <span class="infobox-text">traffic used</span>#}
+
+{#                    <div class="infobox-content">#}
+{#                        <span class="bigger-110">~</span>#}
+{#                        58GB remaining#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="space-6"></div>#}
+
+{#            <div class="infobox infobox-green infobox-small infobox-dark">#}
+{#                <div class="infobox-progress">#}
+{#                    <div class="easy-pie-chart percentage" data-percent="61" data-size="39">#}
+{#                        <span class="percent">61</span>%#}
+{#                    </div>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <div class="infobox-content">Task</div>#}
+{#                    <div class="infobox-content">Completion</div>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-blue infobox-small infobox-dark">#}
+{#                <div class="infobox-chart">#}
+{#                    <span class="sparkline" data-values="3,4,2,3,4,4,2,2"></span>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <div class="infobox-content">Earnings</div>#}
+{#                    <div class="infobox-content">$32,000</div>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="infobox infobox-grey infobox-small infobox-dark">#}
+{#                <div class="infobox-icon">#}
+{#                    <i class="ace-icon fa fa-download"></i>#}
+{#                </div>#}
+
+{#                <div class="infobox-data">#}
+{#                    <div class="infobox-content">Downloads</div>#}
+{#                    <div class="infobox-content">1,205</div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+
+{#        <div class="vspace-12-sm"></div>#}
+
+{#        <div class="col-sm-5">#}
+{#            <div class="widget-box">#}
+{#                <div class="widget-header widget-header-flat widget-header-small">#}
+{#                    <h5 class="widget-title">#}
+{#                        <i class="ace-icon fa fa-signal"></i>#}
+{#                        Verdicts#}
+{#                    </h5>#}
+
+{#                    <div class="widget-toolbar no-border">#}
+{#                        <div class="inline dropdown-hover">#}
+{#                            <button class="btn btn-minier btn-primary">#}
+{#                                This Week#}
+{#                                <i class="ace-icon fa fa-angle-down icon-on-right bigger-110"></i>#}
+{#                            </button>#}
+
+{#                            <ul class="dropdown-menu dropdown-menu-right dropdown-125 dropdown-lighter dropdown-close dropdown-caret">#}
+{#                                <li class="active">#}
+{#                                    <a href="#" class="blue">#}
+{#                                        <i class="ace-icon fa fa-caret-right bigger-110">&nbsp;</i>#}
+{#                                        This Week#}
+{#                                    </a>#}
+{#                                </li>#}
+
+{#                                <li>#}
+{#                                    <a href="#">#}
+{#                                        <i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>#}
+{#                                        Last Week#}
+{#                                    </a>#}
+{#                                </li>#}
+
+{#                                <li>#}
+{#                                    <a href="#">#}
+{#                                        <i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>#}
+{#                                        This Month#}
+{#                                    </a>#}
+{#                                </li>#}
+
+{#                                <li>#}
+{#                                    <a href="#">#}
+{#                                        <i class="ace-icon fa fa-caret-right bigger-110 invisible">&nbsp;</i>#}
+{#                                        Last Month#}
+{#                                    </a>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+
+{#                <div class="widget-body">#}
+{#                    <div class="widget-main">#}
+{#                        <div id="piechart_verdicts" style="width: 900px; height: 500px;"></div>#}
+
+{#                        <div class="hr hr8 hr-double"></div>#}
+
+{#                        <div class="clearfix">#}
+{#                            <div class="grid3">#}
+{#															<span class="grey">#}
+{#																<i class="ace-icon fa fa-facebook-square fa-2x blue"></i>#}
+{#																&nbsp; likes#}
+{#															</span>#}
+{#                                <h4 class="bigger pull-right">1,255</h4>#}
+{#                            </div>#}
+
+{#                            <div class="grid3">#}
+{#															<span class="grey">#}
+{#																<i class="ace-icon fa fa-twitter-square fa-2x purple"></i>#}
+{#																&nbsp; tweets#}
+{#															</span>#}
+{#                                <h4 class="bigger pull-right">941</h4>#}
+{#                            </div>#}
+
+{#                            <div class="grid3">#}
+{#															<span class="grey">#}
+{#																<i class="ace-icon fa fa-pinterest-square fa-2x red"></i>#}
+{#																&nbsp; pins#}
+{#															</span>#}
+{#                                <h4 class="bigger pull-right">1,050</h4>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div><!-- /.widget-main -->#}
+{#                </div><!-- /.widget-body -->#}
+{#            </div><!-- /.widget-box -->#}
+{#        </div><!-- /.col -->#}
+{#    </div><!-- /.row -->#}
+
+    <div class="hr hr32 hr-dotted"></div>
 
 
 
     <br/>
-    Report Notes:
+    <h5>Report Notes:</h5>
     {% apply markdown_to_html %}{{ log_book_cycle_report.reportNotes }}{% endapply %}
     <br/>
     <br/>
+
+    <h5>Cycle Notes:</h5>
+    {% apply markdown_to_html %}{{ log_book_cycle_report.cyclesNotes }}{% endapply %}
+    <br/>
     <br/>
 
 
-    <table class="records_list table table-striped table-condensed font9">
+    <h4>Suites:</h4>Total suites count<strong>{{ suites | length }}</strong>
+    <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
-            <th>ID</th>
-{#            <th title="Name/UUID">Name</th>#}
-            <th>Summary</th>
+            <th class="print-disable">ID</th>
+            <th title="Name/UUID">Name</th>
+{#            <th>Summary</th>#}
             <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]">Tests</th>
             <th title="Pass">Pass</th>
             <th title="Pass Rate">Pass Rate</th>
             <th title="Fail">Fail</th>
             <th title="Fail Rate">Fail Rate</th>
             <th title="Testing Level">Level</th>
-            <th>Chip</th>
             <th>Platform</th>
+            <th>Chip</th>
             <th title="Build Flavor">BF</th>
-            <th>Component</th>
-            <th title="Test Environments">ENV</th>
+{#            <th title="Test Environments">ENV</th>#}
             <th title="Suite Host Name">Host</th>
             <th title="Owners">Owners</th>
-{#            <th title="Closed : X= Closed; O= Open">X</th>#}
-            <th title="JIRA KEY/Publish">JIRA</th>
+            <th>Component</th>
+
+            {#            <th title="Closed : X= Closed; O= Open">X</th>#}
+{#            <th title="JIRA KEY/Publish">JIRA</th>#}
         </tr>
         </thead>
         <tbody>
@@ -113,7 +344,7 @@
         {% set tests_pass = 0 %}
         {% set suite_progress = 0 %}
         {% set suite_done = 0 %}
-        {% for suite in suites | slice(0, 200) %}
+        {% for suite in suites | slice(0, 2000) %}
             {% set suite_css = '' %}
             {% set tests_enabled = tests_enabled + suite.testsCountEnabled %}
             {% set tests_disabled = tests_disabled + suite.testsCountDisabled  %}
@@ -133,28 +364,29 @@
                 {% endif %}
             {% endif %}
             <tr class="{{ suite_css }}">
-                <td><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.id }}</a></td>
-{#                <td title="{{ suite.uuid }}" ondblclick="set_filter(this)">{{ suite.name }}</td>#}
-                <td><a href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.summary }}</a></td>
+                <td class="print-disable"><a href="{{ path('suite_show', {'id': suite.id}) }}" target="_blank">{{ suite.id }}</a></td>
+                <td title="{{ suite.uuid }}"><a href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
+{#                <td><a title="{{ suite.uuid }}" href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.summary }}</a></td>#}
                 <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
                 <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</td>
                 <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate }}%</td>
                 <td>{{ suite.testingLevel }}</td>
-                <td>{{ suite.chip }}</td>
                 <td>{{ suite.platform }}</td>
+                <td>{{ suite.chip }}</td>
                 <td>{{ suite.buildType }}</td>
-                <td>{{ suite.components |join(', ')}}</td>
-                <td>{{ suite.testEnvironments |join(', ')}}</td>
+{#                <td>{{ suite.testEnvironments |join(', ')}}</td>#}
                 <td>
                     {% if suite.host and suite.host.ip is defined %}
                         <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
                     {% endif %}
                 </td>
                 <td>{{ suite.owners | join(', ') }}</td>
-{#                <td>{{ suite.closed ? 'X':'O' }}</td>#}
-                <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>
+                <td>{{ suite.components |join(', ')}}</td>
+
+                {#                <td>{{ suite.closed ? 'X':'O' }}</td>#}
+{#                <td>{% if suite.jiraKey | length < 3 %}{{ suite.publish }}{% else %}<a href="{{ jira_test_set_url }}" class="font8" target="_blank">{{ suite.jiraKey }}</a>{% endif %}</td>#}
             </tr>
         {% endfor %}
         </tbody>
@@ -165,7 +397,7 @@
 {#                    {{ log_book_cycle_report.suitesCount }}#}
                 </strong>
             </th>
-            <th></th>
+            <th class="print-disable"></th>
             <th></th>
             <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>
             <th>{{ tests_pass }}</th>
@@ -175,22 +407,16 @@
             <th></th>
             <th></th>
             <th></th>
-            <th></th>
             <th>Host</th>
+{#            <th></th>#}
             <th></th>
-            <th title="Suites Done/WIP">{{ suite_done }}/
-                {% if suite_progress > 0 %}
-                    <strong>{{ suite_progress }}</strong>
-                {% else %}
-                    {{ suite_progress }}
-                {% endif %}
-            </th>
             <th></th>
+            {#            <th></th>#}
         </tr>
         </tfoot>
     </table>
     <br/>
-    Suite Notes:
+    <h5>Suite Notes:</h5>
     {% apply markdown_to_html %}{{ log_book_cycle_report.suitesNotes }}{% endapply %}
     <br/>
     <br/>
@@ -199,13 +425,53 @@
 
 
     <h5>Failed tests section</h5>
-    <div>Count {{ failed_tests | length }}</div>
-
+    <div>Count {{ testsNotPass | length }}</div>
+    {% include "lbook/cycle/tests_not_pass.html.twig" %}
     <br/>
+    <h5>Tests Notes:</h5>
+    {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
     <br/>
-    <a href="{{ path('log_book_cycle_report_index') }}">back to list</a>
 
-    <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
+    <h5>Bugs Notes:</h5>
+    {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
+    <br/>
+    <div class="print-disable">
+        <a href="{{ path('log_book_cycle_report_index') }}">back to list</a> &nbsp;&nbsp;&nbsp;&nbsp;
 
-    {{ include('log_book_cycle_report/_delete_form.html.twig') }}
+        <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
+        <br/>
+
+        {{ include('log_book_cycle_report/_delete_form.html.twig') }}
+        <br/>
+
+    </div>
+
+
+
+    <script>
+        $(document).ready(function() {
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawVerdictsChart);
+
+            function drawVerdictsChart() {
+
+                var data = google.visualization.arrayToDataTable([
+                    ['Verdict', 'Count'],
+                    ['PASS', {{ log_book_cycle_report.testsPass + 10  }}],
+                    ['FAIL',      {{ log_book_cycle_report.testsFail  + 10 }}],
+                    ['ERROR',  {{ log_book_cycle_report.testsError + 10  }}],
+                    ['OTHER', {{ log_book_cycle_report.testsOther + 10 }}]
+                ]);
+
+                var options = {
+                    title: 'Verdicts'
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('piechart_verdicts'));
+
+                chart.draw(data, options);
+            }
+
+        });
+    </script>
 {% endblock %}

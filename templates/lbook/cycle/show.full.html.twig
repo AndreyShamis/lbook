@@ -28,6 +28,19 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     Load all Tests ({{ testsCount }})
                 </button>
                 {% endif %}
+                {% if cycle.logBookCycleReports  | length == 0%}
+                    <button class="btn btn-white btn-info btn-bold" id="makeReport">
+                    <i class="ace-icon fa fa-book bigger-120 blue"></i>
+                    Make report
+                    </button>
+                        {% else %}
+                    <button class="btn btn-white btn-info btn-bold" id="showReport">
+                    <i class="ace-icon fa fa-book bigger-120 blue"></i>
+                    Show report
+                    </button>
+
+                {% endif %}
+
                 <button class="btn btn-white btn-info btn-bold" id="showIndicators">
                     <i class="ace-icon fa fa-briefcase bigger-120 blue"></i>
                     Indicator
@@ -618,6 +631,18 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             $( "#saveCycleAsArchive" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
             });
+
+
+            {% if cycle.logBookCycleReports  | length == 0 %}
+
+            $( "#makeReport" ).bind( "click", function() {
+                window.location.href = "{{ path('log_book_cycle_report_new_with_cycle', {'cycle': cycle.id }) }}";
+            });
+            {% else  %}
+            $( "#showReport" ).bind( "click", function() {
+                window.location.href = "{{ path('log_book_cycle_report_show', {'id': cycle.logBookCycleReports[0].id }) }}";
+            });
+            {% endif %}
             $( "#showIndicators" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id }) }}";
             });

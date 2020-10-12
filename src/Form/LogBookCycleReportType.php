@@ -5,7 +5,9 @@ namespace App\Form;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookCycleReport;
 use App\Entity\StorageString;
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\AbstractType;
@@ -33,7 +35,7 @@ class LogBookCycleReportType extends AbstractType
 
         $builder
             ->add('name')
-            ->add('reportNotes')
+//            ->add('reportNotes')
 //            ->add('createdAt')
 //            ->add('updatedAt')
             ->add('description')
@@ -148,10 +150,10 @@ class LogBookCycleReportType extends AbstractType
     }
 
     /**
-     * @param PersistentCollection $cycles
+     * @param PersistentCollection|ArrayCollection $cycles
      * @return array
      */
-    protected function getChipsFromCycles(PersistentCollection $cycles) {
+    protected function getChipsFromCycles(Collection $cycles) {
         $ret = [];
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
@@ -165,10 +167,10 @@ class LogBookCycleReportType extends AbstractType
     }
 
     /**
-     * @param PersistentCollection $cycles
+     * @param PersistentCollection|ArrayCollection $cycles
      * @return array
      */
-    protected function getPlatformsFromCycles(PersistentCollection $cycles) {
+    protected function getPlatformsFromCycles(Collection $cycles) {
         $ret = [];
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
@@ -182,10 +184,10 @@ class LogBookCycleReportType extends AbstractType
     }
 
     /**
-     * @param PersistentCollection $cycles
+     * @param PersistentCollection|ArrayCollection $cycles
      * @return array
      */
-    protected function getComponentsFromCycles(PersistentCollection $cycles) {
+    protected function getComponentsFromCycles(Collection $cycles) {
         $ret = [];
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {

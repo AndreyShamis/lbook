@@ -185,7 +185,15 @@
 {#                        <a class="blue" href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" title="Show">#}
 {#                            <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
 {#                        </a>#}
-
+                        {% if cycle.logBookCycleReports  | length == 0%}
+                        <a class="light-blue2" href="{{ path('log_book_cycle_report_new_with_cycle', { 'cycle': cycle.id }) }}" title="Make Report">
+                            <i class="ace-icon fa fa-book bigger-130"></i>
+                        </a>
+                        {% else %}
+                            <a class="light-green" href="{{ path('log_book_cycle_report_show', { 'id': cycle.logBookCycleReports[0].id }) }}" title="Show Report">
+                                <i class="ace-icon fa fa-book bigger-130"></i>
+                            </a>
+                        {% endif %}
                         <a class="light-blue2" href="{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id }) }}" title="Compare as Main Cycle">
                             <i class="ace-icon fa fa-eye bigger-130"></i>
                         </a>

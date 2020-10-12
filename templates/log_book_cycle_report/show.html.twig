@@ -457,14 +457,15 @@
 
                 var data = google.visualization.arrayToDataTable([
                     ['Verdict', 'Count'],
-                    ['PASS', {{ log_book_cycle_report.testsPass + 10  }}],
-                    ['FAIL',      {{ log_book_cycle_report.testsFail  + 10 }}],
-                    ['ERROR',  {{ log_book_cycle_report.testsError + 10  }}],
-                    ['OTHER', {{ log_book_cycle_report.testsOther + 10 }}]
+                    ['PASS', {{ log_book_cycle_report.testsPass }}],
+                    ['FAIL',      {{ log_book_cycle_report.testsFail }}],
+                    ['ERROR',  {{ log_book_cycle_report.testsError }}],
+                    ['OTHER', {{ log_book_cycle_report.testsOther }}]
                 ]);
 
                 var options = {
-                    title: 'Verdicts'
+                    title: 'Verdicts',
+                    colors: ['#0d9d58', '#db4437', '#f4b400', '#175c67', '#99a9e2']
                 };
 
                 var chart = new google.visualization.PieChart(document.getElementById('piechart_verdicts'));

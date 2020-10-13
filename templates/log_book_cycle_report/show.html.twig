@@ -24,6 +24,12 @@
                     <th>Duration</th>
                     <td>{{ log_book_cycle_report.duration }}</td>
                 </tr>
+                {% if log_book_cycle_report.cycles | length > 0%}
+                <tr>
+                    <th>Cycle</th>
+                    <td><a href="{{ path('cycle_show_first', { 'id': log_book_cycle_report.cycles[0].id }) }}">{{ log_book_cycle_report.cycles[0].name }}</a></td>
+                </tr>
+                {% endif %}
                 <tr>
                     <th>SuitesCount</th>
                     <td>{{ log_book_cycle_report.suitesCount }}</td>

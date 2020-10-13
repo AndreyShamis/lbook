@@ -39,6 +39,7 @@ class LogBookCycleReportType extends AbstractType
 //            ->add('createdAt')
 //            ->add('updatedAt')
             ->add('description')
+            ->add('extDefectsJql')
 //            ->add('period')
 //            ->add('duration')
 //            ->add('suitesCount')

@@ -182,10 +182,11 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookCycleReport $report
      * @param LogBookTestRepository $testRepo
      * @param LogBookVerdictRepository $verdicts
-     * @param SuiteExecutionRepository $suites
+     * @param SuiteExecutionRepository $suitesRepo
+     * @param LogBookDefectRepository $defectsRepo
      * @return Response
      */
-    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo): Response
+    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo): Response
     {
 //        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 //        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
@@ -247,16 +248,99 @@ class LogBookCycleReportController extends AbstractController
         $report->setPeriod($max_time->getTimestamp() - $min_time->getTimestamp());
         $report->setDuration($testsTimeSum);
 
+        try {
+            $jql = $report->getExtDefectsJql();
+            if(strlen(jql) > 10) {
+                $defects = $this->getIssues($report, $defectsRepo);
+                if (count($defects)){
+                    foreach ($defects as $defect){
+                        $report->addDefect($defect);
+                    }
+                    if ($report->getBugsNotes() === null || $report->getBugsNotes() === '') {
+
+                        $report->setBugsNotes('Attached ' . count($defects) . ' defects by ' . $jql);
+                    }
+                }
+            }
+
+        } catch (\Throwable $ex) {}
+
+
         $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
     /**
+     * @param LogBookCycleReport $report
+     * @param LogBookDefectRepository $defectsRepo
+     */
+    protected function getIssues(LogBookCycleReport $report, LogBookDefectRepository $defectsRepo): array
+    {
+        $ret = [];
+        try {
+            $jql = $report->getExtDefectsJql();
+            //$jql = 'project = TEST AND labels = monitoring  AND resolution = Unresolved AND issuetype = bug ORDER BY priority DESC';
+            try {
+                $V_FOUND = 'customfield_15482';
+                $issueService = new IssueService();
+
+                $jiraRet = $issueService->search($jql, 0 , 100);
+                if ($jiraRet->total) {
+                    $issues = $jiraRet->getIssues();
+                    /** @var Issue $issue */
+                    foreach ($issues as $issue) {
+                        if ($issue->fields->issuetype->name == 'Bug') {
+                            $versionFound = '';
+                            $status = $issue->fields->status->name; // NEW
+                            $reporter = $issue->fields->reporter->emailAddress;
+                            $key = $issue->key;
+                            $assignee = $issue->fields->assignee->emailAddress;
+                            $updated = '';
+                            try {
+                                $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+                            } catch (\Throwable $ex) {}
+                            $priority = $issue->fields->priority->name; // Medium, Critical
+                            $summary = $issue->fields->summary;
+                            $labels = $issue->fields->labels; // array
+                            $description = $issue->fields->description; //string
+                            if (array_key_exists($V_FOUND, $issue->fields->customFields)) {
+                                $versionFound = $issue->fields->customFields[$V_FOUND];
+                            }
+
+                            $defect = $defectsRepo->findOneOrCreate([
+                                    'name' => $summary,
+                                    'ext_id' => $key,
+                                    'description' => $description,
+                                    'labels' => $labels,
+                                    'statusString' => $status,
+                                    'extReporter' => $reporter,
+                                    'extAssignee' => $assignee,
+                                    'priority' => $priority,
+                                    'extVersionFound' => $versionFound,
+                                ]
+                                , true);
+                            $ret[] = $defect;
+                        }
+
+                    }
+
+                }
+
+            } catch (JiraException $e) {
+                print("Error Occured! " . $e->getMessage());
+                //$this->assertTrue(false, 'testSearch Failed : '.$e->getMessage());
+            }
+        } catch (JiraException $e) {
+            print("Error Occured! " . $e->getMessage());
+        }
+        return $ret;
+    }
+    /**
      * @Route("/jira/test", name="log_book_cycle_report_jira", methods={"GET","POST"})
-     * @param LogBookDefectRepository $deffectsRepo
+     * @param LogBookDefectRepository $defectsRepo
      * @throws \JsonMapper_Exception
      */
-    public function jira_test(LogBookDefectRepository $deffectsRepo)
+    public function jira_test(LogBookDefectRepository $defectsRepo)
     {
 
 

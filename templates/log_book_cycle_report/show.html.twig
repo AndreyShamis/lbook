@@ -29,6 +29,10 @@
                     <th>Cycle</th>
                     <td><a href="{{ path('cycle_show_first', { 'id': log_book_cycle_report.cycles[0].id }) }}">{{ log_book_cycle_report.cycles[0].name }}</a></td>
                 </tr>
+                <tr class="print-disable">
+                    <th>Setup</th>
+                    <td><a href="{{ path('setup_show_first', { 'id': log_book_cycle_report.cycles[0].setup.id }) }}">{{ log_book_cycle_report.cycles[0].setup.name }}</a></td>
+                </tr>
                 {% endif %}
                 <tr>
                     <th>SuitesCount</th>
@@ -438,18 +442,60 @@
     {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
     <br/>
 
+    <h5>Bugs section</h5>
+
+    <table class="records_list table table-striped table-condensed">
+        <thead>
+        <tr>
+            <th class="print-disable">ID</th>
+            <th title="">KEY</th>
+            <th title="Name">Name</th>
+            <th title="Version Found">Version</th>
+            <th title="">Priority</th>
+            <th title="">Status</th>
+            <th title="">Assignee</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for defect in log_book_cycle_report.defects | slice(0, 2000) %}
+
+            <tr>
+                <td class="print-disable"><a href="{{ path('log_book_defect_show', {'id': defect.id}) }}" target="_blank">{{ defect.id }}</a></td>
+                <td>{{ defect.extId }}</td>
+                <td>{{ defect.name }}</td>
+                <td>{{ defect.extVersionFound }}</td>
+                <td>{{ defect.priority }}</td>
+                <td>{{ defect.statusString }}</td>
+                <td>{{ defect.extAssignee }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+            <th class="print-disable"></th>
+        </tr>
+        </tfoot>
+    </table>
     <h5>Bugs Notes:</h5>
     {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
     <br/>
     <div class="print-disable">
         <a href="{{ path('log_book_cycle_report_index') }}">back to list</a> &nbsp;&nbsp;&nbsp;&nbsp;
-
+        {% if app.user.roles is defined and ('ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
         <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
         <br/>
 
         {{ include('log_book_cycle_report/_delete_form.html.twig') }}
         <br/>
-
+        {% endif %}
     </div>
 
 

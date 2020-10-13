@@ -147,6 +147,11 @@ class LogBookCycleReport
      */
     private $bugsNotes;
 
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    private $extDefectsJql;
+
 
     public function __construct()
     {
@@ -499,6 +504,18 @@ class LogBookCycleReport
     public function __toString()
     {
         return $this->getName() . ' - ' . $this->getId();
+    }
+
+    public function getExtDefectsJql(): ?string
+    {
+        return $this->extDefectsJql;
+    }
+
+    public function setExtDefectsJql(?string $extDefectsJql): self
+    {
+        $this->extDefectsJql = $extDefectsJql;
+
+        return $this;
     }
 
 

@@ -291,7 +291,7 @@ class LogBookCycleReportController extends AbstractController
 //            var_dump($issue->fields);
 
 
-            $jql = 'project = TEST AND labels = monitoring  AND resolution = Unresolved AND issuetype = bug ORDER BY priority DESC';
+            $jql = 'project = MESW AND labels = monitoring  AND resolution = Unresolved AND issuetype = bug ORDER BY priority DESC';
 
             try {
                 $V_FOUND = 'customfield_15482';
@@ -333,7 +333,7 @@ class LogBookCycleReportController extends AbstractController
                                 'priority' => $priority,
                                 'extVersionFound' => $versionFound,
                                 ]
-                            );
+                            , true);
                         }
 
                     }

@@ -84,6 +84,41 @@ class LogBookDefect
      */
     private $logBookCycleReports;
 
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $labels = [];
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $statusString;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $extReporter;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $extAssignee;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $extUpdatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $priority;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $extVersionFound;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -262,6 +297,90 @@ class LogBookDefect
             $this->logBookCycleReports->removeElement($logBookCycleReport);
             $logBookCycleReport->removeDefect($this);
         }
+
+        return $this;
+    }
+
+    public function getLabels(): ?array
+    {
+        return $this->labels;
+    }
+
+    public function setLabels(?array $labels): self
+    {
+        $this->labels = $labels;
+
+        return $this;
+    }
+
+    public function getStatusString(): ?string
+    {
+        return $this->statusString;
+    }
+
+    public function setStatusString(?string $statusString): self
+    {
+        $this->statusString = $statusString;
+
+        return $this;
+    }
+
+    public function getExtReporter(): ?string
+    {
+        return $this->extReporter;
+    }
+
+    public function setExtReporter(?string $extReporter): self
+    {
+        $this->extReporter = $extReporter;
+
+        return $this;
+    }
+
+    public function getExtAssignee(): ?string
+    {
+        return $this->extAssignee;
+    }
+
+    public function setExtAssignee(?string $extAssignee): self
+    {
+        $this->extAssignee = $extAssignee;
+
+        return $this;
+    }
+
+    public function getExtUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->extUpdatedAt;
+    }
+
+    public function setExtUpdatedAt(?\DateTimeInterface $extUpdatedAt): self
+    {
+        $this->extUpdatedAt = $extUpdatedAt;
+
+        return $this;
+    }
+
+    public function getPriority(): ?string
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(string $priority): self
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getExtVersionFound(): ?string
+    {
+        return $this->extVersionFound;
+    }
+
+    public function setExtVersionFound(?string $extVersionFound): self
+    {
+        $this->extVersionFound = $extVersionFound;
 
         return $this;
     }

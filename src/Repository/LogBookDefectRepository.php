@@ -19,6 +19,48 @@ class LogBookDefectRepository extends ServiceEntityRepository
         parent::__construct($registry, LogBookDefect::class);
     }
 
+
+    public function findOneOrCreate(array $criteria, bool $external): LogBookDefect
+    {
+
+        if (!$external) {
+            $entity = $this->findOneBy(
+                [
+                    'name' => $criteria['name'],
+                    'isExternal' => false,
+
+                ]
+            );
+
+        } else {
+            $entity = $this->findOneBy(
+                [
+                    'name' => $criteria['name'],
+                    'isExternal' => true,
+                    'ext_id' => $criteria['ext_id']
+                ]
+            );
+        }
+        if (null === $entity) {
+            $entity = new LogBookDefect();
+            $entity->setIsExternal($external);
+            if ($external) {
+                $entity->setName($criteria['name']); // summary
+                $entity->setExtId($criteria['ext_id']); // key
+                $entity->setDescription($criteria['description']);
+                $entity->setLabels($criteria['labels']);
+                $entity->setStatusString($criteria['statusString']);
+                $entity->setExtReporter($criteria['extReporter']);
+                $entity->setExtAssignee($criteria['extAssignee']);
+                $entity->setPriority($criteria['priority']);
+                $entity->setExtVersionFound($criteria['extVersionFound']);
+            }
+
+            $this->_em->persist($entity);
+            $this->_em->flush($entity);
+        }
+        return $entity;
+    }
     // /**
     //  * @return LogBookDefect[] Returns an array of LogBookDefect objects
     //  */

@@ -8,6 +8,7 @@ use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
 use App\Form\LogBookCycleReportType;
 use App\Repository\LogBookCycleReportRepository;
+use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
@@ -251,9 +252,11 @@ class LogBookCycleReportController extends AbstractController
     }
 
     /**
-     * @Route("/jira", name="log_book_cycle_report_jira", methods={"GET","POST"})
+     * @Route("/jira/test", name="log_book_cycle_report_jira", methods={"GET","POST"})
+     * @param LogBookDefectRepository $deffectsRepo
+     * @throws \JsonMapper_Exception
      */
-    public function jira_test()
+    public function jira_test(LogBookDefectRepository $deffectsRepo)
     {
 
 
@@ -295,33 +298,51 @@ class LogBookCycleReportController extends AbstractController
                 $issueService = new IssueService();
 
                 $ret = $issueService->search($jql, 0 , 100);
-                $issues = $ret->getIssues();
-                /** @var Issue $issue */
-                foreach ($issues as $issue) {
-                    if ($issue->fields->issuetype->name == 'Bug') {
-                        $labels = [];
-                        $status = $issue->fields->status->name; // NEW
-                        $reporter = $issue->fields->reporter->emailAddress;
-                        $key = $issue->key;
-                        $assignee = $issue->fields->assignee->emailAddress;
-                        try {
-                            $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
-                        } catch (\Throwable $ex) {
-                            $updated = '';
-                        }
-                        $priority = $issue->fields->priority->name; // Medium, Critical
-                        $summary = $issue->fields->summary;
-                        $labels = $issue->fields->labels; // array
-                        $description = $issue->fields->description; //string
-                        if (array_key_exists($V_FOUND, $issue->fields->customFields)) {
-                            $versionFound = $issue->fields->customFields[$V_FOUND];
-                        }
-                    }
+                if ($ret->total) {
+                    $issues = $ret->getIssues();
+                    /** @var Issue $issue */
+                    foreach ($issues as $issue) {
+                        if ($issue->fields->issuetype->name == 'Bug') {
+                            $labels = [];
+                            $versionFound = '';
+                            $status = $issue->fields->status->name; // NEW
+                            $reporter = $issue->fields->reporter->emailAddress;
+                            $key = $issue->key;
+                            $assignee = $issue->fields->assignee->emailAddress;
+                            try {
+                                $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+                            } catch (\Throwable $ex) {
+                                $updated = '';
+                            }
+                            $priority = $issue->fields->priority->name; // Medium, Critical
+                            $summary = $issue->fields->summary;
+                            $labels = $issue->fields->labels; // array
+                            $description = $issue->fields->description; //string
+                            if (array_key_exists($V_FOUND, $issue->fields->customFields)) {
+                                $versionFound = $issue->fields->customFields[$V_FOUND];
+                            }
 
+                            $defect = $deffectsRepo->findOneOrCreate([
+                                'name' => $summary,
+                                'ext_id' => $key,
+                                'description' => $description,
+                                'labels' => $labels,
+                                'statusString' => $status,
+                                'extReporter' => $reporter,
+                                'extAssignee' => $assignee,
+                                'priority' => $priority,
+                                'extVersionFound' => $versionFound,
+                                ]
+                            );
+                        }
+
+                    }
+                    var_dump($ret);
                 }
-                var_dump($ret);
+
             } catch (JiraException $e) {
-                $this->assertTrue(false, 'testSearch Failed : '.$e->getMessage());
+                print("Error Occured! " . $e->getMessage());
+                //$this->assertTrue(false, 'testSearch Failed : '.$e->getMessage());
             }
         } catch (JiraException $e) {
             print("Error Occured! " . $e->getMessage());

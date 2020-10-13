@@ -9,6 +9,7 @@
         "doctrine/doctrine-migrations-bundle": "2.1.2",
         "erusev/parsedown": "^1.7",
         "knplabs/knp-time-bundle": "^1.9",
+        "lesstif/php-jira-rest-client": "^2.4",
         "phpunit/php-invoker": "^2.0",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/asset": "^4.4",

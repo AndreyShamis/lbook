@@ -11,10 +11,13 @@ use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
+use JiraRestApi\Issue\Issue;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use JiraRestApi\Issue\IssueService;
+use JiraRestApi\JiraException;
 
 /**
  * @Route("/reports")
@@ -179,10 +182,9 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookTestRepository $testRepo
      * @param LogBookVerdictRepository $verdicts
      * @param SuiteExecutionRepository $suites
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @return Response
      */
-    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo)
+    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo): Response
     {
 //        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 //        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
@@ -246,5 +248,84 @@ class LogBookCycleReportController extends AbstractController
 
         $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
+    }
+
+    /**
+     * @Route("/jira", name="log_book_cycle_report_jira", methods={"GET","POST"})
+     */
+    public function jira_test()
+    {
+
+
+        try {
+//            $issueService = new IssueService();
+//
+//            $queryParam = [
+////                'fields' => [  // default: '*all'
+////                    'summary',
+////                    'comment',
+////                ],
+//                'expand' => [
+//                    'renderedFields',
+//                    'names',
+//                    'schema',
+//                    'transitions',
+//                    'operations',
+//                    'editmeta',
+//                    'changelog',
+//                ]
+//            ];
+//
+//            $issue = $issueService->get('MESW-164525', $queryParam);
+//            $status = $issue->fields->status->name; // NEW
+//            $reporter = $issue->fields->reporter->emailAddress;
+//            $key = $issue->key;
+//            $assignee = $issue->fields->assignee->emailAddress;
+//            $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+//            $priority = $issue->fields->priority->name; // Medium
+//            $summary = $issue->fields->summary;
+//
+//            var_dump($issue->fields);
+
+
+            $jql = 'project = TEST AND labels = monitoring  AND resolution = Unresolved AND issuetype = bug ORDER BY priority DESC';
+
+            try {
+                $V_FOUND = 'customfield_15482';
+                $issueService = new IssueService();
+
+                $ret = $issueService->search($jql, 0 , 100);
+                $issues = $ret->getIssues();
+                /** @var Issue $issue */
+                foreach ($issues as $issue) {
+                    if ($issue->fields->issuetype->name == 'Bug') {
+                        $labels = [];
+                        $status = $issue->fields->status->name; // NEW
+                        $reporter = $issue->fields->reporter->emailAddress;
+                        $key = $issue->key;
+                        $assignee = $issue->fields->assignee->emailAddress;
+                        try {
+                            $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+                        } catch (\Throwable $ex) {
+                            $updated = '';
+                        }
+                        $priority = $issue->fields->priority->name; // Medium, Critical
+                        $summary = $issue->fields->summary;
+                        $labels = $issue->fields->labels; // array
+                        $description = $issue->fields->description; //string
+                        if (array_key_exists($V_FOUND, $issue->fields->customFields)) {
+                            $versionFound = $issue->fields->customFields[$V_FOUND];
+                        }
+                    }
+
+                }
+                var_dump($ret);
+            } catch (JiraException $e) {
+                $this->assertTrue(false, 'testSearch Failed : '.$e->getMessage());
+            }
+        } catch (JiraException $e) {
+            print("Error Occured! " . $e->getMessage());
+        }
+        exit();
     }
 }

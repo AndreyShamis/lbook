@@ -1,0 +1,124 @@
+
+{% apply spaceless %}
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="reportsTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#reportsToolBar"
+           data-show-refresh="true"
+           data-key-events="true"
+           data-show-footer="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+        <thead>
+        <tr>
+{#            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>#}
+            <th data-sortable="true" data-switchable="false">ID</th>
+            <th data-sortable="true" title="Report" data-switchable="true" data-visible="true">---</th>
+            <th data-sorter="htmlSorter" data-sortable="true" title="Report Name" data-switchable="false" data-footer-formatter="totalFormatter">Report Name</th>
+            <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
+            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="true">CycleID</th>
+            <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
+            <th data-sortable="true" title="Suites count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Suites</th>
+            <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Tests</th>
+{#            <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>#}
+{#            <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>#}
+{#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
+{#            <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PassRate</th>#}
+{#            <th data-field="FailRate" data-sortable="true" data-sorter="dataPercentSorter" title="Fail Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">FR</th>#}
+{#            <th data-field="ErrorRate" data-sortable="true" data-sorter="dataPercentSorter" title="Error Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">ER</th>#}
+{#            <th data-field="OtherRate" data-sortable="true" data-sorter="dataPercentSorter" title="Other Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">OR</th>#}
+            <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
+            <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fail</th>
+            <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Error</th>
+            <th data-field="Other" data-sortable="true" title="Other Count[NA,etc]" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Other</th>
+            <th data-sortable="true" title="Platform" data-switchable="true">Platforms</th>
+            <th data-sortable="true" title="Chip" data-switchable="true">Chips</th>
+{#            <th data-sortable="true" title="Build Flavor" data-switchable="true">BF</th>#}
+{#            <th data-sortable="true" title="Job Name" data-switchable="true">JobName</th>#}
+{#            <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>#}
+            <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
+            <th data-sortable="true" title="Components" data-switchable="true">Components</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="true">Created</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="true">Updated</th>
+            <th data-sortable="true" title="" data-switchable="true" data-visible="true">Locked</th>
+            <th data-sortable="true" title="Owner" data-switchable="true" data-visible="true">Owner</th>
+{#            <th class="suite_list_options_column">Options</th>#}
+        </tr>
+        </thead>
+        <tbody class="searchable">
+
+        {% set report_closed = 0 %}
+
+        {% set reportCount = iterator|length  %}
+        {% for report in iterator | slice(0, 50000)%}
+            {% set report_css = '' %}
+            {% if not report.isLocked %}
+                {% set report_css = ' report_wip ' %}
+            {% endif %}
+            <tr class="{{ report_css }}">
+{#                <td class="font6" title="Updated {{ report.updatedAt|time_diff }}">#}
+{#                    {% if date(report.updatedAt) > date('-5 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>#}
+{#                    {% elseif date(report.updatedAt) > date('-30 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>#}
+{#                    {% elseif date(report.updatedAt) > date('-60 minutes') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>#}
+{#                    {% elseif date(report.updatedAt) > date('-12 hours') %}#}
+{#                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>#}
+{#                    {% endif %}#}
+{#                </td>#}
+                <td class="font7">{{ report.id }}</td>
+                <td class="font8">{{ report.id }}</td>
+                <td><a title="{{ report.description }}" href="{{ path('log_book_cycle_report_show', { 'id': report.id }) }}">{{ report.name }}</a></td>
+                <td class="font9">{{ report.build }}</td>
+                <td class="font10">{{ report.build }}</td>
+                <td class="font9">
+                    {% if report.cycles[0].id is defined and report.cycles[0].name is defined %}
+                        <a href="{{ path('cycle_show_first', { 'id': report.cycles[0].id }) }}">{{ report.cycles[0].name|default('!NOT_FOUND') }}</a>
+                    {% else %}
+                        NOT_FOUND
+                    {% endif %}
+                </td>
+                <td class="font9">{% if report.cycle.id is defined %}{{ report.cycle.id }}{% endif %}</td>
+                <td><span data-title="{{ report.period }}">{{ report.duration |  executionTimeGenericShort}}</span></td>
+                <td>{{ report.suitesCount }}</td>
+                <td>{{ report.testsTotal }}</td>
+{#                <td>{{ report.testsCountEnabled }}</td>#}
+{#                <td>{{ report.totalExecutedTests}}</td>#}
+{#                <td>{{ report.tests | length}}</td>#}
+{#                <td><span class="{{ passRateToColor(report.passRate) }}" data-percent="{{ report.passRate }}">{{ report.passRate }}%</span></td>#}
+{#                <td><span class="{{ passRateToColor(100 - report.failRate) }}" data-percent="{{ report.failRate }}">{{ report.failRate }}%</span></td>#}
+{#                <td><span class="{{ passRateToColor(100 - report.errorRate) }}" data-percent="{{ report.errorRate }}">{{ report.errorRate }}%</span></td>#}
+{#                <td><span class="{{ passRateToColor(100 - report.otherRate) }}" data-percent="{{ report.otherRate }}">{{ report.otherRate }}%</span></td>#}
+                <td class="passClass">{{ report.testsPass }}</td>
+                <td class="failClass">{{ report.testsFail }}</td>
+                <td class="errorClass">{{ report.testsError }}</td>
+                <td class="errorClass">{{ report.testsOther }}</td>
+                <td style="color: {{ stringToColor(report.platforms | join(' - ' ~ report.platforms | length)) }} !important;">{{ report.platforms | length }}</td>
+                <td style="color: {{ stringToColor(report.chips | join(',')) }} !important;">{{ report.chips | length }}</td>
+{#                <td class="font9">{{ report.buildType }}</td>#}
+{#                <td class="font9">{{ report.jobName }}</td>#}
+{#                <td class="font9">{{ report.branch }}</td>#}
+                <td class="font9">{{ report.mode | replace({'_mode': ''}) }}</td>
+                <td class="font9" title="{{ report.components | join('\n') }}">{{ report.components | length }}</td>
+                <td><span data-title="{{ report.createdAt|date('ymdHis') }}" title="Created at {{ report.createdAt|date('d/m/Y H:i:s') }}">{{ report.createdAt|time_diff}}</span></td>
+                <td><span class="font9" data-title="{{ report.updatedAt|date('ymdHis') }}">{{ report.updatedAt|date('Y/m/d H:i:s')}}</span></td>
+                <td class="font9">{{ report.locked ? 'Y':'WIP'  }}</td>
+                <td>{{ report.creator }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $(function(){
+
+        });
+
+</script>
+{% endapply %}

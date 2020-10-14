@@ -52,6 +52,9 @@ final class LogBookCommon
                 $totalProd *= intval($val);
             }
         }
+        if ($totalSum === 0) {
+            $totalSum = 1;
+        }
         return $totalSum - ($totalProd % $totalSum);
     }
 }

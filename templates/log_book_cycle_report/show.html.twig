@@ -1,83 +1,146 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LogBook Cycle Report{% endblock %}
 {% block content %}
-    <h1>Cycle Report :: {{ log_book_cycle_report.id }}</h1>
 
-<table style="width: 95%">
+<table style="width: 100%;">
     <tr>
-        <td style="width: 48%">
-            <table class="table">
+        <td>
+            <h3>Report:{{ log_book_cycle_report.id }}</h3>
+        </td>
+        <td style="width: 10%;">
+            <div class="print-disable">
+            {% if app.user.roles is defined and ('ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
+                {% if not log_book_cycle_report.locked %}
+                    <button id="lockReport" class="btn btn-app btn-yellow btn-sm"><i class="ace-icon fa fa-lock bigger-160"></i>Lock</button>
+                {% else %}
+                    <button id="unLockReport" class="btn btn-app btn-light btn-sm"><i class="ace-icon fa fa-unlock bigger-160"></i>Unlock</button>
+                {% endif %}
+            {% endif %}
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table style="width: 100%">
+    <tr>
+        <td style="width: 70%">
+            <table class="table" style="width: 100%;">
                 <tbody>
                 <tr>
                     <th>Name</th>
-                    <td><strong>{{ log_book_cycle_report.name }}</strong></td>
+                    <td class="align-center"><strong class="font32 orange">{{ log_book_cycle_report.name }}</strong></td>
                 </tr>
                 <tr>
                     <th>Description</th>
-                    <td>{{ log_book_cycle_report.description }}</td>
+                    <td class="font18">{{ log_book_cycle_report.description }}</td>
                 </tr>
-                <tr>
-                    <th>Period</th>
-                    <td>{{ log_book_cycle_report.period }}</td>
-                </tr>
-                <tr>
-                    <th>Duration</th>
-                    <td>{{ log_book_cycle_report.duration }}</td>
-                </tr>
+
                 {% if log_book_cycle_report.cycles | length > 0%}
                 <tr>
-                    <th>Cycle</th>
-                    <td><a href="{{ path('cycle_show_first', { 'id': log_book_cycle_report.cycles[0].id }) }}">{{ log_book_cycle_report.cycles[0].name }}</a></td>
+                    <th>Setup/Cycle</th>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%;"><a class="font16" href="{{ path('setup_show_first', { 'id': log_book_cycle_report.cycles[0].setup.id }) }}">{{ log_book_cycle_report.cycles[0].setup.name }}</a></td>
+                                <td><a class="font16" href="{{ path('cycle_show_first', { 'id': log_book_cycle_report.cycles[0].id }) }}">{{ log_book_cycle_report.cycles[0].name }}</a></td>
+                            </tr>
+                        </table>
                 </tr>
-                <tr class="print-disable">
-                    <th>Setup</th>
-                    <td><a href="{{ path('setup_show_first', { 'id': log_book_cycle_report.cycles[0].setup.id }) }}">{{ log_book_cycle_report.cycles[0].setup.name }}</a></td>
-                </tr>
+{#                <tr class="print-disable">#}
+{#                    <th></th>#}
+{#                    <td><a href="{{ path('setup_show_first', { 'id': log_book_cycle_report.cycles[0].setup.id }) }}">{{ log_book_cycle_report.cycles[0].setup.name }}</a></td>#}
+{#                </tr>#}
                 {% endif %}
                 <tr>
-                    <th>SuitesCount</th>
-                    <td>{{ log_book_cycle_report.suitesCount }}</td>
+                    <th>Suites</th>
+                    <td><span class="font38 green">{{ log_book_cycle_report.suitesCount }}</span></td>
+                </tr>
+                <tr>
+                    <th>Related Defects</th>
+                    <td><span class="font38 red2">{{ log_book_cycle_report.defects | length }}</span></td>
                 </tr>
                 <tr>
                     <th>Verdicts</th>
                     <td>
-                        <table style="width: 100%;font-weight: bolder;">
+{#                        <table style="width: 100%;font-weight: bolder;">#}
+{#                            <tr>#}
+{#                                <td style="background-color: #ebf4f8;width: 24%;">Total</td>#}
+{#                                <td style="background-color: #82af6f;width: 19%;">Pass</td>#}
+{#                                <td style="background-color: #d15b47;width: 19%;">Fail</td>#}
+{#                                <td style="background-color: #f89406;width: 19%;">Error</td>#}
+{#                                <td style="background-color: #3a87ad;width: 19%;">Other</td>#}
+{#                            </tr>#}
+{#                            <tr>#}
+{#                                <td>#}
+                                    <div class="center">
+                                        <span class="btn btn-app btn-app btn-light">
+                                            <span class="line-height-1 bigger-170 blue"> {{ log_book_cycle_report.testsTotal }} </span><br>
+                                            <span class="line-height-1 smaller-90"> Total </span>
+                                        </span>
+                                        <span class="btn btn-app btn-app btn-success radius-4">
+                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsPass }} </span><br>
+                                            <span class="line-height-1 smaller-90"> Pass </span>
+                                        </span>
+                                        <span class="btn btn-app btn-app btn-pink radius-4">
+                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsFail }} </span><br>
+                                            <span class="line-height-1 smaller-90"> Fail </span>
+                                        </span>
+                                        <span class="btn btn-app btn-app btn-yellow radius-4">
+                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsError }} </span><br>
+                                            <span class="line-height-1 smaller-90"> Error </span>
+                                        </span>
+                                        <span class="btn btn-app btn-app btn-primary no-hover radius-4">
+                                            <span class="line-height-1 bigger-170"> 55 </span><br>
+                                            <span class="line-height-1 smaller-90"> Other </span>
+										</span>
+                                    </div>
+{#                                </td>#}
+{#                                <td style="background-color: #ebf4f8;text-align: center;">#}
+{#                                    <span class="label label-xlg label-primary arrowed arrowed-right">{{ log_book_cycle_report.testsTotal }}</span>#}
+{#                                    </td>#}
+{#                                <td style="font-weight: bolder">{{ log_book_cycle_report.testsPass }}</td>#}
+{#                                <td>{{ log_book_cycle_report.testsFail }}</td>#}
+{#                                <td>{{ log_book_cycle_report.testsError }}</td>#}
+{#                                <td>{{ log_book_cycle_report.testsOther }}</td>#}
+{#                            </tr>#}
+{#                        </table>#}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Platforms</th>
+                    <td>
+{#                        <div class="right align-right">{{ log_book_cycle_report.platforms | length }}</div>#}
+                        {{ log_book_cycle_report.platforms|map((x) => '<span class="label label-success label-white label-xlg middle" style="color:' ~ stringToColor(x ~ log_book_cycle_report.platforms | length ~ (101.11 * (x | length)) ~ x) ~ '!important;">' ~ x ~ '</span>') | join(' ') | raw }}</td>
+                </tr>
+                <tr>
+                    <th>Chips</th>
+                    <td>
+                        {{ log_book_cycle_report.chips|map((x) => '<span class="label label-purple label-white middle" style="color:' ~ stringToColor(x ~ log_book_cycle_report.chips | length ~ x | length ~ x) ~ '!important;">' ~ x ~ '</span>') | join(' ') | raw }}</td>
+                </tr>
+                <tr>
+                    <th>Components</th>
+                    <td>
+                        {{ log_book_cycle_report.components|map((x) => '<span class="label label-info label-white middle" style="color:' ~ stringToColor(x ~ log_book_cycle_report.components | length ~ x | length ~ x) ~ '!important;">' ~ x ~ '</span>') | join(' ') | raw }}</td>
+                </tr>
+                <tr>
+                    <th>Mode</th>
+                    <td><span class="font28 brown">{{ log_book_cycle_report.mode }}</span></td>
+                </tr>
+                <tr>
+                    <th>Time</th>
+                    <td class="font14">
+                        <table style="width: 100%;">
                             <tr>
-                                <td style="background-color: #ebf4f8;width: 24%;">Total</td>
-                                <td style="background-color: #82af6f;width: 19%;">Pass</td>
-                                <td style="background-color: #d15b47;width: 19%;">Fail</td>
-                                <td style="background-color: #f89406;width: 19%;">Error</td>
-                                <td style="background-color: #3a87ad;width: 19%;">Other</td>
-                            </tr>
-                            <tr>
-                                <td style="background-color: #ebf4f8;text-align: center;">{{ log_book_cycle_report.testsTotal }}</td>
-                                <td style="font-weight: bolder">{{ log_book_cycle_report.testsPass }}</td>
-                                <td>{{ log_book_cycle_report.testsFail }}</td>
-                                <td>{{ log_book_cycle_report.testsError }}</td>
-                                <td>{{ log_book_cycle_report.testsOther }}</td>
+                                <td style="width: 50%;">Period : {{ log_book_cycle_report.period |  executionTimeGenericShort }}</td>
+                                <td style="width: 50%;">Duration {{ log_book_cycle_report.duration |  executionTimeGenericShort }}</td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr>
-                    <th>Platforms</th>
-                    <td>{{ log_book_cycle_report.platforms  | join(',')}}</td>
-                </tr>
-                <tr>
-                    <th>Chips</th>
-                    <td>{{ log_book_cycle_report.chips | join(',') }}</td>
-                </tr>
-                <tr>
-                    <th>Mode</th>
-                    <td>{{ log_book_cycle_report.mode }}</td>
-                </tr>
-                <tr>
-                    <th>Components</th>
-                    <td>{{ log_book_cycle_report.components | join(',') }}</td>
-                </tr>
-                <tr>
                     <th>URL</th>
-                    <td>SELF_PATH &nbsp;&nbsp; Created:{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}
+                    <td>{{ app.request.uri }}
+                        &nbsp;&nbsp; Created:{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}
                         &nbsp;&nbsp; Updated:
                         {{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}
                     </td>
@@ -86,7 +149,7 @@
             </table>
 
         </td>
-        <td style="width: 48%"><div id="piechart_verdicts" style="width: 900px; height: 500px;"></div></td>
+        <td style="width: 30%" ><div id="piechart_verdicts" style="width: 700px; height: 600px;" class="prettyprint"></div></td>
     </tr>
 </table>
 {#    <div class="row">#}
@@ -307,19 +370,17 @@
 
     <div class="hr hr32 hr-dotted"></div>
 
+    <div class="well well-lg">
+        <h4 class="blue">Report Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.reportNotes }}{% endapply %}
+    </div>
+    <div class="hr hr32 hr-dotted"></div>
 
-
-    <br/>
-    <h5>Report Notes:</h5>
-    {% apply markdown_to_html %}{{ log_book_cycle_report.reportNotes }}{% endapply %}
-    <br/>
-    <br/>
-
-    <h5>Cycle Notes:</h5>
-    {% apply markdown_to_html %}{{ log_book_cycle_report.cyclesNotes }}{% endapply %}
-    <br/>
-    <br/>
-
+    <div class="well well-lg">
+        <h4 class="blue">Cycle Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.cyclesNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
 
     <h4>Suites:</h4>Total suites count<strong>{{ suites | length }}</strong>
     <table class="records_list table table-striped table-condensed">
@@ -426,24 +487,22 @@
         </tfoot>
     </table>
     <br/>
-    <h5>Suite Notes:</h5>
-    {% apply markdown_to_html %}{{ log_book_cycle_report.suitesNotes }}{% endapply %}
-    <br/>
-    <br/>
-    <br/>
+    <div class="well well-lg">
+        <h4 class="blue">Suite Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.suitesNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
 
 
-
-    <h5>Failed tests section</h5>
-    <div>Count {{ testsNotPass | length }}</div>
+    <h5>Failed tests count {{ failed_tests | length }}, tests Verdict != PASS == {{ testsNotPass | length }}</h5>
     {% include "lbook/cycle/tests_not_pass.html.twig" %}
-    <br/>
-    <h5>Tests Notes:</h5>
-    {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
-    <br/>
+    <div class="well well-lg">
+        <h4 class="blue">Tests Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
 
-    <h5>Bugs section</h5>
-
+    <h5>Defects section [Total : {{ log_book_cycle_report.defects | length }}]</h5>
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
@@ -457,12 +516,10 @@
         </tr>
         </thead>
         <tbody>
-
         {% for defect in log_book_cycle_report.defects | slice(0, 2000) %}
-
             <tr>
                 <td class="print-disable"><a href="{{ path('log_book_defect_show', {'id': defect.id}) }}" target="_blank">{{ defect.id }}</a></td>
-                <td>{{ defect.extId }}</td>
+                <td><a target="_blank" href="{{ jiraKeyToUrl(defect.extId) }}">{{ defect.extId }}</a></td>
                 <td>{{ defect.name }}</td>
                 <td>{{ defect.extVersionFound }}</td>
                 <td>{{ defect.priority }}</td>
@@ -484,24 +541,53 @@
         </tr>
         </tfoot>
     </table>
-    <h5>Bugs Notes:</h5>
-    {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
-    <br/>
+    <div class="well well-lg">
+        <h4 class="blue">Bugs Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
+
     <div class="print-disable">
         <a href="{{ path('log_book_cycle_report_index') }}">back to list</a> &nbsp;&nbsp;&nbsp;&nbsp;
         {% if app.user.roles is defined and ('ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
-        <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
-        <br/>
-
-        {{ include('log_book_cycle_report/_delete_form.html.twig') }}
-        <br/>
+            <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
+            <br/>
+            {{ include('log_book_cycle_report/_delete_form.html.twig') }}
+            <br/>
         {% endif %}
     </div>
 
-
-
     <script>
         $(document).ready(function() {
+
+
+            $( "#cycleEditForm form" ).css( "width", "800px" );
+            $( "#cycleEditForm input[type = 'text']" ).css( "width", "600px" );
+            $( "#cycleEditForm select" ).css( "width", "600px" );
+            $( "#cycleEditForm label" ).css( "width", "200px" );
+            {% if app.user.roles is defined and ('ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
+                {% if not log_book_cycle_report.locked %}
+                    $( "#lockReport" ).bind( "click", function() {
+                        var status = confirm("Are you sure about to lock the report[{{ log_book_cycle_report.name }}]?");
+                        if (status === true) {
+                            window.location.href = "{{ path('log_book_cycle_report_lock', { 'id': log_book_cycle_report.id }) }}";
+                        } else {
+                            return false;
+                        }
+                    });
+                {% else %}
+                    $( "#unLockReport" ).bind( "click", function() {
+                        var status = confirm("Are you sure about to Unlock the report[{{ log_book_cycle_report.name }}]?");
+                        if (status === true) {
+                            window.location.href = "{{ path('log_book_cycle_report_unlock', { 'id': log_book_cycle_report.id }) }}";
+                        } else {
+                            return false;
+                        }
+                    });
+                {% endif %}
+            {% endif %}
+
+
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawVerdictsChart);
 
@@ -527,4 +613,6 @@
 
         });
     </script>
+
+
 {% endblock %}

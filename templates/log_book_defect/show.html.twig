@@ -3,57 +3,97 @@
 {% block content %}
     <h4>Defect :: {{ log_book_defect.id }}</h4>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Name</th>
-                <td colspan="3">{{ log_book_defect.name }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td colspan="3">{% apply markdown_to_html %}{{ log_book_defect.description }}{% endapply %}</td>
-            </tr>
-{#            <tr>#}
-{#                <th>IsExternal</th>#}
-{#                <td>{{ log_book_defect.isExternal ? 'Yes' : 'No' }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>IsClosed</th>#}
-{#                <td>{{ log_book_defect.isClosed ? 'Yes' : 'No' }}</td>#}
-{#            </tr>#}
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ log_book_defect.createdAt ? log_book_defect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <th>UpdatedAt</th>
-                <td>{{ log_book_defect.updatedAt ? log_book_defect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            {% if log_book_defect.isClosed %}
-                <tr>
-                    <th>ClosedAt</th>
-                    <td colspan="3">{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
-                </tr>
-            {% endif %}
+    <table style="width: 100%;vertical-align: top;">
+        <tr>
+            <td style="width: 80%;">
 
-            <tr>
-                <th>Reporter</th>
-                <td colspan="3">{{ log_book_defect.reporter }}</td>
-            </tr>
+                <!------------------------------------------->
 
-            {% if log_book_defect.isExternal %}
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <td colspan="3">{{ log_book_defect.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td colspan="3">
+                            <div class="well">{% apply markdown_to_html %}{{ log_book_defect.description }}{% endapply %}</div>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>External ID</th>
-                    <td>{{ log_book_defect.extId }}</td>
-                    <th>AnotherReporter</th>
-                    <td>{{ log_book_defect.anotherReporter }}</td>
-                </tr>
-                <tr>
-                    <th>External URL</th>
-                    <td colspan="3"><a href="{{ log_book_defect.extUrl }}" target="_blank">{{ log_book_defect.extUrl }}</a></td>
-                </tr>
-            {% endif %}
-        </tbody>
+
+                    {% if log_book_defect.isClosed %}
+                        <tr>
+                            <th>ClosedAt</th>
+                            <td colspan="3">{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if log_book_defect.isExternal %}
+
+                        <tr>
+                            <th>External ID</th>
+                            <td colspan="3">{{ log_book_defect.extId }}</td>
+                        </tr>
+                        <tr>
+                            <th>External URL</th>
+                            <td colspan="3"><a href="{{ log_book_defect.extUrl }}" target="_blank">{{ log_book_defect.extUrl }}</a></td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+
+                <!------------------------------------------->
+
+            </td>
+            <td style="width: 5%;"></td>
+
+            <td style="width: 15%;vertical-align: top;">
+                <table style="width: 100%;vertical-align: top;">
+                    <tr>
+                        <th>Reporter</th>
+                        <td>
+                            <div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+                                <div class="inline position-relative">
+                                    {% if log_book_defect.reporter is not null %}
+                                        <span class="white">{{ log_book_defect.reporter }}</span>
+                                    {% elseif log_book_defect.extReporter is not null %}
+                                        <a class="btn btn-link" href="mailto:{{ log_book_defect.extReporter | lower }}">
+                                            <span class="white">{{ log_book_defect.extReporter }}</span></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Created</th>
+                        <td>{{ log_book_defect.createdAt ? log_book_defect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Updated</th>
+                        <td>{{ log_book_defect.updatedAt ? log_book_defect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    {% if log_book_defect.closedAt is not null %}
+                    <tr>
+                        <th>Closed</th>
+                        <td>{{ log_book_defect.updatedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>IsExternal</th>
+                        <td>{{ log_book_defect.isExternal ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                        <th>IsClosed</th>
+                        <td>{{ log_book_defect.isClosed ? 'Yes' : 'No' }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </table>
+    {% set iterator = log_book_defect.logBookCycleReports %}
+    {% include 'log_book_cycle_report/list.html.twig' %}
 
     <a href="{{ path('log_book_defect_index') }}">back to list</a>
 

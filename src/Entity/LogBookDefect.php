@@ -50,6 +50,13 @@ class LogBookDefect
     private $project;
 
     /**
+     * @ORM\ManyToMany(targetEntity=LogBookCycleReport::class, mappedBy="defects")
+     * @ORM\JoinTable(name="lbk_map_defects_reports")
+     * @ORM\OrderBy({"id" = "DESC"})
+     */
+    private $logBookCycleReports;
+
+    /**
      * @ORM\Column(type="datetime", options={"default"="CURRENT_TIMESTAMP"})
      */
     private $createdAt;
@@ -65,11 +72,6 @@ class LogBookDefect
     private $closedAt;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $anotherReporter;
-
-    /**
      * @ORM\Column(type="string", length=1500, nullable=true)
      */
     private $ext_url;
@@ -78,11 +80,6 @@ class LogBookDefect
      * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $ext_id;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=LogBookCycleReport::class, mappedBy="defects")
-     */
-    private $logBookCycleReports;
 
     /**
      * @ORM\Column(type="simple_array", nullable=true)
@@ -221,18 +218,6 @@ class LogBookDefect
     public function setProject(?LogBookProject $project): self
     {
         $this->project = $project;
-
-        return $this;
-    }
-
-    public function getAnotherReporter(): ?string
-    {
-        return $this->anotherReporter;
-    }
-
-    public function setAnotherReporter(?string $anotherReporter): self
-    {
-        $this->anotherReporter = $anotherReporter;
 
         return $this;
     }

@@ -152,6 +152,10 @@ class LogBookCycleReport
      */
     private $extDefectsJql;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default"="0"})
+     */
+    private $isLocked = false;
 
     public function __construct()
     {
@@ -500,12 +504,6 @@ class LogBookCycleReport
         return $this;
     }
 
-
-    public function __toString()
-    {
-        return $this->getName() . ' - ' . $this->getId();
-    }
-
     public function getExtDefectsJql(): ?string
     {
         return $this->extDefectsJql;
@@ -518,5 +516,24 @@ class LogBookCycleReport
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function isLocked(): bool
+    {
+        return $this->isLocked;
+    }
 
+    /**
+     * @param bool $isLocked
+     */
+    public function setIsLocked(bool $isLocked): void
+    {
+        $this->isLocked = $isLocked;
+    }
+
+    public function __toString()
+    {
+        return $this->getName() . ' - ' . $this->getId();
+    }
 }

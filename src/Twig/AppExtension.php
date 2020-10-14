@@ -30,6 +30,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('getPercentage', array($this, 'getPercentage')),
             new TwigFilter('testFilterTestToBr', array($this, 'testFilterTestToBr')),
             new TwigFilter('jiraKey', array($this, 'jiraKey')),
+            new TwigFilter('jiraKeyToUrl', array($this, 'jiraKeyToUrl')),
             new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
             new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
             new TwigFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
@@ -63,9 +64,18 @@ class AppExtension extends AbstractExtension
             new TwigFunction('parseDomain', array($this, 'parseDomain')),
             new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
             new TwigFunction('jiraKey', array($this, 'jiraKey')),
+            new TwigFunction('jiraKeyToUrl', array($this, 'jiraKeyToUrl')),
             new TwigFunction('testFilterTestToBr', array($this, 'testFilterTestToBr')),
 
         ];
+    }
+
+    public function jiraKeyToUrl($key)
+    {
+        try {
+            return getenv('JIRA_HOST') . '/browse/' . $key;
+        } catch (\Throwable $ex) {}
+        return '';
     }
 
     public function testFilterTestToBr(string $input=null, string $replace='<br/>'): string

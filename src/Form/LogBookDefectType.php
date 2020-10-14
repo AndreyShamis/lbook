@@ -15,11 +15,11 @@ class LogBookDefectType extends AbstractType
             ->add('name')
             ->add('description')
             ->add('isExternal')
-            ->add('anotherReporter')
+//            ->add('anotherReporter')
             ->add('ext_url')
             ->add('ext_id')
 //            ->add('reporter')
-            ->add('logBookCycleReports')
+//            ->add('logBookCycleReports')
         ;
     }
 

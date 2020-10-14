@@ -9,39 +9,35 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>IsExternal</th>
-                <th>IsClosed</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>ClosedAt</th>
-                <th>AnotherReporter</th>
-                <th>Ext_url</th>
-                <th>Ext_id</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Closed</th>
+                <th>External ID</th>
+                <th>External</th>
+                <th>Closed</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for log_book_defect in log_book_defects %}
             <tr>
-                <td>{{ log_book_defect.id }}</td>
-                <td>{{ log_book_defect.name }}</td>
-                <td>{{ log_book_defect.description }}</td>
+                <td><a href="{{ path('log_book_defect_show', {'id': log_book_defect.id}) }}">{{ log_book_defect.id }}</a></td>
+                <td><a href="{{ path('log_book_defect_show', {'id': log_book_defect.id}) }}">{{ log_book_defect.name }}</a></td>
+                <td title="{{ log_book_defect.description }}">{{ shortString(log_book_defect.description, 50, '..') }}</td>
+
+                <td>{{ log_book_defect.createdAt ? log_book_defect.createdAt|date('Y-m-d H:i') : '' }}</td>
+                <td>{{ log_book_defect.updatedAt ? log_book_defect.updatedAt|date('Y-m-d H:i') : '' }}</td>
+                <td>{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i') : '' }}</td>
+                <td>{% if log_book_defect.extId is not empty %}<a href="#">{{ log_book_defect.extId }}</a>{% endif %}</td>
                 <td>{{ log_book_defect.isExternal ? 'Yes' : 'No' }}</td>
                 <td>{{ log_book_defect.isClosed ? 'Yes' : 'No' }}</td>
-                <td>{{ log_book_defect.createdAt ? log_book_defect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ log_book_defect.updatedAt ? log_book_defect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ log_book_defect.closedAt ? log_book_defect.closedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ log_book_defect.anotherReporter }}</td>
-                <td>{{ log_book_defect.extUrl }}</td>
-                <td>{{ log_book_defect.extId }}</td>
                 <td>
-                    <a href="{{ path('log_book_defect_show', {'id': log_book_defect.id}) }}">show</a>
                     <a href="{{ path('log_book_defect_edit', {'id': log_book_defect.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="12">no records found</td>
+                <td colspan="11">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

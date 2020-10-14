@@ -108,6 +108,7 @@ class LogBookCycleReportController extends AbstractController
     public function show(LogBookCycleReport $logBookCycleReport, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo): Response
     {
         $failed_tests = [];
+        $issued_tests = [];
         $cycles = $logBookCycleReport->getCycles();
         $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
         $suites = $logBookCycleReport->getSuites($suitesRepo);
@@ -123,13 +124,18 @@ class LogBookCycleReportController extends AbstractController
         /** @var LogBookTest $test */
         foreach ($tests as $test) {
             if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
+                $issued_tests[] = $test;
+            }
+            if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() === 'FAIL') {
                 $failed_tests[] = $test;
             }
         }
+
         return $this->render('log_book_cycle_report/show.html.twig', [
             'log_book_cycle_report' => $logBookCycleReport,
             'suites' => $logBookCycleReport->getSuites($suitesRepo),
-            'testsNotPass' => $failed_tests,
+            'failed_tests' => $failed_tests,
+            'testsNotPass' => $issued_tests,
         ]);
     }
 
@@ -163,6 +169,32 @@ class LogBookCycleReportController extends AbstractController
     }
 
     /**
+     * @Route("/{id}/lock", name="log_book_cycle_report_lock", methods={"GET","POST"})
+     * @param Request $request
+     * @param LogBookCycleReport $report
+     * @return Response
+     */
+    public function lock(Request $request, LogBookCycleReport $report): Response
+    {
+        $report->setIsLocked(true);
+        $this->getDoctrine()->getManager()->flush();
+        return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
+    }
+
+    /**
+     * @Route("/{id}/inlock", name="log_book_cycle_report_unlock", methods={"GET","POST"})
+     * @param Request $request
+     * @param LogBookCycleReport $report
+     * @return Response
+     */
+    public function unlock(Request $request, LogBookCycleReport $report): Response
+    {
+        $report->setIsLocked(false);
+        $this->getDoctrine()->getManager()->flush();
+        return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
+    }
+
+    /**
      * @Route("/{id}", name="log_book_cycle_report_delete", methods={"DELETE"})
      */
     public function delete(Request $request, LogBookCycleReport $logBookCycleReport): Response
@@ -188,9 +220,10 @@ class LogBookCycleReportController extends AbstractController
      */
     public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo): Response
     {
-//        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
+        if (!$report->isLocked()) {
+            //        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 //        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
-        $suites = $report->getSuites($suitesRepo);
+            $suites = $report->getSuites($suitesRepo);
 //        $qb = $testRepo->createQueryBuilder('t')
 //            ->where('t.cycle IN (:cycles)')
 //            ->andWhere('t.disabled = :disabled')
@@ -201,72 +234,74 @@ class LogBookCycleReportController extends AbstractController
 //            ->setParameters(['cycles'=> $report->getCycles(), 'disabled' => 0, 'verdictPass' => $verdictPass, 'suite_executions' => $suites]);
 //        $tests_not_pass = $qb->getQuery()->execute();
 
-        $tests_total = $tests_pass = $tests_fail = $tests_error = $tests_other = 0;
-        /** @var SuiteExecution $suite */
-        foreach ($suites as $suite) {
-            $tests_pass += $suite->getPassCount();
-            $tests_fail += $suite->getFailCount();
-            $tests_error += $suite->getErrorCount();
-            $tests_other += $suite->getOtherCount();
-            $tests_total += $suite->getTotalExecutedTests();
-        }
-        $report->setTestsPass($tests_pass);
-        $report->setTestsFail($tests_fail);
-        $report->setTestsError($tests_error);
-        $report->setTestsOther($tests_other);
-        $report->setTestsTotal($tests_total);
-
-
-        $report->setSuitesCount(count($suites));
-        $report->setUpdatedAt(new \DateTime());
-        $qb = $testRepo->createQueryBuilder('t')
-            ->where('t.cycle IN (:cycles)')
-            ->andWhere('t.disabled = :disabled')
-            ->andWhere('t.suite_execution IN (:suite_executions)')
-            ->orderBy('t.executionOrder', 'ASC')
-            //->setParameter('cycle', $cycle->getId());
-            ->setParameters(['cycles'=> $report->getCycles(), 'disabled' => 0, 'suite_executions' => $suites]);
-        $tests_all = $qb->getQuery()->execute();
-
-        $testsTimeSum = 0;
-        $min_time = new \DateTime('+100 years');
-        $max_time = new \DateTime('-100 years');
-        $tests = $tests_all;
-        if (count($tests)) {
-            foreach ($tests as $test) {
-                /** @var LogBookTest $test */
-                $max_time = max($max_time, $test->getTimeEnd());
-                $min_time = min($min_time, $test->getTimeStart());
-                $testsTimeSum += $test->getTimeRun();
+            $tests_total = $tests_pass = $tests_fail = $tests_error = $tests_other = 0;
+            /** @var SuiteExecution $suite */
+            foreach ($suites as $suite) {
+                $tests_pass += $suite->getPassCount();
+                $tests_fail += $suite->getFailCount();
+                $tests_error += $suite->getErrorCount();
+                $tests_other += $suite->getOtherCount();
+                $tests_total += $suite->getTotalExecutedTests();
             }
-        } else {
-            $min_time = new \DateTime();
-            $max_time = new \DateTime();
-        }
-        //$this->setTimeStart($min_time);
-       //$this->setTimeEnd($max_time);
-        $report->setPeriod($max_time->getTimestamp() - $min_time->getTimestamp());
-        $report->setDuration($testsTimeSum);
+            $report->setTestsPass($tests_pass);
+            $report->setTestsFail($tests_fail);
+            $report->setTestsError($tests_error);
+            $report->setTestsOther($tests_other);
+            $report->setTestsTotal($tests_total);
 
-        try {
-            $jql = $report->getExtDefectsJql();
-            if(strlen(jql) > 10) {
-                $defects = $this->getIssues($report, $defectsRepo);
-                if (count($defects)){
-                    foreach ($defects as $defect){
-                        $report->addDefect($defect);
-                    }
-                    if ($report->getBugsNotes() === null || $report->getBugsNotes() === '') {
 
-                        $report->setBugsNotes('Attached ' . count($defects) . ' defects by ' . $jql);
+            $report->setSuitesCount(count($suites));
+            $report->setUpdatedAt(new \DateTime());
+            $qb = $testRepo->createQueryBuilder('t')
+                ->where('t.cycle IN (:cycles)')
+                ->andWhere('t.disabled = :disabled')
+                ->andWhere('t.suite_execution IN (:suite_executions)')
+                ->orderBy('t.executionOrder', 'ASC')
+                //->setParameter('cycle', $cycle->getId());
+                ->setParameters(['cycles'=> $report->getCycles(), 'disabled' => 0, 'suite_executions' => $suites]);
+            $tests_all = $qb->getQuery()->execute();
+
+            $testsTimeSum = 0;
+            $min_time = new \DateTime('+100 years');
+            $max_time = new \DateTime('-100 years');
+            $tests = $tests_all;
+            if (count($tests)) {
+                foreach ($tests as $test) {
+                    /** @var LogBookTest $test */
+                    $max_time = max($max_time, $test->getTimeEnd());
+                    $min_time = min($min_time, $test->getTimeStart());
+                    $testsTimeSum += $test->getTimeRun();
+                }
+            } else {
+                $min_time = new \DateTime();
+                $max_time = new \DateTime();
+            }
+            //$this->setTimeStart($min_time);
+            //$this->setTimeEnd($max_time);
+            $report->setPeriod($max_time->getTimestamp() - $min_time->getTimestamp());
+            $report->setDuration($testsTimeSum);
+
+            try {
+                $jql = $report->getExtDefectsJql();
+                if(strlen(jql) > 10) {
+                    $defects = $this->getIssues($report, $defectsRepo);
+                    if (count($defects)){
+                        foreach ($defects as $defect){
+                            $report->addDefect($defect);
+                        }
+                        if ($report->getBugsNotes() === null || $report->getBugsNotes() === '') {
+
+                            $report->setBugsNotes('Attached ' . count($defects) . ' defects by ' . $jql);
+                        }
                     }
                 }
-            }
 
-        } catch (\Throwable $ex) {}
+            } catch (\Throwable $ex) {}
 
 
-        $this->getDoctrine()->getManager()->flush();
+            $this->getDoctrine()->getManager()->flush();
+        }
+
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
@@ -335,6 +370,8 @@ class LogBookCycleReportController extends AbstractController
         }
         return $ret;
     }
+
+
     /**
      * @Route("/jira/test", name="log_book_cycle_report_jira", methods={"GET","POST"})
      * @param LogBookDefectRepository $defectsRepo
@@ -406,7 +443,7 @@ class LogBookCycleReportController extends AbstractController
                                 $versionFound = $issue->fields->customFields[$V_FOUND];
                             }
 
-                            $defect = $deffectsRepo->findOneOrCreate([
+                            $defect = $defectsRepo->findOneOrCreate([
                                 'name' => $summary,
                                 'ext_id' => $key,
                                 'description' => $description,

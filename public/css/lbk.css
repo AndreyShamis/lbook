@@ -224,6 +224,9 @@ button[class~="multiselect"]{
 .suite_wip{
     background-color: #fdfbca !important;
 }
+.report_wip{
+    background-color: #c5d0dc !important;
+}
 .suiteSelected{
     background-color: #b8fdb0 !important;
     font-weight: bold !important;

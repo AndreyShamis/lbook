@@ -31,6 +31,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('testFilterTestToBr', array($this, 'testFilterTestToBr')),
             new TwigFilter('jiraKey', array($this, 'jiraKey')),
             new TwigFilter('jiraKeyToUrl', array($this, 'jiraKeyToUrl')),
+            new TwigFilter('jiraLabelToUrl', array($this, 'jiraLabelToUrl')),
             new TwigFilter('cast_to_array', array($this, 'cast_to_array')),
             new TwigFilter('pre_print_r', array($this, 'pre_print_r'), array('is_safe' => array('html'))),
             new TwigFilter('md2html', array($this, 'markdownToHtml'), array('is_safe' => array('html'))),
@@ -65,11 +66,19 @@ class AppExtension extends AbstractExtension
             new TwigFunction('cleanAutotestFinalMessage', array($this, 'cleanAutotestFinalMessage')),
             new TwigFunction('jiraKey', array($this, 'jiraKey')),
             new TwigFunction('jiraKeyToUrl', array($this, 'jiraKeyToUrl')),
+            new TwigFunction('jiraLabelToUrl', array($this, 'jiraLabelToUrl')),
             new TwigFunction('testFilterTestToBr', array($this, 'testFilterTestToBr')),
 
         ];
     }
 
+    public function jiraLabelToUrl($label)
+    {
+        try {
+            return getenv('JIRA_HOST') . '/issues/?jql=labels%20%3D%20' . $label;
+        } catch (\Throwable $ex) {}
+        return '';
+    }
     public function jiraKeyToUrl($key)
     {
         try {

@@ -283,7 +283,7 @@ class LogBookCycleReportController extends AbstractController
 
             try {
                 $jql = $report->getExtDefectsJql();
-                if(strlen(jql) > 10) {
+                if(strlen($jql) > 10) {
                     $defects = $this->getIssues($report, $defectsRepo);
                     if (count($defects)){
                         foreach ($defects as $defect){

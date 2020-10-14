@@ -40,7 +40,7 @@
                             <td colspan="3"><a href="{{ jiraKeyToUrl(log_book_defect.extId) }}" target="_blank">{{ jiraKeyToUrl(log_book_defect.extId) }}</a></td>
                         </tr>
                         <tr>
-                            <th>Labels/th>
+                            <th>Labels</th>
                             <td colspan="3">
                                 {% for label in log_book_defect.labels  %}
                                 <a href="{{ jiraLabelToUrl(label) }}" target="_blank"><span class="label" style="background-color: {{ stringToColor(label) }}">{{ label }}</span></a>

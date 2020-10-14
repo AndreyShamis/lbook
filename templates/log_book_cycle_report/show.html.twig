@@ -139,10 +139,18 @@
                 </tr>
                 <tr>
                     <th>URL</th>
-                    <td>{{ app.request.uri }}
-                        &nbsp;&nbsp; Created:{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}
-                        &nbsp;&nbsp; Updated:
-                        {{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%;"><strong>{{ app.request.uri }}</strong></td>
+                                <td style="width: 50%;">
+                                    Created:{{ log_book_cycle_report.createdAt ? log_book_cycle_report.createdAt|date('Y-m-d H:i:s') : '' }}
+                                    &nbsp;&nbsp; Updated:
+                                    {{ log_book_cycle_report.updatedAt ? log_book_cycle_report.updatedAt|date('Y-m-d H:i:s') : '' }}
+                                </td>
+                            </tr>
+                        </table>
+
                     </td>
                 </tr>
                 </tbody>

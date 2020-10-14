@@ -19,17 +19,15 @@
         <th data-sortable="true" data-switchable="false">Suite Name</th>
         <th data-sortable="true" data-switchable="false">Suite BF</th>
         <th data-sortable="true" data-switchable="false">Suite UUID</th>
-
     </tr>
     </thead>
     <tbody class="searchable">
-    {#                            {% for testName in testNames | slice(0, 50000)%}#}
     {% for test in failed_tests | slice(0, 50000)%}
         <tr>
             <td><a target="_blank" href="{{ path('test_show_first', {'id': test.id}) }}">{{ test.name }}</a></td>
             <td><span  class="badge {{verdictToBadge(test.verdict)}}">{{ test.verdict }}</span></td>
             <td class="font14">{{ test.testType }}</td>
-            <td class="font10" title="{{ test.failDescription }}">{{ shortString(test.failDescription, 200, '') }}</td>
+            <td class="font10" title="{{ test.failDescription |replace({'"':"'"}) | raw }}">{{ shortString(test.failDescription, 150, '') }}</td>
 {#            <td class="font10">{{ test.cycle }}</td>#}
             <td class="font12">{{ test.suiteExecution.name }}</td>
             <td class="font14">{{ test.suiteExecution.buildType }}</td>

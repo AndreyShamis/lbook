@@ -501,15 +501,6 @@
     </div>
     <div class="hr hr20 hr-double"></div>
 
-
-    <h5>Failed tests count {{ failed_tests | length }}, tests Verdict != PASS == {{ testsNotPass | length }}</h5>
-    {% include "lbook/cycle/tests_not_pass.html.twig" %}
-    <div class="well well-lg">
-        <h4 class="blue">Tests Notes</h4>
-        {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
-    </div>
-    <div class="hr hr20 hr-double"></div>
-
     <h5>Defects section [Total : {{ log_book_cycle_report.defects | length }}]</h5>
     <table class="records_list table table-striped table-condensed">
         <thead>
@@ -554,6 +545,16 @@
         {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
     </div>
     <div class="hr hr20 hr-double"></div>
+
+    <h5>Failed tests count {{ failed_tests | length }}, tests Verdict != PASS == {{ testsNotPass | length }}</h5>
+    {% include "lbook/cycle/tests_not_pass.html.twig" %}
+    <div class="well well-lg">
+        <h4 class="blue">Tests Notes</h4>
+        {% apply markdown_to_html %}{{ log_book_cycle_report.testsNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
+
+
 
     <div class="print-disable">
         <a href="{{ path('log_book_cycle_report_index') }}">back to list</a> &nbsp;&nbsp;&nbsp;&nbsp;

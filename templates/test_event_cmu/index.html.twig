@@ -39,6 +39,7 @@
                 <th data-sortable="true" data-switchable="true">Suite</th>
                 <th data-sortable="true" data-switchable="true">Platform</th>
                 <th data-sortable="true" data-switchable="true">Chip</th>
+                <th data-sortable="true" data-switchable="true">Branch</th>
 {#                <th>A_value</th>#}
 {#                <th>B_value</th>#}
                 <th data-sortable="true" >A_time</th>
@@ -69,6 +70,7 @@
                 <td><a href="{{ path('cycle_suite_show_first', { 'cycle': test_event_cmu.test.suiteExecution.cycle.id, 'suite': test_event_cmu.test.suiteExecution.id }) }}">{{ test_event_cmu.test.suiteExecution }}</a></td>
                 <td>{{ test_event_cmu.test.suiteExecution.platform }}</td>
                 <td>{{ test_event_cmu.test.suiteExecution.chip }}</td>
+                <td>{{ test_event_cmu.test.suiteExecution.branch }}</td>
 {#                <td>{{ test_event_cmu.aValue }}</td>#}
 {#                <td>{{ test_event_cmu.bValue }}</td>#}
                 <td>{{ test_event_cmu.aTime }}</td>

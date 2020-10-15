@@ -604,6 +604,7 @@ class LogBookUploaderController extends AbstractController
             }
             $req_test_name = $request->request->get('test_name', '');
             $req_test_result = $request->request->get('test_result', '');
+            $fail_reason = $request->request->get('fail_reason', '');
             $cycle_name = $request->request->get('cycle', '');
             $setup_name = $request->request->get('setup', '');
 //            if ($setup_name === 'SST_SETUP_TEST') {
@@ -698,8 +699,10 @@ class LogBookUploaderController extends AbstractController
                     $req_test_result = 'FAIL';
                 } else if ($req_test_result === 'ERROR') {
                     $req_test_result = 'ERROR';
-                } else {
-                    $parseTestVerdict = true;
+                }
+                $ALLOWED_VERDICTS = ['PASS', 'ERROR', 'FAIL', 'TEST_NA', 'ABORT', 'UNKNOWN', 'WARNING'];
+                if ( in_array($req_test_result, $ALLOWED_VERDICTS) ) {
+                    $parseTestVerdict = false;
                 }
             }
             if ($continue) {
@@ -794,7 +797,10 @@ class LogBookUploaderController extends AbstractController
                 $dut = $this->targetRepo->findOneOrCreate(array('name' => $test_dut));
 
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
+                if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
+                    $test->setFailDescription($fail_reason);
 
+                }
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
                 $cycle->setDut($dut);

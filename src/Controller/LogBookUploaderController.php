@@ -702,7 +702,7 @@ class LogBookUploaderController extends AbstractController
                 }
                 $ALLOWED_VERDICTS = ['PASS', 'ERROR', 'FAIL', 'TEST_NA', 'ABORT', 'UNKNOWN', 'WARNING'];
                 if ( in_array($req_test_result, $ALLOWED_VERDICTS) ) {
-                    $parseTestVerdict = false;
+                    $parseTestVerdict = true;
                 }
             }
             if ($continue) {

@@ -603,7 +603,7 @@ class LogBookUploaderController extends AbstractController
                 $obj->setDebug(true);
             }
             $req_test_name = $request->request->get('test_name', '');
-            // $req_test_result = $request->request->get('test_result', '');
+            //$req_test_result = $request->request->get('test_result', '');
             $req_test_result = $request->request->get('testResult', '');
             $fail_reason = $request->request->get('fail_reason', '');
             $cycle_name = $request->request->get('cycle', '');
@@ -693,7 +693,6 @@ class LogBookUploaderController extends AbstractController
             $parseFileName = true;
             $parseTestVerdict = true;
             if ($req_test_result !== '') {
-                //$parseTestVerdict = false;
                 if ($req_test_result === 'PASSED') {
                     $req_test_result = 'PASS';
                 } else if ($req_test_result === 'FAILED') {
@@ -701,6 +700,7 @@ class LogBookUploaderController extends AbstractController
                 } else if ($req_test_result === 'ERROR') {
                     $req_test_result = 'ERROR';
                 }
+
                 $ALLOWED_VERDICTS = ['PASS', 'ERROR', 'FAIL', 'TEST_NA', 'ABORT', 'UNKNOWN', 'WARNING'];
                 if ( in_array($req_test_result, $ALLOWED_VERDICTS) ) {
                     $parseTestVerdict = false;
@@ -734,7 +734,7 @@ class LogBookUploaderController extends AbstractController
                     $testVerdictDefault = $this->parseVerdict($req_test_result);
 
                 } else {
-                    $testVerdictDefault = $this->parseVerdict('ERROR');
+                    $testVerdictDefault = $this->parseVerdict('UNKNOWN');
                 }
 
                 // the argument is the path of the directory where the locks are created
@@ -747,9 +747,9 @@ class LogBookUploaderController extends AbstractController
                 try {
                     $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
                     $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
-                    if (!$parseTestVerdict) {
-                        $test->setVerdict($testVerdictDefault);
-                    }
+                    //if (!$parseTestVerdict) {
+                    $test->setVerdict($testVerdictDefault);
+                    //}
                 } catch (Exception $ex) {
                     $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }
@@ -1448,14 +1448,17 @@ class LogBookUploaderController extends AbstractController
         //$test->setTestFileVersion($controlVersion);
         //$test->setTestVersion($testVersion);
 
-        /**
-         * Test Verdict section
-         */
-        if ($testVerdict !== null) {
-            $test->setVerdict($testVerdict);
-        } else {
-            $test->setVerdict($this->parseVerdict('ERROR'));
+        if ($search_test_verdict) {
+            /**
+             * Test Verdict section
+             */
+            if ($testVerdict !== null) {
+                $test->setVerdict($testVerdict);
+            } else {
+                $test->setVerdict($this->parseVerdict('ERROR'));
+            }
         }
+
         $test->setTimeStart($testStartTime);
         $test->setTimeEnd($testEndTime);
         if ($testName !== null && $testName !== '') {

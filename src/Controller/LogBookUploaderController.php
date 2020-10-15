@@ -603,7 +603,8 @@ class LogBookUploaderController extends AbstractController
                 $obj->setDebug(true);
             }
             $req_test_name = $request->request->get('test_name', '');
-            $req_test_result = $request->request->get('test_result', '');
+            // $req_test_result = $request->request->get('test_result', '');
+            $req_test_result = $request->request->get('testResult', '');
             $fail_reason = $request->request->get('fail_reason', '');
             $cycle_name = $request->request->get('cycle', '');
             $setup_name = $request->request->get('setup', '');
@@ -702,7 +703,7 @@ class LogBookUploaderController extends AbstractController
                 }
                 $ALLOWED_VERDICTS = ['PASS', 'ERROR', 'FAIL', 'TEST_NA', 'ABORT', 'UNKNOWN', 'WARNING'];
                 if ( in_array($req_test_result, $ALLOWED_VERDICTS) ) {
-                    $parseTestVerdict = true;
+                    $parseTestVerdict = false;
                 }
             }
             if ($continue) {

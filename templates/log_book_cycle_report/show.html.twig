@@ -30,12 +30,32 @@
                     <th>Name</th>
                     <td class="align-center"><strong class="font32 orange">{{ log_book_cycle_report.name }}</strong></td>
                 </tr>
+
                 <tr>
                     <th>Description</th>
-                    <td class="font18">{{ log_book_cycle_report.description }}</td>
+                    <td class="font16">{{ log_book_cycle_report.description }}</td>
                 </tr>
 
+                <tr>
+                    <th>Product Version</th>
+                    <td class="font16">{{ log_book_cycle_report.build }}</td>
+                </tr>
                 {% if log_book_cycle_report.cycles | length > 0%}
+
+                <tr>
+                    <th>Date</th>
+                    <td class="font18">{{ log_book_cycle_report.cycles[0].timeStart | date('Y-m-d H:i')}}</td>
+                </tr>
+                    {% if log_book_cycle_report.cycles[0].suiteExecution[0] is defined %}
+                        <tr>
+                            <th>Branch</th>
+                            <td class="font18">{{ log_book_cycle_report.cycles[0].suiteExecution[0].branch }}</td>
+                        </tr>
+                        <tr>
+                            <th>Level</th>
+                            <td class="font18">{{ log_book_cycle_report.cycles[0].suiteExecution[0].testingLevel }}</td>
+                        </tr>
+                    {% endif %}
                 <tr>
                     <th>Setup/Cycle</th>
                     <td>
@@ -51,14 +71,6 @@
 {#                    <td><a href="{{ path('setup_show_first', { 'id': log_book_cycle_report.cycles[0].setup.id }) }}">{{ log_book_cycle_report.cycles[0].setup.name }}</a></td>#}
 {#                </tr>#}
                 {% endif %}
-                <tr>
-                    <th>Suites</th>
-                    <td><span class="font38 green">{{ log_book_cycle_report.suitesCount }}</span></td>
-                </tr>
-                <tr>
-                    <th>Related Defects</th>
-                    <td><span class="font38 red2">{{ log_book_cycle_report.defects | length }}</span></td>
-                </tr>
                 <tr>
                     <th>Verdicts</th>
                     <td>
@@ -107,6 +119,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Mode</th>
+                    <td><span class="font28 brown">{{ log_book_cycle_report.mode }}</span></td>
+                </tr>
+                <tr>
                     <th>Platforms</th>
                     <td>
 {#                        <div class="right align-right">{{ log_book_cycle_report.platforms | length }}</div>#}
@@ -118,13 +134,17 @@
                         {{ log_book_cycle_report.chips|map((x) => '<span class="label label-purple label-white middle" style="color:' ~ stringToColor(x ~ log_book_cycle_report.chips | length ~ x | length ~ x) ~ '!important;">' ~ x ~ '</span>') | join(' ') | raw }}</td>
                 </tr>
                 <tr>
+                    <th>Suites</th>
+                    <td><span class="font38 green">{{ log_book_cycle_report.suitesCount }}</span></td>
+                </tr>
+                <tr>
+                    <th>Related Defects</th>
+                    <td><span class="font38 red2">{{ log_book_cycle_report.defects | length }}</span></td>
+                </tr>
+                <tr>
                     <th>Components</th>
                     <td>
                         {{ log_book_cycle_report.components|map((x) => '<span class="label label-info label-white middle" style="color:' ~ stringToColor(x ~ log_book_cycle_report.components | length ~ x | length ~ x) ~ '!important;">' ~ x ~ '</span>') | join(' ') | raw }}</td>
-                </tr>
-                <tr>
-                    <th>Mode</th>
-                    <td><span class="font28 brown">{{ log_book_cycle_report.mode }}</span></td>
                 </tr>
                 <tr>
                     <th>Time</th>

@@ -401,6 +401,56 @@ class LogBookSetupController extends AbstractController
 
     }
 
+
+    /**
+     * Lists all setup entities.
+     *
+     * @Route("/favorite/report", name="setup_favorite_report", methods={"GET"})
+     * @Route("/favorite/report/page/{page}", name="setup_favorite_report_page", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookSetupRepository $setupRepo
+     * @param int $page
+     * @return Response
+     */
+    public function favorite_report(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1): Response
+    {
+        $maxPages = $totalPosts = $thisPage = 0;
+        $iterator = [];
+        $paginator = [];
+        $paginator_size = $this->index_size;
+        try {
+
+            $user = $this->get('security.token_storage')->getToken()->getUser();
+            $paginator_size = 2000;
+            $query = $setupRepo->createQueryBuilder('setups')
+                ->where('setups.disabled = 0')
+                ->andWhere('setups.id IN (:user_setups)')
+                ->orderBy('setups.updatedAt', 'DESC')
+                ->addOrderBy('setups.id', 'DESC')
+                ->setParameter('user_setups', $user->getFavoriteSetups()->toArray());
+
+            $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
+            $totalPosts = $paginator->count();
+            $iterator = $paginator->getIterator();
+
+            $maxPages = ceil($totalPosts / $paginator_size);
+            $thisPage = $page;
+        } catch (\Throwable $ex) {
+            print($ex->getMessage());
+        }
+
+        return $this->render('lbook/setup/report.html.twig', [
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
+            'favorite' => true,
+            'cyclesCount' => 7
+        ]);
+
+    }
+
     /**
      * @Route("/add_favorite/{setup}", name="add_remove_setup_to_favorite", methods={"GET"})
      * @param LogBookSetup|null $setup

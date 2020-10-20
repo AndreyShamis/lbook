@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -109,12 +110,28 @@ class LogBookCycleReportType extends AbstractType
                 ])
             ;
         } else {
+
+            $componentsData = $this->reportSimpleArrayToForm($builder->getData()->getComponents());
+            if ($componentsData === null || $componentsData === []) {
+                $componentsData = $this->getComponentsFromCycles($cycles);
+            }
+            $platformData = $this->reportSimpleArrayToForm($builder->getData()->getPlatforms());
+            if ($platformData === null || $platformData === []) {
+                $platformData = $this->getPlatformsFromCycles($cycles);
+            }
+            $chipData = $this->reportSimpleArrayToForm($builder->getData()->getChips());
+            if ($chipData === null || $chipData === []) {
+                $chipData = $this->getChipsFromCycles($cycles);
+            }
             $builder->add('components', ChoiceType::class, [
                 'required' => false,
                 'choice_label' => 'name',
                 'choice_value' => 'name',
-                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
-                'data' => $this->getComponentsFromCycles($cycles),
+//                'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'components'),
+//                'data' => $this->getComponentsFromCycles($cycles),
+
+                'choices' => $this->getComponentsFromCycles($cycles),
+                'data' => $componentsData,
                 'empty_data' => $this->getComponentsFromCycles($cycles),
                 'multiple'=> true,
                 'attr' => [
@@ -125,8 +142,9 @@ class LogBookCycleReportType extends AbstractType
                     'required' => false,
                     'choice_label' => 'name',
                     'choice_value' => 'name',
-                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
-                    'data' => $this->getPlatformsFromCycles($cycles),
+//                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'platforms'),
+                    'choices' => $this->getPlatformsFromCycles($cycles),
+                    'data' => $platformData,
                     'empty_data' => $this->getPlatformsFromCycles($cycles),
                     'multiple'=> true,
                     'attr' => [
@@ -138,8 +156,9 @@ class LogBookCycleReportType extends AbstractType
                     'required' => false,
                     'choice_label' => 'name',
                     'choice_value' => 'name',
-                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
-                    'data' => $this->getChipsFromCycles($cycles),
+//                    'choices' => $this->entityManager->getRepository(StorageString::class)->findByKeys('lbk', 'suites', 'chips'),
+                    'choices' => $this->getChipsFromCycles($cycles),
+                    'data' => $chipData,
                     'empty_data' => $this->getChipsFromCycles($cycles),
                     'multiple'=> true,
                     'attr' => [
@@ -147,8 +166,45 @@ class LogBookCycleReportType extends AbstractType
                         'class' => 'LogBookSelectableChipsType multiselect']
                 ])
             ;
+
+
+            $nulTransformer = new CallbackTransformer(
+                function ($input)
+                {
+                    return $input;
+                },
+                function ($input)
+                {
+                    $ret = [];
+                    /**
+                     * Convert back input from User into Cycle object DateTime
+                     */
+                    foreach ($input as $i) {
+                        $ret[] = $i->name;
+                    }
+                    return $ret;
+                }
+            );
+            $builder->get('components')->addModelTransformer($nulTransformer);
+            $builder->get('chips')->addModelTransformer($nulTransformer);
+            $builder->get('platforms')->addModelTransformer($nulTransformer);
         }
     }
+
+    protected function reportSimpleArrayToForm(array $arr)
+    {
+        if ($arr === null) {
+            return null;
+        }
+        $ret = [];
+        foreach ($arr as $key => $val) {
+            //$ret[] = $val;
+            $ret[$val] = (object)['name' => $val];
+
+        }
+        return $ret;
+    }
+
 
     /**
      * @param PersistentCollection|ArrayCollection $cycles

@@ -12,6 +12,7 @@ use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
+use App\Service\PagePaginator;
 use JiraRestApi\Issue\Issue;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,11 +28,26 @@ class LogBookCycleReportController extends AbstractController
 {
     /**
      * @Route("/", name="log_book_cycle_report_index", methods={"GET"})
+     * @Route("/page/{page}", name="log_book_cycle_report_index_page", methods={"GET"})
      */
-    public function index(LogBookCycleReportRepository $logBookCycleReportRepository): Response
+    public function index(PagePaginator $pagePaginator, LogBookCycleReportRepository $logBookCycleReportRepository, int $page = 1): Response
     {
+        $paginator_size = 500;
+        $query = $logBookCycleReportRepository->createQueryBuilder('reports')
+            ->orderBy('reports.createdAt', 'DESC')
+            ->addOrderBy('reports.updatedAt', 'DESC');
+        $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+
+        $maxPages = ceil($totalPosts / $paginator_size);
+        $thisPage = $page;
         return $this->render('log_book_cycle_report/index.html.twig', [
-            'log_book_cycle_reports' => $logBookCycleReportRepository->findAll(),
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
         ]);
     }
 

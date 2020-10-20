@@ -11,17 +11,17 @@
            data-show-columns="true"
            data-advanced-search="true"
             {#data-id-table="advancedTable"#}
-           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+           data-page-size="50" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
         <tr>
 {#            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>#}
             <th data-sortable="true" data-switchable="false">ID</th>
-            <th data-sortable="true" title="Report" data-switchable="true" data-visible="true">---</th>
+{#            <th data-sortable="true" title="Report" data-switchable="true" data-visible="true">---</th>#}
             <th data-sorter="htmlSorter" data-sortable="true" title="Report Name" data-switchable="false" data-footer-formatter="totalFormatter">Report Name</th>
-            <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
-            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="true">CycleID</th>
+            <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
+{#            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>#}
+            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle Name</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">Cycle ID</th>
             <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
             <th data-sortable="true" title="Suites count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Suites</th>
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Tests</th>
@@ -72,11 +72,11 @@
 {#                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>#}
 {#                    {% endif %}#}
 {#                </td>#}
-                <td class="font7">{{ report.id }}</td>
-                <td class="font8">{{ report.id }}</td>
+                <td class="font11">{{ report.id }}</td>
+{#                <td class="font8">{{ report.id }}</td>#}
                 <td><a title="{{ report.description }}" href="{{ path('log_book_cycle_report_show', { 'id': report.id }) }}">{{ report.name }}</a></td>
-                <td class="font9">{{ report.build }}</td>
-                <td class="font10">{{ report.build }}</td>
+                <td class="font11">{{ report.build }}</td>
+{#                <td class="font10">wip</td>#}
                 <td class="font9">
                     {% if report.cycles[0].id is defined and report.cycles[0].name is defined %}
                         <a href="{{ path('cycle_show_first', { 'id': report.cycles[0].id }) }}">{{ report.cycles[0].name|default('!NOT_FOUND') }}</a>
@@ -84,7 +84,7 @@
                         NOT_FOUND
                     {% endif %}
                 </td>
-                <td class="font9">{% if report.cycle.id is defined %}{{ report.cycle.id }}{% endif %}</td>
+                <td class="font9">{% if report.cycles[0].id is defined %}{{ report.cycles[0].id }}{% endif %}</td>
                 <td><span data-title="{{ report.period }}">{{ report.duration |  executionTimeGenericShort}}</span></td>
                 <td>{{ report.suitesCount }}</td>
                 <td>{{ report.testsTotal }}</td>
@@ -99,13 +99,13 @@
                 <td class="failClass">{{ report.testsFail }}</td>
                 <td class="errorClass">{{ report.testsError }}</td>
                 <td class="errorClass">{{ report.testsOther }}</td>
-                <td style="color: {{ stringToColor(report.platforms | join(' - ' ~ report.platforms | length)) }} !important;">{{ report.platforms | length }}</td>
-                <td style="color: {{ stringToColor(report.chips | join(',')) }} !important;">{{ report.chips | length }}</td>
+                <td class="font12" style="color: {{ stringToColor(report.platforms | join(' - ' ~ report.platforms | length)) }} !important;"  title="{{ report.platforms | join('\n') }}">{{ report.platforms | length }}</td>
+                <td class="font12" style="color: {{ stringToColor(report.chips | join(',')) }} !important;"  title="{{ report.chips | join('\n') }}">{{ report.chips | length }}</td>
 {#                <td class="font9">{{ report.buildType }}</td>#}
 {#                <td class="font9">{{ report.jobName }}</td>#}
 {#                <td class="font9">{{ report.branch }}</td>#}
-                <td class="font9">{{ report.mode | replace({'_mode': ''}) }}</td>
-                <td class="font9" title="{{ report.components | join('\n') }}">{{ report.components | length }}</td>
+                <td class="font12">{{ report.mode | replace({'_mode': ''}) }}</td>
+                <td class="font12" title="{{ report.components | join('\n') }}">{{ report.components | length }}</td>
                 <td><span data-title="{{ report.createdAt|date('ymdHis') }}" title="Created at {{ report.createdAt|date('d/m/Y H:i:s') }}">{{ report.createdAt|time_diff}}</span></td>
                 <td><span class="font9" data-title="{{ report.updatedAt|date('ymdHis') }}">{{ report.updatedAt|date('Y/m/d H:i:s')}}</span></td>
                 <td class="font9">{{ report.locked ? 'Y':'WIP'  }}</td>

@@ -221,6 +221,7 @@ class LogBookCycleReportController extends AbstractController
     public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo): Response
     {
         if (!$report->isLocked()) {
+            $testsTotalEnabledInSuites = 0;
             //        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
 //        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
             $suites = $report->getSuites($suitesRepo);
@@ -242,12 +243,14 @@ class LogBookCycleReportController extends AbstractController
                 $tests_error += $suite->getErrorCount();
                 $tests_other += $suite->getOtherCount();
                 $tests_total += $suite->getTotalExecutedTests();
+                $testsTotalEnabledInSuites += $suite->getTestsCountEnabled();
             }
             $report->setTestsPass($tests_pass);
             $report->setTestsFail($tests_fail);
             $report->setTestsError($tests_error);
             $report->setTestsOther($tests_other);
             $report->setTestsTotal($tests_total);
+            $report->setTestsTotalEnabledInSuites($testsTotalEnabledInSuites);
 
 
             $report->setSuitesCount(count($suites));

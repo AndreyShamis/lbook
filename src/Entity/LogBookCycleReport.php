@@ -80,6 +80,11 @@ class LogBookCycleReport
     /**
      * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
      */
+    private $testsTotalEnabledInSuites = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
     private $testsPass = 0;
 
     /**
@@ -334,6 +339,22 @@ class LogBookCycleReport
         $this->suitesCount = $suitesCount;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestsTotalEnabledInSuites(): int
+    {
+        return $this->testsTotalEnabledInSuites;
+    }
+
+    /**
+     * @param int $testsTotalEnabledInSuites
+     */
+    public function setTestsTotalEnabledInSuites(int $testsTotalEnabledInSuites): void
+    {
+        $this->testsTotalEnabledInSuites = $testsTotalEnabledInSuites;
     }
 
     public function getTestsPass(): int

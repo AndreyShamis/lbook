@@ -107,6 +107,16 @@ class LogBookDefect
     private $extUpdatedAt;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $extCreatedAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $extClosedAt;
+
+    /**
      * @ORM\Column(type="string", length=20)
      */
     private $priority;
@@ -346,11 +356,47 @@ class LogBookDefect
         return $this;
     }
 
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getExtCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->extCreatedAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $extCreatedAt
+     */
+    public function setExtCreatedAt(?\DateTimeInterface $extCreatedAt): void
+    {
+        $this->extCreatedAt = $extCreatedAt;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getExtClosedAt(): ?\DateTimeInterface
+    {
+        return $this->extClosedAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $extClosedAt
+     */
+    public function setExtClosedAt(?\DateTimeInterface $extClosedAt): void
+    {
+        $this->extClosedAt = $extClosedAt;
+    }
+
     public function getPriority(): ?string
     {
         return $this->priority;
     }
 
+    /**
+     * @param string $priority
+     * @return $this
+     */
     public function setPriority(string $priority): self
     {
         $this->priority = $priority;
@@ -358,11 +404,18 @@ class LogBookDefect
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getExtVersionFound(): ?string
     {
         return $this->extVersionFound;
     }
 
+    /**
+     * @param string|null $extVersionFound
+     * @return $this
+     */
     public function setExtVersionFound(?string $extVersionFound): self
     {
         $this->extVersionFound = $extVersionFound;

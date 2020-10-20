@@ -330,9 +330,15 @@ class LogBookCycleReportController extends AbstractController
                             $reporter = $issue->fields->reporter->emailAddress;
                             $key = $issue->key;
                             $assignee = $issue->fields->assignee->emailAddress;
-                            $updated = '';
+                            $updated_fmt = null;
+                            $created_fmt = null;
                             try {
-                                $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+//                                $updated = $issue->fields->updated->date;  // 2020-06-14 19:46:34.000000
+//                                $format = 'Y-m-d H:i:s';
+//                                $updated_fmt_str = date($format, strtotime($updated));
+//                                $updated_fmt = \DateTime::createFromFormat($format, $updated_fmt_str);
+                                $updated_fmt = $issue->fields->updated;
+                                $created_fmt = $issue->fields->created;
                             } catch (\Throwable $ex) {}
                             $priority = $issue->fields->priority->name; // Medium, Critical
                             $summary = $issue->fields->summary;
@@ -352,8 +358,18 @@ class LogBookCycleReportController extends AbstractController
                                     'extAssignee' => $assignee,
                                     'priority' => $priority,
                                     'extVersionFound' => $versionFound,
+                                    'ExtUpdatedAt' => $updated_fmt,
+                                    'ExtCreatedAt' => $created_fmt,
                                 ]
                                 , true);
+                            if($updated_fmt !== null && $defect->getExtUpdatedAt()->getTimestamp() != $updated_fmt->getTimestamp()) {
+                                $defect->setExtUpdatedAt($updated_fmt);
+                                $defect->setUpdatedAt(new \DateTime());
+                            }
+                            if($created_fmt !== null && $defect->getExtCreatedAt()->getTimestamp() != $updated_fmt->$created_fmt()) {
+                                $defect->setExtCreatedAt($created_fmt);
+                                $defect->setUpdatedAt(new \DateTime());
+                            }
                             $ret[] = $defect;
                         }
 

@@ -529,9 +529,10 @@
             <th title="">KEY</th>
             <th title="Name">Name</th>
             <th title="Version Found">Version</th>
-            <th title="">Priority</th>
-            <th title="">Status</th>
-            <th title="">Assignee</th>
+            <th title="Priority">Priority</th>
+            <th title="Status">Status</th>
+            <th title="Assignee">Assignee</th>
+            <th title="">Updated</th>
         </tr>
         </thead>
         <tbody>
@@ -544,12 +545,14 @@
                 <td>{{ defect.priority }}</td>
                 <td>{{ defect.statusString }}</td>
                 <td>{{ defect.extAssignee }}</td>
+                <td title="{{ defect.extUpdatedAt | date('Y-m-d H:i') }}">{{ defect.extUpdatedAt | time_diff }}</td>
             </tr>
         {% endfor %}
         </tbody>
         <tfoot>
         <tr>
             <th></th>
+            <th class="print-disable"></th>
             <th class="print-disable"></th>
             <th class="print-disable"></th>
             <th class="print-disable"></th>

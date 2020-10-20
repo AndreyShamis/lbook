@@ -54,6 +54,8 @@ class LogBookDefectRepository extends ServiceEntityRepository
                 $entity->setExtAssignee($criteria['extAssignee']);
                 $entity->setPriority($criteria['priority']);
                 $entity->setExtVersionFound($criteria['extVersionFound']);
+                $entity->setExtUpdatedAt($criteria['ExtUpdatedAt']);
+                $entity->setExtCreatedAt($criteria['ExtCreatedAt']);
             }
 
             $this->_em->persist($entity);

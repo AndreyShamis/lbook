@@ -107,6 +107,16 @@ class LogBookDefect
     private $extUpdatedAt;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $extCreatedAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $extClosedAt;
+
+    /**
      * @ORM\Column(type="string", length=20)
      */
     private $priority;
@@ -344,6 +354,38 @@ class LogBookDefect
         $this->extUpdatedAt = $extUpdatedAt;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExtCreatedAt()
+    {
+        return $this->extCreatedAt;
+    }
+
+    /**
+     * @param mixed $extCreatedAt
+     */
+    public function setExtCreatedAt($extCreatedAt): void
+    {
+        $this->extCreatedAt = $extCreatedAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExtClosedAt()
+    {
+        return $this->extClosedAt;
+    }
+
+    /**
+     * @param mixed $extClosedAt
+     */
+    public function setExtClosedAt($extClosedAt): void
+    {
+        $this->extClosedAt = $extClosedAt;
     }
 
     public function getPriority(): ?string

@@ -532,7 +532,9 @@
             <th title="Priority">Priority</th>
             <th title="Status">Status</th>
             <th title="Assignee">Assignee</th>
-            <th title="">Updated</th>
+            <th title="Updated">Updated</th>
+{#            <th title="Created">Created</th>#}
+            <th class="print-disable" title="Age - represents number of weeks">Age</th>
         </tr>
         </thead>
         <tbody>
@@ -545,7 +547,16 @@
                 <td>{{ defect.priority }}</td>
                 <td>{{ defect.statusString }}</td>
                 <td>{{ defect.extAssignee }}</td>
-                <td title="{{ defect.extUpdatedAt | date('Y-m-d H:i') }}">{{ defect.extUpdatedAt | time_diff }}</td>
+                {% if defect.isExternal %}
+                    {% set updated = defect.extUpdatedAt %}
+                    {% set created = defect.extCreatedAt %}
+                {% else %}
+                    {% set updated = defect.updatedAt %}
+                    {% set created = defect.createdAt %}
+                {% endif %}
+                <td class="print-disable" title="{{ updated | date('Y-m-d H:i') }}">{{ updated | time_diff }}</td>
+{#                <td title="{{ created | date('Y-m-d H:i') }}">{{ created | time_diff }}</td>#}
+                <td class="print-disable">{{ defect.age }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -559,6 +570,8 @@
             <th class="print-disable"></th>
             <th class="print-disable"></th>
             <th class="print-disable"></th>
+            <th class="print-disable"></th>
+{#            <th class="print-disable"></th>#}
             <th class="print-disable"></th>
         </tr>
         </tfoot>

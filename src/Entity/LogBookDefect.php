@@ -232,6 +232,27 @@ class LogBookDefect
         return $this;
     }
 
+    public function getAge()
+    {
+        try {
+            if ($this->isExternal) {
+                $updated = $this->getUpdatedAt();
+                $created = $this->getCreatedAt();
+                if ($this->getExtUpdatedAt() !== null) {
+                    $updated = $this->getExtUpdatedAt();
+                }
+                if ($this->getExtCreatedAt() !== null) {
+                    $created = $this->getExtCreatedAt();
+                }
+                return round(($updated->getTimestamp()/60/60/24) - ($created->getTimestamp()/60/60/24), 0);
+            } else {
+                return $this->getUpdatedAt()->getTimestamp() - $this->getCreatedAt()->getTimestamp();
+            }
+        } catch (\Throwable $ex) {
+
+        }
+        return 0;
+    }
     public function getExtUrl(): ?string
     {
         return $this->ext_url;

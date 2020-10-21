@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\LogBookTestMDRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity(repositoryClass=LogBookTestMDRepository::class)
+ */
+class LogBookTestMD
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
+    private $id;
+
+    /**
+     * @var array
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $value;
+
+    /**
+     * @ORM\OneToOne(targetEntity=LogBookTest::class, inversedBy="newMetaData", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $test;
+
+    public function __construct()
+    {
+        $this->value = [];
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getValue(): array
+    {
+        return $this->value;
+    }
+
+    public function setValue(array $value): self
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function getTest(): LogBookTest
+    {
+        return $this->test;
+    }
+
+    public function setTest(LogBookTest $test): self
+    {
+        $this->test = $test;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return implode(';;', $this->getValue());
+    }
+}

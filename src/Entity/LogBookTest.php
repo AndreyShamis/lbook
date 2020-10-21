@@ -171,6 +171,11 @@ class LogBookTest
 
     protected $rate = 0;
 
+    /**
+     * @ORM\OneToOne(targetEntity=LogBookTestMD::class, mappedBy="test", cascade={"persist", "remove"})
+     */
+    private $newMetaData;
+
     public function setRate(float $r) {
         $this->rate = round($r, 2);
     }
@@ -873,6 +878,23 @@ class LogBookTest
     public function setTestType(?LogBookTestType $testType): self
     {
         $this->testType = $testType;
+
+        return $this;
+    }
+
+    public function getNewMetaData(): ?LogBookTestMD
+    {
+        return $this->newMetaData;
+    }
+
+    public function setNewMetaData(LogBookTestMD $newMetaData): self
+    {
+        $this->newMetaData = $newMetaData;
+
+        // set the owning side of the relation if necessary
+        if ($newMetaData->getTest() !== $this) {
+            $newMetaData->setTest($this);
+        }
 
         return $this;
     }

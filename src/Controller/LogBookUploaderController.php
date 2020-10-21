@@ -229,148 +229,6 @@ class LogBookUploaderController extends AbstractController
     }
 
     /**
-     * @Route("/suite_execution", name="add_new_suite_execution", methods={"GET|POST"})
-     * @param Request $request
-     * @param LoggerInterface $logger
-     * @param HostRepository $hosts
-     * @return Response
-     */
-    public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts): Response
-    {
-        $created = false;
-        $ip = $request->getClientIp();
-        $suiteExecution = null;
-        $data = json_decode($request->getContent(), true);
-        if ($data === null) {
-            $data = array();
-        }
-
-        try {
-            if (!array_key_exists('hostname', $data)) {
-                $data['hostname'] = '';
-            }
-            $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
-            unset($data['hostname']);
-            $data['host'] = $suiteHost;
-        } catch (\Throwable $ex) {
-            $logger->critical('SUITE_CREATE_FAIL in host:[' . $data['hostname'] . ':' . $ip . ']',
-                array(
-                    'ip' => $ip,
-                ));
-        }
-//        $logger->critical($ip . '::IP  :' , $data);
-
-        if (!array_key_exists('components', $data)) {
-            $data['components'] = array();
-        }
-        if (!array_key_exists('summary', $data)) {
-            $data['summary'] = '';
-        }
-        if (!array_key_exists('name', $data)) {
-            $data['name'] = '';
-        }
-        if (!array_key_exists('test_environments', $data)) {
-            $data['test_environments'] = array();
-        }
-        $data['components'] = array_filter($data['components']);
-        $data['test_environments'] = array_filter($data['test_environments']);
-        try {
-            $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
-            $created = true;
-            $logger->notice('NEW_SUITE:[' . $suiteExecution->getSummary() . ': Tests:' . $suiteExecution->getTestsCountEnabled() . ']',
-                array(
-                    'name' => $suiteExecution->getName(),
-                    'job_name' => $suiteExecution->getJobName(),
-                ));
-            try {
-                if ($suiteHost !== null) {
-                    $suiteHost->setLastSeenAt(new DateTime());
-                    try {
-                        if (array_key_exists('host_uptime', $data)) {
-                            $suiteHost->setUptime(DateTime::createFromFormat('U', $data['host_uptime']));
-                        }
-                    } catch (\Throwable $ex) {}
-
-                    try {
-                        if (array_key_exists('host_memory_total', $data)) {
-                            $suiteHost->setMemoryTotal($data['host_memory_total']);
-                        }
-                        if (array_key_exists('host_memory_free', $data)) {
-                            $suiteHost->setMemoryFree($data['host_memory_free']);
-                        }
-                    } catch (\Throwable $ex) {}
-
-                    try {
-                        if (array_key_exists('host_system', $data)) {
-                            $suiteHost->setSystem($data['host_system']);
-                        }
-                        if (array_key_exists('host_release', $data)) {
-                            $suiteHost->setSystemRelease($data['host_release']);
-                        }
-                        if (array_key_exists('host_version', $data)) {
-                            $suiteHost->setSystemVersion($data['host_version']);
-                        }
-                    } catch (\Throwable $ex) {}
-
-                    try {
-                        if (array_key_exists('host_cpu_count', $data)) {
-                            $suiteHost->setCpuCount($data['host_cpu_count']);
-                        }
-                        if (array_key_exists('host_cpu_usage', $data)) {
-                            $suiteHost->setCpuUsage($data['host_cpu_usage']);
-                        }
-                    } catch (\Throwable $ex) {}
-                    try {
-                        if (array_key_exists('host_user', $data)) {
-                            $suiteHost->setUserName($data['host_user']);
-                        }
-                        if (array_key_exists('host_python_version', $data)) {
-                            $suiteHost->setPythonVersion($data['host_python_version']);
-                        }
-                    } catch (\Throwable $ex) {}
-
-
-
-                    $suiteHost->setLastSuite($suiteExecution);
-                    $tarLab = '';
-                    try {
-                        $tarLab = $suiteExecution->getPlatform() . '::' . $suiteExecution->getChip();
-                    } catch (\Throwable $ex) {}
-                    $suiteHost->setTargetLabel($tarLab);
-                    $suiteHost->addTargetLabel($suiteExecution->getChip());
-                    $suiteHost->addTargetLabel($suiteExecution->getPlatform());
-                    $this->em->persist($suiteHost);
-                    $this->em->flush();
-                }
-            } catch (\Throwable $ex) {
-                $logger->critical('SUITE_HOST_UPDATE_FAILED:[' . $suiteHost->getName() . ':' . $suiteHost->getIp() . ']',
-                    array(
-                        'tarLab' => $tarLab,
-                        'PLATFORM' => $suiteExecution->getPlatform(),
-                        'CHIP' => $suiteExecution->getChip(),
-                        'SuiteName' => $suiteExecution->getName(),
-                        'SuiteSummary' => $suiteExecution->getSummary(),
-                    ));
-            }
-        } catch (\Throwable $e) {
-            $method = $request->getMethod();
-            $data['ip'] = $ip;
-            $data['method'] = $method;
-            $data['request'] = $request->request->all();
-            $data['query'] = $request->query->all();
-            $data['trace'] = $e->getTraceAsString();
-            $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
-            return new Response($e->getMessage());
-        }
-
-        return $this->render('lbook/suite/add_execution.html.twig', array(
-            'suiteExecution' => $suiteExecution,
-            'created' => $created
-        ));
-    }
-
-
-    /**
      * @Route("/create_suite_execution", name="add_new_suite_execution_json", methods={"GET|POST"})
      * @param Request $request
      * @param LoggerInterface $logger
@@ -378,7 +236,7 @@ class LogBookUploaderController extends AbstractController
      * @param TestFilterRepository $filtersRepo
      * @return JsonResponse
      */
-    public function createSuiteExecutionNew(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
+    public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
     {
         $created = false;
         $ip = $request->getClientIp();
@@ -437,10 +295,12 @@ class LogBookUploaderController extends AbstractController
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
-            $logger->notice('NEW_SUITE:[' . $suiteExecution->getSummary() . ': Tests:' . $suiteExecution->getTestsCountEnabled() . ']',
+            $logger->notice('NEW_SUITE:',
                 array(
                     'name' => $suiteExecution->getName(),
+                    'uuid' => $suiteExecution->getUuid(),
                     'job_name' => $suiteExecution->getJobName(),
+                    'test_count' => $suiteExecution->getTestsCountEnabled(),
                 ));
             try {
                 if ($suiteHost !== null) {
@@ -498,8 +358,6 @@ class LogBookUploaderController extends AbstractController
                     } catch (\Throwable $ex) {
                         $fin_res['DEBUG'][] = $ex->getMessage();
                     }
-
-
 
                     $suiteHost->setLastSuite($suiteExecution);
                     $tarLab = '';
@@ -889,21 +747,26 @@ class LogBookUploaderController extends AbstractController
             if ($orig_name === 'autoserv.DEBUG') {
                 $fileName = $this->generateUniqueFileName($this->RANDOM_FILE_NAME_LEN);
             } else {
-                $fileName = $this->generateUniqueFileName($this->RANDOM_FILE_NAME_LEN *2). '_' . $orig_name;
+                $fileName = $this->generateUniqueFileName($this->RANDOM_FILE_NAME_LEN * 2). '_' . $orig_name;
             }
             $fileName .= '_' . $cycle->getTestsCount() . '.txt';
 
             $obj->addMessage('File name is :' . $fileName . '. File ext :'  .$file->guessExtension());
             try {
-                $dir = self::$UPLOAD_PATH . '/' . $setup->getId() . '/' . $cycle->getId();
+                $in_path_path =  '/' . $setup->getId() . '/' . $cycle->getId();
+                $dir = self::$UPLOAD_PATH . $in_path_path;
                 $new_file = $file->move($dir, $fileName);
-                $logger->notice('F_HANDLER:[' . $new_file->getFilename() . ':' . $new_file->getSize() . ']',
+                $logger->notice('F_HAND',
                     array(
-                        'sid' => $setup->getId(),
-                        'sname' => $setup->getName(),
-                        'cid' => $cycle->getId(),
-                        'cname' => $cycle->getName(),
-                        'ip' => $remote_ip
+                        'S_I' => $setup->getId(),
+                        'S_N' => $setup->getName(),
+                        'C_I' => $cycle->getId(),
+                        'C_N' => $cycle->getName(),
+                        'IP' => $remote_ip,
+                        'F_N' => $new_file->getSize(),
+                        'F_S' => $new_file->getFilename(),
+                        'F_P' => $in_path_path,
+
                     ));
             } catch (\Throwable $ex) {
                 $msg = 'Fail in fileHandler[move]:' . $ex->getMessage();

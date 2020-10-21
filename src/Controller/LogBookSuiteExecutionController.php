@@ -10,6 +10,7 @@ use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\DBAL\Types\Type;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -436,10 +437,10 @@ class LogBookSuiteExecutionController extends AbstractController
     /**
      * @Route("/close/{id}", name="suite_close", methods="GET|POST")
      * @param SuiteExecution $suite
-     * @param SuiteExecutionRepository $suites
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function close(SuiteExecution $suite, SuiteExecutionRepository $suites): Response
+    public function close(SuiteExecution $suite, LoggerInterface $logger): Response
     {
 //        $this->denyAccessUnlessGranted('view', $suite);
         $suite->calculateStatistic();
@@ -447,6 +448,11 @@ class LogBookSuiteExecutionController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->persist($suite);
         $em->flush();
+        $logger->notice('CLOSE_SUITE:',
+            array(
+                'name' => $suite->getName(),
+                'job_name' => $suite->getJobName(),
+            ));
         return $this->render('lbook/suite/close.html.twig',
             [
                 'suite' => $suite

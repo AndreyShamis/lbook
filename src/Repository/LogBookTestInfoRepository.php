@@ -27,6 +27,7 @@ class LogBookTestInfoRepository extends ServiceEntityRepository
      */
     public function findOneOrCreate(array $criteria): LogBookTestInfo
     {
+        $criteria['name'] = LogBookTestInfo::validateName($criteria['name']);
         $entity = $this->findOneBy($criteria);
         if (null === $entity) {
             $entity = new LogBookTestInfo();

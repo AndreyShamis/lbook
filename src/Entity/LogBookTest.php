@@ -412,7 +412,14 @@ class LogBookTest
         $this->addMetaData($meta_data);
 
     }
+    /**
+     * @param string $key
+     */
+    public function resetMetaData(string $key): void
+    {
+        unset($this->meta_data[$key]);
 
+    }
     /**
      * @return int
      */

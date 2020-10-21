@@ -623,28 +623,11 @@ class LogBookUploaderController extends AbstractController
                         if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test_metadata_arr) ) {
                             $testType = $this->testTypeRepo->findOneOrCreate(['name' => $test_metadata_arr['TEST_TYPE_SHOW_OPT']]);
                             $test->setTestType($testType);
-                            $md = $test->getMetaData();
-                            unset($md['TEST_TYPE_SHOW_OPT']);
-                            $test->setMetaData($md);
+                            $test->resetMetaData('TEST_TYPE_SHOW_OPT');
                         }
                     } catch (Exception $ex) {
                         $logger->alert('[TEST_TYPE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                     }
-                    try {
-                        if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
-                            $testInfo = $this->testInfo->findOneOrCreate([
-                                'name' => $test->getName(),
-                                'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
-                            ]);
-                            $test->setTestInfo($testInfo);
-                            $md = $test->getMetaData();
-                            unset($md['TEST_TYPE_SHOW_OPT']);
-                            $test->setMetaData($md);
-                        }
-                    } catch (Exception $ex) {
-                        $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
-                    }
-
 
                     //}
                 } catch (Exception $ex) {
@@ -700,6 +683,20 @@ class LogBookUploaderController extends AbstractController
                     $test->setFailDescription($fail_reason);
 
                 }
+
+                try {
+                    if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
+                        $testInfo = $this->testInfo->findOneOrCreate([
+                            'name' => $test->getName(),
+                            'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
+                        ]);
+                        $test->setTestInfo($testInfo);
+                        $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
+                    }
+                } catch (Exception $ex) {
+                    $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                }
+
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
                 $cycle->setDut($dut);

@@ -83,9 +83,10 @@ class LogBookTestInfo
     public function setPath(?string $path): self
     {
         if ($path !== null) {
-            $this->name = self::validatePath($path);
+            $this->path = self::validatePath($path);
+        } else {
+            $this->path = $path;
         }
-        $this->path = $path;
 
         return $this;
     }

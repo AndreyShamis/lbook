@@ -4,8 +4,26 @@ For upload can be used curl with post log file.
 
 # Settings
 ## Apache config
-- max_upload_file_size
-- max_execution_time
+Need to change 
+
+`sudo vi /etc/php/7.2/apache2/php.ini`
+
+Optional `sudo vi /etc/php/7.2/cli/php.ini`
+
+- **post_max_size** = 200M
+- **upload_max_filesize** = 100M
+- **max_upload_file_size**
+- **max_execution_time** = 4096
+- **max_input_time** = 160
+- **memory_limit** = 4096M
+- 
+
+~~~ bash
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+~~~
+
+
 
 Add this to your /etc/apache/sites-avaliable/site.name.conf
 ~~~ apacheconf

@@ -17,7 +17,9 @@ use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookMessageTypeRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTargetRepository;
+use App\Repository\LogBookTestInfoRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookTestTypeRepository;
 use App\Repository\LogBookUserRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
@@ -76,6 +78,10 @@ class LogBookUploaderController extends AbstractController
     protected $suiteExecutionRepo;
     /** @var TestEventCmuRepository $cmuRepo */
     protected $cmuRepo;
+    /** @var LogBookTestTypeRepository $testTypeRepo */
+    protected $testTypeRepo;
+    /** @var LogBookTestInfoRepository $testInfo */
+    protected $testInfo;
 
     private $blackListLevels = array();
 
@@ -113,6 +119,8 @@ class LogBookUploaderController extends AbstractController
         $this->userRepo = $this->em->getRepository('App:LogBookUser');
         $this->suiteExecutionRepo = $this->em->getRepository('App:SuiteExecution');
         $this->cmuRepo = $this->em->getRepository('App:TestEventCmu');
+        $this->testTypeRepo = $this->em->getRepository('App:LogBookTestType');
+        $this->testInfo = $this->em->getRepository('App:LogBookTestInfo');
     }
 
     /**
@@ -473,6 +481,10 @@ class LogBookUploaderController extends AbstractController
             $build_name = $request->request->get('build', '');
             $test_dut = $request->request->get('dut', '');
             $test_metadata = $request->request->get('test_metadata', '');
+            $test_metadata_arr = $this->extractTestVariables($test_metadata);
+            $logger->alert($test_metadata, $test_metadata_arr);
+
+            exit();
             $cycle_metadata = $request->request->get('cycle_metadata', '');
             $suite_execution_id = $request->request->get('suite_execution_id', 0);
             if ($cycle_token !== '') {
@@ -605,8 +617,30 @@ class LogBookUploaderController extends AbstractController
                 try {
                     $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
                     $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
-                    //if (!$parseTestVerdict) {
                     $test->setVerdict($testVerdictDefault);
+
+
+                    try {
+                        if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test_metadata_arr) ) {
+                            $testType = $this->testTypeRepo->findOneOrCreate(['name' => $test_metadata_arr['TEST_TYPE_SHOW_OPT']]);
+                            $test->setTestType($testType);
+                        }
+                    } catch (Exception $ex) {
+                        $logger->alert('[TEST_TYPE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                    }
+                    try {
+                        if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
+                            $testInfo = $this->testInfo->findOneOrCreate([
+                                'name' => $test->getName(),
+                                'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
+                            ]);
+                            $test->setTestInfo($testInfo);
+                        }
+                    } catch (Exception $ex) {
+                        $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                    }
+
+
                     //}
                 } catch (Exception $ex) {
                     $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
@@ -656,6 +690,7 @@ class LogBookUploaderController extends AbstractController
                 $dut = $this->targetRepo->findOneOrCreate(array('name' => $test_dut));
 
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
+
                 if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
                     $test->setFailDescription($fail_reason);
 

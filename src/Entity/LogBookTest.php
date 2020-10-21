@@ -156,6 +156,17 @@ class LogBookTest
      */
     protected $failDescription = '';
 
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookTestInfo::class, inversedBy="logBookTests")
+     */
+    private $testInfo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookTestType::class)
+     */
+    private $testType;
+
+
     protected $failDescriptionParsed = false;
 
     protected $rate = 0;
@@ -184,21 +195,27 @@ class LogBookTest
         $this->failDescriptionParsed = $failDescriptionParsed;
     }
 
-    public function getTestType(): string
+    public function getMDTestType(): string
     {
         $ret = 'TEST';
-        $key = 'TEST_TYPE_SHOW_OPT';
-        $md = $this->getMetaData();
-        if (array_key_exists($key, $md)) {
-            $ret = $md[$key];
-            if ($ret === 'PRE_TEST_FLOW') {
-                $ret = 'PRE_CYCLE';
+        if ($this->getTestType() === null) {
+            $key = 'TEST_TYPE_SHOW_OPT';
+            $md = $this->getMetaData();
+            if (array_key_exists($key, $md)) {
+                $ret = $md[$key];
+                if ($ret === 'PRE_TEST_FLOW') {
+                    $ret = 'PRE_CYCLE';
+                }
+                if ($ret === 'POST_TEST_FLOW') {
+                    $ret = 'POST_CYCLE';
+                }
             }
-            if ($ret === 'POST_TEST_FLOW') {
-                $ret = 'POST_CYCLE';
-            }
+        } else {
+            $ret = $this->getTestType()->getName();
         }
+
         return $ret;
+
     }
     /**
      * LogBookTest constructor.
@@ -357,11 +374,11 @@ class LogBookTest
      */
     public function setMetaData(array $meta_data): void
     {
-        if ($this->meta_data === null || \count($this->meta_data) === 0) {
-            $this->meta_data = $meta_data;
-        } else {
-            $this->addMetaData($meta_data);
+        if ($this->meta_data === null) {
+            $this->meta_data = [];
         }
+        $this->addMetaData($meta_data);
+
     }
 
     /**
@@ -781,6 +798,30 @@ class LogBookTest
     public function setTestKey(string $testKey): self
     {
         $this->testKey = $testKey;
+
+        return $this;
+    }
+
+    public function getTestInfo(): ?LogBookTestInfo
+    {
+        return $this->testInfo;
+    }
+
+    public function setTestInfo(?LogBookTestInfo $testInfo): self
+    {
+        $this->testInfo = $testInfo;
+
+        return $this;
+    }
+
+    public function getTestType(): ?LogBookTestType
+    {
+        return $this->testType;
+    }
+
+    public function setTestType(?LogBookTestType $testType): self
+    {
+        $this->testType = $testType;
 
         return $this;
     }

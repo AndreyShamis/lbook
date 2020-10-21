@@ -248,7 +248,7 @@ class LogBookCycleController extends AbstractController
                         $ret_test['order'] = $test->getExecutionOrder();
                         $ret_test['chip'] = $test->getChip();
                         $ret_test['platform'] = $test->getPlatform();
-                        $ret_test['test_type'] = $test->getTestType();
+                        $ret_test['test_type'] = $test->getMDTestType();
                         $ret_test['metadata'] = $test->getMetaData(); //array();
                         try {
                             unset($ret_test['metadata']['TEST_FILENAME']);
@@ -351,7 +351,7 @@ class LogBookCycleController extends AbstractController
             $ret_test['order'] = $test->getExecutionOrder();
             $ret_test['chip'] = $test->getChip();
             $ret_test['platform'] = $test->getPlatform();
-            $ret_test['test_type'] = $test->getTestType();
+            $ret_test['test_type'] = $test->getMDTestType();
             $ret_test['metadata'] = $test->getMetaData(); //array();
             try {
                 unset($ret_test['metadata']['TEST_FILENAME']);

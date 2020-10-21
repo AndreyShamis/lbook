@@ -613,7 +613,7 @@ class LogBookUploaderController extends AbstractController
 //                if ($lock->acquire(true)) {
                 try {
                     $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
-                    
+
                     //$test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
                     $test = $this->testsRepo->create($test_criteria);
                     $test->setTempMetaData($test_metadata_arr);

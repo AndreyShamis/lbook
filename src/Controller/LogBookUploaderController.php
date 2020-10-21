@@ -701,7 +701,8 @@ class LogBookUploaderController extends AbstractController
                 if ($test->getMetaData() !== null && count($test->getMetaData())) {
                     $newMD = new LogBookTestMD();
                     $newMD->setValue($test->getMetaData());
-                    $newMD->setTest($test);
+                    //$newMD->setTest($test);
+                    $test->setNewMetaData($newMD);
                     $test->resetMetaData('*');
                     $this->em->persist($newMD);
                 }

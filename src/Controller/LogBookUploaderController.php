@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookMessage;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestMD;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
 use App\Entity\LogBookSetup;
@@ -697,6 +698,10 @@ class LogBookUploaderController extends AbstractController
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }
 
+                $newMD = new LogBookTestMD();
+                $newMD->setValue($test->getMetaData());
+                $newMD->setTest($test);
+                $this->em->persist($newMD);
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
                 $cycle->setDut($dut);

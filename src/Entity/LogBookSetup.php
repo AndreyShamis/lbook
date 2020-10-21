@@ -107,9 +107,9 @@ class LogBookSetup
     /**
      * @var integer
      * Value in days used for delete Cycles
-     * @ORM\Column(name="retention_policy", type="smallint", options={"unsigned"=true, "default"="400"})
+     * @ORM\Column(name="retention_policy", type="smallint", options={"unsigned"=true, "default"="40"})
      */
-    protected $retentionPolicy = 400;
+    protected $retentionPolicy = 40;
 
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
@@ -131,7 +131,7 @@ class LogBookSetup
         $this->setCreatedAt();
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
-        $this->setRetentionPolicy(15);
+        $this->setRetentionPolicy(7);
         $this->favoritedByUsers = new ArrayCollection();
     }
 

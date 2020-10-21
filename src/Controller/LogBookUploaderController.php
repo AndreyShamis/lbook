@@ -482,9 +482,6 @@ class LogBookUploaderController extends AbstractController
             $test_dut = $request->request->get('dut', '');
             $test_metadata = $request->request->get('test_metadata', '');
             $test_metadata_arr = $this->extractTestVariables($test_metadata);
-            $logger->alert($test_metadata, $test_metadata_arr);
-
-            exit();
             $cycle_metadata = $request->request->get('cycle_metadata', '');
             $suite_execution_id = $request->request->get('suite_execution_id', 0);
             if ($cycle_token !== '') {
@@ -616,9 +613,11 @@ class LogBookUploaderController extends AbstractController
 //                if ($lock->acquire(true)) {
                 try {
                     $test_criteria = $this->createTestCriteria($testName, $cycle, $new_file, $testVerdictDefault);
-                    $test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                    
+                    //$test = $this->insertTest($test_criteria, $cycle, $obj, $logger);
+                    $test = $this->testsRepo->create($test_criteria);
+                    $test->setTempMetaData($test_metadata_arr);
                     $test->setVerdict($testVerdictDefault);
-
 
                     try {
                         if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test_metadata_arr) ) {
@@ -926,75 +925,76 @@ class LogBookUploaderController extends AbstractController
         );
     }
 
-    /**
-     * Trying to insert test into DB in order to calculated execution order.
-     * If there is UniqueConstraintViolationException new execution order will be generated
-     * @param array $test_criteria
-     * @param LogBookCycle $cycle
-     * @param LogBookUpload $obj
-     * @param LoggerInterface $logger
-     * @return LogBookTest
-     * @throws Exception
-     */
-    protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): LogBookTest
-    {
-        $orderFound = false;
-        $counter = 0;
-        $test = $this->testsRepo->create($test_criteria);
-//        while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
-//            try {
-//                if ($counter > 0) {
-//                    $logger->alert('[insertTest] Found counter increment',
-//                        array(
-//                        'counter' => $counter,
-//                        'orderFound' => $orderFound,
-//                        'test_criteria' => $test_criteria,
-//                        'cycle' => $cycle,
-//                    ));
-//                }
-//                $test = $this->testsRepo->create($test_criteria);
-//                if ($test !== null) {
-//                    $orderFound = true;
-//                } else {
-//                    try {
-//                        /** sleep for 0.2-0.5 second */
-//                        usleep(\random_int(200000, 500000));
-//                    } catch (Exception $e) {}
-//                }
-//            } catch (UniqueConstraintViolationException $ex) {
-//                $logger->alert('[insertTest] Found UniqueConstraintViolationException', array('ex' => $ex));
-//                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
-//                try {
-//                    /** sleep for 0.2-0.5 second */
-//                    usleep(\random_int(200000, 500000));
-//                } catch (Exception $e) {}
-//                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
-//            } catch (ORMException $ex) {
-//                $logger->alert('[insertTest] Found ORMException', array('ex' => $ex));
-//                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
-//                try {
-//                    /** sleep for 0.2-0.5 second */
-//                    usleep(\random_int(200000, 500000));
-//                } catch (Exception $e) {}
-//                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
-//                $this->testsRepo  = $this->em->getRepository('App:LogBookTest');
-//            }
+//    /**
+//     * Trying to insert test into DB in order to calculated execution order.
+//     * If there is UniqueConstraintViolationException new execution order will be generated
+//     * @param array $test_criteria
+//     * @param LogBookCycle $cycle
+//     * @param LogBookUpload $obj
+//     * @param LoggerInterface $logger
+//     * @return LogBookTest
+//     * @throws Exception
+//     */
+//    protected function insertTest(array $test_criteria, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger): LogBookTest
+//    {
+//        $orderFound = false;
+//        $counter = 0;
+//        $test = $this->testsRepo->create($test_criteria);
+////        while($orderFound !== true && $counter< self::$MAX_EXEC_ORDER_SEARCH_COUNTER) {
+////            try {
+////                if ($counter > 0) {
+////                    $logger->alert('[insertTest] Found counter increment',
+////                        array(
+////                        'counter' => $counter,
+////                        'orderFound' => $orderFound,
+////                        'test_criteria' => $test_criteria,
+////                        'cycle' => $cycle,
+////                    ));
+////                }
+////                $test = $this->testsRepo->create($test_criteria);
+////                if ($test !== null) {
+////                    $orderFound = true;
+////                } else {
+////                    try {
+////                        /** sleep for 0.2-0.5 second */
+////                        usleep(\random_int(200000, 500000));
+////                    } catch (Exception $e) {}
+////                }
+////            } catch (UniqueConstraintViolationException $ex) {
+////                $logger->alert('[insertTest] Found UniqueConstraintViolationException', array('ex' => $ex));
+////                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
+////                try {
+////                    /** sleep for 0.2-0.5 second */
+////                    usleep(\random_int(200000, 500000));
+////                } catch (Exception $e) {}
+////                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+////            } catch (ORMException $ex) {
+////                $logger->alert('[insertTest] Found ORMException', array('ex' => $ex));
+////                $obj->addMessage($ex->getMessage(). ' Counter=' . $counter);
+////                try {
+////                    /** sleep for 0.2-0.5 second */
+////                    usleep(\random_int(200000, 500000));
+////                } catch (Exception $e) {}
+////                //$test_criteria['executionOrder'] = $this->getTestNewExecutionOrder($cycle);
+////                $this->testsRepo  = $this->em->getRepository('App:LogBookTest');
+////            }
+////
+////            $counter++;
+////        }
 //
-//            $counter++;
+//        if ($test === null) {
+//            $msg = '[THROW][Exception][insertTest] counter=' . $counter . ' orderFound='. (int)$orderFound;
+//            $logger->critical($msg, array(
+//                'counter' => $counter,
+//                'orderFound' => $orderFound,
+//                'test_criteria' => $test_criteria,
+//                'cycle' => $cycle,
+//            ));
+//            throw new \RuntimeException($msg);
 //        }
+//        return $test;
+//    }
 
-        if ($test === null) {
-            $msg = '[THROW][Exception][insertTest] counter=' . $counter . ' orderFound='. (int)$orderFound;
-            $logger->critical($msg, array(
-                'counter' => $counter,
-                'orderFound' => $orderFound,
-                'test_criteria' => $test_criteria,
-                'cycle' => $cycle,
-            ));
-            throw new \RuntimeException($msg);
-        }
-        return $test;
-    }
     /**
      * @param string $build_name
      * @param LogBookCycle $cycle

@@ -139,6 +139,8 @@ class LogBookTest
      */
     protected $meta_data = [];
 
+    protected $temp_meta_data = [];
+
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\SuiteExecution", inversedBy="tests")
      */
@@ -225,6 +227,7 @@ class LogBookTest
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
         $this->meta_data = [];
+        $this->temp_meta_data = [];
         $this->failDescription = '';
     }
 
@@ -237,6 +240,17 @@ class LogBookTest
             $this->meta_data = array();
         }
         return $this->meta_data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTempMetaData(): array
+    {
+        if ($this->temp_meta_data === null) {
+            $this->temp_meta_data = array();
+        }
+        return $this->temp_meta_data;
     }
 
     public function getFromMetaData(string $key, string $default=null): string
@@ -356,6 +370,14 @@ class LogBookTest
     /**
      * @param array $meta_data
      */
+    public function addTempMetaData(array $meta_data): void
+    {
+        $this->temp_meta_data = array_merge($this->temp_meta_data, $meta_data);
+    }
+
+    /**
+     * @param array $meta_data
+     */
     public function addMetaData(array $meta_data): void
     {
 //        foreach ($meta_data as $key => $val) {
@@ -365,6 +387,18 @@ class LogBookTest
 //            }
 //        }
         $this->meta_data = array_merge($this->meta_data, $meta_data);
+    }
+
+    /**
+     * @param array $meta_data
+     */
+    public function setTempMetaData(array $meta_data): void
+    {
+        if ($this->temp_meta_data === null) {
+            $this->temp_meta_data = [];
+        }
+        $this->addTempMetaData($meta_data);
+
     }
 
     /**

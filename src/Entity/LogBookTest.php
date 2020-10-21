@@ -156,6 +156,17 @@ class LogBookTest
      */
     protected $failDescription = '';
 
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookTestInfo::class, inversedBy="logBookTests")
+     */
+    private $testInfo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookTestType::class)
+     */
+    private $testType;
+
+
     protected $failDescriptionParsed = false;
 
     protected $rate = 0;
@@ -184,21 +195,27 @@ class LogBookTest
         $this->failDescriptionParsed = $failDescriptionParsed;
     }
 
-    public function getTestType(): string
+    public function getMDTestType(): string
     {
         $ret = 'TEST';
-        $key = 'TEST_TYPE_SHOW_OPT';
-        $md = $this->getMetaData();
-        if (array_key_exists($key, $md)) {
-            $ret = $md[$key];
-            if ($ret === 'PRE_TEST_FLOW') {
-                $ret = 'PRE_CYCLE';
+        if ($this->getTestType() === null) {
+            $key = 'TEST_TYPE_SHOW_OPT';
+            $md = $this->getMetaData();
+            if (array_key_exists($key, $md)) {
+                $ret = $md[$key];
+                if ($ret === 'PRE_TEST_FLOW') {
+                    $ret = 'PRE_CYCLE';
+                }
+                if ($ret === 'POST_TEST_FLOW') {
+                    $ret = 'POST_CYCLE';
+                }
             }
-            if ($ret === 'POST_TEST_FLOW') {
-                $ret = 'POST_CYCLE';
-            }
+        } else {
+            $ret = $this->getTestType()->getName();
         }
+
         return $ret;
+
     }
     /**
      * LogBookTest constructor.
@@ -343,12 +360,12 @@ class LogBookTest
      */
     public function addMetaData(array $meta_data): void
     {
-        foreach ($meta_data as $key => $val) {
-            if ($key === 'TEST_CASE_SHOW' && mb_strlen($val) > 2) {
-                $this->setTestKey($val);
-                break;
-            }
-        }
+//        foreach ($meta_data as $key => $val) {
+//            if ($key === 'TEST_CASE_SHOW' && mb_strlen($val) > 2) {
+//                $this->setTestKey($val);
+//                break;
+//            }
+//        }
         $this->meta_data = array_merge($this->meta_data, $meta_data);
     }
 
@@ -357,11 +374,11 @@ class LogBookTest
      */
     public function setMetaData(array $meta_data): void
     {
-        if ($this->meta_data === null || \count($this->meta_data) === 0) {
-            $this->meta_data = $meta_data;
-        } else {
-            $this->addMetaData($meta_data);
+        if ($this->meta_data === null) {
+            $this->meta_data = [];
         }
+        $this->addMetaData($meta_data);
+
     }
 
     /**
@@ -752,7 +769,7 @@ class LogBookTest
 
     public function toArray(): array
     {
-        return array(
+        $ret = array(
             'id' => $this->getId(),
             'name' => $this->getName(),
             'verdict' => $this->getVerdict()->getName(),
@@ -764,6 +781,18 @@ class LogBookTest
             'time_end' => $this->getTimeEnd()->getTimestamp(),
             'time_run' => $this->getTimeRun(),
         );
+        if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
+            $ret['meta_data']['CONTROL_FILE_SHOW_OPT'] = $this->getTestInfo()->getPath();
+        }
+        if ($this->getTestType() !== null) {
+            $ret['meta_data']['TEST_TYPE_SHOW_OPT'] = $this->getTestType()->getName();
+        }  else {
+            if (!array_key_exists('TEST_TYPE_SHOW_OPT', $ret['meta_data'])){
+                $ret['meta_data']['TEST_TYPE_SHOW_OPT'] = 'TEST';
+            }
+        }
+        return $ret;
+
     }
 
     /**
@@ -781,6 +810,30 @@ class LogBookTest
     public function setTestKey(string $testKey): self
     {
         $this->testKey = $testKey;
+
+        return $this;
+    }
+
+    public function getTestInfo(): ?LogBookTestInfo
+    {
+        return $this->testInfo;
+    }
+
+    public function setTestInfo(?LogBookTestInfo $testInfo): self
+    {
+        $this->testInfo = $testInfo;
+
+        return $this;
+    }
+
+    public function getTestType(): ?LogBookTestType
+    {
+        return $this->testType;
+    }
+
+    public function setTestType(?LogBookTestType $testType): self
+    {
+        $this->testType = $testType;
 
         return $this;
     }

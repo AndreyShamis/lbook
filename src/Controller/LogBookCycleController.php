@@ -248,7 +248,7 @@ class LogBookCycleController extends AbstractController
                         $ret_test['order'] = $test->getExecutionOrder();
                         $ret_test['chip'] = $test->getChip();
                         $ret_test['platform'] = $test->getPlatform();
-                        $ret_test['test_type'] = $test->getTestType();
+                        $ret_test['test_type'] = $test->getMDTestType();
                         $ret_test['metadata'] = $test->getMetaData(); //array();
                         try {
                             unset($ret_test['metadata']['TEST_FILENAME']);
@@ -259,9 +259,14 @@ class LogBookCycleController extends AbstractController
                             unset($ret_test['metadata']['CHIP']);
                             unset($ret_test['metadata']['PLATFORM']);
                             unset($ret_test['metadata']['TIMEOUT']);
-                            $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                            unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                            $ret_test['metadata']['CONTROL'] = $control_path;
+
+                            if ($test->getTestInfo() !== null && $test->getTestInfo()->getPath() !== null) {
+                                $ret_test['metadata']['CONTROL'] = $test->getTestInfo()->getPath();
+                            } else {
+                                $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                                unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                                $ret_test['metadata']['CONTROL'] = $control_path;
+                            }
                         } catch (\Throwable $ex) {}
                         $suite = $test->getSuiteExecution();
                         if ($suite !== null) {
@@ -351,7 +356,7 @@ class LogBookCycleController extends AbstractController
             $ret_test['order'] = $test->getExecutionOrder();
             $ret_test['chip'] = $test->getChip();
             $ret_test['platform'] = $test->getPlatform();
-            $ret_test['test_type'] = $test->getTestType();
+            $ret_test['test_type'] = $test->getMDTestType();
             $ret_test['metadata'] = $test->getMetaData(); //array();
             try {
                 unset($ret_test['metadata']['TEST_FILENAME']);
@@ -362,9 +367,14 @@ class LogBookCycleController extends AbstractController
                 unset($ret_test['metadata']['CHIP']);
                 unset($ret_test['metadata']['PLATFORM']);
                 unset($ret_test['metadata']['TIMEOUT']);
-                $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                $ret_test['metadata']['CONTROL'] = $control_path;
+
+                if ($test->getTestInfo() !== null && $test->getTestInfo()->getPath() !== null) {
+                    $ret_test['metadata']['CONTROL'] = $test->getTestInfo()->getPath();
+                } else {
+                    $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                    unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                    $ret_test['metadata']['CONTROL'] = $control_path;
+                }
             } catch (\Throwable $ex) {}
             $suite = $test->getSuiteExecution();
             if ($suite !== null) {
@@ -593,8 +603,16 @@ class LogBookCycleController extends AbstractController
             $final = array();
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
+                if ($test->getTestKey() !== null && $test->getTestKey() !== '') {
+                    $test_dict['testKey'] = $test->getTestKey();
+                } else {
+                    if (array_key_exists('TEST_CASE_SHOW', $test->getMetaData())){
+                        $test_dict['testKey'] = $test->getMetaData()['TEST_CASE_SHOW'];
+                    } else {
+                        // TODO HERE issue
+                    }
+                }
 
-                $test_dict['testKey'] = $test->getMetaData()['TEST_CASE_SHOW'];
                 $test_dict['start'] = $test->getTimeStart()->format(\DateTime::ATOM);
                 $test_dict['finish'] = $test->getTimeEnd()->format(\DateTime::ATOM);
                 $test_dict['comment'] = '';

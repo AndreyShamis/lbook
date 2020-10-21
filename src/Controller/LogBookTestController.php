@@ -119,8 +119,9 @@ class LogBookTestController extends AbstractController
                 if ($test !== null) {
                     $test->addMetaData(array(
                         'EXECUTION_SHOW' => $data['test_execution_key'],
-                        'TEST_CASE_SHOW' => $data['test_key']
+//                        'TEST_CASE_SHOW' => $data['test_key']
                         ));
+                    $test->setTestKey($data['test_key']);
                     $this->em->flush();
                     $fin_res['message'] = 'success';
                 } else {

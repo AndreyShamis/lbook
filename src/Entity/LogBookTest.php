@@ -172,8 +172,7 @@ class LogBookTest
     protected $rate = 0;
 
     /**
-     * @ORM\OneToOne(targetEntity=LogBookTestMD::class, mappedBy="test", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="log_book_test_md", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\OneToOne(targetEntity=LogBookTestMD::class, cascade={"persist", "remove"})
      */
     private $newMetaData;
 

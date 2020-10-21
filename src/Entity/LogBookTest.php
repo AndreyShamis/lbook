@@ -173,6 +173,7 @@ class LogBookTest
 
     /**
      * @ORM\OneToOne(targetEntity=LogBookTestMD::class, mappedBy="test", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="log_book_test_md", referencedColumnName="id", onDelete="CASCADE")
      */
     private $newMetaData;
 
@@ -243,6 +244,9 @@ class LogBookTest
     {
         if ($this->meta_data === null) {
             $this->meta_data = array();
+        }
+        if ($this->meta_data === [] && $this->newMetaData !== null && $this->newMetaData !== []){
+            return $this->getNewMetaData()->getValue();
         }
         return $this->meta_data;
     }
@@ -422,7 +426,11 @@ class LogBookTest
      */
     public function resetMetaData(string $key): void
     {
-        unset($this->meta_data[$key]);
+        if ($key === '*') {
+            $this->meta_data = [];
+        } else {
+            unset($this->meta_data[$key]);
+        }
 
     }
     /**

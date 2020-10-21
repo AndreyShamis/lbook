@@ -39,7 +39,7 @@ use Doctrine\Common\Collections\Collection;
 class LogBookSetupController extends AbstractController
 {
     protected $index_size = 250;
-    protected $show_cycle_size = 500;
+    protected $show_cycle_size = 250;
 
 
     /**

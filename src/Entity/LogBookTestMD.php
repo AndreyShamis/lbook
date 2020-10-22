@@ -25,12 +25,12 @@ class LogBookTestMD
      * @ORM\Column(type="array", nullable=true)
      */
     private $value;
-//
-//    /**
-//     * @ORM\OneToOne(targetEntity=LogBookTest::class, inversedBy="newMetaData", cascade={"persist"})
-//     * @ORM\JoinColumn(nullable=true)
-//     */
-//    private $test;
+
+    /**
+     * @ORM\OneToOne(targetEntity=LogBookTest::class, inversedBy="newMetaData", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $test;
 
     public function __construct()
     {
@@ -54,17 +54,17 @@ class LogBookTestMD
         return $this;
     }
 
-//    public function getTest(): LogBookTest
-//    {
-//        return $this->test;
-//    }
-//
-//    public function setTest(LogBookTest $test): self
-//    {
-//        $this->test = $test;
-//
-//        return $this;
-//    }
+    public function getTest(): LogBookTest
+    {
+        return $this->test;
+    }
+
+    public function setTest(LogBookTest $test): self
+    {
+        $this->test = $test;
+
+        return $this;
+    }
 
     public function __toString()
     {

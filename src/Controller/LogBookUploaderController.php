@@ -475,10 +475,10 @@ class LogBookUploaderController extends AbstractController
             $fail_reason = $request->request->get('fail_reason', '');
             $cycle_name = $this->cleanString($request->request->get('cycle', ''));
             $setup_name = $this->cleanString($request->request->get('setup', ''));
-            if (strpos($setup_name, 'AppSW_CI') !== false){
-                $setup_name = 'AppSW_CI';
-            }
-
+//            if (strpos($setup_name, 'AppSW_CI') !== false){
+//                $setup_name = 'AppSW_CI';
+//            }
+//
 
 //            if ($setup_name === 'SST_SETUP_TEST') {
 //                return $this->render('lbook/upload/curl.html.twig', []);
@@ -703,9 +703,9 @@ class LogBookUploaderController extends AbstractController
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }
 
-                if ($test->getMetaData() !== null && count($test->getMetaData())) {
+                if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
                     $newMD = new LogBookTestMD();
-                    $newMD->setValue($test->getMetaData());
+                    $newMD->setValue($test->getOldMetaData());
                     //$newMD->setTest($test);
                     $test->setNewMetaData($newMD);
                     $test->resetMetaData('*');

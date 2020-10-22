@@ -239,6 +239,14 @@ class LogBookTest
     /**
      * @return array
      */
+    public function getOldMetaData(): array
+    {
+        return $this->meta_data;
+    }
+
+    /**
+     * @return array
+     */
     public function getMetaData(): array
     {
         if ($this->meta_data === null) {
@@ -897,11 +905,11 @@ class LogBookTest
     public function setNewMetaData(LogBookTestMD $newMetaData): self
     {
         $this->newMetaData = $newMetaData;
-
-        // set the owning side of the relation if necessary
-        if ($newMetaData->getTest() !== $this) {
-            $newMetaData->setTest($this);
-        }
+//
+//        // set the owning side of the relation if necessary
+//        if ($newMetaData->getTest() !== $this) {
+//            $newMetaData->setTest($this);
+//        }
 
         return $this;
     }

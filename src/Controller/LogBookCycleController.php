@@ -578,6 +578,7 @@ class LogBookCycleController extends AbstractController
         }
     }
 
+
     /**
      *
      * @Route("/te/{testExecutionKey}", name="get_tests_by_jira_te", methods={"GET"})
@@ -592,15 +593,32 @@ class LogBookCycleController extends AbstractController
             $key_len = mb_strlen($testExecutionKey);
             //$metadata_1 = '%s:14:"EXECUTION_SHOW";s:'. $key_len . ':"' .$testExecutionKey. '";%';
             $metadata_1 = '%s:'. $key_len . ':"' .$testExecutionKey. '"%';
+
             $qb = $testRepo->createQueryBuilder('t')
-                ->where('t.timeEnd > :period')
-                ->andWhere('t.meta_data LIKE :metadata_1')
+                ->where('t.timeEnd > :period');
+
+            $qb = $qb->leftJoin('t.newMetaData', 'newMetaData')->andWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal($metadata_1)))
                 ->orderBy('t.executionOrder', 'ASC')
-                ->setParameter('metadata_1', $metadata_1)
+                ->setMaxResults(5000)
                 ->setParameter('period', new \DateTime('-7 days'));
             $q = $qb->getQuery();
             $tests = $q->execute();
+
+            if (count($tests) < 1) {
+                $qb = $testRepo->createQueryBuilder('t')
+                    ->where('t.timeEnd > :period')
+                    ->andWhere('t.meta_data LIKE :metadata_1')
+                    ->setMaxResults(3000)
+                    ->orderBy('t.executionOrder', 'ASC')
+                    ->setParameter('metadata_1', $metadata_1)
+                    ->setParameter('period', new \DateTime('-7 days'));
+                $q = $qb->getQuery();
+                $tests = $q->execute();
+            }
+
             $final = array();
+//            print (count($tests));
+//            exit();
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
                 if ($test->getTestKey() !== null && $test->getTestKey() !== '') {
@@ -624,6 +642,7 @@ class LogBookCycleController extends AbstractController
             try{
                 $fin_res['query_dql'] = $q->getDQL();
                 $fin_res['query_sql'] = $q->getSQL();
+                $fin_res['tests_total'] = count($tests);
                 $tmp_arr = $q->getParameters()->toArray();
                 $fin_res['query_params'] = [];
                 /**

@@ -117,7 +117,7 @@ class LogBookTestController extends AbstractController
             }
             if ($status === 200) {
                 if ($test !== null) {
-                    $test->addMetaData(array(
+                    $test->addNewMetaData(array(
                         'EXECUTION_SHOW' => $data['test_execution_key'],
 //                        'TEST_CASE_SHOW' => $data['test_key']
                         ));

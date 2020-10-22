@@ -162,6 +162,12 @@ class LogBookTest
     private $testInfo;
 
     /**
+     * @ORM\OneToOne(targetEntity=LogBookTestMD::class, cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
+     */
+    private $newMetaData;
+
+    /**
      * @ORM\ManyToOne(targetEntity=LogBookTestType::class)
      */
     private $testType;
@@ -171,11 +177,7 @@ class LogBookTest
 
     protected $rate = 0;
 
-    /**
-     * @ORM\OneToOne(targetEntity=LogBookTestMD::class, cascade={"persist", "remove"}, orphanRemoval=true)
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
-     */
-    private $newMetaData;
+
 
     public function setRate(float $r) {
         $this->rate = round($r, 2);
@@ -913,5 +915,9 @@ class LogBookTest
         }
 
         return $this;
+    }
+    public function addNewMetaData(array $meta_data): void
+    {
+        $this->newMetaData->setValue(array_merge($this->newMetaData->getValue(), $meta_data));
     }
 }

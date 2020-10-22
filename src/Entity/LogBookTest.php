@@ -908,11 +908,11 @@ class LogBookTest
     public function setNewMetaData(LogBookTestMD $newMetaData): self
     {
         $this->newMetaData = $newMetaData;
-//
-//        // set the owning side of the relation if necessary
-//        if ($newMetaData->getTest() !== $this) {
-//            $newMetaData->setTest($this);
-//        }
+
+        // set the owning side of the relation if necessary
+        if ($newMetaData->getTest() !== $this) {
+            $newMetaData->setTest($this);
+        }
 
         return $this;
     }

@@ -163,7 +163,7 @@ class LogBookTest
 
     /**
      * @ORM\OneToOne(targetEntity=LogBookTestMD::class, cascade={"persist", "remove"}, orphanRemoval=true)
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $newMetaData;
 
@@ -908,11 +908,11 @@ class LogBookTest
     public function setNewMetaData(LogBookTestMD $newMetaData): self
     {
         $this->newMetaData = $newMetaData;
-
-        // set the owning side of the relation if necessary
-        if ($newMetaData->getTest() !== $this) {
-            $newMetaData->setTest($this);
-        }
+//
+//        // set the owning side of the relation if necessary
+//        if ($newMetaData->getTest() !== $this) {
+//            $newMetaData->setTest($this);
+//        }
 
         return $this;
     }

@@ -54,7 +54,7 @@ class LogBookTestMD
         return $this;
     }
 
-    public function getTest(): LogBookTest
+    public function getTest(): ?LogBookTest
     {
         return $this->test;
     }

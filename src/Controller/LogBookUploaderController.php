@@ -469,18 +469,23 @@ class LogBookUploaderController extends AbstractController
             if ($request->request->get('debug', false) === 'true') {
                 $obj->setDebug(true);
             }
-            $req_test_name = $request->request->get('test_name', '');
+            $req_test_name = $this->cleanString($request->request->get('test_name', ''));
             //$req_test_result = $request->request->get('test_result', '');
-            $req_test_result = $request->request->get('testResult', '');
+            $req_test_result = $this->cleanString($request->request->get('testResult', ''));
             $fail_reason = $request->request->get('fail_reason', '');
-            $cycle_name = $request->request->get('cycle', '');
-            $setup_name = $request->request->get('setup', '');
+            $cycle_name = $this->cleanString($request->request->get('cycle', ''));
+            $setup_name = $this->cleanString($request->request->get('setup', ''));
+            if (strpos($setup_name, 'AppSW_CI') !== false){
+                $setup_name = 'AppSW_CI';
+            }
+
+
 //            if ($setup_name === 'SST_SETUP_TEST') {
 //                return $this->render('lbook/upload/curl.html.twig', []);
 //            }
-            $cycle_token = $request->request->get('token', '');
-            $build_name = $request->request->get('build', '');
-            $test_dut = $request->request->get('dut', '');
+            $cycle_token = $this->cleanString($request->request->get('token', ''));
+            $build_name = $this->cleanString($request->request->get('build', ''));
+            $test_dut = $this->cleanString($request->request->get('dut', ''));
             $test_metadata = $request->request->get('test_metadata', '');
             $test_metadata_arr = $this->extractTestVariables($test_metadata);
             $cycle_metadata = $request->request->get('cycle_metadata', '');
@@ -776,6 +781,13 @@ class LogBookUploaderController extends AbstractController
         ));
     }
 
+    public static function cleanName($inputName)
+    {
+        $charForRemove[] = "'";
+        $charForRemove[] = '"';
+
+        return str_replace($charForRemove, "_", $inputName);
+    }
     /**
      * @param UploadedFile $file
      * @param LogBookSetup $setup

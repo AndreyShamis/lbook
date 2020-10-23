@@ -722,6 +722,7 @@ class LogBookUploaderController extends AbstractController
                 $test->resetMetaData('SUITE_SHOW');
                 $test->resetMetaData('CHIP');
                 $test->resetMetaData('PLATFORM');
+                $test->resetMetaData('HOSTNAME');
 
                 if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
                     $newMD = new LogBookTestMD();

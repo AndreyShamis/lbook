@@ -64,8 +64,8 @@ class LogBookBotController extends AbstractController
             ->andWhere('setups.isPrivate = 0')
             ->andWhere('setups.updatedAt <= :theDate')
             ->orderBy('setups.id', 'ASC')
-            ->setParameter('theDate', new \DateTime('-'. 10 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
-            ->setMaxResults(300);
+            ->setParameter('theDate', new \DateTime('-'. 3 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->setMaxResults(10000);
         ;
         $setups = $query->getQuery()->execute();
         $setupsForDelete = [];

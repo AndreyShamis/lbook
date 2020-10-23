@@ -375,10 +375,6 @@ class LogBookSetup
         return $this->updatedAt;
     }
 
-    /**
-     * @PreFlush
-     * @PrePersist
-     */
     public function setUpdatedAt(): void
     {
         $this->updatedAt = new \DateTime();

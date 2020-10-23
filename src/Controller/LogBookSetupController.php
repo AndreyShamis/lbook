@@ -742,6 +742,7 @@ class LogBookSetupController extends AbstractController
             $editForm->handleRequest($request);
 
             if ($editForm->isSubmitted() && $editForm->isValid()) {
+                $obj->setUpdatedAt();
                 $this->getDoctrine()->getManager()->flush();
                 return $this->redirectToRoute('setup_edit', array('id' => $obj->getId()));
             }

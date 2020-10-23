@@ -918,6 +918,10 @@ class LogBookTest
     }
     public function addNewMetaData(array $meta_data): void
     {
+        if ($this->newMetaData === null && count($meta_data)) {
+            $this->newMetaData = new LogBookTestMD();
+            $this->newMetaData->setTest($this);
+        }
         $this->newMetaData->setValue(array_merge($this->newMetaData->getValue(), $meta_data));
     }
 }

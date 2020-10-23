@@ -493,6 +493,7 @@ class LogBookUploaderController extends AbstractController
 //            if ($setup_name === 'SST_SETUP_TEST') {
 //                return $this->render('lbook/upload/curl.html.twig', []);
 //            }
+            $testTypeStr = substr($this->cleanString($request->request->get('test_type', 'TEST')), 0 , 14);
             $cycle_token = $this->cleanString($request->request->get('token', ''));
             $build_name = $this->cleanString($request->request->get('build', ''));
             $test_dut = $this->cleanString($request->request->get('dut', ''));
@@ -640,7 +641,12 @@ class LogBookUploaderController extends AbstractController
                             $testType = $this->testTypeRepo->findOneOrCreate(['name' => $test_metadata_arr['TEST_TYPE_SHOW_OPT']]);
                             $test->setTestType($testType);
                             $test->resetMetaData('TEST_TYPE_SHOW_OPT');
+                        } elseif (strlen($testTypeStr) > 0) {
+                            $testType = $this->testTypeRepo->findOneOrCreate(['name' => $testTypeStr]);
+                            $test->setTestType($testType);
+                            $test->resetMetaData('TEST_TYPE_SHOW_OPT');
                         }
+
                     } catch (Exception $ex) {
                         $logger->alert('[TEST_TYPE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                     }

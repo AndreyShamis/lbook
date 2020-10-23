@@ -640,11 +640,9 @@ class LogBookUploaderController extends AbstractController
                         if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test_metadata_arr) ) {
                             $testType = $this->testTypeRepo->findOneOrCreate(['name' => $test_metadata_arr['TEST_TYPE_SHOW_OPT']]);
                             $test->setTestType($testType);
-                            $test->resetMetaData('TEST_TYPE_SHOW_OPT');
                         } elseif (strlen($testTypeStr) > 0) {
                             $testType = $this->testTypeRepo->findOneOrCreate(['name' => $testTypeStr]);
                             $test->setTestType($testType);
-                            $test->resetMetaData('TEST_TYPE_SHOW_OPT');
                         }
 
                     } catch (Exception $ex) {
@@ -713,20 +711,27 @@ class LogBookUploaderController extends AbstractController
                             'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
                         ]);
                         $test->setTestInfo($testInfo);
-                        $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
                     }
                 } catch (Exception $ex) {
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }
+
+                $test->resetMetaData('TEST_TYPE_SHOW_OPT');
+                $test->resetMetaData('CLUSTER_SHOW');
+                $test->resetMetaData('SUITE_SHOW');
+                $test->resetMetaData('CHIP');
+                $test->resetMetaData('PLATFORM');
+                $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
 
                 if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
                     $newMD = new LogBookTestMD();
                     $newMD->setValue($test->getOldMetaData());
                     //$newMD->setTest($test);
                     $test->setNewMetaData($newMD);
-                    $test->resetMetaData('*');
                     $this->em->persist($newMD);
                 }
+
+                $test->resetMetaData('*');
 
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);

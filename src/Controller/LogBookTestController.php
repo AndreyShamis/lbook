@@ -161,7 +161,7 @@ class LogBookTestController extends AbstractController
     {
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.meta_data != :emptyMT')
-            ->setMaxResults(10000)
+            ->setMaxResults(50000)
             ->setParameter('emptyMT', 'a:0:{}')
             ->orderBy('t.id', 'ASC');
 
@@ -219,6 +219,7 @@ class LogBookTestController extends AbstractController
                 }
                 $test->resetMetaData('*');
             } catch (\Throwable $ex) {
+                print('<br/>MIGRATION - ' . $ex->getMessage());
                 $logger->critical('MIGRATION :' . $ex->getMessage(), [
                     'ex_file' => $ex->getFile(),
                     'ex_line' => $ex->getLine(),
@@ -229,12 +230,14 @@ class LogBookTestController extends AbstractController
 
         }
         $this->em->flush();
-        return array(
-            'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
-        );
+        print('Finish ' . $totalPosts );
+        exit();
+//        return array(
+//            'size'      => $totalPosts,
+//            'maxPages'  => $maxPages,
+//            'thisPage'  => $thisPage,
+//            'iterator'  => $iterator,
+//        );
     }
 
     /**

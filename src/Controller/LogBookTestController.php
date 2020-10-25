@@ -161,7 +161,7 @@ class LogBookTestController extends AbstractController
     {
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.meta_data != :emptyMT')
-            ->setMaxResults(100)
+            ->setMaxResults(10000)
             ->setParameter('emptyMT', 'a:0:{}')
             ->orderBy('t.id', 'ASC');
 

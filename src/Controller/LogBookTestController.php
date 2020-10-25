@@ -347,17 +347,25 @@ class LogBookTestController extends AbstractController
 //                }
 //                $qb->setParameter('test_name', '%'.$test_name.'%')
 //                    ->setParameter('metadata', $test_name.'%');
+
+                $test_name = trim($test_name);
                 if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
-                    $qb->andWhere('MATCH_AGAINST(t.name, :search_str) != 0 OR t.id = :test_id')
-                        ->setParameter('test_id', (int)$test_name);
+                    $qb->andWhere('MATCH_AGAINST(t.name, :search_str) != 0 OR t.id = :test_id');
+                    $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
+                    $qb->setParameter('test_id', (int)$test_name);
+
                 } else {
                     $qb->andWhere('MATCH_AGAINST(t.name, :search_str) > 1 OR t.name LIKE :test_name');
+                    //$qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal('%'. $test_name. '%') ));
+                    $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
+
                     $qb->addSelect('MATCH_AGAINST(t.name, :search_str) as rate');
+
                     $qb->orderBy('rate', 'DESC');
                     $qb->addOrderBy('t.id', 'DESC');
                     $addOrder = false;
                 }
-                $test_name = trim($test_name);
+
                 $test_name_match = str_replace('%', ' ', $test_name);
                 $test_name_match = str_replace('?', ' ', $test_name_match);
                 $test_name_match = str_replace('  ', ' ', $test_name_match);
@@ -377,7 +385,11 @@ class LogBookTestController extends AbstractController
             if ($addOrder) {
                 $qb->orderBy('t.id', 'DESC');
             }
+            if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
+            }else {
+                $qb->setParameter('test_name', $test_name_search);
 
+            }
             if ($enableSearch) {
                 $query = $qb->getQuery();
                 $sql = $query->getSQL();
@@ -386,7 +398,9 @@ class LogBookTestController extends AbstractController
                     foreach($tests as $tmp_test) {
                         /** @var LogBookTest $t_t */
                         $t_t = $tmp_test[0];
-                        $t_t->setRate($tmp_test['rate']);
+                        try {
+                            $t_t->setRate($tmp_test['rate'] + $tmp_test['rate2']);
+                        } catch (\Throwable $ex) {}
                         $new_tests[] = $t_t;
                     }
                 } else {

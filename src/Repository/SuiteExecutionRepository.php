@@ -36,12 +36,6 @@ class SuiteExecutionRepository extends ServiceEntityRepository
         if (!array_key_exists('product_version', $criteria)) {
             $criteria['product_version'] = '';
         }
-        if (!array_key_exists('target_arch', $criteria)) {
-            $criteria['target_arch'] = '';
-        }
-        if (!array_key_exists('arch', $criteria)) {
-            $criteria['arch'] = '';
-        }
         if (array_key_exists('suite_dict', $criteria)) {
             $suite_dict = $criteria['suite_dict'];
         }
@@ -72,9 +66,24 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $arch = $criteria['arch'];
         }
         if (!array_key_exists('tests_count', $criteria)) {
-            $criteria['tests_count'] = 0;
+            if (array_key_exists('tests_count_enabled', $criteria) && (int)$criteria['tests_count_enabled'] > 0) {
+                $criteria['tests_count'] = (int)$criteria['tests_count_enabled'];
+            }else {
+                $criteria['tests_count'] = 0;
+            }
         } else {
             $criteria['tests_count'] = (int)$criteria['tests_count'];
+        }
+
+        if (!array_key_exists('tests_count_enabled', $criteria)) {
+            if (array_key_exists('tests_count', $criteria) && (int)$criteria['tests_count'] > 0) {
+                $criteria['tests_count_enabled'] = (int)$criteria['tests_count'];
+            }else {
+
+                $criteria['tests_count_enabled'] = 0;
+            }
+        } else {
+            $criteria['tests_count_enabled'] = (int)$criteria['tests_count_enabled'];
         }
 
         if (!array_key_exists('build_flavor', $criteria)) {
@@ -94,11 +103,7 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $criteria['platform_hw_ver'] = trim($criteria['platform_hw_ver']);
         }
 
-        if (!array_key_exists('tests_count_enabled', $criteria)) {
-            $criteria['tests_count_enabled'] = 0;
-        } else {
-            $criteria['tests_count_enabled'] = (int)$criteria['tests_count_enabled'];
-        }
+
         try {
             $entity = $this->findOneBy(
                 array(
@@ -134,10 +139,18 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             $entity->setBuildType($criteria['build_flavor']);
             $entity->setPlatformHardwareVersion($criteria['platform_hw_ver']);
             $entity->setPublish($publish);
-            $entity->setJobName($criteria['job_name']);
-            $entity->setBuildTag($criteria['build_tag']);
-            $entity->setTargetArch($criteria['target_arch']);
-            $entity->setArch($criteria['arch']);
+            if (array_key_exists('job_name', $criteria)) {
+                $entity->setJobName($criteria['job_name']);
+            }
+            if (array_key_exists('build_tag', $criteria)) {
+                $entity->setBuildTag($criteria['build_tag']);
+            }
+            if (array_key_exists('target_arch', $criteria)) {
+                $entity->setTargetArch($criteria['target_arch']);
+            }
+            if (array_key_exists('arch', $criteria)) {
+                $entity->setArch($criteria['arch']);
+            }
             $entity->setDatetime($criteria['datetime']);
             $entity->setTestsCount($criteria['tests_count']);
             $entity->setTestsCountEnabled($criteria['tests_count_enabled']);

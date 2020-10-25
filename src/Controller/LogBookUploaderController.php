@@ -258,7 +258,7 @@ class LogBookUploaderController extends AbstractController
 
         try {
             if (!array_key_exists('hostname', $data)) {
-                $data['hostname'] = '';
+                $data['hostname'] = $ip;
             }
             $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
             unset($data['hostname']);
@@ -290,7 +290,7 @@ class LogBookUploaderController extends AbstractController
             $data['summary'] = '';
         }
         if (!array_key_exists('name', $data)) {
-            $data['name'] = '';
+            $data['name'] = 'NoName';
         }
         if (array_key_exists('test_environments', $data)) {
             //$data['test_environments'] = array();

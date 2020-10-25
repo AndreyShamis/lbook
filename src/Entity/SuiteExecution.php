@@ -132,12 +132,12 @@ class SuiteExecution
     private $owners = [];
 
     /**
-     * @ORM\Column(type="simple_array")
+     * @ORM\Column(type="simple_array", nullable=true)
      */
     private $components;
 
     /**
-     * @ORM\Column(name="test_environments", type="simple_array")
+     * @ORM\Column(name="test_environments", type="simple_array", nullable=true)
      */
     private $testEnvironments;
 
@@ -255,6 +255,10 @@ class SuiteExecution
      */
     private $host;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $branchName;
 
     protected $rate = 0;
 
@@ -608,6 +612,9 @@ class SuiteExecution
      */
     public function getComponents(): array
     {
+        if ($this->components === null) {
+            return [];
+        }
         return $this->components;
     }
 
@@ -615,7 +622,7 @@ class SuiteExecution
      * @param array $components
      * @return $this
      */
-    public function setComponents(array $components): self
+    public function setComponents(?array $components): self
     {
         $this->components = $components;
 
@@ -624,10 +631,13 @@ class SuiteExecution
 
     public function getTestEnvironments(): ?array
     {
+        if ($this->testEnvironments === null) {
+            return [];
+        }
         return $this->testEnvironments;
     }
 
-    public function setTestEnvironments(array $testEnvironments): self
+    public function setTestEnvironments(?array $testEnvironments): self
     {
         $this->testEnvironments = $testEnvironments;
 
@@ -1085,6 +1095,25 @@ class SuiteExecution
     public function setPlatformHardwareVersion(string $platformHardwareVersion): void
     {
         $this->platformHardwareVersion = $platformHardwareVersion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBranchName() : string
+    {
+        if ($this->branchName === null) {
+            return $this->getBranch();
+        }
+        return $this->branchName;
+    }
+
+    /**
+     * @param mixed $branchName
+     */
+    public function setBranchName(?string $branchName): void
+    {
+        $this->branchName = $branchName;
     }
 
 

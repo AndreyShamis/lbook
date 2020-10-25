@@ -30,6 +30,18 @@ class SuiteExecutionRepository extends ServiceEntityRepository
     public function findOneOrCreate(array $criteria): SuiteExecution
     {
         $suite_dict = array();
+        if (!array_key_exists('testing_level', $criteria)) {
+            $criteria['testing_level'] = 'sanity';
+        }
+        if (!array_key_exists('product_version', $criteria)) {
+            $criteria['product_version'] = '';
+        }
+        if (!array_key_exists('target_arch', $criteria)) {
+            $criteria['target_arch'] = '';
+        }
+        if (!array_key_exists('arch', $criteria)) {
+            $criteria['arch'] = '';
+        }
         if (array_key_exists('suite_dict', $criteria)) {
             $suite_dict = $criteria['suite_dict'];
         }
@@ -147,12 +159,16 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             if (array_key_exists('test_set_url', $criteria)) {
                 $entity->setTestSetUrl($criteria['test_set_url']);
             }
+            if (array_key_exists('branchName', $criteria) && strlen(trim($criteria['branchName'])) > 2) {
+                $entity->setBranchName(substr(trim($criteria['branchName']),0, 49));
+            }
             if (array_key_exists('test_environments', $criteria)) {
                 $entity->setTestEnvironments($criteria['test_environments']);
             }
-            if (array_key_exists('components', $criteria)) {
-                $entity->setComponents($criteria['components']);
-            }
+            $entity->setComponents($criteria['components']);
+//            if (array_key_exists('components', $criteria)) {
+//
+//            }
             if (array_key_exists('owners', $criteria) && $criteria['owners'] !== null && count($criteria['owners']) > 0) {
                 $entity->setOwners($criteria['owners']);
             } elseif (array_key_exists('assignees', $suite_dict) && $suite_dict['assignees'] !== null && count($suite_dict['assignees']) > 0){

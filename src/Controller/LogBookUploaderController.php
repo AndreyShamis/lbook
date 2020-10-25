@@ -272,7 +272,7 @@ class LogBookUploaderController extends AbstractController
 //        $logger->critical($ip . '::IP  :' , $data);
 
         if (!array_key_exists('components', $data)) {
-            $data['components'] = array();
+            $data['components'] = ['No'];
         }
         if (!array_key_exists('owners', $data)) {
             $data['owners'] = array();
@@ -292,15 +292,16 @@ class LogBookUploaderController extends AbstractController
         if (!array_key_exists('name', $data)) {
             $data['name'] = '';
         }
-        if (!array_key_exists('test_environments', $data)) {
-            $data['test_environments'] = array();
+        if (array_key_exists('test_environments', $data)) {
+            //$data['test_environments'] = array();
+            $data['test_environments'] = array_filter($data['test_environments']);
         }
 
         if (!array_key_exists('package_mode', $data)) {
             $data['package_mode'] = 'package_mode';
         }
         $data['components'] = array_filter($data['components']);
-        $data['test_environments'] = array_filter($data['test_environments']);
+
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;

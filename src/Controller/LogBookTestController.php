@@ -189,6 +189,11 @@ class LogBookTestController extends AbstractController
                     $testType = $testTypeRepo->findOneOrCreate(['name' => 'TEST']);
                     $test->setTestType($testType);
                 }
+
+
+                if ( array_key_exists('TEST_CASE_SHOW',  $test->getMetaData()) && strlen($test->getMetaData()['TEST_CASE_SHOW']) > 5) {
+                    $test->setTestKey($test->getMetaData()['TEST_CASE_SHOW']);
+                }
                 $test->resetMetaData('TEST_TYPE_SHOW_OPT');
                 $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
                 $test->resetMetaData('CLUSTER_SHOW');
@@ -198,10 +203,13 @@ class LogBookTestController extends AbstractController
                 $test->resetMetaData('HOSTNAME');
                 $test->resetMetaData('TEST_FILENAME');
                 $test->resetMetaData('TEST_VER');
+                $test->resetMetaData('TEST_VERSION_SHOW_OPT');
                 $test->resetMetaData('CONTROL_VER');
+                $test->resetMetaData('CONTROL_VERSION_SHOW_OPT');
                 $test->resetMetaData('TIMEOUT');
                 $test->resetMetaData('LABELS');
                 $test->resetMetaData('UUID');
+                $test->resetMetaData('TEST_CASE_SHOW');
 
                 if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
                     $newMD = new LogBookTestMD();

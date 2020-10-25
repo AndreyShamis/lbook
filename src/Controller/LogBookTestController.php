@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestMD;
 use App\Entity\TestSearch;
 use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
+use App\Repository\LogBookTestInfoRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookTestTypeRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -142,6 +145,90 @@ class LogBookTestController extends AbstractController
             return $response;
         }
     }
+
+    /**
+     * @Route("/migration", name="migration", methods={"GET"})
+     * @Template(template="lbook/test/list.html.twig")
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testsRepo
+     * @param LogBookTestInfoRepository $testInfo
+     * @param LogBookTestTypeRepository $testTypeRepo
+     * @return array
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LoggerInterface $logger): array
+    {
+        $query = $testsRepo->createQueryBuilder('t')
+            ->where('t.meta_data != :emptyMT')
+            ->setMaxResults(100)
+            ->setParameter('emptyMT', 'a:0:{}')
+            ->orderBy('t.id', 'ASC');
+
+        /** @var \ArrayIterator $iterator */
+        $iterator = $query->getQuery()->execute();
+        $totalPosts = count($iterator);
+        $maxPages =1;
+        $thisPage = 1;
+        /** @var LogBookTest $test */
+        foreach ($iterator as $test) {
+            try {
+                if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
+                    $crit = [
+                        'name' => $test->getName(),
+                        'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
+                    ];
+                    $testInfo = $testInfoRepo->findOneOrCreate($crit);
+                    $test->setTestInfo($testInfo);
+                }
+
+                if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test->getMetaData()) ) {
+                    $testType = $testTypeRepo->findOneOrCreate(['name' => $test->getMetaData()['TEST_TYPE_SHOW_OPT']]);
+                    $test->setTestType($testType);
+                } else {
+                    $testType = $testTypeRepo->findOneOrCreate(['name' => 'TEST']);
+                    $test->setTestType($testType);
+                }
+                $test->resetMetaData('TEST_TYPE_SHOW_OPT');
+                $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
+                $test->resetMetaData('CLUSTER_SHOW');
+                $test->resetMetaData('SUITE_SHOW');
+                $test->resetMetaData('CHIP');
+                $test->resetMetaData('PLATFORM');
+                $test->resetMetaData('HOSTNAME');
+                $test->resetMetaData('TEST_FILENAME');
+                $test->resetMetaData('TEST_VER');
+                $test->resetMetaData('CONTROL_VER');
+                $test->resetMetaData('TIMEOUT');
+                $test->resetMetaData('LABELS');
+                $test->resetMetaData('UUID');
+
+                if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
+                    $newMD = new LogBookTestMD();
+                    $newMD->setValue($test->getOldMetaData());
+                    $test->setNewMetaData($newMD);
+                    $this->em->persist($newMD);
+                }
+                $test->resetMetaData('*');
+            } catch (\Throwable $ex) {
+                $logger->critical('MIGRATION :' . $ex->getMessage(), [
+                    'ex_file' => $ex->getFile(),
+                    'ex_line' => $ex->getLine(),
+                    'trace' => $ex->getTraceAsString(),
+                    ]);
+            }
+
+
+        }
+        $this->em->flush();
+        return array(
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+        );
+    }
+
     /**
      * @Route("/search", name="test_search", methods={"GET|POST"})
      * @param Request $request

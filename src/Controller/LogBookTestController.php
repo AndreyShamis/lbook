@@ -10,6 +10,7 @@ use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestInfoRepository;
+use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
 use App\Service\PagePaginator;
@@ -157,11 +158,12 @@ class LogBookTestController extends AbstractController
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LoggerInterface $logger): array
+    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LoggerInterface $logger): array
     {
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.meta_data != :emptyMT')
-            ->setMaxResults(10000)
+            ->andWhere('t.newMetaData IS NULL')
+            ->setMaxResults(20000)
             ->setParameter('emptyMT', 'a:0:{}')
             ->orderBy('t.id', 'ASC');
 
@@ -212,12 +214,18 @@ class LogBookTestController extends AbstractController
                 $test->resetMetaData('TEST_CASE_SHOW');
 
                 if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
-                    $newMD = new LogBookTestMD();
+                    $md = $mdRepo->findOneBy(["test" => $test]);
+                    if ($md === null) {
+                        $newMD = new LogBookTestMD();
+                    } else {
+                        $newMD = $md;
+                    }
                     $newMD->setValue($test->getOldMetaData());
                     $test->setNewMetaData($newMD);
                     $this->em->persist($newMD);
                 }
                 $test->resetMetaData('*');
+
             } catch (\Throwable $ex) {
                 $logger->critical('MIGRATION :' . $ex->getMessage(), [
                     'ex_file' => $ex->getFile(),
@@ -226,9 +234,9 @@ class LogBookTestController extends AbstractController
                     ]);
             }
 
-
         }
         $this->em->flush();
+
 
         return array(
             'size'      => $totalPosts,

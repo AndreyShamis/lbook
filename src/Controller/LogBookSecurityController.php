@@ -116,9 +116,7 @@ class LogBookSecurityController extends AbstractController
                     try {
                         $user = $userRepo->loadUserByUsername($user_name);
                     } catch (\Throwable $ex){}
-                    if (!$user !== null && !$user->isLdapUser()) {
-
-                    } else {
+                    if ($user === null || ($user !== null && $user->isLdapUser())) {
                         $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
                         if (\is_array($ldapUserArr)) {
                             $ldapLogin = true;
@@ -128,6 +126,8 @@ class LogBookSecurityController extends AbstractController
                                 $user = $userRepo->create($ldapUserArr);
                             }
                         }
+                    } else {
+                        $user = $userRepo->loadUserByUsername($user_name);
                     }
                 } else {
                     $user = $userRepo->loadUserByUsername($user_name);

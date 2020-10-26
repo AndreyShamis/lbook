@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookTestInfoRepository::class)
+ * @ORM\Table(name="log_book_test_info", indexes={
+ *     @Index(name="fulltext_name_path", columns={"name", "path"}, flags={"fulltext"})})
  */
 class LogBookTestInfo
 {
@@ -20,7 +22,7 @@ class LogBookTestInfo
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=500)
+     * @ORM\Column(type="string", length=250)
      */
     private $name = '';
 
@@ -34,7 +36,7 @@ class LogBookTestInfo
      */
     private $logBookTests;
 
-    public static $MAX_NAME_LEN = 500;
+    public static $MAX_NAME_LEN = 250;
     public static $MAX_PATH_LEN = 500;
 
     public static function validateName($newName): string

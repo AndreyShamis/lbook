@@ -66,9 +66,11 @@ class LogBookCycleReportController extends AbstractController
             if ($cycle !== null) {
                 $logBookCycleReport->addCycle($cycle);
                 $logBookCycleReport->setDescription('Cycle executed on ' . $cycle->getBuild());
-                $logBookCycleReport->setName($cycle->getName());
                 /** @var SuiteExecution $some_suite */
                 $some_suite = $cycle->getSuiteExecution()->first();
+                $logBookCycleReport->setName('['. strtoupper($some_suite->getTestingLevel()) .'][' . str_replace('_MODE', '', strtoupper($some_suite->getMode())) .'] ' . $cycle->getName());
+
+
                 $logBookCycleReport->setMode($some_suite->getMode());
 
                 //$logBookCycleReport->setReportNotes($reportNotes);

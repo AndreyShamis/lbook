@@ -356,7 +356,7 @@ class LogBookTestController extends AbstractController
 
                 } else {
                     //$qb->andWhere('MATCH_AGAINST(t.name, :search_str) > 1 OR t.name LIKE :test_name');
-                    $qb->leftJoin('t.testInfo', 'testInfo')->orWhere('MATCH_AGAINST(testInfo.name, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, :search_str) as rate');
+                    $qb->leftJoin('t.testInfo', 'testInfo')->orWhere('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) as rate');
                     //$qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal('%'. $test_name. '%') ));
                     $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
 

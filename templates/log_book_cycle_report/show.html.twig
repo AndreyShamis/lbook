@@ -476,9 +476,9 @@
 {#                <td><a title="{{ suite.uuid }}" href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.summary }}</a></td>#}
                 <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
-                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</td>
+                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate  | round(0, 'floor') }}%</td>
                 <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</td>
-                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate }}%</td>
+                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate | round(0, 'ceil')}}%</td>
                 <td>{{ suite.testingLevel }}</td>
                 <td>{{ suite.platform }}</td>
                 <td>{{ suite.chip }}</td>
@@ -542,7 +542,7 @@
             <th title="Assignee">Assignee</th>
             <th title="Updated">Updated</th>
 {#            <th title="Created">Created</th>#}
-            <th class="print-disable" title="Age - represents number of weeks">Age</th>
+            <th class="print-disable" title="Age - represents number of days">Age</th>
         </tr>
         </thead>
         <tbody>

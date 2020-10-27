@@ -179,6 +179,9 @@ class LogBookCycleReport
             ->setParameter('cycles', $this->getCycles())
             ->setParameter('platforms', $this->getPlatforms())
             ->setParameter('chips', $this->getChips())
+            ->setMaxResults(10000)
+            ->orderBy('s.passRate', 'ASC')
+            ->addOrderBy('s.name', 'ASC')
         ;
         return $qb->getQuery()->execute();
     }

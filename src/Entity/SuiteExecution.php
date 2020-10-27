@@ -338,7 +338,12 @@ class SuiteExecution
         $testsFound = false;
         /** @var LogBookTest $test */
         foreach ($tests as $test) {
-            $type = $test->getMDTestType();
+            try {
+                $type = $test->getTestType()->getName();
+            } catch (\Throwable $ex) {
+                $type = 'TEST';
+            }
+
             if ($type === 'TEST') {
                 $totoal_real_tests_found += 1;
                 if ($test->isPass()) {

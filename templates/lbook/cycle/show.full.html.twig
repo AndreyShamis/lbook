@@ -431,10 +431,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}
-                    {% if item == 'SUITE_SHOW' and suitesCount > 0 %}
-                    {% else %}
-                    <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column" {% if item== 'CLUSTER_SHOW' %}  data-visible="false" {% endif %}>{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
-                    {% endif %}
+                    <th data-sortable="true" title="{{ key }}-{{ item }}" data-field="{{ item }}" class="meta_data_column">{{ shortString(item|replace({'_SHOW': '' }) , 15) }}</th>
                 {% endfor %}
             {% endif %}
             {% if show_metadata_opt == true %}
@@ -465,19 +462,19 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% if test.isDisabled == 1 %}
                 {% set test_disabled = ' test-disabled ' %}
             {% endif %}
-            {% if test.testType == 'PRE_CYCLE' %}
+            {% if test.testType.name == 'PRE_CYCLE' or test.testType.name == 'PRE_TEST_FLOW' %}
                 {% set testType = ' test-pre-cycle ' %}
-            {% elseif test.testType == 'POST_CYCLE' %}
+            {% elseif test.testType.name == 'POST_CYCLE' or test.testType.name == 'POST_TEST_FLOW' %}
                 {% set testType = ' test-post-cycle ' %}
-            {% elseif test.testType == 'HEALTH_CHECK' %}
+            {% elseif test.testType.name == 'HEALTH_CHECK' %}
                 {% set testType = ' test-health-cycle ' %}
-            {% elseif test.testType == 'RECOVERY' %}
+            {% elseif test.testType.name == 'RECOVERY' %}
                 {% set testType = ' test-recovery-cycle ' %}
             {% endif %}
             <tr class='{{ test_disabled }}{{ testType }}'>
                 {#{% if is_granted('edit', cycle.setup) %}#}
-                    {% if 'SUITE_SHOW' in test.metaData|keys %}
-                        {%  set column =  test.metaData['SUITE_SHOW'] %}
+                    {% if test.suiteExecution is defined  %}
+                        {%  set column =  test.suiteExecution.name ~ '[' ~  shortString(test.suiteExecution.buildType, 3, '')  ~ ']' ~ '[' ~  test.suiteExecution.id ~ ']'%}
                     {% else %}
                         {%  set column =  test.verdict %}
                     {% endif %}
@@ -485,7 +482,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {#{% endif %}#}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
-                <td class="cycleName" title="{{ test.testType }}"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                <td class="cycleName" title="{{ test.testType }} - {{ test.testPath }}"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td><span data-title="{{ test.timeRun }}">{{ test.timeRun | ExecutionTimeGeneric}}</span></td>
                 {% if cycle_show_test_time_start_show == true %}
                     {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}
@@ -515,8 +512,6 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {% endif %}
                 {% if show_metadata == true %}
                     {% for key, item in additional_cols %}
-                        {% if item == 'SUITE_SHOW' and test.suiteExecution.name is defined %}
-                        {% else %}
                         <td title="{{ item }}">
                             {% if item in test.metaData|keys %}
                                 {% if isUrl(test.metaData[item]) %}
@@ -537,7 +532,6 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 {% endif %}
                             {% endif %}
                         </td>
-                        {% endif %}
                     {% endfor %}
                 {% endif %}
                 {% if show_metadata_opt == true %}

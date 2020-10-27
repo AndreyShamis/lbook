@@ -86,27 +86,31 @@
 {#                                <td>#}
                                     <div class="center">
                                         <span class="btn btn-app btn-app btn-light">
-                                            <span class="line-height-1 bigger-170 blue"> {{ log_book_cycle_report.testsTotalEnabledInSuites }} </span><br>
-                                            <span class="line-height-1 smaller-90"> Enabled </span>
+                                            <span class="line-height-1 bigger-170 green">{{ log_book_cycle_report.testsTotalEnabledInSuites }}</span><br>
+                                            <span class="line-height-1 smaller-90">Enabled</span>
                                         </span>
                                         <span class="btn btn-app btn-app btn-light">
-                                            <span class="line-height-1 bigger-170 blue"> {{ log_book_cycle_report.testsTotal }} </span><br>
-                                            <span class="line-height-1 smaller-90"> Total </span>
+                                            <span class="line-height-1 bigger-170 brown">{{ getPercentage(log_book_cycle_report.testsTotal, log_book_cycle_report.testsTotalEnabledInSuites ) | round(0, 'floor')}}%</span><br>
+                                            <span class="line-height-1 smaller-80">Ratio</span>
+                                        </span>
+                                        <span class="btn btn-app btn-app btn-light">
+                                            <span class="line-height-1 bigger-160 blue">{{ log_book_cycle_report.testsTotal }}</span><br>
+                                            <span class="line-height-1 smaller-80">Total</span>
                                         </span>
                                         <span class="btn btn-app btn-app btn-success radius-4">
-                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsPass }} </span><br>
+                                            <span class="line-height-1 bigger-160">{{ log_book_cycle_report.testsPass }}</span><br>
                                             <span class="line-height-1 smaller-90"> Pass </span>
                                         </span>
                                         <span class="btn btn-app btn-app btn-pink radius-4">
-                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsFail }} </span><br>
+                                            <span class="line-height-1 bigger-160">{{ log_book_cycle_report.testsFail }}</span><br>
                                             <span class="line-height-1 smaller-90"> Fail </span>
                                         </span>
                                         <span class="btn btn-app btn-app btn-yellow radius-4">
-                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsError }} </span><br>
+                                            <span class="line-height-1 bigger-160">{{ log_book_cycle_report.testsError }}</span><br>
                                             <span class="line-height-1 smaller-90"> Error </span>
                                         </span>
                                         <span class="btn btn-app btn-app btn-primary no-hover radius-4">
-                                            <span class="line-height-1 bigger-170"> {{ log_book_cycle_report.testsOther }}  </span><br>
+                                            <span class="line-height-1 bigger-160">{{ log_book_cycle_report.testsOther }}</span><br>
                                             <span class="line-height-1 smaller-90"> Other </span>
 										</span>
                                     </div>

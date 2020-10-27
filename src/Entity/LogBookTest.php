@@ -168,7 +168,7 @@ class LogBookTest
     private $newMetaData;
 
     /**
-     * @ORM\ManyToOne(targetEntity=LogBookTestType::class)
+     * @ORM\ManyToOne(targetEntity=LogBookTestType::class, fetch="EAGER")
      */
     private $testType;
 
@@ -176,8 +176,41 @@ class LogBookTest
     protected $failDescriptionParsed = false;
 
     protected $rate = 0;
+    protected $testPath = null;
+    protected $testFailDescription = null;
 
 
+    public function getTestPath(): string
+    {
+        if ($this->testPath !== null) {
+            return $this->testPath;
+        }
+        if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
+            return $this->getTestInfo()->getPath();
+        }
+        return '';
+    }
+
+    public function setTestPath(string $path): void
+    {
+        $this->testPath = $path;
+    }
+
+    public function getTestFailDescription(): string
+    {
+        if ($this->testFailDescription !== null) {
+            return $this->testFailDescription;
+        }
+//        if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
+//            return $this->getTestInfo()->getPath();
+//        }
+        return $this->getFailDescription();
+    }
+
+    public function setTestFailDescription(string $desc): void
+    {
+        $this->testFailDescription = $desc;
+    }
 
     public function setRate(float $r) {
         $this->rate = round($r, 2);
@@ -203,28 +236,6 @@ class LogBookTest
         $this->failDescriptionParsed = $failDescriptionParsed;
     }
 
-    public function getMDTestType(): string
-    {
-        $ret = 'TEST';
-        if ($this->getTestType() === null) {
-            $key = 'TEST_TYPE_SHOW_OPT';
-            $md = $this->getMetaData();
-            if (array_key_exists($key, $md)) {
-                $ret = $md[$key];
-                if ($ret === 'PRE_TEST_FLOW') {
-                    $ret = 'PRE_CYCLE';
-                }
-                if ($ret === 'POST_TEST_FLOW') {
-                    $ret = 'POST_CYCLE';
-                }
-            }
-        } else {
-            $ret = $this->getTestType()->getName();
-        }
-
-        return $ret;
-
-    }
     /**
      * LogBookTest constructor.
      * @throws \Exception
@@ -842,6 +853,7 @@ class LogBookTest
             'time_start' => $this->getTimeStart()->getTimestamp(),
             'time_end' => $this->getTimeEnd()->getTimestamp(),
             'time_run' => $this->getTimeRun(),
+            'testType' => $this->getTestType()->getName(),
         );
         if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
             $ret['meta_data']['CONTROL_FILE_SHOW_OPT'] = $this->getTestInfo()->getPath();

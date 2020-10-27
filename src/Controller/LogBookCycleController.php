@@ -248,7 +248,7 @@ class LogBookCycleController extends AbstractController
                         $ret_test['order'] = $test->getExecutionOrder();
                         $ret_test['chip'] = $test->getChip();
                         $ret_test['platform'] = $test->getPlatform();
-                        $ret_test['test_type'] = $test->getMDTestType();
+                        $ret_test['test_type'] = $test->getTestType()->getName();
                         $ret_test['metadata'] = $test->getMetaData(); //array();
                         try {
                             unset($ret_test['metadata']['TEST_FILENAME']);
@@ -356,7 +356,7 @@ class LogBookCycleController extends AbstractController
             $ret_test['order'] = $test->getExecutionOrder();
             $ret_test['chip'] = $test->getChip();
             $ret_test['platform'] = $test->getPlatform();
-            $ret_test['test_type'] = $test->getMDTestType();
+            $ret_test['test_type'] = $test->getTestType()->getName();
             $ret_test['metadata'] = $test->getMetaData(); //array();
             try {
                 unset($ret_test['metadata']['TEST_FILENAME']);
@@ -820,14 +820,19 @@ class LogBookCycleController extends AbstractController
             $qb = $testRepo->createQueryBuilder('t')
                 // ->select('t')
                 ->addSelect('v.name as verdict')
+                ->addSelect('tt.name as testType')
                 //->addSelect('v.name ')
                 //  ->from('App:LogBookVerdict', 'ver')
                 ->innerJoin('App:LogBookVerdict', 'v', 'WITH', 'v.id = t.verdict')
+                ->innerJoin('App:LogBookTestType', 'tt', 'WITH', 't.testType = tt.id')
                 //  ->leftJoin('t.verdict', 'v')
                 ->where('t.cycle = :cycle')
-                ->andWhere('t.disabled = :disabled')
-                ->orderBy('t.executionOrder', 'ASC')
+                ->andWhere('t.disabled = :disabled');
+//            $qb->leftJoin('App:LogBookTestMD', 'p', 'WITH', 't.newMetaData = p.id');
+
+            $qb->orderBy('t.executionOrder', 'ASC')
                 ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+
             $q = $qb->getQuery();
             $sql = $q->getSQL();
             $encoder = new JsonEncoder();
@@ -872,33 +877,23 @@ class LogBookCycleController extends AbstractController
 
             foreach ($res as $key => $val) {
                 $test = $val[0];
+
+                    //exit();
                 $verdict = $val['verdict'];
                 $test['verdict'] = $verdict;
+                $test['TEST_TYPE'] = $val['testType'];
                 $val = $test;
                 //$val['timeStart'] = $val['timeStart']->format('H:i:s');
                 $val['timeStart'] = $val['timeStart']->format(\DateTime::ATOM);
                 //$val['timeEnd'] = $val['timeEnd']->format('H:i:s');
                 $val['timeEnd'] = $val['timeEnd']->format(\DateTime::ATOM);
                 unset($val['disabled'], $val['logFile'], $val['dutUpTimeStart'], $val['dutUpTimeEnd'], $val['forDelete']);
-                if ($val['meta_data'] !== null) {
-                    foreach ($val['meta_data'] as $md_key => $md_val) {
-                        $val[$md_key] = $md_val;
-                    }
-                }
                 unset($val['meta_data']);
                 $res[$key] = $val;
             }
             $fin_res['total'] = $paginator->count();
             $fin_res['rows'] = $res;
             return new JsonResponse($fin_res);
-            //$json = $serializer->serialize($fin_res, 'json');
-            //return new JsonResponse($json, 200, array(), true);
-
-//            $response = $this->json([]);
-//            $response->setJson($json);
-//            $response->setContent('text/json');
-//            $response->setEncodingOptions(JSON_PRETTY_PRINT);
-            return $response;
         } catch (\Throwable $ex) {
             $response = $this->json([]);
             $js = json_encode('["'. $ex->getMessage() .'"]');
@@ -1049,10 +1044,14 @@ class LogBookCycleController extends AbstractController
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
+                ->addSelect('i.name as name')
+                ->addSelect('i.path as testPath')
                 ->andWhere('t.disabled = :disabled')
-                ->orderBy('t.executionOrder', 'ASC')
-                //->setParameter('cycle', $cycle->getId());
-                ->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+                ->orderBy('t.executionOrder', 'ASC');
+            $qb->innerJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
+
+            //->setParameter('cycle', $cycle->getId());
+            $qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
             if ($suite !== null) {
                 $qb->andWhere('t.suite_execution = :suite')
                     ->setParameter('suite', $suite->getId());
@@ -1061,82 +1060,73 @@ class LogBookCycleController extends AbstractController
             $paginator = $pagePaginator->paginate($qb, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
-
             $maxPages = ceil($totalPosts / $maxSize); //$this->show_tests_size);
             $thisPage = $page;
             $disable_uptime = false;
             $deleteForm = $this->createDeleteForm($cycle);
             $nul_found = 0;
-
+            $em = $this->getDoctrine()->getManager();
             $additional_cols = $additional_opt_cols = $suites = $failed_tests = $errors = array();
             $iterator->rewind();
+            $res = $iterator->getArrayCopy();
             $suites = $cycle->getSuiteExecution();
+
+            $ret_tests = [];
             $errors_found = false;
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
-                    $test = $iterator->current();
-                    if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
-                        $errors_found = true;
-                        $failed_tests[] = $test;
-//                        $logs = $test->getLogs();
-//                        $err_key = $test->getExecutionOrder() . '-' . $test->getName();
-//                        foreach ($logs as $log) {
-//                            if ($log->getMsgType()->getName() === 'FAIL') {
-//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
-//                                    $errors[$err_key] = $log->getMessage();
-//                                }
-//                            }
-//                            if ($log->getMsgType()->getName() === 'ERROR') {
-//                                if (strpos($log->getMessage(), 'ERROR ') === 0) {
-//                                    $errors[$err_key] = $log->getMessage();
-//                                }
-//                            }
-//                            if ($log->getMsgType()->getName() === 'UNKNOWN') {
-//                                if (strpos($log->getMessage(), 'FAIL ') === 0) {
-//                                    $errors[$err_key] = $log->getMessage();
-//                                }
-//                            }
-//                        }
-                    }
+                    $obj = $iterator->current();
+                    $test = $obj[0];
+                    $testName = $obj['name'];
+                    $testPath = $obj['testPath'];
+                    //$testFailDescription = $obj['testFailDesc'];
+                    if ($test instanceof \App\Entity\LogBookTest) {
+                        $test->setName($testName);
+                        $test->setTestPath($testPath);
+                        //$test->setTestFailDescription($testFailDescription);
+                        $ret_tests[] = $test;
 
-                    if ($test !== null) {
-                        /**
-                         * Search for metadata with _SHOW postfix, if exist that column will be shown
-                         * @var array $md
-                         */
+                        if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
+                            $errors_found = true;
+                            $failed_tests[] = $test;
+                        }
+
+                        if ($test !== null) {
+                            /**
+                             * Search for metadata with _SHOW postfix, if exist that column will be shown
+                             * @var array $md
+                             */
 //                        $suite = $test->getSuiteExecution();
 //                        if ($suite !== null && !in_array($suite, $suites, true)) {
 //                            $suites[] = $suite;
 //                        }
 
-                        $md = $test->getMetaData();
-                        if (\count($md) > 0) {
-                            foreach ($md as $key => $value) {
-                                if ($forJson) {
-                                    $tmp_key = $key;
-                                    if (!\in_array($tmp_key, $additional_cols, true)) {
-                                        $additional_cols[] = $tmp_key;
-                                    }
-                                } else {
-                                    if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
-                                        if ($this->endsWith($key, 'SUITE_SHOW') && count($cycle->getSuiteExecution()) ) {
-
-                                        } else {
-                                            $additional_cols[] = $key;
+                            $md = $test->getMetaData();
+                            if (\count($md) > 0) {
+                                foreach ($md as $key => $value) {
+                                    if ($forJson) {
+                                        $tmp_key = $key;
+                                        if (!\in_array($tmp_key, $additional_cols, true)) {
+                                            $additional_cols[] = $tmp_key;
                                         }
-                                    } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
-                                        $additional_opt_cols[] = $key;
+                                    } else {
+                                        if ($this->endsWith($key, '_SHOW') && !\in_array($key, $additional_cols, true)) {
+                                            $additional_cols[] = $key;
+                                        } else if ($this->endsWith($key, '_SHOW_OPT') && !\in_array($key, $additional_opt_cols, true)) {
+                                            $additional_opt_cols[] = $key;
+                                        }
                                     }
                                 }
                             }
+                            /** Search for uptime if show or not */
+                            if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
+                                $nul_found++;
+                            }
                         }
-                        /** Search for uptime if show or not */
-                        if ($test->getDutUpTimeStart() === 0 && $test->getDutUpTimeEnd() === 0) {
-                            $nul_found++;
-                        }
+                        $iterator->next();
                     }
-                    $iterator->next();
+
                 }
             }
 
@@ -1151,7 +1141,7 @@ class LogBookCycleController extends AbstractController
                 'size'                  => $totalPosts,
                 'maxPages'              => $maxPages,
                 'thisPage'              => $thisPage,
-                'iterator'              => $iterator,
+                'iterator'              => $ret_tests,
                 'disabled_uptime'       => $disable_uptime,
                 'delete_form'           => $deleteForm->createView(),
                 'additional_cols'       => $additional_cols,

@@ -480,12 +480,12 @@ class LogBookUploaderController extends AbstractController
             if ($request->request->get('debug', false) === 'true') {
                 $obj->setDebug(true);
             }
-            $req_test_name = $this->cleanString($request->request->get('test_name', ''));
+            $req_test_name = $this->cleanName($request->request->get('test_name', ''));
             //$req_test_result = $request->request->get('test_result', '');
-            $req_test_result = $this->cleanString($request->request->get('testResult', ''));
+            $req_test_result = $this->cleanUploadFields($request->request->get('testResult', ''));
             $fail_reason = $request->request->get('fail_reason', '');
-            $cycle_name = $this->cleanString($request->request->get('cycle', ''));
-            $setup_name = $this->cleanString($request->request->get('setup', ''));
+            $cycle_name = $this->cleanName($request->request->get('cycle', ''));
+            $setup_name = $this->cleanName($request->request->get('setup', ''));
 //            if (strpos($setup_name, 'AppSW_CI') !== false){
 //                $setup_name = 'AppSW_CI';
 //            }
@@ -494,10 +494,10 @@ class LogBookUploaderController extends AbstractController
 //            if ($setup_name === 'SST_SETUP_TEST') {
 //                return $this->render('lbook/upload/curl.html.twig', []);
 //            }
-            $testTypeStr = substr($this->cleanString($request->request->get('test_type', 'TEST')), 0 , 14);
-            $cycle_token = $this->cleanString($request->request->get('token', ''));
-            $build_name = $this->cleanString($request->request->get('build', ''));
-            $test_dut = $this->cleanString($request->request->get('dut', ''));
+            $testTypeStr = substr($this->cleanUploadFields($request->request->get('test_type', 'TEST')), 0 , 14);
+            $cycle_token = $this->cleanUploadFields($request->request->get('token', ''));
+            $build_name = $this->cleanUploadFields($request->request->get('build', ''));
+            $test_dut = $this->cleanName($request->request->get('dut', ''));
             $test_metadata = $request->request->get('test_metadata', '');
             $test_metadata_arr = $this->extractTestVariables($test_metadata);
             $cycle_metadata = $request->request->get('cycle_metadata', '');
@@ -812,11 +812,55 @@ class LogBookUploaderController extends AbstractController
 
     public static function cleanName($inputName)
     {
+        $ret = LogBookUploaderController::cleanUploadFields($inputName);
+        $ret = str_replace('[', '', $ret);
+        $ret = str_replace(']', '', $ret);
+        $tmp_arr = explode('@', $ret);
+        if (count($tmp_arr) > 1) {
+            if (strlen($tmp_arr[0]) > strlen($tmp_arr[1])) {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[0]);
+            } else {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[1]);
+            }
+        }
+
+        $tmp_arr = explode('#', $ret);
+        if (count($tmp_arr) > 1) {
+            if (strlen($tmp_arr[0]) > strlen($tmp_arr[1])) {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[0]);
+            } else {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[1]);
+            }
+        }
+
+        $tmp_arr = explode('~', $ret);
+        if (count($tmp_arr) > 1) {
+            if (strlen($tmp_arr[0]) > strlen($tmp_arr[1])) {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[0]);
+            } else {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[1]);
+            }
+        }
+
+        $tmp_arr = explode('%', $ret);
+        if (count($tmp_arr) > 1) {
+            if (strlen($tmp_arr[0]) > strlen($tmp_arr[1])) {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[0]);
+            } else {
+                $ret = LogBookUploaderController::cleanUploadFields($tmp_arr[1]);
+            }
+        }
+        return $ret;
+    }
+
+    public static function cleanUploadFields($inputName)
+    {
         $charForRemove[] = "'";
         $charForRemove[] = '"';
 
         return str_replace($charForRemove, "_", $inputName);
     }
+
     /**
      * @param UploadedFile $file
      * @param LogBookSetup $setup
@@ -1067,6 +1111,7 @@ class LogBookUploaderController extends AbstractController
         $newTempArr = array();
         $last_good_key = -1;
         $firstLines = true;
+        $printMessage = true;
         foreach ($temp_arr as $key => $value) {
             $msg_len = mb_strlen($value);
             if ($msg_len < $this->_MIN_LOG_STR_LEN
@@ -1093,7 +1138,10 @@ class LogBookUploaderController extends AbstractController
                 if ($tmp_size >= $this->MAX_SINGLE_LOG_SIZE) {
                     $last_good_key = 0;
                     $firstLines = false;
-                    $logger->warning('Reset $last_good_key due big size: ' . $tmp_size);
+                    if ($printMessage) {
+                        $printMessage = false;
+                        $logger->warning('Reset $last_good_key due big size: ' . $tmp_size);
+                    }
                 } else {
                     $newTempArr[$last_good_key] = $new_value;
                 }
@@ -1680,12 +1728,13 @@ class LogBookUploaderController extends AbstractController
      */
     protected function cleanString(string $string): string
     {
-        $s = trim($string);
+        $s = str_replace('-------------------------', '-', trim($string));
+        $s = str_replace('====================', '=', trim($string));
         //$s = iconv('UTF-8', 'UTF-8//IGNORE', $s); // drop all non utf-8 characters
         // this is some bad utf-8 byte sequence that makes mysql complain - control and formatting i think
-        $s = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/', ' ', $s);
+        /**   $s = preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/', ' ', $s); */
         //$s = preg_replace('/\s+/', ' ', $s); // reduce all multiple whitespace to a single space
-        return $s;
+        return preg_replace('/(?>[\x00-\x1F]|\xC2[\x80-\x9F]|\xE2[\x80-\x8F]{2}|\xE2\x80[\xA4-\xA8]|\xE2\x81[\x9F-\xAF])/', ' ', $s);
     }
 
 //    /**

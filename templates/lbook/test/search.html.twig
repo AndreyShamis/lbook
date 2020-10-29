@@ -3,67 +3,88 @@
 {% block content %}
     <h1>Search tests</h1>
     {{ form_start(form, {'label_attr': {'class': 'testSearchForm'}}) }}
-    <table>
+    <table style="width: 100%;">
         <tr>
-            <td>{{ form_label(form.name, 'Test Name', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.name) }}</td>
-            <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Test Name'}}) }}</td>
-        </tr>
-        <tr>
-            <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.verdict) }}</td>
-            <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>
-        </tr>
-        <tr>
-            <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
-            <td>{{ form_errors(form.setup) }}</td>
-            <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
-        </tr>
-        <tr>
-            <td>
-                {{ form_label(form.fromDate) }}
-                /
-                {{ form_label(form.toDate) }}
-            </td>
-            <td>
-                {{ form_errors(form.fromDate) }}
-                {{ form_errors(form.toDate) }}
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="input-group input-group-sm">
-                            {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
-                            {{ form_widget(form.fromDate) }}
-                            <span class="input-group-addon">
+            <td style="width: 50%;">
+                <table>
+                    <tr>
+                        <td>{{ form_label(form.name, 'Test Name', {'label_attr': {'class': 'testSearchFormLabel testSearchTestName', 'style' : 'width:300px;'}}) }}</td>
+                        <td>{{ form_errors(form.name) }}</td>
+                        <td>{{ form_widget(form.name, {'attr': {'placeholder': 'Test Name'}}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.metaData, 'Meta Data', {'label_attr': {'class': 'testSearchFormLabel testSearchTestMetaData', 'style' : 'width:300px;'}}) }}</td>
+                        <td>{{ form_errors(form.metaData) }}</td>
+                        <td>{{ form_widget(form.metaData, {'attr': {'placeholder': 'Meta Data'}}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form_label(form.fromDate) }}
+                            /
+                            {{ form_label(form.toDate) }}
+                        </td>
+                        <td>
+                            {{ form_errors(form.fromDate) }}
+                            {{ form_errors(form.toDate) }}
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="input-group input-group-sm">
+                                        {#<label for="fromDate"></label><input type="text" id="fromDate" class="form-control" />#}
+                                        {{ form_widget(form.fromDate) }}
+                                        <span class="input-group-addon">
                                 <i class="ace-icon fa fa-calendar"></i>
                             </span>
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="input-group input-group-sm">
-                            {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
-                            {{ form_widget(form.toDate) }}
-                            <span class="input-group-addon">
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="input-group input-group-sm">
+                                        {#<label for="toDate"></label><input type="text" id="toDate" class="form-control" />#}
+                                        {{ form_widget(form.toDate) }}
+                                        <span class="input-group-addon">
                                 <i class="ace-icon fa fa-calendar"></i>
                             </span>
-                        </div>
-                    </div>
-                </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.limit) }}</td>
+                        <td>{{ form_errors(form.limit) }}</td>
+                        <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
+                    </tr>
+                    {#<tr>#}
+                    {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
+                    {#<td>{{ form_errors(form.cycle) }}</td>#}
+                    {#<td>#}
+                    {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
+                    {#</td>#}
+                    {#</tr>#}
+                </table>
+
+
+
+            </td>
+            <td style="width: 50%;">
+                <table>
+                    <tr>
+                        <td>{{ form_label(form.verdict, 'Verdict', {'label_attr': {'class': 'testSearchFormLabel testSearchVerdict', 'style' : 'width:300px;'}}) }}</td>
+                        <td>{{ form_errors(form.verdict) }}</td>
+                        <td>{{ form_widget(form.verdict, {'attr': {'class': 'testSearchSelection testSearchVerdictSelection'}}) }}</td>
+                    </tr>
+                    <tr>
+                        <td>{{ form_label(form.setup, 'Setup', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>
+                        <td>{{ form_errors(form.setup) }}</td>
+                        <td>{{ form_widget(form.setup, {'attr': {'class': 'testSearchSelection testSearchSetupSelection'}}) }}</td>
+                    </tr>
+                </table>
+
+
+
             </td>
         </tr>
-        <tr>
-            <td>{{ form_label(form.limit) }}</td>
-            <td>{{ form_errors(form.limit) }}</td>
-            <td>{{ form_widget(form.limit, {'attr': {'class': ''}}) }}</td>
-        </tr>
-        {#<tr>#}
-            {#<td>{{ form_label(form.cycle, 'Cycle', {'label_attr': {'class': 'testSearchFormLabel', 'style' : 'width:300px;'}}) }}</td>#}
-            {#<td>{{ form_errors(form.cycle) }}</td>#}
-            {#<td>#}
-                {#{{ form_widget(form.cycle, {'attr': {'style': 'visibility: hidden;'}}) }}(Not in use)#}
-            {#</td>#}
-        {#</tr>#}
     </table>
 
     {{ form_widget(form) }}
@@ -71,9 +92,9 @@
     {{ form_end(form) }}
 
     <ul>
-        <li><a href="{{ path('test_index') }}">Back to the list</a></li>
+{#        <li><a href="{{ path('test_index') }}">Back to the list</a></li>#}
         <li>Found {{ tests_count }} tests</li>
-        <li>{{ sql }}</li>
+        <li class="font8">{{ sql }}</li>
     </ul>
 
     <script src="{{ asset('assets/js/bootstrap-multiselect.min.js') }}"></script>
@@ -175,9 +196,9 @@
                             <tr>
                                 <th data-sortable="true" title="Test ID">ID</th>
                                 <th data-sortable="true" title="Rate">Rate</th>
-                                <th data-sortable="true"  data-switchable="true">Setup Name</th>
-                                <th data-sortable="true"  data-switchable="true">Cycle Name</th>
                                 <th data-sorter="htmlSorter" data-sortable="true"  data-switchable="false">Test Name</th>
+                                <th data-sortable="true"  data-switchable="true" title="Cycle Name">Cycle</th>
+                                <th data-sortable="true"  data-switchable="true" title="Setup Name">Setup</th>
                                 <th data-sorter="htmlSorter" data-visible="false" data-sortable="true"  data-switchable="true">Test Build</th>
                                 <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
                                 <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
@@ -194,9 +215,9 @@
                                 <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                                     <td>{{ test.id }}</td>
                                     <td>{{ test.rate }}</td>
-                                    <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
-                                    <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                                     <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                                    <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
+                                    <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
                                     <td>
                                         {% if test.cycle.build.id is defined %}
                                         <a href="{{ path('build_show_cycles_first', { 'id': test.cycle.build.id  }) }}">{{ test.cycle.build }}</a>

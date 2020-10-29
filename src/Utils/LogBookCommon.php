@@ -6,6 +6,12 @@ namespace App\Utils;
 
 final class LogBookCommon
 {
+
+    public static function get(array $array, $key, $default = null)
+    {
+        return isset($array[$key]) ? $array[$key] : $default;
+    }
+
     /**
      * @param string $str
      * @return int

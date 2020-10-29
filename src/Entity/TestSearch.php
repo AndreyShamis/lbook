@@ -13,6 +13,8 @@ class TestSearch
 
     protected $name = '';
 
+    protected $metaData = '';
+
     protected $verdicts;
 
     protected $setups;
@@ -151,6 +153,22 @@ class TestSearch
     public function setSetup(LogBookSetup $setups = null): void
     {
         $this->setups = $setups;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMetaData(): string
+    {
+        return $this->metaData;
+    }
+
+    /**
+     * @param string $metData
+     */
+    public function setMetData(string $metaData): void
+    {
+        $this->metaData = $metaData;
     }
 
 

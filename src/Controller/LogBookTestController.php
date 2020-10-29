@@ -14,6 +14,7 @@ use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
 use App\Service\PagePaginator;
+use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -254,7 +255,7 @@ class LogBookTestController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo): Response
+    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo, LoggerInterface $logger): Response
     {
         set_time_limit(30);
         $tests = $new_tests = array();
@@ -290,12 +291,15 @@ class LogBookTestController extends AbstractController
                 $test->setLimit($limit);
             }
             $test_name = $post['name'];
+            $testMetaData = $post['metaData'];
             $fromDate = $post['fromDate'];
             $toDate = $post['toDate'];
 
-            $qb = $testRepo->createQueryBuilder('t')
+            $qb =
+                $testRepo->createQueryBuilder('t')
                 ->where('t.disabled = 0')
                 ->setMaxResults($test->getLimit());
+
             if ($fromDate !== null && mb_strlen($fromDate) > 7) {
                 $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
                 if ($startDate !== false) {
@@ -339,7 +343,7 @@ class LogBookTestController extends AbstractController
                 $enableSearch = True;
             }
 
-            if ($test_name !== null && \mb_strlen($test_name) >= 2) {
+            if ( ($test_name !== null && \mb_strlen($test_name) >= 2) || ($testMetaData !== null && \mb_strlen($testMetaData) >= 2) ) {
 //                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
 //                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
 //                        ->setParameter('test_id', (int)$test_name);
@@ -356,14 +360,23 @@ class LogBookTestController extends AbstractController
                     $qb->setParameter('test_id', (int)$test_name);
 
                 } else {
+
                     //$qb->andWhere('MATCH_AGAINST(t.name, :search_str) > 1 OR t.name LIKE :test_name');
-                    $qb->leftJoin('t.testInfo', 'testInfo')->orWhere('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) as rate');
+                    if (strlen($test_name)) {
+                        $qb->leftJoin('t.testInfo', 'testInfo')->andWhere('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) as rate');
+                    }
                     //$qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal('%'. $test_name. '%') ));
-                    $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
+                    if (strlen($testMetaData)) {
+                        $qb->leftJoin('t.newMetaData', 'newMetaData')->andWhere('MATCH_AGAINST(newMetaData.value, :metaData) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :metaData) as rate2');
+                        $qb->addOrderBy('rate2', 'DESC');
+
+                    }
 
                     //$qb->addSelect('MATCH_AGAINST(t.name, :search_str) as rate');
+                    if (strlen($test_name)) {
+                        $qb->addOrderBy('rate', 'DESC');
+                    }
 
-                    $qb->orderBy('rate', 'DESC');
                     $qb->addOrderBy('t.id', 'DESC');
                     $addOrder = false;
                 }
@@ -375,13 +388,17 @@ class LogBookTestController extends AbstractController
                 $test_name_match = str_replace(' ++', ' +', $test_name_match);
                 $test_name_match = str_replace(' +-', ' -', $test_name_match);
 
-                $qb->setParameter('search_str', $test_name_match);
                 $test_name_search = $test_name;
                 if (mb_strlen($test_name_search) > 10) {
                     $test_name_search .= '%';
                 }
-                $qb->setParameter('test_name', $test_name_search);
-
+                if (strlen($test_name)) {
+                    $qb->setParameter('search_str', $test_name_match);
+                    $qb->setParameter('test_name', $test_name_search);
+                }
+                if (strlen($testMetaData)) {
+                    $qb->setParameter('metaData', $testMetaData);
+                }
                 $enableSearch = True;
             }
             if ($addOrder) {
@@ -389,7 +406,7 @@ class LogBookTestController extends AbstractController
             }
             if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
             }else {
-                $qb->setParameter('test_name', $test_name_search);
+                //$qb->setParameter('test_name', $test_name_search);
 
             }
             if ($enableSearch) {
@@ -401,8 +418,13 @@ class LogBookTestController extends AbstractController
                         /** @var LogBookTest $t_t */
                         $t_t = $tmp_test[0];
                         try {
-                            $t_t->setRate($tmp_test['rate'] + $tmp_test['rate2']);
-                        } catch (\Throwable $ex) {}
+                            $t_t->setRate(
+                                LogBookCommon::get($tmp_test, 'rate', 0) +
+                                LogBookCommon::get($tmp_test, 'rate2', 0));
+                        } catch (\Throwable $ex) {
+                            $logger->critical('setRate in search ' . $ex->getMessage());
+
+                        }
                         $new_tests[] = $t_t;
                     }
                 } else {

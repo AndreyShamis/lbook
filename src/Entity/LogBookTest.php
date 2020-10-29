@@ -132,14 +132,6 @@ class LogBookTest
      */
     protected $forDelete = false;
 
-    /**
-     * @var array
-     * @ORM\Column(type="array", nullable=true)
-     * //, columnDefinition="LONGTEXT DEFAULT NULL"
-     */
-    protected $meta_data = [];
-
-    protected $temp_meta_data = [];
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\SuiteExecution", inversedBy="tests")
@@ -172,9 +164,12 @@ class LogBookTest
      */
     private $testType;
 
-
+    /**
+     * @var array
+     */
+    protected $meta_data = [];
+    protected $temp_meta_data = [];
     protected $failDescriptionParsed = false;
-
     protected $rate = 0;
     protected $testPath = null;
     protected $testFailDescription = null;

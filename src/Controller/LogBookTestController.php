@@ -160,8 +160,9 @@ class LogBookTestController extends AbstractController
      */
     public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LoggerInterface $logger): array
     {
+        exit();
         $query = $testsRepo->createQueryBuilder('t')
-            ->where('t.meta_data != :emptyMT')
+            ->where('t.- != :emptyMT')
             ->andWhere('t.newMetaData IS NULL')
             ->setMaxResults(20000)
             ->setParameter('emptyMT', 'a:0:{}')

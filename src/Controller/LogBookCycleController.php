@@ -604,17 +604,17 @@ class LogBookCycleController extends AbstractController
             $q = $qb->getQuery();
             $tests = $q->execute();
 
-            if (count($tests) < 1) {
-                $qb = $testRepo->createQueryBuilder('t')
-                    ->where('t.timeEnd > :period')
-                    ->andWhere('t.meta_data LIKE :metadata_1')
-                    ->setMaxResults(3000)
-                    ->orderBy('t.executionOrder', 'ASC')
-                    ->setParameter('metadata_1', $metadata_1)
-                    ->setParameter('period', new \DateTime('-7 days'));
-                $q = $qb->getQuery();
-                $tests = $q->execute();
-            }
+//            if (count($tests) < 1) {
+//                $qb = $testRepo->createQueryBuilder('t')
+//                    ->where('t.timeEnd > :period')
+//                    ->andWhere('t.meta_data LIKE :metadata_1')
+//                    ->setMaxResults(3000)
+//                    ->orderBy('t.executionOrder', 'ASC')
+//                    ->setParameter('metadata_1', $metadata_1)
+//                    ->setParameter('period', new \DateTime('-7 days'));
+//                $q = $qb->getQuery();
+//                $tests = $q->execute();
+//            }
 
             $final = array();
 //            print (count($tests));

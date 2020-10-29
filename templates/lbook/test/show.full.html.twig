@@ -36,6 +36,9 @@
                     {% if suite %}
                         <li class="" title="Suite {{ suite.summary }}"><a data-toggle="tab" href="#suiteExecution">{{ suite.id }} - {{ suite.name }} - {{ suite.passRate }}%</a></li>
                     {% endif %}
+                    {% if test.testInfo is defined and test.testInfo.id is defined %}
+                        <li class="" title="Test Info"><a data-toggle="tab" href="#testInfo">Test Info [{{ test.testInfo }}]</a></li>
+                    {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>
 
@@ -44,7 +47,7 @@
                         <table class="records_list table table-striped table-condensed">
                             <tbody>
                             <tr>
-                                <th>Setup / Cycle info</th>
+                                <th style="width: 130px !important;">Setup / Cycle info</th>
                                 <td>
                                     <span class="blue">{{ test.cycle.setup.id }} : {{ test.cycle.setup.name }}</span>
                                     /
@@ -84,14 +87,10 @@
                                 <th>Time start / Time end</th>
                                 <td>
                                     <i class="ace-icon fa fa-calendar"></i>
-                                    <span class="blue" title="Start time">
- {% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}
- </span>
+                                    <span class="blue" title="Start time">{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</span>
                                     /
                                     <i class="ace-icon fa fa-calendar"></i>
-                                    <span class="blue" title="End time">
- {% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}
- </span>
+                                    <span class="blue" title="End time">{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</span>
                                 </td>
                                 <th>Run time / % of cycle time</th>
                                 <td>
@@ -108,10 +107,35 @@
                                 <th>Platform</th>
                                 <td>{{ test.platform }}</td>
                                 <th>Verdict</th>
-                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span> {{ test.failDescription(true) }}</td>
+                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span>
+
+                                </td>
                                 <th></th>
                                 <td></td>
                             </tr>
+                            {% set fnParsed = test.failDescription %}
+                            {% set fParsed = test.failDescription(true) %}
+
+                            {% if fnParsed | length %}
+                            <tr>
+                                <th>
+                                    Fail description
+                                </th>
+                                <td colspan="5">
+                                    <span style="text-wrap: normal;">{{ fnParsed }}</span>
+                                </td>
+                            </tr>
+                                {% if fnParsed !=  fParsed and fParsed | length %}
+                                    <tr>
+                                        <th>
+                                            Parsed failure
+                                        </th>
+                                        <td colspan="5">
+                                            <span style="text-wrap: normal;">{{ fParsed }}</span>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -154,6 +178,15 @@
                                     <td><span title="{{ suite.id }}">{{ suite.id}}</span></td>
                                 </tr>
                             </table>
+                        </div>
+                    {% endif %}
+
+                    {% if test.testInfo is defined and test.testInfo.id is defined %}
+                        <div id="testInfo" class="tab-pane">
+                            <ul>
+                                <li>Test Name: {{ test.testInfo.name }}</li>
+                                <li>Test Path: {{ test.testInfo.path ? test.testInfo.path : 'null' }}</li>
+                            </ul>
                         </div>
                     {% endif %}
 

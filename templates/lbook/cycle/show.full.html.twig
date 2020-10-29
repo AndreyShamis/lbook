@@ -118,17 +118,17 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </tr>
                                 <tr>
                                     <th>Start Time</th>
-                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
+                                    <td><span class="label label-success label-white label-lg arrowed arrowed-right">{{ cycle.timeStart|date('Y-m-d H:i:s') }}</span></td>
                                     <th>Created</th>
-                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.createdAt|date('Y-m-d H:i') }}</span></td>
                                     <th>Uploader</th>
                                     <td colspan="3"><span class="label label-purple label-white middle">{{ cycle.targetUploader }}</span></td>
                                 </tr>
                                 <tr>
                                     <th>End Time</th>
-                                    <td><span class="label label-success label-white arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
+                                    <td><span class="label label-success label-white label-lg arrowed arrowed-right">{{ cycle.timeEnd|date('Y-m-d H:i:s') }}</span></td>
                                     <th>Updated</th>
-                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i:s') }}</span></td>
+                                    <td><span class="label label-white middle arrowed arrowed-right">{{ cycle.updatedAt|date('Y-m-d H:i') }}</span></td>
                                     <th></th>
                                     <td colspan="2"></td>
                                     <td colspan="1">

@@ -706,7 +706,7 @@ class LogBookUploaderController extends AbstractController
 
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
 
-                if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
+                if ( strlen($fail_reason) > 2 && $test->getVerdict()->getName() !== 'PASS') {
                     $test->setFailDescription($fail_reason);
                 }
 

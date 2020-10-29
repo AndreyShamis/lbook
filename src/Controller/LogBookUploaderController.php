@@ -748,7 +748,7 @@ class LogBookUploaderController extends AbstractController
                 $failDescObj = null;
 
                 try{
-                    if ( $fail_reason !== null && strlen($fail_reason) > 2 && $test->getVerdict()->getName() !== 'PASS') {
+                    if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
                         try {
                             $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
                         }catch (Exception $ex) {

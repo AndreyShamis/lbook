@@ -33,7 +33,7 @@ class LogBookTest
     protected $id;
 
     public static $MAX_NAME_LEN = 255;
-    public static $MAX_FAIL_DESC_LEN = 245;
+    public static $MAX_FAIL_DESC_LEN = 250;
     /**
      * @var string
      *
@@ -349,7 +349,7 @@ class LogBookTest
      */
     public function setFailDescription(string $newValue):void
     {
-        $this->failDescription = LogBookTest::validateFailDescription($newValue);
+        $this->failDescription = trim(LogBookTest::validateFailDescription(trim($newValue)));
     }
 
     /**

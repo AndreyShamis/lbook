@@ -37,7 +37,7 @@
                         <li class="" title="Suite {{ suite.summary }}"><a data-toggle="tab" href="#suiteExecution">{{ suite.id }} - {{ suite.name }} - {{ suite.passRate }}%</a></li>
                     {% endif %}
                     {% if test.testInfo is defined and test.testInfo.id is defined %}
-                        <li class="" title="Test Info"><a data-toggle="tab" href="#testInfo">Test Info [{{ test.testInfo }}]</a></li>
+                        <li class="" title="Test Info"><a data-toggle="tab" href="#testInfo">Test Info [{{ test.testInfo.id }}]</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                 </ul>

@@ -705,15 +705,8 @@ class LogBookUploaderController extends AbstractController
 
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
 
-                /** @var LogBookTestFailDesc $failDescObj */
-                $failDescObj = null;
                 if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
                     $test->setFailDescription($fail_reason);
-                    try {
-                        $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
-                    }catch (Exception $ex) {
-                        $logger->critical('Failed set fail desc' . $ex->getMessage(), $ex->getTrace());
-                    }
                 }
 
                 try {
@@ -751,6 +744,22 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 $test->resetMetaData('*');
+
+                /** @var LogBookTestFailDesc $failDescObj */
+                $failDescObj = null;
+
+                try{
+                    if ( $fail_reason !== null && strlen($fail_reason) > 2 && $test->getVerdict()->getName() !== 'PASS') {
+                        try {
+                            $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
+                        }catch (Exception $ex) {
+                            $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());
+                        }
+                    }
+                } catch (Exception $ex) {
+                    $logger->critical('ERROR: Fail reason search' . $ex->getMessage());
+                }
+
 
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);

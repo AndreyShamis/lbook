@@ -1042,11 +1042,10 @@ class LogBookCycleController extends AbstractController
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
-                ->addSelect('i.name as name')
-                ->addSelect('i.path as testPath')
+                ->addSelect('i.name as name, i.path as testPath')
                 ->andWhere('t.disabled = :disabled')
                 ->orderBy('t.executionOrder', 'ASC');
-            $qb->innerJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
+            $qb->leftJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
 
             //->setParameter('cycle', $cycle->getId());
             $qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
@@ -1079,8 +1078,12 @@ class LogBookCycleController extends AbstractController
                     $testPath = $obj['testPath'];
                     //$testFailDescription = $obj['testFailDesc'];
                     if ($test instanceof \App\Entity\LogBookTest) {
-                        $test->setName($testName);
-                        $test->setTestPath($testPath);
+                        if ($testName !== null) {
+                            $test->setName($testName);
+                        }
+                        if ($testPath !== null) {
+                            $test->setTestPath($testPath);
+                        }
                         //$test->setTestFailDescription($testFailDescription);
                         $ret_tests[] = $test;
 

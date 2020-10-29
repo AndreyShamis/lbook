@@ -18,6 +18,7 @@ use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookMessageTypeRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTargetRepository;
+use App\Repository\LogBookTestFailDescRepository;
 use App\Repository\LogBookTestInfoRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
@@ -83,6 +84,8 @@ class LogBookUploaderController extends AbstractController
     protected $testTypeRepo;
     /** @var LogBookTestInfoRepository $testInfo */
     protected $testInfo;
+    /** @var LogBookTestFailDescRepository $testFailDescRepo */
+    protected $testFailDescRepo;
 
     private $blackListLevels = array();
 
@@ -122,6 +125,7 @@ class LogBookUploaderController extends AbstractController
         $this->cmuRepo = $this->em->getRepository('App:TestEventCmu');
         $this->testTypeRepo = $this->em->getRepository('App:LogBookTestType');
         $this->testInfo = $this->em->getRepository('App:LogBookTestInfo');
+        $this->testFailDescRepo = $this->em->getRepository('App:LogBookTestFailDesc');
     }
 
     /**
@@ -702,7 +706,11 @@ class LogBookUploaderController extends AbstractController
 
                 if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
                     $test->setFailDescription($fail_reason);
-
+                    try {
+                        $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
+                    }catch (Exception $ex) {
+                        $logger->critical('$this->testFailDescRepo->findOrCreate([\"description\" => \"$fail_reason\"])' . $ex->getMessage(), $ex->getTrace());
+                    }
                 }
 
                 try {

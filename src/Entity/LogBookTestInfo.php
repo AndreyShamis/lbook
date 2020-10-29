@@ -48,9 +48,15 @@ class LogBookTestInfo
         return $newName;
     }
 
-    public static function validatePath($newPath): string
+    /**
+     * @param string|null $newPath
+     * @return string|null
+     */
+    public static function validatePath(string $newPath = null): ? string
     {
-        if (mb_strlen($newPath) > self::$MAX_PATH_LEN) {
+        if ( $newPath === null ) {
+            return $newPath;
+        } elseif (mb_strlen($newPath) > self::$MAX_PATH_LEN) {
             $newPath = mb_substr($newPath, 0, self::$MAX_PATH_LEN);
         }
         return $newPath;

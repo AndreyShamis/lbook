@@ -710,13 +710,16 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 try {
+                    $testPath = null;
                     if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
-                        $testInfo = $this->testInfo->findOneOrCreate([
-                            'name' => $test->getName(),
-                            'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
-                        ]);
-                        $test->setTestInfo($testInfo);
+                        $testPath = $test->getMetaData()['CONTROL_FILE_SHOW_OPT'];
                     }
+
+                    $testInfo = $this->testInfo->findOneOrCreate([
+                        'name' => $test->getName(),
+                        'path' => $testPath
+                    ]);
+                    $test->setTestInfo($testInfo);
                 } catch (Exception $ex) {
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }

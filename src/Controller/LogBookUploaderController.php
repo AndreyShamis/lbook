@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookMessage;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestFailDesc;
 use App\Entity\LogBookTestMD;
 use App\Entity\LogBookUpload;
 use App\Entity\LogBookVerdict;
@@ -704,12 +705,14 @@ class LogBookUploaderController extends AbstractController
 
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
 
+                /** @var LogBookTestFailDesc $failDescObj */
+                $failDescObj = null;
                 if ( strlen($fail_reason) > 3 && $test->getVerdict()->getName() !== 'PASS') {
                     $test->setFailDescription($fail_reason);
                     try {
-                        $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
+                        $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $fail_reason]);
                     }catch (Exception $ex) {
-                        $logger->critical('$this->testFailDescRepo->findOrCreate([\"description\" => \"$fail_reason\"])' . $ex->getMessage(), $ex->getTrace());
+                        $logger->critical('Failed set fail desc' . $ex->getMessage(), $ex->getTrace());
                     }
                 }
 

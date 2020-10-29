@@ -28,6 +28,7 @@ use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterRepository;
 use App\Repository\TestEventCmuRepository;
+use App\Utils\LogBookCommon;
 use ArrayIterator;
 use DateTime;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -643,21 +644,18 @@ class LogBookUploaderController extends AbstractController
                     $test->setVerdict($testVerdictDefault);
 
                     try {
-                        if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test_metadata_arr) ) {
-                            $testType = $this->testTypeRepo->findOneOrCreate(['name' => $test_metadata_arr['TEST_TYPE_SHOW_OPT']]);
-                            $test->setTestType($testType);
-                        } elseif (strlen($testTypeStr) > 0) {
+                        $testTypeStr = LogBookCommon::get($test_metadata_arr, 'TEST_TYPE_SHOW_OPT', $testTypeStr);
+                        if (strlen($testTypeStr) > 0) {
                             $testType = $this->testTypeRepo->findOneOrCreate(['name' => $testTypeStr]);
                             $test->setTestType($testType);
                         }
-
                     } catch (Exception $ex) {
-                        $logger->alert('[TEST_TYPE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                        $logger->alert('[TEST_TYPE_SHOW_OPT] Found Exception:' . $ex->getMessage());
                     }
 
                     //}
                 } catch (Exception $ex) {
-                    $logger->alert('[lock] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                    $logger->alert('[lock] Found Exception:' . $ex->getMessage());
                 }
 //                    finally {
 ////                        $lock->release();
@@ -672,7 +670,10 @@ class LogBookUploaderController extends AbstractController
                             $tmpEvent = $this->cmuRepo->findOneOrCreate($tmpEventJson);
                         }
                     }
-                } catch (\Throwable $ex) {}
+                } catch (\Throwable $ex) {
+                    $logger->alert('[eventsCMU] Found Exception:' . $ex->getMessage());
+
+                }
 
                 if ($suite_execution_id > 0) {
                     $suite_execution = $this->suiteExecutionRepo->find($suite_execution_id);
@@ -710,14 +711,9 @@ class LogBookUploaderController extends AbstractController
                 }
 
                 try {
-                    $testPath = null;
-                    if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
-                        $testPath = $test->getMetaData()['CONTROL_FILE_SHOW_OPT'];
-                    }
-
                     $testInfo = $this->testInfo->findOneOrCreate([
                         'name' => $test->getName(),
-                        'path' => $testPath
+                        'path' => LogBookCommon::get($test->getMetaData(), 'CONTROL_FILE_SHOW_OPT', null)
                     ]);
                     $test->setTestInfo($testInfo);
                 } catch (Exception $ex) {

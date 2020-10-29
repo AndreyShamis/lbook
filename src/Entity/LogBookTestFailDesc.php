@@ -37,16 +37,19 @@ class LogBookTestFailDesc
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $updatedAt;
+    public static $MAX_DESC_LEN = 250;
 
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime());
-        $this->setUpdatedAt(new \DateTime());
+    }
+
+    public static function validateDescription($newDesc): string
+    {
+        if (mb_strlen($newDesc) > self::$MAX_DESC_LEN) {
+            $newDesc = mb_substr($newDesc, 0, self::$MAX_DESC_LEN);
+        }
+        return $newDesc;
     }
 
     public function getId(): ?int
@@ -61,7 +64,7 @@ class LogBookTestFailDesc
 
     public function setDescription(string $description): self
     {
-        $this->description = $description;
+        $this->description = LogBookTestFailDesc::validateDescription($description);
         $this->calculateHash();
         return $this;
     }
@@ -91,18 +94,6 @@ class LogBookTestFailDesc
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

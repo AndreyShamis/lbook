@@ -22,7 +22,7 @@ class LogBookTestFailDescRepository extends ServiceEntityRepository
     }
 
     public function findByDescMd5($desc){
-        $this->findOneBy(['md5' => md5($desc)]);
+        return $this->findOneBy(['md5' => md5(LogBookTestFailDesc::validateDescription($desc))]);
     }
 
 

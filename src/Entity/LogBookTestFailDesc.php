@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LogBookTestFailDescRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
@@ -37,11 +39,19 @@ class LogBookTestFailDesc
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LogBookTest::class, mappedBy="failDesc", fetch="EXTRA_LAZY")
+     */
+    private $tests;
+
     public static $MAX_DESC_LEN = 250;
+
 
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime());
+        $this->tests = new ArrayCollection();
     }
 
     public static function validateDescription($newDesc): string
@@ -102,4 +112,37 @@ class LogBookTestFailDesc
     {
         return $this->getDescription();
     }
+
+    /**
+     * @return Collection|LogBookTest[]
+     */
+    public function getTests(): Collection
+    {
+        return $this->tests;
+    }
+
+    public function addTest(LogBookTest $test): self
+    {
+        if (!$this->tests->contains($test)) {
+            $this->tests[] = $test;
+            $test->setFailDesc($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTest(LogBookTest $test): self
+    {
+        if ($this->tests->contains($test)) {
+            $this->tests->removeElement($test);
+            // set the owning side to null (unless already changed)
+            if ($test->getFailDesc() === $this) {
+                $test->setFailDesc(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

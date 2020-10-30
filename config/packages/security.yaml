@@ -63,6 +63,7 @@ security:
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
     role_hierarchy:
+        ROLE_REPORT_CREATOR:       [ROLE_USER]
         ROLE_FILTER_CREATOR:       [ROLE_USER]
         ROLE_ADMIN:       [ROLE_USER, ROLE_EVENT_CREATE, ROLE_FILTER_CREATOR]
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH, ROLE_FILTER_CREATOR]

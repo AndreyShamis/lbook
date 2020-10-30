@@ -173,6 +173,7 @@ class LogBookCycleReportController extends AbstractController
      */
     public function edit(Request $request, LogBookCycleReport $logBookCycleReport, CycleReportEditHistoryRepository $historyRepo, LoggerInterface $logger): Response
     {
+        $this->denyAccessUnlessGranted('edit', $logBookCycleReport);
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -225,6 +226,7 @@ class LogBookCycleReportController extends AbstractController
      */
     public function lock(Request $request, LogBookCycleReport $report): Response
     {
+        $this->denyAccessUnlessGranted('edit', $report);
         $report->setIsLocked(true);
         $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
@@ -238,6 +240,7 @@ class LogBookCycleReportController extends AbstractController
      */
     public function unlock(Request $request, LogBookCycleReport $report): Response
     {
+        $this->denyAccessUnlessGranted('edit', $report);
         $report->setIsLocked(false);
         $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
@@ -248,6 +251,7 @@ class LogBookCycleReportController extends AbstractController
      */
     public function delete(Request $request, LogBookCycleReport $logBookCycleReport): Response
     {
+        $this->denyAccessUnlessGranted('delete', $logBookCycleReport);
         if ($this->isCsrfTokenValid('delete'.$logBookCycleReport->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($logBookCycleReport);

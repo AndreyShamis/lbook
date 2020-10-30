@@ -67,7 +67,7 @@ class ReportVoter extends Voter
         $report = $subject;
 
         // ROLE_SUPER_ADMIN can do anything! The power!
-        if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FILTER_CREATOR', 'ROLE_REPORT_CREATOR'))) {
+        if ($this->decisionManager->decide($token, array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_REPORT_CREATOR'))) {
             return true;
         }
         switch ($attribute) {

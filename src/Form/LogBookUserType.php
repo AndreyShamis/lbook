@@ -32,6 +32,7 @@ class LogBookUserType extends AbstractType
                         'Admin' => 'ROLE_ADMIN',
                         'Manager' => 'ROLE_MANAGER',
                         'Filter Creator' => 'ROLE_FILTER_CREATOR',
+                        'Report Creator' => 'ROLE_REPORT_CREATOR',
                         'USER' => 'ROLE_USER',
                         // ...
                     ],

@@ -7,13 +7,17 @@ use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
 use App\Form\LogBookCycleReportType;
+use App\Repository\CycleReportEditHistoryRepository;
 use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
+use Doctrine\ORM\UnitOfWork;
+use Exception;
 use JiraRestApi\Issue\Issue;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +33,11 @@ class LogBookCycleReportController extends AbstractController
     /**
      * @Route("/", name="log_book_cycle_report_index", methods={"GET"})
      * @Route("/page/{page}", name="log_book_cycle_report_index_page", methods={"GET"})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleReportRepository $logBookCycleReportRepository
+     * @param int $page
+     * @return Response
+     * @throws Exception
      */
     public function index(PagePaginator $pagePaginator, LogBookCycleReportRepository $logBookCycleReportRepository, int $page = 1): Response
     {
@@ -159,9 +168,10 @@ class LogBookCycleReportController extends AbstractController
      * @Route("/{id}/edit", name="log_book_cycle_report_edit", methods={"GET","POST"})
      * @param Request $request
      * @param LogBookCycleReport $logBookCycleReport
+     * @param CycleReportEditHistoryRepository $historyRepo
      * @return Response
      */
-    public function edit(Request $request, LogBookCycleReport $logBookCycleReport): Response
+    public function edit(Request $request, LogBookCycleReport $logBookCycleReport, CycleReportEditHistoryRepository $historyRepo, LoggerInterface $logger): Response
     {
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
         $form->handleRequest($request);
@@ -172,6 +182,29 @@ class LogBookCycleReportController extends AbstractController
             $logBookCycleReport->setSuitesNotes($request->request->get('suitesNotes'));
             $logBookCycleReport->setTestsNotes($request->request->get('testsNotes'));
             $logBookCycleReport->setBugsNotes($request->request->get('bugsNotes'));
+
+            try{
+                /** @var UnitOfWork $uow */
+                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                $uow->computeChangeSets(); // do not compute changes if inside a listener
+                $diff_arr = $uow->getEntityChangeSet($logBookCycleReport);
+                $user = $this->get('security.token_storage')->getToken()->getUser();
+                try{
+                    unset($diff_arr['updatedAt']);
+                } catch (\Throwable $ex) {}
+                $diff_str = json_encode($diff_arr, JSON_FORCE_OBJECT|JSON_PRETTY_PRINT);
+                $f = [
+                    'user' => $user,
+                    'report' => $logBookCycleReport,
+                    'diff' => $diff_str,
+                    'happenedAt' => new \DateTime(),
+                ];
+
+                $history = $historyRepo->findOneOrCreate($f);
+                $logBookCycleReport->addHistory($history);
+            } catch (\Throwable $ex) {
+                $logger->critical('REPORT_DIFF:' .$ex->getMessage());
+            }
             $this->getDoctrine()->getManager()->flush();
 
 

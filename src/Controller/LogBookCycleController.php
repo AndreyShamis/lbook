@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\CycleSearch;
+use App\Entity\Host;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookTestInfo;
+use App\Entity\LogBookTestType;
+use App\Entity\LogBookVerdict;
 use App\Entity\SuiteExecution;
 use App\Form\CycleSearchType;
 use App\Repository\LogBookCycleRepository;
@@ -1060,6 +1063,9 @@ class LogBookCycleController extends AbstractController
             $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
             $query = $query->setDQL($qb->getDQL());
             $query->setFetchMode(LogBookTest::class, "testInfo", ClassMetadataInfo::FETCH_EAGER);
+            $query->setFetchMode(LogBookTest::class, "verdict", ClassMetadataInfo::FETCH_EAGER);
+            $query->setFetchMode(LogBookTest::class, "testType", ClassMetadataInfo::FETCH_EAGER);
+            $query->setFetchMode(LogBookTest::class, "suite_execution", ClassMetadataInfo::FETCH_EAGER);
             $query = $query->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
             if ($suiteMode) {
                 $query = $query->setParameter('suite', $suite->getId());

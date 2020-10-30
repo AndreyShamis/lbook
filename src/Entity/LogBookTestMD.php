@@ -16,7 +16,7 @@ class LogBookTestMD
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(type="bigint")
+     * @ORM\Column(type="bigint", options={"unsigned"=true})
      */
     private $id;
 

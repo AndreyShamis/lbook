@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\LogBookCycleReportRepository;
-use App\Repository\LogBookTestRepository;
-use App\Repository\LogBookVerdictRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -162,12 +160,18 @@ class LogBookCycleReport
      */
     private $isLocked = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity=CycleReportEditHistory::class, mappedBy="report", orphanRemoval=true)
+     */
+    private $history;
+
     public function __construct()
     {
         $this->defects = new ArrayCollection();
         $this->cycles = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->history = new ArrayCollection();
     }
 
     public function getSuites(SuiteExecutionRepository $suitesRepo)
@@ -559,5 +563,36 @@ class LogBookCycleReport
     public function __toString()
     {
         return $this->getName() . ' - ' . $this->getId();
+    }
+
+    /**
+     * @return Collection|CycleReportEditHistory[]
+     */
+    public function getHistory(): Collection
+    {
+        return $this->history;
+    }
+
+    public function addHistory(CycleReportEditHistory $history): self
+    {
+        if (!$this->history->contains($history)) {
+            $this->history[] = $history;
+            $history->setReport($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistory(CycleReportEditHistory $history): self
+    {
+        if ($this->history->contains($history)) {
+            $this->history->removeElement($history);
+            // set the owning side to null (unless already changed)
+            if ($history->getReport() === $this) {
+                $history->setReport(null);
+            }
+        }
+
+        return $this;
     }
 }

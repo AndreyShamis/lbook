@@ -165,6 +165,11 @@ class LogBookTest
     private $testType;
 
     /**
+     * @ORM\ManyToOne(targetEntity=LogBookTestFailDesc::class, inversedBy="tests")
+     */
+    private $failDesc;
+
+    /**
      * @var array
      */
     protected $meta_data = [];
@@ -173,7 +178,6 @@ class LogBookTest
     protected $rate = 0;
     protected $testPath = null;
     protected $testFailDescription = null;
-
 
     public function getTestPath(): string
     {
@@ -930,5 +934,17 @@ class LogBookTest
             $this->newMetaData->setTest($this);
         }
         $this->newMetaData->setValue(array_merge($this->newMetaData->getValue(), $meta_data));
+    }
+
+    public function getFailDesc(): ?LogBookTestFailDesc
+    {
+        return $this->failDesc;
+    }
+
+    public function setFailDesc(?LogBookTestFailDesc $failDesc): self
+    {
+        $this->failDesc = $failDesc;
+
+        return $this;
     }
 }

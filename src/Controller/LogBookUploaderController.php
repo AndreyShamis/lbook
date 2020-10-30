@@ -751,14 +751,15 @@ class LogBookUploaderController extends AbstractController
                     if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
                         try {
                             $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
+                            $test->setFailDesc($failDescObj);
                         }catch (Exception $ex) {
                             $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());
                         }
+
                     }
                 } catch (Exception $ex) {
                     $logger->critical('ERROR: Fail reason search' . $ex->getMessage());
                 }
-
 
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);

@@ -149,7 +149,7 @@ class LogBookTest
     protected $failDescription = '';
 
     /**
-     * @ORM\ManyToOne(targetEntity=LogBookTestInfo::class, inversedBy="logBookTests")
+     * @ORM\ManyToOne(targetEntity=LogBookTestInfo::class, inversedBy="logBookTests", fetch="EAGER")
      */
     private $testInfo;
 

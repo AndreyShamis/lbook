@@ -5,13 +5,14 @@ namespace App\Controller;
 use App\Entity\CycleSearch;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestInfo;
 use App\Entity\SuiteExecution;
 use App\Form\CycleSearchType;
 use App\Repository\LogBookCycleRepository;
-use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -1042,19 +1043,29 @@ class LogBookCycleController extends AbstractController
 
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.cycle = :cycle')
-                ->addSelect('i.name as name, i.path as testPath')
+//                ->addSelect('i.name as name, i.path as testPath')
                 ->andWhere('t.disabled = :disabled')
                 ->orderBy('t.executionOrder', 'ASC');
-            $qb->leftJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
+//            $qb->leftJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
 
-            //->setParameter('cycle', $cycle->getId());
-            $qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+            //$qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
             if ($suite !== null) {
                 $qb->andWhere('t.suite_execution = :suite')
                     ->setParameter('suite', $suite->getId());
                 $suiteMode = true;
             }
-            $paginator = $pagePaginator->paginate($qb, $page, $maxSize); //$this->show_tests_size);
+
+            $em = $this->getDoctrine()->getManager();
+            /** @var Query $query */
+            $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
+            $query = $query->setDQL($qb->getDQL());
+            $query->setFetchMode(LogBookTest::class, "testInfo", ClassMetadataInfo::FETCH_EAGER);
+            $query = $query->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+            if ($suiteMode) {
+                $query = $query->setParameter('suite', $suite->getId());
+            }
+//            $res = $query->execute();
+            $paginator = $pagePaginator->paginate($query, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
             $iterator = $paginator->getIterator(); # ArrayIterator
             $maxPages = ceil($totalPosts / $maxSize); //$this->show_tests_size);
@@ -1073,17 +1084,18 @@ class LogBookCycleController extends AbstractController
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
                     $obj = $iterator->current();
-                    $test = $obj[0];
-                    $testName = $obj['name'];
-                    $testPath = $obj['testPath'];
+                    $test = $obj;
+//                    $test = $obj[0];
+//                    $testName = $obj['name'];
+//                    $testPath = $obj['testPath'];
                     //$testFailDescription = $obj['testFailDesc'];
                     if ($test instanceof \App\Entity\LogBookTest) {
-                        if ($testName !== null) {
-                            $test->setName($testName);
-                        }
-                        if ($testPath !== null) {
-                            $test->setTestPath($testPath);
-                        }
+//                        if ($testName !== null) {
+//                            $test->setName($testName);
+//                        }
+//                        if ($testPath !== null) {
+//                            $test->setTestPath($testPath);
+//                        }
                         //$test->setTestFailDescription($testFailDescription);
                         $ret_tests[] = $test;
 

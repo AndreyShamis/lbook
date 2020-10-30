@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestFailDesc;
 use App\Entity\LogBookTestMD;
 use App\Entity\TestSearch;
 use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
+use App\Repository\LogBookTestFailDescRepository;
 use App\Repository\LogBookTestInfoRepository;
 use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
@@ -155,20 +157,21 @@ class LogBookTestController extends AbstractController
      * @Template(template="lbook/test/list.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testsRepo
-     * @param LogBookTestInfoRepository $testInfo
+     * @param LogBookTestInfoRepository $testInfoRepo
      * @param LogBookTestTypeRepository $testTypeRepo
+     * @param LogBookTestMDRepository $mdRepo
+     * @param LogBookTestFailDescRepository $fdRepo
+     * @param LoggerInterface $logger
      * @return array
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LoggerInterface $logger): array
+    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LogBookTestFailDescRepository $fdRepo, LoggerInterface $logger): array
     {
-        exit();
+
         $query = $testsRepo->createQueryBuilder('t')
-            ->where('t.- != :emptyMT')
-            ->andWhere('t.newMetaData IS NULL')
-            ->setMaxResults(20000)
-            ->setParameter('emptyMT', 'a:0:{}')
+            ->where('t.failDescription != :failDescription')
+            ->andWhere('t.failDesc IS NULL')
+            ->setMaxResults(2000)
+            ->setParameter('failDescription', '')
             ->orderBy('t.id', 'ASC');
 
         /** @var \ArrayIterator $iterator */
@@ -179,54 +182,12 @@ class LogBookTestController extends AbstractController
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
             try {
-                if ( array_key_exists('CONTROL_FILE_SHOW_OPT',  $test->getMetaData()) ) {
-                    $crit = [
-                        'name' => $test->getName(),
-                        'path' => $test->getMetaData()['CONTROL_FILE_SHOW_OPT']
-                    ];
-                    $testInfo = $testInfoRepo->findOneOrCreate($crit);
-                    $test->setTestInfo($testInfo);
-                }
 
-                if ( array_key_exists('TEST_TYPE_SHOW_OPT',  $test->getMetaData()) ) {
-                    $testType = $testTypeRepo->findOneOrCreate(['name' => $test->getMetaData()['TEST_TYPE_SHOW_OPT']]);
-                    $test->setTestType($testType);
-                } else {
-                    $testType = $testTypeRepo->findOneOrCreate(['name' => 'TEST']);
-                    $test->setTestType($testType);
-                }
-
-
-                if ( array_key_exists('TEST_CASE_SHOW',  $test->getMetaData()) && strlen($test->getMetaData()['TEST_CASE_SHOW']) > 5) {
-                    $test->setTestKey($test->getMetaData()['TEST_CASE_SHOW']);
-                }
-                $test->resetMetaData('TEST_TYPE_SHOW_OPT');
-                $test->resetMetaData('CONTROL_FILE_SHOW_OPT');
-                $test->resetMetaData('CLUSTER_SHOW');
-                $test->resetMetaData('SUITE_SHOW');
-                $test->resetMetaData('CHIP');
-                $test->resetMetaData('PLATFORM');
-                $test->resetMetaData('HOSTNAME');
-                $test->resetMetaData('TEST_FILENAME');
-                $test->resetMetaData('TEST_VER');
-                $test->resetMetaData('TEST_VERSION_SHOW_OPT');
-                $test->resetMetaData('CONTROL_VER');
-                $test->resetMetaData('CONTROL_VERSION_SHOW_OPT');
-                $test->resetMetaData('TIMEOUT');
-                $test->resetMetaData('LABELS');
-                $test->resetMetaData('UUID');
-                $test->resetMetaData('TEST_CASE_SHOW');
-
-                if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
-                    $md = $mdRepo->findOneBy(["test" => $test]);
-                    if ($md === null) {
-                        $newMD = new LogBookTestMD();
-                    } else {
-                        $newMD = $md;
-                    }
-                    $newMD->setValue($test->getOldMetaData());
-                    $test->setNewMetaData($newMD);
-                    $this->em->persist($newMD);
+                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {
+                    /** @var LogBookTestFailDesc $fDesc */
+                    $fDesc = $fdRepo->findOrCreate(['description' => $test->getFailDescription()]);
+                    $fDesc->addTest($test);
+                    $this->em->persist($fDesc);
                 }
                 $test->resetMetaData('*');
 

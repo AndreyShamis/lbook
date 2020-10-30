@@ -1051,7 +1051,7 @@ class LogBookCycleController extends AbstractController
                 ->orderBy('t.executionOrder', 'ASC');
 //            $qb->leftJoin('App:LogBookTestInfo', 'i', 'WITH', 't.testInfo = i.id');
 
-            //$qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
+            $qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
             if ($suite !== null) {
                 $qb->andWhere('t.suite_execution = :suite')
                     ->setParameter('suite', $suite->getId());
@@ -1061,15 +1061,13 @@ class LogBookCycleController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             /** @var Query $query */
             $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
-            $query = $query->setDQL($qb->getDQL());
+            $query->setDQL($qb->getDQL());
             $query->setFetchMode(LogBookTest::class, "testInfo", ClassMetadataInfo::FETCH_EAGER);
             $query->setFetchMode(LogBookTest::class, "verdict", ClassMetadataInfo::FETCH_EAGER);
             $query->setFetchMode(LogBookTest::class, "testType", ClassMetadataInfo::FETCH_EAGER);
             $query->setFetchMode(LogBookTest::class, "suite_execution", ClassMetadataInfo::FETCH_EAGER);
-            $query = $query->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
-            if ($suiteMode) {
-                $query = $query->setParameter('suite', $suite->getId());
-            }
+            $query->setParameters($qb->getParameters());
+            $query->setMaxResults($qb->getMaxResults());
 //            $res = $query->execute();
             $paginator = $pagePaginator->paginate($query, $page, $maxSize); //$this->show_tests_size);
             $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
@@ -1096,6 +1094,7 @@ class LogBookCycleController extends AbstractController
 //                    $testPath = $obj['testPath'];
                     //$testFailDescription = $obj['testFailDesc'];
                     if ($test instanceof \App\Entity\LogBookTest) {
+
 //                        if ($testName !== null) {
 //                            $test->setName($testName);
 //                        }

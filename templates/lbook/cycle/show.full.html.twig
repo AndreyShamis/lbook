@@ -482,7 +482,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 {#{% endif %}#}
                 {% if cycle_show_test_id_show == true %}<td>{{ test.id }}</td>{% endif %}
                 <td>{{ test.executionOrder }}</td>
-                <td class="cycleName" title="{{ test.testType }} - {{ test.testInfo.path }}"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.testInfo.name }}</a></td>
+                <td class="cycleName" title="{{ test.testType | default('TEST') }} - {{ test.testInfo.path | default('') }}"><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.testInfo.name | default(test.name) | default('NoName') }}</a></td>
                 <td><span data-title="{{ test.timeRun }}">{{ test.timeRun | ExecutionTimeGeneric}}</span></td>
                 {% if cycle_show_test_time_start_show == true %}
                     {#title="{{ test.timeStart|date('Y-m-d H:i:s') }}"#}

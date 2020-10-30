@@ -16,6 +16,8 @@ use App\Repository\LogBookTestTypeRepository;
 use App\Service\PagePaginator;
 use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -409,10 +411,25 @@ class LogBookTestController extends AbstractController
                 //$qb->setParameter('test_name', $test_name_search);
 
             }
+            $em = $this->getDoctrine()->getManager();
+            /** @var Query $queryObj */
+            $queryObj = $em->createQuery("SELECT t FROM App\LogBookTest t");
+            $queryObj->setDQL($qb->getDQL());
+
+            $queryObj->setFetchMode(LogBookTest::class, "testInfo", ClassMetadataInfo::FETCH_EAGER);
+            $queryObj->setFetchMode(LogBookTest::class, "verdict", ClassMetadataInfo::FETCH_EAGER);
+            $queryObj->setFetchMode(LogBookTest::class, "testType", ClassMetadataInfo::FETCH_EAGER);
+            $queryObj->setFetchMode(LogBookTest::class, "suite_execution", ClassMetadataInfo::FETCH_EAGER);
+            $queryObj->setFetchMode(LogBookTest::class, "cycle", ClassMetadataInfo::FETCH_EAGER);
+
+            $queryObj->setParameters($qb->getParameters());
+            $queryObj->setMaxResults($qb->getMaxResults());
             if ($enableSearch) {
-                $query = $qb->getQuery();
-                $sql = $query->getSQL();
-                $tests = $query->execute();
+                //$query = $qb->getQuery();
+                //$sql = $query->getSQL();
+                $sql = $queryObj->getSQL();
+                $tests = $queryObj->execute();
+                //$tests = $query->execute();
                 if (!$addOrder){
                     foreach($tests as $tmp_test) {
                         /** @var LogBookTest $t_t */

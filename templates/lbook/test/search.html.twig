@@ -215,7 +215,7 @@
                                 <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                                     <td>{{ test.id }}</td>
                                     <td>{{ test.rate }}</td>
-                                    <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
+                                    <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}" title="{{ test.testInfo.path | default('') }}">{{ test.testInfo.name | default(test.name) | default('NoName') }}</a></td>
                                     <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                                     <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
                                     <td>

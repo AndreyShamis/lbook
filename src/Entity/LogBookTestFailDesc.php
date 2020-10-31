@@ -42,7 +42,6 @@ class LogBookTestFailDesc
 
     /**
      * @ORM\OneToMany(targetEntity=LogBookTest::class, mappedBy="failDesc", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $tests;
 

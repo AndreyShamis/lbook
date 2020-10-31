@@ -165,6 +165,7 @@ class LogBookTest
 
     /**
      * @ORM\ManyToOne(targetEntity=LogBookTestFailDesc::class, inversedBy="tests")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $failDesc;
 

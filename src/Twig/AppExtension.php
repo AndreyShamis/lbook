@@ -293,6 +293,38 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\-+/', '-',$ret_val);
             $ret_val = preg_replace('/\++/', '+',$ret_val);
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
+
+            try {
+                $ret_val = preg_replace_callback('/BW value (\d+[\.|\,|\d]*) ,below expected BW (\d+)/', 'parser_BW_TPT',$ret_val);
+
+                function parser_BW_TPT($matches){
+                    $fdigit = round($matches[1], 0);
+                    $percent = AppExtension::getPercentageStatic($fdigit, $matches[2], 0);
+                    return 'BW value ' . $percent .  '% ,below expected BW ' . $matches[2];
+                }
+            } catch (\Throwable $ex) {
+
+            }
+            try {
+                $ret_val = preg_replace_callback('/(.*) value (\d+[\.|\,|\d]*) ,below expected BW (\d+)(.*)/', 'parser_BW_TPT', $ret_val);
+
+                function parser_BW_TPT($matches){
+                    $percent = AppExtension::getPercentageStatic($matches[2], $matches[3], 0);
+                    return $matches[1] . ' value ' . $percent .  '% ,below expected BW ' . $matches[3] . $matches[4];
+                }
+            } catch (\Throwable $ex) {
+
+            }
+            try {
+                $ret_val = preg_replace_callback('/preformace_tests FAILED current result (\d+[\.|\,|\d]*) is larger then (\d+[\.|\,|\d]*) \* (\d+[\.|\,|\d]*) \=(\d+[\.|\,|\d]*)/', 'parser_PerfTest', $ret_val);
+
+                function parser_PerfTest($matches){
+                    return 'preformace_tests FAILED current result ' . round($matches[1], 0).  ' is larger then ' . round($matches[2], 0).  ' * ' . round($matches[3], 2).  ' =' . round($matches[4], 0);
+
+                }
+            } catch (\Throwable $ex) {
+
+            }
             trim($ret_val);
         } catch (\Throwable $ex) {
 
@@ -429,6 +461,20 @@ class AppExtension extends AbstractExtension
         }
         return '#'.$ret;
     }
+
+    public static function getPercentageStatic($valueOf, $valueFrom, $precision = 2) {
+        $ret = 0;
+        try {
+            if ($valueFrom>0) {
+                $ret = ($valueOf*100)/$valueFrom;
+            }
+            $ret = round($ret,$precision);
+        }
+        catch (Exception $ex) {
+        }
+        return $ret;
+    }
+
 
     /**
      * @param $valueOf

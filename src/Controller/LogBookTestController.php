@@ -190,8 +190,7 @@ class LogBookTestController extends AbstractController
 //                    similar_text($fdOld, $fd, $similarPercent);
 //                    if ($similarPercent <= 80) {
                         /** @var LogBookTestFailDesc $fDesc */
-                    $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
-                    $fDesc->addTest($test);
+                    $fDesc = $fdRepo->findOrCreate(['description' => $fd, 'test' => $test]);
                     $fDesc->setTestsCount($fDesc->getTests()->count());
                     $this->em->persist($fDesc);
 //

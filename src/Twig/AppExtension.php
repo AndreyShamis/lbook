@@ -300,6 +300,7 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\/localdrive\/users\/[\d|\w|\_|\-|\.]+\/jenkins_ws\/workspace\/CI_workspace/', '/WS/',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+\,[\d|\-|\,]+/', '',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+/', '',$ret_val);
+            $ret_val = preg_replace('/\/bin\/bash\: line 1\: \d* /', '',$ret_val);
             $ret_val = preg_replace('/CmdResult\:\:EXIT_CODE\=\d+ \|\| /', '',$ret_val);
             $ret_val = preg_replace('/\t+/', ' ',$ret_val);
             $ret_val = preg_replace('/\s+/', ' ',$ret_val);

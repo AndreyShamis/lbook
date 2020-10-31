@@ -285,6 +285,7 @@ class AppExtension extends AbstractExtension
             if ($r) {
                 $ret_val = $out[2][0];
             }
+            $ret_val = str_replace(' || DURATION=0', '',$ret_val);
             $ret_val = str_replace('Command <&&', '',$ret_val);
             $ret_val = str_replace('Command <', '',$ret_val);
             $ret_val = str_replace('0000000001', '',$ret_val);
@@ -296,8 +297,10 @@ class AppExtension extends AbstractExtension
             $ret_val = str_replace('9999999999', '',$ret_val);
             $ret_val = str_replace('==== STDOUT ====', 'stdout',$ret_val);
             $ret_val = str_replace('==== STDERR ====', 'stderr',$ret_val);
+            $ret_val = preg_replace('/\/localdrive\/users\/[\d|\w|\_|\-|\.]+\/jenkins_ws\/workspace\/CI_workspace', '/{WS/',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+\,[\d|\-|\,]+/', '',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+/', '',$ret_val);
+            $ret_val = preg_replace('/CmdResult\:\:EXIT_CODE\=\d+ \|\| /', '',$ret_val);
             $ret_val = preg_replace('/\t+/', ' ',$ret_val);
             $ret_val = preg_replace('/\s+/', ' ',$ret_val);
             $ret_val = preg_replace('/\-+/', '-',$ret_val);

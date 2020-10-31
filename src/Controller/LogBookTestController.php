@@ -169,7 +169,7 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.failDescription != :failDescription')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(2000)
+            ->setMaxResults(10)
             ->setParameter('failDescription', '')
             ->orderBy('t.id', 'ASC');
 
@@ -192,6 +192,7 @@ class LogBookTestController extends AbstractController
                         /** @var LogBookTestFailDesc $fDesc */
                     $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
                     $fDesc->addTest($test);
+                    $test->setFailDesc($fDesc);
                     $this->em->persist($fDesc);
                     $fDesc->setTestsCount($fDesc->getTests()->count());
                     $this->em->persist($fDesc);

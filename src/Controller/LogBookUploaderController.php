@@ -759,10 +759,11 @@ class LogBookUploaderController extends AbstractController
                             if ($lastSeen !== null) {
                                 $diffSeconds =  $nowDate->getTimestamp() - $lastSeen->getTimestamp();
                                 $diffHours = round($diffSeconds/60/60, 0);
-                                $diffDays = round($diffSeconds/$diffHours/24, 0);
+                                if ($diffHours > 0) {
+                                    $diffDays = round($diffSeconds/$diffHours/24, 0);
+                                }
 
                             }
-
                             if ($diffHours > 2 || $lastSeen === null) {
                                 $failDescObj->setLastMarkedAsSeenAt($nowDate);
                                 $failDescObj->setTestsCount($failDescObj->getTests()->count());

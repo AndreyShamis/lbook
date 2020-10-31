@@ -169,9 +169,8 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.failDescription != :failDescription')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(1000)
+            ->setMaxResults(2000)
             ->setParameter('failDescription', '')
-            ->setFirstResult(10000)
             ->orderBy('t.id', 'ASC');
 
         /** @var \ArrayIterator $iterator */
@@ -183,23 +182,23 @@ class LogBookTestController extends AbstractController
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
             try {
-                $fdOld = $test->getFailDescription();
+                //$fdOld = $test->getFailDescription();
                 $fd = LogBookTestFailDesc::validateDescription($test->getFailDescription(true));
                 $similarPercent = 0;
 
-                if ($fd !== null && $fd !== '' && $fdOld != $fd ){
-                    similar_text($fdOld, $fd, $similarPercent);
-                    if ($similarPercent <= 80) {
+                if ($fd !== null && $fd !== '' ) { //&& $fdOld != $fd ){
+//                    similar_text($fdOld, $fd, $similarPercent);
+//                    if ($similarPercent <= 80) {
                         /** @var LogBookTestFailDesc $fDesc */
-                        $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
-                        $fDesc->addTest($test);
-                        $this->em->persist($fDesc);
-
-                        $a = $fd;
-//                        echo $fdOld . "\t\t - \t " . $fd . "\n<br/>";
-                    } else {
-                        $b = 1;
-                    }
+                    $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
+                    $fDesc->addTest($test);
+                    $this->em->persist($fDesc);
+//
+//                        $a = $fd;
+////                        echo $fdOld . "\t\t - \t " . $fd . "\n<br/>";
+//                    } else {
+//                        $b = 1;
+                    //}
 
                 }
 //                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {

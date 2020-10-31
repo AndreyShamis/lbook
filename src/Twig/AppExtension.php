@@ -285,7 +285,6 @@ class AppExtension extends AbstractExtension
             if ($r) {
                 $ret_val = $out[2][0];
             }
-            $ret_val = str_replace('/nonrelease_mnt', '/nr_mnt',$ret_val);
             $ret_val = str_replace('> failed,', '-',$ret_val);
             $ret_val = str_replace(' || DURATION=0', '',$ret_val);
             $ret_val = str_replace('Command <&&', '',$ret_val);

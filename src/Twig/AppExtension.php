@@ -258,7 +258,8 @@ class AppExtension extends AbstractExtension
     }
 
     public static function parser_PerfTest($matches){
-        return 'preformace_tests FAILED current result ' . round($matches[1], 0).  ' is larger then ' . round($matches[2], 0).  ' * ' . round($matches[3], 2).  ' =' . round($matches[4], 0);
+        return '' . round($matches[1], 0).  ' is larger then ' . round($matches[4], 0);
+        //return '' . round($matches[1], 0).  ' is larger then ' . round($matches[2], 0).  ' * ' . round($matches[3], 2).  ' =' . round($matches[4], 0);
     }
 
     /**

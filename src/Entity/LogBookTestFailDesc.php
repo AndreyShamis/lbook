@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookTestFailDescRepository::class)
- * @ORM\Table(name="lbooK_test_fail_desc", indexes={
+ * @ORM\Table(name="lbook_test_fail_desc", indexes={
  *     @Index(name="description_index", columns={"description"}),
  *     @Index(name="description_md5_index", columns={"description", "md5"}),
  *     @Index(name="ft_description_index", columns={"description"}, flags={"fulltext"})

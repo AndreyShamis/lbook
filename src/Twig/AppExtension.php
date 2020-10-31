@@ -258,13 +258,20 @@ class AppExtension extends AbstractExtension
      */
     public static function cleanAutotestFinalMessage(string $input=null): string
     {
-        $ret_val = $input;
+        $ret_val = substr($input, 0 , 5);
         try {
             preg_match_all("/(FAIL|ERROR|TEST_NA) .*\d\d\:\d\d\:\d\d\s+(.*)/", $input, $out, PREG_PATTERN_ORDER);
 
-            if (count($out) > 1 && count($out[2]) >= 1) {
+            if (count($out) >= 3 && count($out[2]) >= 1 && strlen($out[2][0]) > 10 ) {
+                $ret_val = $out[2][0];
+
+            }
+            preg_match_all("/(Exception escaped control file, job aborting:)s*(.*)/", $input, $out, PREG_PATTERN_ORDER);
+
+            if (count($out) >= 3 && count($out[2]) >= 1 && strlen($out[2][0]) > 10 ) {
                 $ret_val = $out[2][0];
             }
+
         } catch (\Throwable $ex) {
 
         }

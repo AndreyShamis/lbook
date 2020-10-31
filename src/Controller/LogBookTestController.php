@@ -170,7 +170,7 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.failDescription != :failDescription')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(2000)
+            ->setMaxResults(10000)
             ->setParameter('failDescription', '')
             ->orderBy('t.id', 'ASC');
 

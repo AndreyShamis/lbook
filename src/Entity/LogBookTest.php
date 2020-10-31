@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *     @Index(name="i_disabled", columns={"disabled"}),
  *     @Index(name="i_cycle_execution_order", columns={"cycle", "execution_order"}),
  *     @Index(name="i_cycle_disabled", columns={"cycle", "disabled"}),
- *     @Index(name="fulltext_name", columns={"name"}, flags={"fulltext"}),
  *     @Index(name="i_executionOrder", columns={"execution_order"})})
  * // , uniqueConstraints={@ORM\UniqueConstraint(name="test_uniq_cycle_execution_order", columns={"execution_order", "cycle"})}
  * @ORM\HasLifecycleCallbacks()
@@ -316,7 +315,8 @@ class LogBookTest
                     $errors = '';
                     if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'ERROR' && strpos($log->getMessage(), 'ERROR ') === 0) {
+                    } elseif ($log->getMsgType()->getName() === 'ERROR' &&
+                        (strpos($log->getMessage(), 'ERROR ') === 0 || strpos($log->getMessage(), 'Exception escaped control file, job aborting:') === 0)) {
                         $errors = $log->getMessage();
                     } elseif ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
                         $errors = $log->getMessage();
@@ -326,9 +326,10 @@ class LogBookTest
                     if ($errors !== null && $errors != '') {
                         $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
                     }
-
+                    if(strlen($ret_val) > 10) {
+                        break;
+                    }
                 }
-
             }
 
             if ($ret_val === null || $ret_val === '') {

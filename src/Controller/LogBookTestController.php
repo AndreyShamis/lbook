@@ -169,7 +169,7 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.failDescription != :failDescription')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(3000)
+            ->setMaxResults(1000)
             ->setParameter('failDescription', '')
             ->orderBy('t.id', 'ASC');
 
@@ -178,7 +178,9 @@ class LogBookTestController extends AbstractController
         $totalPosts = count($iterator);
         $maxPages =1;
         $thisPage = 1;
-        $logger->notice('  - Start MIGRATION for ' . count($iterator) . ' tests');
+        $timestamp = new \DateTime();
+        $timestamp = $timestamp->getTimestamp();
+        $logger->notice('  - Start MIGRATION for ' . count($iterator) . ' tests - ' . $timestamp);
 //        echo "<pre>";
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
@@ -196,7 +198,8 @@ class LogBookTestController extends AbstractController
                     $test->setFailDesc($fDesc);
                     $this->em->persist($fDesc);
                     $fDesc->setTestsCount($fDesc->getTests()->count());
-                    $this->em->flush();
+                    $this->em->persist($fDesc);
+                    //$this->em->flush();
 //
 //                        $a = $fd;
 ////                        echo $fdOld . "\t\t - \t " . $fd . "\n<br/>";
@@ -224,7 +227,7 @@ class LogBookTestController extends AbstractController
 //        exit();
         $this->em->flush();
 
-        $logger->notice('  - FINISH MIGRATION');
+        $logger->notice('  - FINISH MIGRATION - '. $timestamp);
         return array(
             'size'      => $totalPosts,
             'maxPages'  => $maxPages,

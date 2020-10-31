@@ -324,7 +324,7 @@ class LogBookTestController extends AbstractController
                 $enableSearch = True;
             }
 
-            if ( ($test_name !== null && \mb_strlen($test_name) >= 2) || ($testMetaData !== null && \mb_strlen($testMetaData) >= 2) ) {
+            if ( ($test_name !== null && \mb_strlen($test_name) >= 1) || ($testMetaData !== null && \mb_strlen($testMetaData) >= 1) ) {
 //                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
 //                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
 //                        ->setParameter('test_id', (int)$test_name);
@@ -334,33 +334,33 @@ class LogBookTestController extends AbstractController
 //                $qb->setParameter('test_name', '%'.$test_name.'%')
 //                    ->setParameter('metadata', $test_name.'%');
 
-                $test_name = trim($test_name);
-                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
-                    $qb->andWhere('MATCH_AGAINST(t.name, :search_str) != 0 OR t.id = :test_id');
-                    $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
-                    $qb->setParameter('test_id', (int)$test_name);
+//                $test_name = trim($test_name);
+//                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
+//                    $qb->andWhere('MATCH_AGAINST(t.name, :search_str) != 0 OR t.id = :test_id');
+//                    $qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere('MATCH_AGAINST(newMetaData.value, :search_str) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :search_str) as rate2');
+//                    $qb->setParameter('test_id', (int)$test_name);
+//
+//                } else {
 
-                } else {
-
-                    //$qb->andWhere('MATCH_AGAINST(t.name, :search_str) > 1 OR t.name LIKE :test_name');
-                    if (strlen($test_name)) {
-                        $qb->leftJoin('t.testInfo', 'testInfo')->andWhere('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) as rate');
-                    }
-                    //$qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal('%'. $test_name. '%') ));
-                    if (strlen($testMetaData)) {
-                        $qb->leftJoin('t.newMetaData', 'newMetaData')->andWhere('MATCH_AGAINST(newMetaData.value, :metaData) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :metaData) as rate2');
-                        $qb->addOrderBy('rate2', 'DESC');
-
-                    }
-
-                    //$qb->addSelect('MATCH_AGAINST(t.name, :search_str) as rate');
-                    if (strlen($test_name)) {
-                        $qb->addOrderBy('rate', 'DESC');
-                    }
-
-                    $qb->addOrderBy('t.id', 'DESC');
-                    $addOrder = false;
+                //$qb->andWhere('MATCH_AGAINST(t.name, :search_str) > 1 OR t.name LIKE :test_name');
+                if (strlen($test_name)) {
+                    $qb->leftJoin('t.testInfo', 'testInfo')->andWhere('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) > 1 OR testInfo.name LIKE :test_name')->addSelect('MATCH_AGAINST(testInfo.name, testInfo.path, :search_str) as rate');
                 }
+                //$qb->leftJoin('t.newMetaData', 'newMetaData')->orWhere($qb->expr()->like('newMetaData.value', $qb->expr()->literal('%'. $test_name. '%') ));
+                if (strlen($testMetaData)) {
+                    $qb->leftJoin('t.newMetaData', 'newMetaData')->andWhere('MATCH_AGAINST(newMetaData.value, :metaData) > 1')->addSelect('MATCH_AGAINST(newMetaData.value, :metaData) as rate2');
+                    $qb->addOrderBy('rate2', 'DESC');
+
+                }
+
+                //$qb->addSelect('MATCH_AGAINST(t.name, :search_str) as rate');
+                if (strlen($test_name)) {
+                    $qb->addOrderBy('rate', 'DESC');
+                }
+
+                $qb->addOrderBy('t.id', 'DESC');
+                $addOrder = false;
+//                }
 
                 $test_name_match = str_replace('%', ' ', $test_name);
                 $test_name_match = str_replace('?', ' ', $test_name_match);

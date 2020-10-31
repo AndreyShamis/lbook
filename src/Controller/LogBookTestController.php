@@ -166,12 +166,12 @@ class LogBookTestController extends AbstractController
      */
     public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LogBookTestFailDescRepository $fdRepo, LoggerInterface $logger): array
     {
-
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.failDescription != :failDescription')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(10000)
+            ->setMaxResults(1000)
             ->setParameter('failDescription', '')
+            ->setFirstResult(10000)
             ->orderBy('t.id', 'ASC');
 
         /** @var \ArrayIterator $iterator */
@@ -179,17 +179,35 @@ class LogBookTestController extends AbstractController
         $totalPosts = count($iterator);
         $maxPages =1;
         $thisPage = 1;
+//        echo "<pre>";
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
             try {
+                $fdOld = $test->getFailDescription();
+                $fd = LogBookTestFailDesc::validateDescription($test->getFailDescription(true));
+                $similarPercent = 0;
 
-                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {
-                    /** @var LogBookTestFailDesc $fDesc */
-                    $fDesc = $fdRepo->findOrCreate(['description' => $test->getFailDescription()]);
-                    $fDesc->addTest($test);
-                    $this->em->persist($fDesc);
+                if ($fd !== null && $fd !== '' && $fdOld != $fd ){
+                    similar_text($fdOld, $fd, $similarPercent);
+                    if ($similarPercent <= 80) {
+                        /** @var LogBookTestFailDesc $fDesc */
+                        $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
+                        $fDesc->addTest($test);
+                        $this->em->persist($fDesc);
+
+                        $a = $fd;
+//                        echo $fdOld . "\t\t - \t " . $fd . "\n<br/>";
+                    } else {
+                        $b = 1;
+                    }
+
                 }
-                $test->resetMetaData('*');
+//                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {
+//                    /** @var LogBookTestFailDesc $fDesc */
+//                    $fDesc = $fdRepo->findOrCreate(['description' => $test->getFailDescription()]);
+//                    $fDesc->addTest($test);
+//                    $this->em->persist($fDesc);
+//                }
 
             } catch (\Throwable $ex) {
                 $logger->critical('MIGRATION :' . $ex->getMessage(), [
@@ -200,6 +218,7 @@ class LogBookTestController extends AbstractController
             }
 
         }
+//        exit();
         $this->em->flush();
 
 

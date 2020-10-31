@@ -271,7 +271,14 @@ class AppExtension extends AbstractExtension
             if (count($out) >= 3 && count($out[2]) >= 1 && strlen($out[2][0]) > 10 ) {
                 $ret_val = $out[2][0];
             }
-
+            $r = preg_match_all("/Command \<.*EXIT_CODE\=\d+\,(.*)\:\s(.*)/", $ret_val, $out, PREG_PATTERN_ORDER);
+            if ($r) {
+                $ret_val = $out[2][0];
+            }
+            $ret_val = str_replace('Command <&&', '',$ret_val);
+            $ret_val = str_replace('Command <', '',$ret_val);
+            $ret_val = preg_replace('/\t+/', ' ',$ret_val);
+            $ret_val = preg_replace('/\s+/', ' ',$ret_val);
         } catch (\Throwable $ex) {
 
         }

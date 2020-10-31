@@ -285,6 +285,8 @@ class AppExtension extends AbstractExtension
             if ($r) {
                 $ret_val = $out[2][0];
             }
+            $ret_val = str_replace('/nonrelease_mnt', '/nr_mnt',$ret_val);
+            $ret_val = str_replace('> failed,', '-',$ret_val);
             $ret_val = str_replace(' || DURATION=0', '',$ret_val);
             $ret_val = str_replace('Command <&&', '',$ret_val);
             $ret_val = str_replace('Command <', '',$ret_val);
@@ -301,7 +303,7 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\. PID: \d+\,[\d|\-|\,]+/', '',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+/', '',$ret_val);
             $ret_val = preg_replace('/\/bin\/bash\: line 1\: \d* /', '',$ret_val);
-            $ret_val = preg_replace('/CmdResult\:\:EXIT_CODE\=\d+ \|\| /', '',$ret_val);
+            $ret_val = preg_replace('/CmdResult\:\:EXIT_CODE\=\d+ \|\| CMD\=\[.*/', '',$ret_val);
             $ret_val = preg_replace('/\t+/', ' ',$ret_val);
             $ret_val = preg_replace('/\s+/', ' ',$ret_val);
             $ret_val = preg_replace('/\-+/', '-',$ret_val);

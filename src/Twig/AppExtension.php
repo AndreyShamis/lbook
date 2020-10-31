@@ -252,7 +252,14 @@ class AppExtension extends AbstractExtension
         return $ret;
     }
 
+    public static function parser_BW_TPT($matches){
+        $percent = AppExtension::getPercentageStatic($matches[2], $matches[3], 0);
+        return $matches[1] . ' value ' . $percent .  '% ,below expected BW ' . $matches[3] . $matches[4];
+    }
 
+    public static function parser_PerfTest($matches){
+        return 'preformace_tests FAILED current result ' . round($matches[1], 0).  ' is larger then ' . round($matches[2], 0).  ' * ' . round($matches[3], 2).  ' =' . round($matches[4], 0);
+    }
 
     /**
      * @param string|null $input
@@ -296,22 +303,15 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\++/', '+',$ret_val);
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
 
-            function parser_BW_TPT($matches){
-                $percent = AppExtension::getPercentageStatic($matches[2], $matches[3], 0);
-                return $matches[1] . ' value ' . $percent .  '% ,below expected BW ' . $matches[3] . $matches[4];
-            }
 
-            function parser_PerfTest($matches){
-                return 'preformace_tests FAILED current result ' . round($matches[1], 0).  ' is larger then ' . round($matches[2], 0).  ' * ' . round($matches[3], 2).  ' =' . round($matches[4], 0);
-            }
-            
+
             try {
-                $ret_val = preg_replace_callback('/(.*) value (\d+[\.|\,|\d]*) ,below expected BW (\d+)(.*)/', 'parser_BW_TPT', $ret_val);
+                $ret_val = preg_replace_callback('/(.*) value (\d+[\.|\,|\d]*) ,below expected BW (\d+)(.*)/', array('AppExtension', 'parser_BW_TPT'), $ret_val);
             } catch (\Throwable $ex) {
 
             }
             try {
-                $ret_val = preg_replace_callback('/preformace_tests FAILED current result (\d+[\.|\,|\d]*) is larger then (\d+[\.|\,|\d]*) \* (\d+[\.|\,|\d]*) \=(\d+[\.|\,|\d]*)/', 'parser_PerfTest', $ret_val);
+                $ret_val = preg_replace_callback('/preformace_tests FAILED current result (\d+[\.|\,|\d]*) is larger then (\d+[\.|\,|\d]*) \* (\d+[\.|\,|\d]*) \=(\d+[\.|\,|\d]*)/', array('AppExtension', 'parser_PerfTest'), $ret_val);
             } catch (\Throwable $ex) {
 
             }

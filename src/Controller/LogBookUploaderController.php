@@ -751,8 +751,24 @@ class LogBookUploaderController extends AbstractController
                     if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
                         try {
                             $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
+
                             $failDescObj->addTest($test);
                             $test->setFailDesc($failDescObj);
+
+
+                            $lastSeen = $failDescObj->getLastMarkedAsSeenAt();
+                            $diffDays = $diffHours = 0;
+                            $nowDate = new DateTime();
+                            if ($lastSeen !== null) {
+                                $diffSeconds =  $nowDate->getTimestamp() - $lastSeen->getTimestamp();
+                                $diffHours = round($diffSeconds/60/60, 0);
+                                $diffDays = round($diffSeconds/$diffHours/24, 0);
+
+                            }
+
+                            if ($diffHours > 3 || $lastSeen === null) {
+                                $failDescObj->setLastMarkedAsSeenAt($nowDate);
+                            }
                         }catch (Exception $ex) {
                             $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());
                         }

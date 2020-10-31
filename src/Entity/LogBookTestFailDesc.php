@@ -45,15 +45,33 @@ class LogBookTestFailDesc
      */
     private $tests;
 
-    public static $MAX_DESC_LEN = 250;
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"unsigned"=true})
+     */
+    private $testsCount;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $lastMarkedAsSeenAt;
 
 
+    /**
+     * LogBookTestFailDesc constructor.
+     */
     public function __construct()
     {
         $this->setCreatedAt(new \DateTime());
+        $this->setLastMarkedAsSeenAt($this->getCreatedAt());
         $this->tests = new ArrayCollection();
     }
 
+    public static $MAX_DESC_LEN = 250;
+
+    /**
+     * @param $newDesc
+     * @return string
+     */
     public static function validateDescription($newDesc): string
     {
         if (mb_strlen($newDesc) > self::$MAX_DESC_LEN) {
@@ -62,16 +80,26 @@ class LogBookTestFailDesc
         return $newDesc;
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
+    /**
+     * @param string $description
+     * @return $this
+     */
     public function setDescription(string $description): self
     {
         $this->description = LogBookTestFailDesc::validateDescription($description);
@@ -140,6 +168,33 @@ class LogBookTestFailDesc
                 $test->setFailDesc(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTestsCount(): int
+    {
+        if ($this->testsCount === null) {
+            return 0;
+        }
+        return $this->testsCount;
+    }
+
+    public function setTestsCount(?int $testsCount): self
+    {
+        $this->testsCount = $testsCount;
+
+        return $this;
+    }
+
+    public function getLastMarkedAsSeenAt(): ?\DateTimeInterface
+    {
+        return $this->lastMarkedAsSeenAt;
+    }
+
+    public function setLastMarkedAsSeenAt(\DateTimeInterface $lastMarkedAsSeenAt): self
+    {
+        $this->lastMarkedAsSeenAt = $lastMarkedAsSeenAt;
 
         return $this;
     }

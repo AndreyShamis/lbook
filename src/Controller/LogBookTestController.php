@@ -192,6 +192,7 @@ class LogBookTestController extends AbstractController
                         /** @var LogBookTestFailDesc $fDesc */
                     $fDesc = $fdRepo->findOrCreate(['description' => $fd]);
                     $fDesc->addTest($test);
+                    $fDesc->setTestsCount($failDescObj->getTests()->count());
                     $this->em->persist($fDesc);
 //
 //                        $a = $fd;

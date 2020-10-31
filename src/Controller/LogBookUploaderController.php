@@ -766,8 +766,9 @@ class LogBookUploaderController extends AbstractController
 
                             }
 
-                            if ($diffHours > 3 || $lastSeen === null) {
+                            if ($diffHours > 2 || $lastSeen === null) {
                                 $failDescObj->setLastMarkedAsSeenAt($nowDate);
+                                $failDescObj->setTestsCount($failDescObj->getTests()->count());
                             }
                         }catch (Exception $ex) {
                             $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());

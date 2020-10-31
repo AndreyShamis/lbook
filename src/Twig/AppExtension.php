@@ -308,6 +308,7 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\-+/', '-',$ret_val);
             $ret_val = preg_replace('/\++/', '+',$ret_val);
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
+            $ret_val = preg_replace('/\-gtest_filter\=[\.|\/|\_|\-|\d|\w|]+\- /', '',$ret_val);
 
 
 

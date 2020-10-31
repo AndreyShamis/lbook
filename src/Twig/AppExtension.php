@@ -277,8 +277,23 @@ class AppExtension extends AbstractExtension
             }
             $ret_val = str_replace('Command <&&', '',$ret_val);
             $ret_val = str_replace('Command <', '',$ret_val);
+            $ret_val = str_replace('0000000001', '',$ret_val);
+            $ret_val = str_replace('Total Actual ', '',$ret_val);
+            $ret_val = str_replace('[+] ', '',$ret_val);
+            $ret_val = str_replace('/nonrelease_content', '',$ret_val);
+            $ret_val = str_replace('0000000002', '',$ret_val);
+            $ret_val = str_replace('0000000003', '',$ret_val);
+            $ret_val = str_replace('9999999999', '',$ret_val);
+            $ret_val = str_replace('==== STDOUT ====', 'stdout',$ret_val);
+            $ret_val = str_replace('==== STDERR ====', 'stderr',$ret_val);
+            $ret_val = preg_replace('/\. PID: \d+\,[\d|\-|\,]+/', '',$ret_val);
+            $ret_val = preg_replace('/\. PID: \d+/', '',$ret_val);
             $ret_val = preg_replace('/\t+/', ' ',$ret_val);
             $ret_val = preg_replace('/\s+/', ' ',$ret_val);
+            $ret_val = preg_replace('/\-+/', '-',$ret_val);
+            $ret_val = preg_replace('/\++/', '+',$ret_val);
+            $ret_val = preg_replace('/\=+/', '=',$ret_val);
+            trim($ret_val);
         } catch (\Throwable $ex) {
 
         }

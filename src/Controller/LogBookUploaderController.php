@@ -750,7 +750,8 @@ class LogBookUploaderController extends AbstractController
                 try{
                     if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
                         try {
-                            $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription(), 'test' => $test]);
+                            $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
+                            $failDescObj->addTest($test);
                             $lastSeen = $failDescObj->getLastMarkedAsSeenAt();
                             $diffDays = $diffHours = 0;
                             $nowDate = new DateTime();

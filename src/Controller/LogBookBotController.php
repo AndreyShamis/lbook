@@ -56,8 +56,9 @@ class LogBookBotController extends AbstractController
      * @return array
      * @throws \Exception
      */
-    public function setupCleaner(LogBookSetupRepository $setupRepo): array
+    public function setupCleaner(LogBookSetupRepository $setupRepo, LoggerInterface $logger): array
     {
+        $logger->notice(' # [ + Setup cleaner started to work]');
         $maxDeleteAtOnce = 10;
         $query = $setupRepo->createQueryBuilder('setups')
             ->where('setups.disabled = 0')
@@ -90,7 +91,12 @@ class LogBookBotController extends AbstractController
             } catch (\Throwable $ex) {}
 
         }
+
         $this->em->flush();
+        if (count($setupsForDelete)) {
+            $logger->notice('Clear ' . count($setupsForDelete) . ' setups');
+        }
+        $logger->notice(' # [ - Setup cleaner finish]');
         return array(
             'setupsForDelete'      => $setupsForDelete,
             'setups'  => $setups,

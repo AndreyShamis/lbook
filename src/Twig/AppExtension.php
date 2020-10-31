@@ -304,17 +304,17 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
 
 
-
-            try {
-                $ret_val = preg_replace_callback('/(.*) value (\d+[\.|\,|\d]*) ,below expected BW (\d+)(.*)/', array('AppExtension', 'parser_BW_TPT'), $ret_val);
-            } catch (\Throwable $ex) {
-
-            }
-            try {
-                $ret_val = preg_replace_callback('/preformace_tests FAILED current result (\d+[\.|\,|\d]*) is larger then (\d+[\.|\,|\d]*) \* (\d+[\.|\,|\d]*) \=(\d+[\.|\,|\d]*)/', array('AppExtension', 'parser_PerfTest'), $ret_val);
-            } catch (\Throwable $ex) {
-
-            }
+//
+//            try {
+//                $ret_val = preg_replace_callback('/(.*) value (\d+[\.|\,|\d]*) ,below expected BW (\d+)(.*)/', array('AppExtension', 'parser_BW_TPT'), $ret_val);
+//            } catch (\Throwable $ex) {
+//
+//            }
+//            try {
+//                $ret_val = preg_replace_callback('/preformace_tests FAILED current result (\d+[\.|\,|\d]*) is larger then (\d+[\.|\,|\d]*) \* (\d+[\.|\,|\d]*) \=(\d+[\.|\,|\d]*)/', array('AppExtension', 'parser_PerfTest'), $ret_val);
+//            } catch (\Throwable $ex) {
+//
+//            }
             trim($ret_val);
         } catch (\Throwable $ex) {
 

@@ -175,7 +175,7 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.verdict != :verdict')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(10000)
+            ->setMaxResults(8000)
             ->setParameter('verdict', $vPass)
             ->orderBy('t.id', 'ASC|DESC');
         $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
@@ -195,7 +195,7 @@ class LogBookTestController extends AbstractController
                 $curTimestamp = new \DateTime();
                 $curTimestamp = $curTimestamp->getTimestamp();
                 $tDelata = ($curTimestamp - $timestamp);
-                if ( $tDelata >= 150 ) {
+                if ( $tDelata >= 120 ) {
                     $logger->notice('  - Break MIGRATION for ' . count($changed_tests) . ' tests - TimeDelta:' . $tDelata);
                     break;
                 }

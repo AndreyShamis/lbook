@@ -172,7 +172,7 @@ class LogBookTestController extends AbstractController
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.verdict != :verdict')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(3000)
+            ->setMaxResults(5000)
             ->setParameter('verdict', $vPass)
             ->orderBy('t.id', 'ASC|DESC');
         $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');

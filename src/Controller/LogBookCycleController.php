@@ -250,8 +250,8 @@ class LogBookCycleController extends AbstractController
                             $ret_test['verdict'] = 'WIP';
                         }
                         $ret_test['order'] = $test->getExecutionOrder();
-                        $ret_test['chip'] = $test->getChip();
-                        $ret_test['platform'] = $test->getPlatform();
+                        $ret_test['chip'] = $test->getSuiteExecution()->getChip();
+                        $ret_test['platform'] = $test->getSuiteExecution()->getPlatform();
                         $ret_test['test_type'] = $test->getTestType()->getName();
                         $ret_test['metadata'] = $test->getMetaData(); //array();
                         try {
@@ -358,8 +358,8 @@ class LogBookCycleController extends AbstractController
                 $ret_test['verdict'] = 'WIP';
             }
             $ret_test['order'] = $test->getExecutionOrder();
-            $ret_test['chip'] = $test->getChip();
-            $ret_test['platform'] = $test->getPlatform();
+            $ret_test['chip'] = $test->getSuiteExecution()->getChip();
+            $ret_test['platform'] = $test->getSuiteExecution()->getPlatform();
             $ret_test['test_type'] = $test->getTestType()->getName();
             $ret_test['metadata'] = $test->getMetaData(); //array();
             try {

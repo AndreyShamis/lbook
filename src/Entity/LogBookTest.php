@@ -173,69 +173,11 @@ class LogBookTest
      * @var array
      */
     protected $meta_data = [];
-    protected $temp_meta_data = [];
-    protected $failDescriptionParsed = false;
+//    protected $temp_meta_data = [];
     protected $rate = 0;
     protected $testPath = null;
     protected $testFailDescription = null;
 
-
-
-    public function getTestPath(): string
-    {
-        if ($this->testPath !== null) {
-            return $this->testPath;
-        }
-        if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
-            return $this->getTestInfo()->getPath();
-        }
-        return '';
-    }
-
-    public function setTestPath(string $path): void
-    {
-        $this->testPath = $path;
-    }
-
-    public function getTestFailDescription(): string
-    {
-        if ($this->testFailDescription !== null) {
-            return $this->testFailDescription;
-        }
-//        if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
-//            return $this->getTestInfo()->getPath();
-//        }
-        return $this->getFailDescription();
-    }
-
-    public function setTestFailDescription(string $desc): void
-    {
-        $this->testFailDescription = $desc;
-    }
-
-    public function setRate(float $r) {
-        $this->rate = round($r, 2);
-    }
-
-    public function getRate(): float{
-        return $this->rate;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFailDescriptionParsed(): bool
-    {
-        return $this->failDescriptionParsed;
-    }
-
-    /**
-     * @param bool $failDescriptionParsed
-     */
-    public function setFailDescriptionParsed(bool $failDescriptionParsed): void
-    {
-        $this->failDescriptionParsed = $failDescriptionParsed;
-    }
 
     /**
      * LogBookTest constructor.
@@ -247,8 +189,20 @@ class LogBookTest
         $this->timeEnd = new \DateTime();
         $this->logs = new ArrayCollection();
         $this->meta_data = [];
-        $this->temp_meta_data = [];
-        $this->failDescription = '';
+    }
+
+    /**
+     * @param float $r
+     */
+    public function setRate(float $r) {
+        $this->rate = round($r, 2);
+    }
+
+    /**
+     * @return float
+     */
+    public function getRate(): float{
+        return $this->rate;
     }
 
     /**
@@ -271,17 +225,6 @@ class LogBookTest
             return $this->getNewMetaData()->getValue();
         }
         return $this->meta_data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTempMetaData(): array
-    {
-        if ($this->temp_meta_data === null) {
-            $this->temp_meta_data = array();
-        }
-        return $this->temp_meta_data;
     }
 
     public function getFromMetaData(string $key, string $default=null): string
@@ -366,16 +309,12 @@ class LogBookTest
     public function getFailDescription(bool $forceParse=false): string
     {
         if (!$forceParse){
-            // In cycle show we check twice what is the fail description,
-            // in second time we will get saved value
-            if ($this->failDescription !== null && $this->failDescription !== '') {
-                return $this->failDescription;
+            if($this->getFailDesc() !== null) {
+                return $this->getFailDesc()->getDescription();
             }
-
         }
 
         try {
-            $this->setFailDescriptionParsed(true);
             return $this->parseFailDescription();
         } catch (\Throwable $ex) {}
         return 'Failed To Parse';
@@ -390,24 +329,6 @@ class LogBookTest
         return '';
     }
 
-    public function getChip(): string
-    {
-        return $this->getFromMetaData('CHIP', '');
-    }
-
-    public function getPlatform(): string
-    {
-        return $this->getFromMetaData('PLATFORM', '');
-    }
-
-    /**
-     * @param array $meta_data
-     */
-    public function addTempMetaData(array $meta_data): void
-    {
-        $this->temp_meta_data = array_merge($this->temp_meta_data, $meta_data);
-    }
-
     /**
      * @param array $meta_data
      */
@@ -420,18 +341,6 @@ class LogBookTest
 //            }
 //        }
         $this->meta_data = array_merge($this->meta_data, $meta_data);
-    }
-
-    /**
-     * @param array $meta_data
-     */
-    public function setTempMetaData(array $meta_data): void
-    {
-        if ($this->temp_meta_data === null) {
-            $this->temp_meta_data = [];
-        }
-        $this->addTempMetaData($meta_data);
-
     }
 
     /**

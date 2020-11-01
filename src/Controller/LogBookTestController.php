@@ -407,6 +407,7 @@ class LogBookTestController extends AbstractController
             $queryObj->setFetchMode(LogBookTest::class, "testType", ClassMetadataInfo::FETCH_EAGER);
             $queryObj->setFetchMode(LogBookTest::class, "suite_execution", ClassMetadataInfo::FETCH_EAGER);
             $queryObj->setFetchMode(LogBookTest::class, "cycle", ClassMetadataInfo::FETCH_EAGER);
+            $queryObj->setFetchMode(LogBookTest::class, "failDesc", ClassMetadataInfo::FETCH_EAGER);
 
             $queryObj->setParameters($qb->getParameters());
             $queryObj->setMaxResults($qb->getMaxResults());

@@ -172,11 +172,13 @@ class LogBookTestController extends AbstractController
         $timestamp = $timestamp->getTimestamp();
 
         $vPass = $vRepo->findOneBy(['name' => 'PASS']);
+        $vUnknown = $vRepo->findOneBy(['name' => 'UNKNOWN']);
+        $vAbort = $vRepo->findOneBy(['name' => 'ABORT']);
         $query = $testsRepo->createQueryBuilder('t')
-            ->where('t.verdict != :verdict')
+            ->where('t.verdict NOT IN (:verdict)')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(8000)
-            ->setParameter('verdict', $vPass)
+            ->setMaxResults(5000)
+            ->setParameter('verdict', [$vPass, $vUnknown, $vAbort])
             ->orderBy('t.id', 'ASC|DESC');
         $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
 

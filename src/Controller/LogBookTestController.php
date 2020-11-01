@@ -168,29 +168,37 @@ class LogBookTestController extends AbstractController
      */
     public function testFailDescriptionParser(PagePaginator $pagePaginator, LogBookVerdictRepository $vRepo, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LogBookTestFailDescRepository $fdRepo, LoggerInterface $logger): array
     {
+        $timestamp = new \DateTime();
+        $timestamp = $timestamp->getTimestamp();
+
         $vPass = $vRepo->findOneBy(['name' => 'PASS']);
         $query = $testsRepo->createQueryBuilder('t')
             ->where('t.verdict != :verdict')
             ->andWhere('t.failDesc IS NULL')
-            ->setMaxResults(3000)
+            ->setMaxResults(10000)
             ->setParameter('verdict', $vPass)
             ->orderBy('t.id', 'ASC|DESC');
         $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
-
 
         /** @var \ArrayIterator $iterator */
         $iterator = $query->getQuery()->execute();
         $totalPosts = count($iterator);
         $maxPages = 1;
         $thisPage = 1;
-        $timestamp = new \DateTime();
-        $timestamp = $timestamp->getTimestamp();
+
         $logger->notice('  - Start MIGRATION for ' . count($iterator) . ' tests - ' . $timestamp);
 
         $changed_tests = [];
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
             try {
+                $curTimestamp = new \DateTime();
+                $curTimestamp = $curTimestamp->getTimestamp();
+                $tDelata = ($curTimestamp - $timestamp);
+                if ( $tDelata >= 150 ) {
+                    $logger->notice('  - Break MIGRATION for ' . count($changed_tests) . ' tests - TimeDelta:' . $tDelata);
+                    break;
+                }
                 //$fdOld = $test->getFailDescription();
                 $fd = LogBookTestFailDesc::validateDescription($test->getFailDescription(true));
                 $similarPercent = 0;

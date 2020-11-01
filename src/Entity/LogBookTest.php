@@ -307,6 +307,9 @@ class LogBookTest
     public function getFailDescription(bool $forceParse=false): string
     {
         if (!$forceParse){
+            if ($this->failDescription !== null && strlen($this->failDescription) > 0) {
+                return $this->failDescription;
+            }
             if($this->getFailDesc() !== null) {
                 return $this->getFailDesc()->getDescription();
             }

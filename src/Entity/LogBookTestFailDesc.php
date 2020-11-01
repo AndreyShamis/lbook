@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping\Index;
  * @ORM\Entity(repositoryClass=LogBookTestFailDescRepository::class)
  * @ORM\Table(name="lbook_test_fail_desc", indexes={
  *     @Index(name="description_index", columns={"description"}),
- *     @Index(name="description_md5_index", columns={"description", "md5"}),
+ *     @Index(name="md5_index", columns={"md5"}),
  *     @Index(name="ft_description_index", columns={"description"}, flags={"fulltext"})
  * }, uniqueConstraints={@ORM\UniqueConstraint(name="md5_unique", columns={"md5"})})
  */

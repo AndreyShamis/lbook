@@ -18,6 +18,11 @@
                         <td>{{ form_widget(form.metaData, {'attr': {'placeholder': 'Meta Data'}}) }}</td>
                     </tr>
                     <tr>
+                        <td>{{ form_label(form.failDesc, 'Fail description', {'label_attr': {'class': 'testSearchFormLabel testSearchTestFailDesc', 'style' : 'width:300px;'}}) }}</td>
+                        <td>{{ form_errors(form.failDesc) }}</td>
+                        <td>{{ form_widget(form.failDesc, {'attr': {'placeholder': 'Meta Data'}}) }}</td>
+                    </tr>
+                    <tr>
                         <td>
                             {{ form_label(form.fromDate) }}
                             /
@@ -150,8 +155,6 @@
         );
     </script>
 
-
-
     <div class="row">
         <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
             <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
@@ -207,6 +210,7 @@
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
                                 {#<th data-sortable="true" data-visible="false">Uptime</th>#}
                                 <th data-sortable="true">Verdict</th>
+                                <th data-visible="false" data-sortable="true"  data-switchable="true">FailDesc</th>
                                 {#<th data-sortable="false" data-visible="false">Actions</th>#}
                             </tr>
                             </thead>
@@ -218,25 +222,15 @@
                                     <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}" title="{{ test.testInfo.path | default('') }}">{{ test.testInfo.name | default(test.name) | default('NoName') }}</a></td>
                                     <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                                     <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
-                                    <td>
-                                        {% if test.cycle.build.id is defined %}
-                                        <a href="{{ path('build_show_cycles_first', { 'id': test.cycle.build.id  }) }}">{{ test.cycle.build }}</a>
-                                        {% endif %}
-                                    </td>
+                                    <td>{% if test.cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': test.cycle.build.id  }) }}">{{ test.cycle.build }}</a>{% endif %}</td>
                                     <td>{{ test.executionOrder }}</td>
                                     <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date('Y-m-d H:i:s') }}</span>{% endif %}</td>
                                     <td>{{ test.timeRun | ExecutionTimeGeneric }}</td>
                                     {#<td>{{ test.dutUpTimeStart }}</td>#}
                                     {#<td>{{ test.dutUpTimeEnd }}</td>#}
-                                    <td>
-                                        <span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span>
-                                    </td>
-                                    {#<td>#}
-                                        {#{% if is_granted('edit', test.cycle.setup) %}#}
-                                            {#<a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
-                                        {#{% endif %}#}
-                                    {#</td>#}
+                                    <td><span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span></td>
+                                    <td>{{ test.failDesc.description | default('') }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>

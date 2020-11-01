@@ -201,7 +201,7 @@ class LogBookTestController extends AbstractController
                     $logger->notice('  - Break MIGRATION for ' . count($changed_tests) . ' tests - TimeDelta:' . $tDelata);
                     break;
                 }
-                //$fdOld = $test->getFailDescription();
+                $fdOld = $test->getFailDescription();
                 $fd = LogBookTestFailDesc::validateDescription($test->getFailDescription(true));
                 $similarPercent = 0;
 
@@ -217,6 +217,22 @@ class LogBookTestController extends AbstractController
                     $this->em->persist($fDesc);
                     //$this->em->flush();
                     $changed_tests[] = $test;
+                } else {
+                    if ($fdOld !== null && strlen($fdOld)) {
+                        $fDesc = $fdRepo->findOrCreate(['description' => $fdOld]);
+                        $fDesc->addTest($test);
+                        $test->setFailDesc($fDesc);
+                        $this->em->persist($fDesc);
+                        $fDesc->setTestsCount($fDesc->getTests()->count());
+                        $this->em->persist($fDesc);
+                    } else {
+                        $fDesc = $fdRepo->findOrCreate(['description' => 'EMPTY']);
+                        $fDesc->addTest($test);
+                        $test->setFailDesc($fDesc);
+                        $this->em->persist($fDesc);
+//                        $fDesc->setTestsCount($fDesc->getTests()->count());
+                        $this->em->persist($fDesc);
+                    }
                 }
 //                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {
 //                    /** @var LogBookTestFailDesc $fDesc */

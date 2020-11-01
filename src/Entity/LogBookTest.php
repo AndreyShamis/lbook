@@ -250,35 +250,33 @@ class LogBookTest
         try {
             $ret_val = '';
             $ver = '';
-            if ($this->getVerdict() !== null) {
+            if ( $this->getVerdict() !== null ) {
                 $ver = $this->getVerdict()->getName();
             }
-            if ($ver !== 'PASS' && $ver !== 'UNKNOWN') {
+            if ( $ver !== 'PASS' && $ver !== 'UNKNOWN' ) {
                 $logs = $this->getLogs();
-                foreach ($logs as $log) {
+                foreach ( $logs as $log ) {
                     $errors = '';
-                    if ($log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                    if ( $log->getMsgType()->getName() === 'FAIL' && strpos($log->getMessage(), 'FAIL ') === 0 ) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'ERROR' &&
-                        (strpos($log->getMessage(), 'ERROR ') === 0 || strpos($log->getMessage(), 'Exception escaped control file, job aborting:') === 0)) {
+                    } elseif ( $log->getMsgType()->getName() === 'ERROR' &&
+                        (strpos($log->getMessage(), 'ERROR ') === 0 || strpos($log->getMessage(), 'Exception escaped control file, job aborting:') === 0) ) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0) {
+                    } elseif ( $log->getMsgType()->getName() === 'UNKNOWN' && strpos($log->getMessage(), 'FAIL ') === 0 ) {
                         $errors = $log->getMessage();
-                    } elseif ($log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0) {
+                    } elseif ( $log->getMsgType()->getName() === 'TEST_NA' && strpos($log->getMessage(), 'TEST_NA ') === 0 ) {
                         $errors = $log->getMessage();
                     }
-                    if ($errors !== null && $errors != '') {
+                    if ( $errors !== null && $errors != '' ) {
                         $ret_val = AppExtension::cleanAutotestFinalMessage($errors);
                     }
-                    if(strlen($ret_val) > 10) {
+                    if( strlen($ret_val) > 10 ) {
                         break;
                     }
                 }
             }
 
-            if ($ret_val === null || $ret_val === '') {
-                $this->setFailDescription(' ');
-            } else {
+            if ( $ret_val !== null && strlen($ret_val) > 2 ) {
                 $this->setFailDescription($ret_val);
             }
             return $ret_val;

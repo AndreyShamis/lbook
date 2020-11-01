@@ -34,3 +34,5 @@ doctrine:
         dql:
             string_functions:
                 MATCH_AGAINST: App\Doctrine\MatchAgainst
+            numeric_functions:
+                RAND: App\Doctrine\Rand

@@ -253,7 +253,7 @@ class LogBookTest
             if ( $this->getVerdict() !== null ) {
                 $ver = $this->getVerdict()->getName();
             }
-            if ( $ver !== 'PASS' && $ver !== 'UNKNOWN' ) {
+            if ( $ver !== 'PASS') {
                 $logs = $this->getLogs();
                 foreach ( $logs as $log ) {
                     $errors = '';

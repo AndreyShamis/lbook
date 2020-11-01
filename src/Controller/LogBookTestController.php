@@ -280,6 +280,7 @@ class LogBookTestController extends AbstractController
             }
             $test_name = $post['name'];
             $testMetaData = $post['metaData'];
+            $failDesc = $post['failDesc'];
             $fromDate = $post['fromDate'];
             $toDate = $post['toDate'];
 
@@ -331,7 +332,7 @@ class LogBookTestController extends AbstractController
                 $enableSearch = True;
             }
 
-            if ( ($test_name !== null && \mb_strlen($test_name) >= 1) || ($testMetaData !== null && \mb_strlen($testMetaData) >= 1) ) {
+            if ( ($test_name !== null && \mb_strlen($test_name) >= 1) || ($testMetaData !== null && \mb_strlen($testMetaData) >= 1) || ($failDesc !== null && \mb_strlen($failDesc) >= 1) ) {
 //                if (\is_numeric($test_name) && (string)(int)$test_name === $test_name) {
 //                    $qb->andWhere('t.name LIKE :test_name OR t.meta_data LIKE :metadata OR t.id = :test_id')
 //                        ->setParameter('test_id', (int)$test_name);
@@ -359,7 +360,11 @@ class LogBookTestController extends AbstractController
                     $qb->addOrderBy('rate2', 'DESC');
 
                 }
+                if (strlen($failDesc)) {
+                    $qb->leftJoin('t.failDesc', 'failDesc')->andWhere('MATCH_AGAINST(failDesc.description, :failDesc) > 1')->addSelect('MATCH_AGAINST(failDesc.description, :failDesc) as rate3');
+                    $qb->addOrderBy('rate3', 'DESC');
 
+                }
                 //$qb->addSelect('MATCH_AGAINST(t.name, :search_str) as rate');
                 if (strlen($test_name)) {
                     $qb->addOrderBy('rate', 'DESC');
@@ -386,6 +391,9 @@ class LogBookTestController extends AbstractController
                 }
                 if (strlen($testMetaData)) {
                     $qb->setParameter('metaData', $testMetaData);
+                }
+                if (strlen($failDesc)) {
+                    $qb->setParameter('failDesc', $failDesc);
                 }
                 $enableSearch = True;
             }
@@ -424,7 +432,8 @@ class LogBookTestController extends AbstractController
                         try {
                             $t_t->setRate(
                                 LogBookCommon::get($tmp_test, 'rate', 0) +
-                                LogBookCommon::get($tmp_test, 'rate2', 0));
+                                LogBookCommon::get($tmp_test, 'rate2', 0) +
+                                LogBookCommon::get($tmp_test, 'rate3', 0));
                         } catch (\Throwable $ex) {
                             $logger->critical('setRate in search ' . $ex->getMessage());
 

@@ -15,6 +15,8 @@ class TestSearch
 
     protected $metaData = '';
 
+    protected $failDesc = '';
+
     protected $verdicts;
 
     protected $setups;
@@ -171,5 +173,20 @@ class TestSearch
         $this->metaData = $metaData;
     }
 
+    /**
+     * @return string
+     */
+    public function getFailDesc(): string
+    {
+        return $this->failDesc;
+    }
+
+    /**
+     * @param string $failDesc
+     */
+    public function setFailDesc(string $failDesc): void
+    {
+        $this->failDesc = $failDesc;
+    }
 
 }

@@ -32,6 +32,14 @@ class TestSearchType extends AbstractType
                             'style' => 'width:400px;'
                         )
                 ))
+            ->add('failDesc', TextType::class,
+                array(
+                    'required' => false,
+                    'attr' =>
+                        array(
+                            'style' => 'width:400px;'
+                        )
+                ))
             ->add('metaData', TextType::class,
                 array(
                     'required' => false,

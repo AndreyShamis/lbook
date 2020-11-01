@@ -6,6 +6,7 @@ use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookTestFailDesc;
 use App\Entity\LogBookTestMD;
+use App\Entity\LogBookVerdict;
 use App\Entity\TestSearch;
 use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
@@ -15,6 +16,7 @@ use App\Repository\LogBookTestInfoRepository;
 use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
+use App\Repository\LogBookVerdictRepository;
 use App\Service\PagePaginator;
 use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
@@ -164,24 +166,28 @@ class LogBookTestController extends AbstractController
      * @param LoggerInterface $logger
      * @return array
      */
-    public function testMigration(PagePaginator $pagePaginator, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LogBookTestFailDescRepository $fdRepo, LoggerInterface $logger): array
+    public function testFailDescriptionParser(PagePaginator $pagePaginator, LogBookVerdictRepository $vRepo, LogBookTestRepository $testsRepo, LogBookTestInfoRepository $testInfoRepo, LogBookTestTypeRepository $testTypeRepo, LogBookTestMDRepository $mdRepo, LogBookTestFailDescRepository $fdRepo, LoggerInterface $logger): array
     {
+        $vPass = $vRepo->findOneBy(['name' => 'PASS']);
         $query = $testsRepo->createQueryBuilder('t')
-            ->where('t.failDescription != :failDescription')
+            ->where('t.verdict != :verdict')
             ->andWhere('t.failDesc IS NULL')
             ->setMaxResults(1000)
-            ->setParameter('failDescription', '')
-            ->orderBy('t.id', 'ASC');
+            ->setParameter('verdict', $vPass)
+            ->orderBy('t.id', 'ASC|DESC');
+        $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
+
 
         /** @var \ArrayIterator $iterator */
         $iterator = $query->getQuery()->execute();
         $totalPosts = count($iterator);
-        $maxPages =1;
+        $maxPages = 1;
         $thisPage = 1;
         $timestamp = new \DateTime();
         $timestamp = $timestamp->getTimestamp();
         $logger->notice('  - Start MIGRATION for ' . count($iterator) . ' tests - ' . $timestamp);
-//        echo "<pre>";
+
+        $changed_tests = [];
         /** @var LogBookTest $test */
         foreach ($iterator as $test) {
             try {
@@ -189,7 +195,7 @@ class LogBookTestController extends AbstractController
                 $fd = LogBookTestFailDesc::validateDescription($test->getFailDescription(true));
                 $similarPercent = 0;
 
-                if ($fd !== null && $fd !== '' ) { //&& $fdOld != $fd ){
+                if ($fd !== null && strlen($fd) > 1) { //&& $fdOld != $fd ){
 //                    similar_text($fdOld, $fd, $similarPercent);
 //                    if ($similarPercent <= 80) {
                         /** @var LogBookTestFailDesc $fDesc */
@@ -200,13 +206,7 @@ class LogBookTestController extends AbstractController
                     $fDesc->setTestsCount($fDesc->getTests()->count());
                     $this->em->persist($fDesc);
                     //$this->em->flush();
-//
-//                        $a = $fd;
-////                        echo $fdOld . "\t\t - \t " . $fd . "\n<br/>";
-//                    } else {
-//                        $b = 1;
-                    //}
-
+                    $changed_tests[] = $test;
                 }
 //                if ($test->getFailDescription() !== null && $test->getFailDescription() !== '') {
 //                    /** @var LogBookTestFailDesc $fDesc */
@@ -229,7 +229,7 @@ class LogBookTestController extends AbstractController
 
         $logger->notice('  - FINISH MIGRATION - '. $timestamp);
         return array(
-            'size'      => $totalPosts,
+            'size'      => $totalPosts, //count($changed_tests),
             'maxPages'  => $maxPages,
             'thisPage'  => $thisPage,
             'iterator'  => $iterator,

@@ -55,6 +55,10 @@ class LogBookTestFailDesc
      */
     private $lastMarkedAsSeenAt;
 
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $lastUpdateDiff = 0;
 
     /**
      * LogBookTestFailDesc constructor.
@@ -199,5 +203,22 @@ class LogBookTestFailDesc
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getLastUpdateDiff(): int
+    {
+        return $this->lastUpdateDiff;
+    }
+
+    /**
+     * @param int $lastUpdateDiff
+     */
+    public function setLastUpdateDiff(int $lastUpdateDiff): self
+    {
+        $this->lastUpdateDiff = $lastUpdateDiff;
+
+        return $this;
+    }
 
 }

@@ -55,6 +55,10 @@ class LogBookTestFailDesc
      */
     private $lastMarkedAsSeenAt;
 
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $lastUpdateDiff = 0;
 
     /**
      * LogBookTestFailDesc constructor.
@@ -64,6 +68,7 @@ class LogBookTestFailDesc
         $this->setCreatedAt(new \DateTime());
         $this->setLastMarkedAsSeenAt($this->getCreatedAt());
         $this->tests = new ArrayCollection();
+        $this->lastUpdateDiff = 0;
     }
 
     public static $MAX_DESC_LEN = 250;
@@ -199,5 +204,22 @@ class LogBookTestFailDesc
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function getLastUpdateDiff(): int
+    {
+        return $this->lastUpdateDiff;
+    }
+
+    /**
+     * @param int $lastUpdateDiff
+     */
+    public function setLastUpdateDiff(int $lastUpdateDiff): self
+    {
+        $this->lastUpdateDiff = $lastUpdateDiff;
+
+        return $this;
+    }
 
 }

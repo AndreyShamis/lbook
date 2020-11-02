@@ -40,8 +40,9 @@ class LogBookTestFailDescRepository extends ServiceEntityRepository
             $entity->setDescription($criteria['description']);
             if (array_key_exists('test', $criteria)) {
                 $entity->addTest($criteria['test']);
-                $entity->setTestsCount(1);
             }
+            $entity->setTestsCount(1);
+
             $this->_em->persist($entity);
             $this->_em->flush($entity);
         }

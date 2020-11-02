@@ -823,7 +823,7 @@ class LogBookUploaderController extends AbstractController
         try{
             if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
                 try {
-                    $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
+                    $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => LogBookTestFailDesc::cleanDescription($test->getFailDescription())]);
                     $failDescObj->addTest($test);
                     $test->setFailDesc($failDescObj);
                     $lastSeen = $failDescObj->getLastMarkedAsSeenAt();

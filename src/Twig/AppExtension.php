@@ -298,6 +298,8 @@ class AppExtension extends AbstractExtension
             $ret_val = str_replace('9999999999', '',$ret_val);
             $ret_val = str_replace('==== STDOUT ====', 'stdout',$ret_val);
             $ret_val = str_replace('==== STDERR ====', 'stderr',$ret_val);
+            trim($ret_val);
+
             $ret_val = preg_replace('/\/localdrive\/users\/[\d|\w|\_|\-|\.]+\/jenkins_ws\/workspace\/CI_workspace/', '/WS/',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+\,[\d|\-|\,]+/', '',$ret_val);
             $ret_val = preg_replace('/\. PID: \d+/', '',$ret_val);
@@ -310,12 +312,8 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
             $ret_val = preg_replace('/\-gtest_filter\=[\.|\/|\_|\-|\d|\w|\=|\s|\*|\"|\:]+\- EXIT_CODE/', ' EXIT_CODE',$ret_val);
             $ret_val = preg_replace('/\-gtest_filter\=[\.|\/|\_|\-|\d|\w|\=|\*|\"|\:]+/', ' ',$ret_val);
-
-//            try{
-//                $ret_val = preg_replace('/\\[\d]+_[\d]+_[\d]+\/', '\\', $ret_val);
-//            } catch (\Throwable $ex) {}
-
-            $ret_val = preg_replace('/_code_[\d]+_[\d]+/', '_code', $ret_val);
+            $ret_val = str_replace('//', '/',$ret_val);
+            trim($ret_val);
 
             try {
                 $ret_val = preg_replace('/\/bin\/workloads\_[\d]+\_[\d]+\/[\d|\w|\.|\_|\-]+/', '',$ret_val);

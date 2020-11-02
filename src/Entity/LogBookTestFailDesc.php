@@ -73,6 +73,19 @@ class LogBookTestFailDesc
 
     public static $MAX_DESC_LEN = 250;
 
+    public static function cleanDescription($input) {
+        $ret = $input;
+        try {
+            try{
+                $ret = preg_replace('/\\[\d]+_[\d]+_[\d]+\\\\/', '\\', $ret);
+            } catch (\Throwable $ex) {}
+            $ret = preg_replace('/\_code\_[\d]+\_[\d]+/', '_code', $ret);
+
+        } catch (\Throwable $ex) {}
+
+        return $ret;
+    }
+
     /**
      * @param $newDesc
      * @return string

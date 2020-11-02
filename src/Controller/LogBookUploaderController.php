@@ -744,39 +744,8 @@ class LogBookUploaderController extends AbstractController
 
                 $test->resetMetaData('*');
 
-                /** @var LogBookTestFailDesc $failDescObj */
-                $failDescObj = null;
-
-                try{
-                    if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
-                        try {
-                            $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
-                            $failDescObj->addTest($test);
-                            $test->setFailDesc($failDescObj);
-                            $lastSeen = $failDescObj->getLastMarkedAsSeenAt();
-                            $diffDays = $diffHours = 0;
-                            $nowDate = new DateTime();
-                            if ($lastSeen !== null) {
-                                $diffSeconds =  $nowDate->getTimestamp() - $lastSeen->getTimestamp();
-                                $diffHours = round($diffSeconds/60/60, 0);
-                                if ($diffHours > 0) {
-                                    $diffDays = round($diffSeconds/$diffHours/24, 0);
-                                }
-
-                            }
-                            if ($diffHours > 2 || $lastSeen === null) {
-                                $failDescObj->setLastMarkedAsSeenAt($nowDate);
-                                $failDescObj->setTestsCount($failDescObj->getTests()->count());
-                                $logger->notice('  - Update FAIL_DESC diffHours=' . $diffHours . ' Tests Count=' . $failDescObj->getTestsCount());
-                            }
-                        }catch (Exception $ex) {
-                            $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());
-                        }
-
-                    }
-                } catch (Exception $ex) {
-                    $logger->critical('ERROR: Fail reason search' . $ex->getMessage());
-                }
+                /** Work with Fail Description [LogBookTestFailDesc] */
+                $this->keepFailDesc($test, $logger);
 
                 $cycle->setTargetUploader($uploader);
                 $cycle->setController($uploader);
@@ -845,6 +814,38 @@ class LogBookUploaderController extends AbstractController
             'cycle_link' => $cycle_link,
             'return_urls_only' => $return_urls_only,
         ));
+    }
+
+    protected function keepFailDesc(LogBookTest $test, LoggerInterface $logger)
+    {
+        /** @var LogBookTestFailDesc $failDescObj */
+        $failDescObj = null;
+        try{
+            if ( $test->getFailDescription() !== null && strlen($test->getFailDescription()) > 1 ) {
+                try {
+                    $failDescObj = $this->testFailDescRepo->findOrCreate(['description' => $test->getFailDescription()]);
+                    $failDescObj->addTest($test);
+                    $test->setFailDesc($failDescObj);
+                    $lastSeen = $failDescObj->getLastMarkedAsSeenAt();
+                    $diffHours = 0;
+                    $nowDate = new DateTime();
+                    if ($lastSeen !== null) {
+                        $diffSeconds =  $nowDate->getTimestamp() - $lastSeen->getTimestamp();
+                        $diffHours = round($diffSeconds/60/60, 0);
+                    }
+                    if ($diffHours >= 3 || $lastSeen === null) {
+                        $failDescObj->setLastMarkedAsSeenAt($nowDate);
+                        $failDescObj->setLastUpdateDiff((int)$diffHours);
+                        $failDescObj->setTestsCount($failDescObj->getTests()->count());
+                        $logger->notice('  - Update FAIL_DESC diffHours=' . $diffHours . ' Tests Count=' . $failDescObj->getTestsCount());
+                    }
+                }catch (Exception $ex) {
+                    $logger->critical('ERROR: Failed set fail desc' . $ex->getMessage());
+                }
+            }
+        } catch (Exception $ex) {
+            $logger->critical('ERROR: Fail reason search' . $ex->getMessage());
+        }
     }
 
     public static function cleanName($inputName)

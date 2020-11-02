@@ -310,6 +310,9 @@ class AppExtension extends AbstractExtension
             $ret_val = preg_replace('/\=+/', '=',$ret_val);
             $ret_val = preg_replace('/\-gtest_filter\=[\.|\/|\_|\-|\d|\w|\=|\s|\*|\"|\:]+\- EXIT_CODE/', ' EXIT_CODE',$ret_val);
             $ret_val = preg_replace('/\-gtest_filter\=[\.|\/|\_|\-|\d|\w|\=|\*|\"|\:]+/', ' ',$ret_val);
+
+            $ret_val = preg_replace('/\\\\[\d]+\_[\d]+\_[\d]+\\\\/', '\\', $ret_val);
+            $ret_val = preg_replace('/_code_[\d]+\_[\d]+/', '_code', $ret_val);
             try {
                 $ret_val = preg_replace('/\/bin\/workloads\_[\d]+\_[\d]+\/[\d|\w|\.|\_|\-]+/', '',$ret_val);
             } catch (\Throwable $ex) {}

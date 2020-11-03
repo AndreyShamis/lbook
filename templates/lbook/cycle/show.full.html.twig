@@ -361,8 +361,19 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
     </div>
 
     {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
-    {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
-    {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
+
+    {% set cycle_show_test_time_start_show = 1 %}
+    {% if app.user.settings.cycleShowTestTimeStartShow == false %}
+        {% set cycle_show_test_time_start_show = 0 %}
+    {% endif %}
+
+    {% set cycle_show_test_time_end_show = 1 %}
+    {% if app.user.settings.cycleShowTestTimeEndShow == false %}
+        {% set cycle_show_test_time_end_show = 0 %}
+    {% endif %}
+{#    {% set test_show_test_time_start_show = app.user.settings.testShowTestTimeStartShow | default(true) %}#}
+{#    {% set test_show_test_time_end_show = app.user.settings.testShowTestTimeEndShow | default(true) %}#}
+
     {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
     {% set cycle_show_test_control_file = false %}
 

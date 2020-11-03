@@ -14,6 +14,7 @@ use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormInterface;
@@ -352,13 +353,14 @@ class LogBookSetupController extends AbstractController
      * Lists all setup entities.
      *
      * @Route("/page/{page}", name="setup_index", methods={"GET"})
+     * @param LoggerInterface $logger
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
      * @param int $page
      * @param bool $favorite
      * @return Response
      */
-    public function index(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1, $favorite = false): Response
+    public function index(LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1, $favorite = false): Response
     {
         $maxPages = $totalPosts = $thisPage = 0;
         $iterator = [];
@@ -387,7 +389,9 @@ class LogBookSetupController extends AbstractController
             $maxPages = ceil($totalPosts / $paginator_size);
             $thisPage = $page;
         } catch (\Throwable $ex) {
+            $logger->critical($ex->getMessage());
             print($ex->getMessage());
+            exit();
         }
 
         return $this->render('lbook/setup/index.html.twig', [
@@ -484,13 +488,14 @@ class LogBookSetupController extends AbstractController
      * Lists all setup entities.
      *
      * @Route("/", name="setup_index_first", methods={"GET"})
+     * @param LoggerInterface $logger
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
      * @return Response
      */
-    public function indexFirst(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
+    public function indexFirst(LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
     {
-        return $this->index($pagePaginator, $setupRepo);
+        return $this->index($logger, $pagePaginator, $setupRepo);
     }
 
 
@@ -498,13 +503,14 @@ class LogBookSetupController extends AbstractController
      * Lists all setup entities favorited by user.
      *
      * @Route("/favorite", name="show_first_favorite", methods={"GET"})
+     * @param LoggerInterface $logger
      * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
      * @return Response
      */
-    public function showFavoriteIndex(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
+    public function showFavoriteIndex(LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo): Response
     {
-        return $this->index($pagePaginator, $setupRepo, 1, true);
+        return $this->index($logger, $pagePaginator, $setupRepo, 1, true);
     }
     /**
      * Creates a new setup entity.

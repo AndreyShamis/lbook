@@ -48,7 +48,7 @@ class LogBookBotController extends AbstractController
 
 
     /**
-     * Lists all setup entities.
+     * Setup Cleaner.
      *
      * @Route("/setups/clean", name="bot_setup_cleaner", methods={"GET"})
      * @Template(template="log_book_bot/delete.setups.html.twig")
@@ -58,7 +58,7 @@ class LogBookBotController extends AbstractController
      */
     public function setupCleaner(LogBookSetupRepository $setupRepo, LoggerInterface $logger): array
     {
-        $logger->notice(' # [ + Setup cleaner started to work]');
+        $logger->notice(' #[SETUP_CLEANER][ + Setup cleaner started to work]');
         $maxDeleteAtOnce = 10;
         $query = $setupRepo->createQueryBuilder('setups')
             ->where('setups.disabled = 0')
@@ -66,7 +66,7 @@ class LogBookBotController extends AbstractController
             ->andWhere('setups.updatedAt <= :theDate')
             ->orderBy('setups.id', 'ASC')
             ->setParameter('theDate', new \DateTime('-'. 3 . ' days'), \Doctrine\DBAL\Types\Type::DATETIME)
-            ->setMaxResults(10000);
+            ->setMaxResults(2000);
         ;
         $setups = $query->getQuery()->execute();
         $setupsForDelete = [];
@@ -77,6 +77,8 @@ class LogBookBotController extends AbstractController
                 $sCyclesCount = \count($sCycles);
                 if ($sCyclesCount === 0 && count($setupsForDelete) <= $maxDeleteAtOnce) {
                     $setupsForDelete[] = $setup;
+                } else {
+                    $setup->setCyclesCount($sCyclesCount);
                 }
                 if (count($setupsForDelete) > $maxDeleteAtOnce) {
                     continue;
@@ -94,15 +96,53 @@ class LogBookBotController extends AbstractController
 
         $this->em->flush();
         if (count($setupsForDelete)) {
-            $logger->notice('Clear ' . count($setupsForDelete) . ' setups');
+            $logger->notice(' #[SETUP_CLEANER]REMOVE ' . count($setupsForDelete) . ' setups');
         }
-        $logger->notice(' # [ - Setup cleaner finish]');
+        $logger->notice(' #[SETUP_CLEANER][ - Setup cleaner FINISH]');
         return array(
             'setupsForDelete'      => $setupsForDelete,
             'setups'  => $setups,
         );
     }
 
+
+    /**
+     * Setup Cycles Counter.
+     *
+     * @Route("/setups/count_cycles", name="bot_setup_count_cycles", methods={"GET"})
+     * @Template(template="log_book_bot/setups.calculate.cycles.html.twig")
+     * @param LogBookSetupRepository $setupRepo
+     * @return array
+     * @throws \Exception
+     */
+    public function setupCalculateCycles(LogBookSetupRepository $setupRepo, LoggerInterface $logger): array
+    {
+        $hours = rand(0, 24 * 30);
+        $logger->notice(' #[SETUP_CYCLE_COUNT][ + Setup [setupCalculateCycles] started to work] HOURS '. $hours);
+        $query = $setupRepo->createQueryBuilder('setups')
+            ->where('setups.disabled = 0')
+            ->andWhere('setups.updatedAt >= :theDate')
+            ->setParameter('theDate', new \DateTime('-'. $hours . ' hours'), \Doctrine\DBAL\Types\Type::DATETIME)
+            ->setMaxResults(100);
+        $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
+        $setups = $query->getQuery()->execute();
+        /** @var LogBookSetup $setup */
+        foreach ($setups as $setup) {
+            try {
+                $sCycles = $setup->getCycles();
+                $sCyclesCount = \count($sCycles);
+                $setup->setCyclesCount($sCyclesCount);
+            } catch (\Throwable $ex) {
+                $logger->critical(' #[SETUP_CYCLE_COUNT]ERROR ' . $ex->getMessage());
+            }
+
+        }
+        $this->em->flush();
+        $logger->notice(' #[SETUP_CYCLE_COUNT][ - Setup [setupCalculateCycles] FINISH]');
+        return array(
+            'setups'  => $setups,
+        );
+    }
 
     /**
      * @Route("/delete_cycles", name="bot_delete_cycles")

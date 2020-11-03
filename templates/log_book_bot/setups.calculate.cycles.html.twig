@@ -1,0 +1,10 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LBOOK Setup Cycle founder{% endblock %}
+{% block content %}
+    <h1 style="margin-top: 0 !important;">Setup Cycle founder / Calculate cycles count cyclesCount</h1>
+    <div>Setups count in search: {{ setups | length }}</div>
+    {% for setup in setups | slice(0, 10000)%}
+        {{ setup.id }} - {{ setup.name }} <br/>
+
+    {% endfor %}
+{% endblock %}

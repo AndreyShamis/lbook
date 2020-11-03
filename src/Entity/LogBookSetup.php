@@ -111,16 +111,20 @@ class LogBookSetup
      */
     protected $retentionPolicy = 40;
 
-    public static $MIN_NAME_LEN = 2;
-    public static $MAX_NAME_LEN = 250;
-
-
-
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", inversedBy="favoriteSetups", fetch="EXTRA_LAZY", indexBy="")
      * @ORM\JoinTable(name="favorited_by_user")
      */
     private $favoritedByUsers;
+
+    /**
+     * @ORM\Column(type="integer", name="cycles_count", nullable=true, options={"unsigned"=true, "default"="0"})
+     */
+    private $cyclesCount = 0;
+
+    public static $MIN_NAME_LEN = 2;
+    public static $MAX_NAME_LEN = 250;
+
 
     /**
      * LogBookSetup constructor.
@@ -133,6 +137,7 @@ class LogBookSetup
         $this->cycles = new ArrayCollection();
         $this->setRetentionPolicy(7);
         $this->favoritedByUsers = new ArrayCollection();
+        $this->cyclesCount = 0;
     }
 
     /**
@@ -411,5 +416,21 @@ class LogBookSetup
         }
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCyclesCount(): int
+    {
+        return $this->cyclesCount;
+    }
+
+    /**
+     * @param int $cyclesCount
+     */
+    public function setCyclesCount(int $cyclesCount): void
+    {
+        $this->cyclesCount = $cyclesCount;
     }
 }

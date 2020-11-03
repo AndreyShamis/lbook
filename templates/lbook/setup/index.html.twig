@@ -91,7 +91,7 @@
                     {% endif %}
                     <td>{{ setup.id }}</td>
                     <td><a href="{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup_name }}</a></td>
-                    <td>{{ setup.cycles | length }}</td>
+                    <td>{{ setup.cyclesCount | default(0) }}</td>
                     <td><span data-title="{{ setup.updatedAt|date('ymdHis') }}" title="Updated at {{ setup.updatedAt|date('d/m/Y H:i:s') }}">{{ setup.updatedAt|time_diff}}</span></td>
                     <td>{{ setup.osStr }}</td>
                     <td>{{ setup.owner }}</td>

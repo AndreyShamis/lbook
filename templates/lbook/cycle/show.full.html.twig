@@ -361,8 +361,19 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
     </div>
 
     {% set cycle_show_test_id_show = app.user.settings.cycleShowTestIdShow | default(true) %}
-    {% set cycle_show_test_time_start_show = app.user.settings.cycleShowTestTimeStartShow | default(true) %}
-    {% set cycle_show_test_time_end_show = app.user.settings.cycleShowTestTimeEndShow | default(true) %}
+    
+    {% set cycle_show_test_time_start_show = 1 %}
+    {% if app.user.settings.cycleShowTestTimeStartShow == false %}
+        {% set cycle_show_test_time_start_show = 0 %}
+    {% endif %}
+
+    {% set cycle_show_test_time_end_show = 1 %}
+    {% if app.user.settings.cycleShowTestTimeEndShow == false %}
+        {% set cycle_show_test_time_end_show = 0 %}
+    {% endif %}
+{#    {% set test_show_test_time_start_show = app.user.settings.testShowTestTimeStartShow | default(true) %}#}
+{#    {% set test_show_test_time_end_show = app.user.settings.testShowTestTimeEndShow | default(true) %}#}
+
     {% set cycle_show_test_time_ratio_show = app.user.settings.cycleShowTestTimeRatioShow | default(true) %}
     {% set cycle_show_test_control_file = false %}
 
@@ -413,7 +424,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name" data-footer-formatter="totalFormatter">Test Name</th>
             <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="timeRun" title="Test run time" data-footer-formatter="timeSumFormatter">Runtime</th>
             {% if cycle_show_test_time_start_show == true %}
-                <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start</th>
+                <th data-sortable="true" data-field="timeStart" data-sorter="dataTitleDateSorter" title="Test start time">Start {{ cycle_show_test_time_start_show }} - {{ app.user.settings.cycleShowTestTimeStartShow  }}</th>
             {% endif %}
             {% if cycle_show_test_time_end_show == true %}
                 <th data-sortable="true" data-field="timeEnd" data-sorter="dataTitleDateSorter" title="Test end time">End</th>

@@ -33,11 +33,12 @@ class LogBookTest
 
     public static $MAX_NAME_LEN = 255;
     public static $MAX_FAIL_DESC_LEN = 250;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
+
+//    /**
+//     * @var string
+//     *
+//     * @O RM\Colu mn(name="name", type="string", length=255)
+//     */
     protected $name = '';
 
     /**
@@ -142,9 +143,9 @@ class LogBookTest
      */
     private $testKey = '';
 
-    /**
-     * @ORM\Column(name="fail_description", type="string", length=250, options={"default"=""})
-     */
+//    /**
+//     * @ ORM\ Column(name="fail_description", type="string", length=250, options={"default"=""})
+//     */
     protected $failDescription = '';
 
     /**

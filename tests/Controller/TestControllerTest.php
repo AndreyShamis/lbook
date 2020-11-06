@@ -11,6 +11,8 @@ namespace App\Tests\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
+use App\Entity\LogBookTestInfo;
+use App\Repository\LogBookTestInfoRepository;
 use App\Utils\RandomString;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
@@ -219,9 +221,13 @@ class TestControllerTest extends LogBookApplicationTestCase
     {
         if ($em === null) {
             $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+            /** @var LogBookTestInfoRepository $testInfoRepo */
+            $testInfoRepo = self::$entityManager->getRepository(LogBookTestInfo::class);
             $em = self::$entityManager;
         } else {
             $testRepo = $em->getRepository(LogBookTest::class);
+            $testInfoRepo = $em->getRepository(LogBookTestInfo::class);
+
         }
         if ($cycle === null) {
             $cycle = CycleControllerTest::createCycle(RandomString::generateRandomString(100), $setup, $em);
@@ -238,6 +244,9 @@ class TestControllerTest extends LogBookApplicationTestCase
             'logFileSize' => 100 + self::getExecutionOrder(),
             'executionOrder' => self::getExecutionOrder(),
         ), true);
+
+        $ti = $testInfoRepo->findOneOrCreate(['name' => $testName , 'path' => 'path/path']);
+        $test->setTestInfo($ti);
         return $test;
 
     }

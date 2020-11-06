@@ -88,7 +88,7 @@ class UploaderTest extends LogBookApplicationTestCase
 
         //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
         $this->assertSame($setupName, $setup->getName(), 'Check that AutoGEN Setup name is same: Actual: ' . $setup->getName() . ', expected ' . $setupName . 'Current testID:' . $testId);
-        $this->assertSame($errorTestName, $test->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
+        $this->assertSame($errorTestName, $test->getTestInfo()->getName(), 'Check that test name is same: Actual: ' . $test->getName() . ', expected ' . $errorTestName . 'Current testID:' . $testId);
         $this->assertSame(35, $test->getTimeRun(), 'Check that test RunTime is same: Actual: ' . $test->getTimeRun() . ', expected ' . 35);
         $this->assertSame(359, $test->getLogs()->count(), 'Check that test Logs count is same: Actual: ' . $test->getTimeRun() . ', expected ' . 359);
         $this->assertEquals(1, $setup->getCycles()->count(), 'Check that Setup include 1 created cycle. count: ' . $setup->getCycles()->count());

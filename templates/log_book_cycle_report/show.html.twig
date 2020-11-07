@@ -145,10 +145,12 @@
                     <th>Suites</th>
                     <td><span class="font38 green">{{ log_book_cycle_report.suitesCount }}</span></td>
                 </tr>
+                {% if log_book_cycle_report.defects | length %}
                 <tr>
                     <th>Related Defects</th>
                     <td><span class="font38 red2">{{ log_book_cycle_report.defects | length }}</span></td>
                 </tr>
+                {% endif %}
                 <tr>
                     <th>Components</th>
                     <td>
@@ -406,19 +408,27 @@
 
     <div class="hr hr32 hr-dotted"></div>
 
+    {% if log_book_cycle_report.reportNotes %}
     <div class="well well-lg">
         <h4 class="blue">Report Notes</h4>
         {% apply markdown_to_html %}{{ log_book_cycle_report.reportNotes }}{% endapply %}
     </div>
     <div class="hr hr32 hr-dotted"></div>
+    {% endif %}
 
+    {% if log_book_cycle_report.cyclesNotes %}
     <div class="well well-lg">
         <h4 class="blue">Cycle Notes</h4>
         {% apply markdown_to_html %}{{ log_book_cycle_report.cyclesNotes }}{% endapply %}
     </div>
     <div class="hr hr20 hr-double"></div>
+    {% endif %}
 
-    <h4>Suites:</h4>Total suites count<strong>{{ suites | length }}</strong>
+
+    <div class="well well-lg">
+        <h4 class="blue">Suites</h4>
+        Total suites count<strong>{{ suites | length }}</strong>
+    </div>
     <table class="records_list table table-striped table-condensed">
         <thead>
         <tr>
@@ -529,6 +539,7 @@
     </div>
     <div class="hr hr20 hr-double"></div>
 
+    {% if log_book_cycle_report.defects | length %}
     <h5>Defects section [Total : {{ log_book_cycle_report.defects | length }}]</h5>
     <table class="records_list table table-striped table-condensed">
         <thead>
@@ -584,13 +595,21 @@
         </tr>
         </tfoot>
     </table>
+    {% endif %}
+
+    {% if log_book_cycle_report.bugsNotes %}
     <div class="well well-lg">
         <h4 class="blue">Bugs Notes</h4>
         {% apply markdown_to_html %}{{ log_book_cycle_report.bugsNotes }}{% endapply %}
     </div>
     <div class="hr hr20 hr-double"></div>
+    {% endif %}
 
-    <h5>Failed tests count {{ failed_tests | length }}, tests Verdict != PASS == {{ testsNotPass | length }}</h5>
+
+    <div class="well well-lg">
+        <h4 class="blue">Failed tests</h4>
+        count {{ failed_tests | length }}, tests Verdict != PASS == {{ testsNotPass | length }}
+    </div>
     {% include "lbook/cycle/tests_not_pass.html.twig" %}
     <div class="well well-lg">
         <h4 class="blue">Tests Notes</h4>

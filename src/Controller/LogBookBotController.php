@@ -236,6 +236,10 @@ class LogBookBotController extends AbstractController
                     $counter++;
                 } else {
                     $skip++;
+                    $logger->notice('[BOT][findCyclesForDelete] Skip cycle', [
+                        'EVENT' => (string)$new_event,
+                        'STATUS' => $new_event->getStatus(),
+                    ]);
                     //$this->log($new_event . ' already exist');
                 }
             } else {
@@ -248,7 +252,7 @@ class LogBookBotController extends AbstractController
             }
 
         }
-        $this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
+        //$this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
         $this->em->flush();
         $logger->notice('[BOT][findCyclesForDelete]  FINISH', [
             'ADDED_TO_REMOVE' => $counter,

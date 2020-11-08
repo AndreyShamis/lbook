@@ -11,6 +11,22 @@
         </div>
     </div>
 
+    {% if not suiteMode and cycle.passRate != suites_pass_rate %}
+    <div class="infobox infobox-green">
+        <div class="infobox-progress">
+            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ suites_pass_rate }}" data-color="#82af6f">
+                <span class="percent">{{ suites_pass_rate }}%</span>
+            </div>
+        </div>
+        <div class="infobox-data" title="Pass Rate - {{ suites_pass_rate }}%">
+            <span class="infobox-text" style="color: #82af6f">Suite</span>
+            <div class="infobox-content">
+                <span class="bigger-110">{{ suites_tests_pass }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="infobox infobox-green">
         <div class="infobox-progress">
             <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#82af6f">
@@ -24,6 +40,7 @@
             </div>
         </div>
     </div>
+
     {% if cycle.testsWarning > 0 %}
         <div class="infobox infobox-black">
             <div class="infobox-progress">

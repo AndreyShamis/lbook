@@ -186,52 +186,72 @@ class LogBookBotController extends AbstractController
      * @Route("/find_cycles_for_delete", name="find_cycles_for_delete")
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
+     * @param LoggerInterface $logger
      * @return Response
      * @throws \Exception
      */
-    public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events): Response
+    public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events, LoggerInterface $logger): Response
     {
         $list = $cycleRepo->findByDeleteAt(500);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
-        $counter = $skip = 0;
+        $counter = $skip = $skipped_due_report = 0;
         foreach ($list as $cycle) {
-            $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
-            $type = EventType::DELETE_CYCLE;
-            $new_event = new Event($type);
-            $name = EventType::getTypeName($type) . '_' . $cycle->getId();
-            $new_event->setName($name);
-            $new_event->setObjectClass(LogBookCycle::class);
-            $new_event->setObjectId($cycle->getId());
-
-            $res = $events->findOneBy(
-                array(
-                    'name' => $new_event ->getName(),
-                    'eventType' => $new_event->getEventType(),
-                    'objectId' => $new_event->getObjectId(),
-                    'objectClass' => $new_event->getObjectClass()
-                ));
-
-            if ($res === null) {
-                $new_event->setMessage($name. ' - ' . $msg);
-                $new_event->addMetaData(
-                    array(
-                        'id' => $new_event->getObjectId(),
-                        'class' => $new_event->getObjectClass(),
-                        'delete_time' => $cycle->getDeleteAt()->format('Y-m-d H:i:s'),
-                        'tests' => $cycle->getTestsCount(),
-                        'pass_rate' => $cycle->getPassRate()
-                    ));
-                $this->em->persist($new_event);
-                $counter++;
-            } else {
-                $skip++;
-                //$this->log($new_event . ' already exist');
+            $cycleReports = $cycle->getLogBookCycleReports();
+            if ($cycleReports === null) {
+                $cycleReports = [];
             }
+            if ( count($cycleReports) === 0 ) {
+                $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');
+                $type = EventType::DELETE_CYCLE;
+                $new_event = new Event($type);
+                $name = EventType::getTypeName($type) . '_' . $cycle->getId();
+                $new_event->setName($name);
+                $new_event->setObjectClass(LogBookCycle::class);
+                $new_event->setObjectId($cycle->getId());
+
+                $res = $events->findOneBy(
+                    array(
+                        'name' => $new_event ->getName(),
+                        'eventType' => $new_event->getEventType(),
+                        'objectId' => $new_event->getObjectId(),
+                        'objectClass' => $new_event->getObjectClass()
+                    ));
+
+                if ($res === null) {
+                    $new_event->setMessage($name. ' - ' . $msg);
+                    $new_event->addMetaData(
+                        array(
+                            'id' => $new_event->getObjectId(),
+                            'class' => $new_event->getObjectClass(),
+                            'delete_time' => $cycle->getDeleteAt()->format('Y-m-d H:i:s'),
+                            'tests' => $cycle->getTestsCount(),
+                            'pass_rate' => $cycle->getPassRate()
+                        ));
+                    $this->em->persist($new_event);
+                    $counter++;
+                } else {
+                    $skip++;
+                    //$this->log($new_event . ' already exist');
+                }
+            } else {
+                $skipped_due_report++;
+                $logger->notice('[BOT][findCyclesForDelete] Skip cycle for delete due report existence', [
+                    'ID' => $cycle->getId(),
+                    'NAME' => $cycle->getName(),
+                    'REPORTS_COUNT' => count($cycleReports),
+                ]);
+            }
+
         }
         $this->log('Finish adding ' . $counter . ' objects, skipped: ' . $skip);
         $this->em->flush();
+        $logger->notice('[BOT][findCyclesForDelete]  FINISH', [
+            'ADDED_TO_REMOVE' => $counter,
+            'SKIPPED' => $skip,
+            'SKIPPED_DUE_REPORTS' => $skipped_due_report,
+        ]);
         exit();
 
     }
@@ -289,6 +309,7 @@ class LogBookBotController extends AbstractController
      * @Route("/cycle_event_delete", name="delete_cycle_from_event_table")
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
+     * @param LoggerInterface $logger
      * @return Response
      * @throws \Exception
      */

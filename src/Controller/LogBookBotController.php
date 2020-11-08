@@ -193,6 +193,9 @@ class LogBookBotController extends AbstractController
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events, LoggerInterface $logger): Response
     {
         $list = $cycleRepo->findByDeleteAt(500);
+        $logger->notice('[BOT][findCyclesForDelete]  START', [
+            'COUNT' => count($list)
+        ]);
         $this->log("\n\n" . 'Found ' . count($list));
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
@@ -329,70 +332,75 @@ class LogBookBotController extends AbstractController
         if ($found > 0) {
             $monolog = true;
         }
-        $logger->alert('[BOT][deleteCycleByEvent] Started' , [
+        $logger->notice('[BOT][deleteCycleByEvent] Started' , [
             'LIMIT' => $limit,
             'MONOLOG' => $monolog,
             'FOUND' => $found
         ]);
+        try {
+            $this->log('-----------------------------------------------------------------', $monolog);
+            $this->log("\n\n" . 'Found ' . count($list) . ' for PROGRESS, Limit is ' . $limit, $monolog);
 
-        $this->log('-----------------------------------------------------------------', $monolog);
-        $this->log("\n\n" . 'Found ' . count($list) . ' for PROGRESS, Limit is ' . $limit, $monolog);
+            foreach ($list as $event) {
+                $event->setStatus(EventStatus::PROGRESS);
+                $event->setStartedAt(new \DateTime());
+                $this->em->persist($event);
+            }
 
-        foreach ($list as $event) {
-            $event->setStatus(EventStatus::PROGRESS);
-            $event->setStartedAt(new \DateTime());
-            $this->em->persist($event);
+            $this->em->flush();
+            $this->log('Start loop: ', $monolog);
+        } catch (\Throwable $ex) {
+            $logger->critical('[BOT][deleteCycleByEvent] ERROR on events:' . $ex->getMessage());
         }
 
-        $this->em->flush();
-        $this->log('Start loop: ', $monolog);
+        try {
+            foreach ($list as $event) {
+                //$this->em->refresh($event);
+                /** @var LogBookCycle $cycle */
+                $cycle = $cycleRepo->find($event->getObjectId());
+                try {
+                    if ( $cycle !== null ) {
+                        $id = $cycle->getId();
+                        $name = $cycle->getName();
+                        $cycleRepo->delete($cycle);
+                        $logger->alert('[BOT][deleteCycleByEvent] DELETE CYCLE' , [
+                            'ID' => $id,
+                            'NAME' => $name
+                        ]);
+                        $this->log('Deleted ID:' . $id . ' - ' . $event);
+                        $event->setStatus(EventStatus::FINISH);
+                    } else {
+                        $msg = EventStatus::getStatusName(EventStatus::ERROR) .
+                            ':Object with ID ' . $event->getObjectId() . ' not found';
+                        $this->log('Failed to delete ' . $event. ' ['.$msg.']');
+                        $logger->alert('[BOT][deleteCycleByEvent] FAIL in DELETE CYCLE' , [
+                            'EVENT' => $event,
+                            'MSG' => $msg
+                        ]);
+                        $event->addMetaData(array('message' => $msg));
+                        $event->setStatus(EventStatus::ERROR);
+                    }
 
-        foreach ($list as $event) {
-
-            $this->em->refresh($event);
-            /** @var LogBookCycle $cycle */
-            $cycle = $cycleRepo->find($event->getObjectId());
-            try {
-                if ( $cycle !== null ) {
-                    $id = $cycle->getId();
-                    $name = $cycle->getName();
-                    $cycleRepo->delete($cycle);
-                    $logger->alert('[BOT][deleteCycleByEvent] DELETE CYCLE' , [
-                        'ID' => $id,
-                        'NAME' => $name
-                    ]);
-                    $this->log('Deleted ID:' . $id . ' - ' . $event);
-                    $event->setStatus(EventStatus::FINISH);
-                } else {
-                    $msg = EventStatus::getStatusName(EventStatus::ERROR) .
-                        ':Object with ID ' . $event->getObjectId() . ' not found';
-                    $this->log('Failed to delete ' . $event. ' ['.$msg.']');
-                    $logger->alert('[BOT][deleteCycleByEvent] FAIL in DELETE CYCLE' , [
-                        'EVENT' => $event,
-                        'MSG' => $msg
-                    ]);
+                } catch (\Throwable $ex) {
+                    $logger->critical('[BOT][deleteCycleByEvent] ERROR:' . $ex->getMessage());
+                    $msg = EventStatus::getStatusName(EventStatus::ERROR) . ':' . $ex->getMessage();
+                    $print_msg = 'Failed to delete ' . $event. ' ['.$msg.']';
+                    $this->log($print_msg);
+                    $this->logger->critical($print_msg, array($ex));
                     $event->addMetaData(array('message' => $msg));
                     $event->setStatus(EventStatus::ERROR);
                 }
-
-            } catch (\Throwable $ex) {
-                $logger->critical('[BOT][deleteCycleByEvent] ERROR:' . $ex->getMessage());
-                $msg = EventStatus::getStatusName(EventStatus::ERROR) . ':' . $ex->getMessage();
-                $print_msg = 'Failed to delete ' . $event. ' ['.$msg.']';
-                $this->log($print_msg);
-                $this->logger->critical($print_msg, array($ex));
-                $event->addMetaData(array('message' => $msg));
-                $event->setStatus(EventStatus::ERROR);
+                $this->em->persist($event);
             }
-            $this->em->persist($event);
+            $this->em->flush();
+
+        } catch (\Throwable $ex) {
+            $logger->critical('[BOT][deleteCycleByEvent] ERROR on cycles:' . $ex->getMessage());
         }
-        $this->em->flush();
-//        foreach ($list as $event) {
-//            $this->em->clear($event);
-//        }
+
         $this->log('===================================================================', $monolog);
+        $logger->notice('[BOT][deleteCycleByEvent] FINISH');
         $this->clearSuccess($events);
-        $logger->alert('[BOT][deleteCycleByEvent] FINISH');
         exit();
     }
 

@@ -733,6 +733,7 @@ class LogBookUploaderController extends AbstractController
                 $test->resetMetaData('TIMEOUT');
                 $test->resetMetaData('LABELS');
                 $test->resetMetaData('UUID');
+                $test->resetMetaData('GLIBC_REAL_EXECUTION_TIME');
 
                 if ($test->getOldMetaData() !== null && $test->getOldMetaData() !== []) {
                     $newMD = new LogBookTestMD();

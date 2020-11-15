@@ -264,7 +264,7 @@ class LogBookTestController extends AbstractController
 
     /**
      * @Route("/search", name="test_search", methods={"GET|POST"})
-     * @Route("/search/{name}", name="test_search_name", methods={"GET"})
+     * @Route("/search/{name}", name="test_search_name", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycleRepository $cycleRepo
@@ -281,11 +281,20 @@ class LogBookTestController extends AbstractController
         $startDate = $endDate = null;
         $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
         $test = new TestSearch();
+        $d = null;
+        $post = $request->request->get('test_search');
 
         if ($name !== null) {
-            $test->setName($name);
-            $d = new \DateTime('- 14 days');
-            $test->setFromDatet($d->format('m/d/Y'));
+            if (array_key_exists('name', $post)) {
+                $name = $post['name'];
+            } else {
+                $test->setName($name);
+            }
+            if (!array_key_exists('fromDate', $post)) {
+                $d = new \DateTime('- 14 days');
+                $test->setFromDatet($d->format('m/d/Y'));
+            }
+
         }
         $form = $this->createForm(TestSearchType::class, $test, array());
         try {
@@ -293,10 +302,10 @@ class LogBookTestController extends AbstractController
         } catch (\Exception $ex) {}
 
         $addOrder = true;
-        $post = $request->request->get('test_search');
+
 
         if ($post !== null || $name !== null) {
-            if ($name !== null) {
+            if ($post === null) {
                 $post = [];
             }
             $enableSearch = false;
@@ -316,14 +325,26 @@ class LogBookTestController extends AbstractController
             $failDesc = $testMetaData = $fromDate = $toDate = null;
             if ($name !== null) {
                 $test_name = $name;
-                $fromDate = $d->format('m/d/Y');
+                if ($d !== null) {
+                    $fromDate = $d->format('m/d/Y');
+                }
             } else {
                 $test_name = $post['name'];
+            }
+
+            if (array_key_exists('metaData', $post)) {
                 $testMetaData = $post['metaData'];
+            }
+            if (array_key_exists('failDesc', $post)) {
                 $failDesc = $post['failDesc'];
-                $fromDate = $post['fromDate'];
+            }
+            if (array_key_exists('toDate', $post)) {
                 $toDate = $post['toDate'];
             }
+            if (array_key_exists('fromDate', $post)) {
+                $fromDate = $post['fromDate'];
+            }
+
             $qb = $testRepo->createQueryBuilder('t')
                 ->where('t.disabled = 0')
                 ->setMaxResults($test->getLimit());

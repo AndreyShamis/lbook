@@ -107,6 +107,15 @@
             <b class="arrow"></b>
         </li>
     {% endif %}
+
+    <li class="{% if route starts with 'fail_desc_' %}active{% endif %}">
+        <a href="{{ asset(path('fail_desc_index')) }}" >
+            <i class="menu-icon fa fa-tag"></i>
+            <span class="menu-text" title="Test Fail descriptions">Failures</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
+
     <li class="{% if route starts with 'log_book_defect_' %}active{% endif %}">
         <a href="{{ asset(path('log_book_defect_index')) }}">
         <i class="menu-icon fa fa-file-o"></i>

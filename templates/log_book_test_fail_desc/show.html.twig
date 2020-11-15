@@ -1,0 +1,45 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LogBook Test Fail Descriptions {% endblock %}
+{% block content %}
+
+    <h4>LogBook Test Fail Description</h4>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ log_book_test_fail_desc.id }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ log_book_test_fail_desc.description }}</td>
+            </tr>
+            <tr>
+                <th>Md5</th>
+                <td>{{ log_book_test_fail_desc.md5 }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ log_book_test_fail_desc.createdAt ? log_book_test_fail_desc.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>TestsCount</th>
+                <td>{{ log_book_test_fail_desc.testsCount }}</td>
+            </tr>
+            <tr>
+                <th>LastMarkedAsSeenAt</th>
+                <td>{{ log_book_test_fail_desc.lastMarkedAsSeenAt ? log_book_test_fail_desc.lastMarkedAsSeenAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>LastUpdateDiff</th>
+                <td>{{ log_book_test_fail_desc.lastUpdateDiff }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('fail_desc_index') }}">back to list</a>
+
+
+    {% include "lbook/test/list.global.html.twig" %}
+{#    {{ include('log_book_test_fail_desc/_delete_form.html.twig') }}#}
+{% endblock %}

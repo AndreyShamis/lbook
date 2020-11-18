@@ -17,6 +17,7 @@ use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
 use App\Repository\LogBookVerdictRepository;
+use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
@@ -265,18 +266,20 @@ class LogBookTestController extends AbstractController
     /**
      * @Route("/search", name="test_search", methods={"GET|POST"})
      * @Route("/search/{name}", name="test_search_name", methods={"GET|POST"})
+     * @Route("/search/{name}/bf/{build_flavor}", name="test_search_name_bf", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo, LoggerInterface $logger, string $name = null): Response
+    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suiteRepo, LoggerInterface $logger, string $name = null, string $build_flavor = null): Response
     {
         set_time_limit(30);
         $tests = $new_tests = array();
         $verdict = null;
         $setups = null;
         $sql = '';
+        $suiteInTable = true;
         $leftDate = $rightDate = false;
         $startDate = $endDate = null;
         $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
@@ -285,13 +288,13 @@ class LogBookTestController extends AbstractController
         $post = $request->request->get('test_search');
 
         if ($name !== null) {
-            if (array_key_exists('name', $post)) {
+            if ($post !== null && array_key_exists('name', $post)) {
                 $name = $post['name'];
             } else {
                 $test->setName($name);
             }
-            if (!array_key_exists('fromDate', $post)) {
-                $d = new \DateTime('- 14 days');
+            if ($post === null || !array_key_exists('fromDate', $post)) {
+                $d = new \DateTime('- 30 days');
                 $test->setFromDatet($d->format('m/d/Y'));
             }
 
@@ -462,6 +465,12 @@ class LogBookTestController extends AbstractController
                     $qb->setParameter('failDesc', $ta);
                 }
                 $enableSearch = True;
+
+                if ($build_flavor !== null) {
+                    $qb->innerJoin('t.suite_execution', 's')->andWhere('s.buildType = :build_flavor')
+                        ->setParameter('build_flavor', $build_flavor);
+                    $suiteInTable = true;
+                }
             }
             if ($addOrder) {
                 $qb->orderBy('t.id', 'DESC');
@@ -516,6 +525,7 @@ class LogBookTestController extends AbstractController
             //'tests' => $tests,
             'iterator' => $new_tests,
             'tests_count' => \count($new_tests),
+            'suiteInTable' => $suiteInTable,
             'sql' => $sql,
 //            'thisPage'      => 1,
 //            'maxPages'      => 1,

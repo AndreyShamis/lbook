@@ -155,6 +155,9 @@
         );
     </script>
 
+    {% if suiteInTable is not defined %}
+        {% set suiteInTable = false %}
+    {% endif %}
     <div class="row">
         <div class="col-sm-12 widget-container-col ui-sortable" id="widget-container-col-12" style="min-height: 108px;">
             <div class="widget-box transparent ui-sortable-handle" id="widget-box-12" style="opacity: 1;">
@@ -201,6 +204,10 @@
                                 <th data-sortable="true" title="Rate">Rate</th>
                                 <th data-sorter="htmlSorter" data-sortable="true"  data-switchable="false">Test Name</th>
                                 <th data-sortable="true"  data-switchable="true" title="Cycle Name">Cycle</th>
+                                {% if suiteInTable %}
+                                    <th data-sortable="true"  data-switchable="true" title="Suite Name">Suite</th>
+                                    <th data-sortable="true"  data-switchable="true" title="Build Flavor" data-visible="false">BF</th>
+                                {% endif %}
                                 <th data-sortable="true"  data-switchable="true" title="Setup Name">Setup</th>
                                 <th data-sorter="htmlSorter" data-visible="false" data-sortable="true"  data-switchable="true">Test Build</th>
                                 <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
@@ -221,6 +228,10 @@
                                     <td>{{ test.rate }}</td>
                                     <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}" title="{{ test.testInfo.path | default('') }}">{{ test.testInfo.name | default(test.name) | default('NoName') }}</a></td>
                                     <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
+                                    {% if suiteInTable %}
+                                        <td><a href="{{ path('suite_show', { 'id': test.suiteExecution.id | default(0) }) }}">{{ test.suiteExecution.name | default('') }}</a></td>
+                                        <td>{{ test.suiteExecution.buildType | default('') }}</td>
+                                    {% endif %}
                                     <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
                                     <td>{% if test.cycle.build.id is defined %}<a href="{{ path('build_show_cycles_first', { 'id': test.cycle.build.id  }) }}">{{ test.cycle.build }}</a>{% endif %}</td>
                                     <td>{{ test.executionOrder }}</td>
@@ -230,7 +241,7 @@
                                     {#<td>{{ test.dutUpTimeStart }}</td>#}
                                     {#<td>{{ test.dutUpTimeEnd }}</td>#}
                                     <td><span class="badge {{ verdictToBadge(test.verdict) }}">{{ test.verdict }}</span></td>
-                                    <td>{{ test.failDesc.description | default('') }}</td>
+                                    <td>{% if test.failDesc is not null %}<a href="{{ path('fail_desc_show', {'id': test.failDesc.id }) }}" target="_blank">{{ test.failDesc.description | default('') }}</a>{% endif %}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>

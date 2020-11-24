@@ -270,9 +270,12 @@ class LogBookTestController extends AbstractController
      * @param Request $request
      * @param LogBookTestRepository $testRepo
      * @param LogBookCycleRepository $cycleRepo
+     * @param LoggerInterface $logger
+     * @param string|null $name
+     * @param string|null $build_flavor
      * @return Response
      */
-    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suiteRepo, LoggerInterface $logger, string $name = null, string $build_flavor = null): Response
+    public function search(Request $request, LogBookTestRepository $testRepo, LogBookCycleRepository $cycleRepo, LoggerInterface $logger, string $name = null, string $build_flavor = null): Response
     {
         set_time_limit(30);
         $tests = $new_tests = array();

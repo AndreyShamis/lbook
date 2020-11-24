@@ -1082,13 +1082,21 @@ class LogBookCycleController extends AbstractController
             $iterator->rewind();
             //$res = $iterator->getArrayCopy();
             $suites = $cycle->getSuiteExecution();
-            $suites_pass_rate = $suites_tests_pass = 0;
+            $suites_pass_rate = $suites_tests_pass = $suites_tests_aborted = $suites_tests_total = $suites_tests_wip = 0;
             if (!$suiteMode) {
                 $pr_sum = 0;
                 /** @var SuiteExecution $suite */
                 foreach ($suites as $suite) {
                     $pr_sum += $suite->getPassRate();
                     $suites_tests_pass += $suite->getPassCount();
+                    $suites_tests_total += $suite->getTestsCountEnabled();
+
+                    if ($suite->getClosed() ) {
+                        $suites_tests_aborted += ($suite->getTestsCountEnabled() - $suite->getTotalExecutedTests());
+                    } else {
+                        $suites_tests_wip += ($suite->getTestsCountEnabled() - $suite->getTotalExecutedTests());
+                    }
+
                 }
                 $suite_count = count($suites);
 
@@ -1168,6 +1176,7 @@ class LogBookCycleController extends AbstractController
             if ($forJson) {
                 $iterator = null;
             }
+
             $ret_arr = array(
                 'cycle'                 => $cycle,
                 'size'                  => $totalPosts,
@@ -1186,6 +1195,9 @@ class LogBookCycleController extends AbstractController
                 'failed_tests'          => $failed_tests,
                 'suites_pass_rate' => $suites_pass_rate,
                 'suites_tests_pass' => $suites_tests_pass,
+                'suites_tests_aborted' => $suites_tests_aborted,
+                'suites_tests_total' => $suites_tests_total,
+                'suites_tests_wip' => $suites_tests_wip,
 
 //                'errors'                => $errors,
             );

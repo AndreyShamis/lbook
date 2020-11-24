@@ -12,19 +12,37 @@
     </div>
 
     {% if not suiteMode and cycle.passRate != suites_pass_rate %}
-    <div class="infobox infobox-green">
+    {% if suites_tests_aborted > 0 %}
+        <div class="infobox infobox-grey" title="Aborted {{ suites_tests_aborted }} tests">
         <div class="infobox-progress">
-            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ suites_pass_rate }}" data-color="#82af6f">
-                <span class="percent">{{ suites_pass_rate }}%</span>
+            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ getPercentage(suites_tests_aborted, suites_tests_total, 1) }}" data-color="#FF6E40">
+                <span class="percent">{{ getPercentage(suites_tests_aborted, suites_tests_total, 1) }}%</span>
             </div>
         </div>
-        <div class="infobox-data" title="Pass Rate - {{ suites_pass_rate }}%">
-            <span class="infobox-text" style="color: #82af6f">Suite</span>
+        <div class="infobox-data" title="Rate - {{ getPercentage(suites_tests_aborted, suites_tests_total, 1) }}%">
+            <span class="infobox-text" style="color: #ff5e00">Aborted</span>
             <div class="infobox-content">
-                <span class="bigger-110">{{ suites_tests_pass }}</span>
+                <span class="bigger-110">{{ suites_tests_aborted }}/{{ suites_tests_total }}</span>
             </div>
         </div>
     </div>
+    {% endif %}
+
+        {% if suites_tests_wip > 0 %}
+    <div class="infobox infobox-blue3" title="Missing {{ suites_tests_wip }} tests">
+        <div class="infobox-progress">
+            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ getPercentage(suites_tests_wip, suites_tests_total, 1) }}" data-color="#00d0e2">
+                <span class="percent">{{ getPercentage(suites_tests_wip, suites_tests_total, 1) }}%</span>
+            </div>
+        </div>
+        <div class="infobox-data" title="Rate - {{ getPercentage(suites_tests_wip, suites_tests_total, 3) }}%">
+            <span class="infobox-text" style="color:#00d0e2;">WIP</span>
+            <div class="infobox-content">
+                <span class="bigger-110">{{ suites_tests_wip }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 
     <div class="infobox infobox-green">

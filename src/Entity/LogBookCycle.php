@@ -329,6 +329,30 @@ class LogBookCycle
         $this->logBookCycleReports = new ArrayCollection();
     }
 
+    public function isAllSuitesFinished(): bool
+    {
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            if (!$suiteExecution->getClosed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function getTestingLevels(): array
+    {
+        $ret = [];
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            $l = $suiteExecution->getTestingLevel();
+            if (!in_array($l, $ret)) {
+                $ret[] = $l;
+            }
+        }
+        return $ret;
+    }
+
     /**
      * @return bool
      */

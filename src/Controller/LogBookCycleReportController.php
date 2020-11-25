@@ -10,6 +10,7 @@ use App\Entity\SuiteExecution;
 use App\Form\LogBookCycleReportType;
 use App\Repository\CycleReportEditHistoryRepository;
 use App\Repository\LogBookCycleReportRepository;
+use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookVerdictRepository;
@@ -261,6 +262,47 @@ class LogBookCycleReportController extends AbstractController
         return $this->redirectToRoute('log_book_cycle_report_index');
     }
 
+
+    /**
+     * @Route("/auto/create", name="log_book_cycle_report_auto_create", methods={"GET","POST"})
+     * @param LogBookCycleRepository $cycleRepo
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function auto_create(LogBookCycleRepository $cycleRepo, LoggerInterface $logger): Response
+    {
+        $time_limiter1 = new \DateTime('-2 hours');
+        $time_limiter2 = new \DateTime('-40 hours');
+        $qb = $cycleRepo->createQueryBuilder('c')
+            ->where('c.tokenExpiration  < CURRENT_TIMESTAMP()')
+            ->andWhere('c.timeEnd < :time_limiter1')
+            ->andWhere('c.timeEnd > :time_limiter2')
+            ->andWhere('c.timeEnd > :time_limiter2')
+            ->innerJoin('c.setup', 's')->andWhere('s.autoCycleReport = 1')
+            ->setParameter('time_limiter1', $time_limiter1)
+            ->setParameter('time_limiter2', $time_limiter2)
+            ;
+
+        $cycles = $qb->getQuery()->execute();
+        $cycles_ret = [];
+        /** @var LogBookCycle $cycle */
+        foreach ($cycles as $cycle) {
+            if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {
+                $l = $cycle->getTestingLevels();
+                if (count($l) == 1 && in_array($l[0], ['nightly', 'weekly'])) {
+                    $cycles_ret[] = $cycle;
+                }
+                $a = 1;
+            }
+        }
+
+        return $this->render('lbook/cycle/index.html.twig', [
+            'size'      => count($cycles_ret),
+            'maxPages'  => 1,
+            'thisPage'  => 1,
+            'iterator'  => $cycles_ret
+        ]);
+    }
 
     /**
      * @Route("/{id}/calculate", name="log_book_cycle_report_calculate", methods={"GET","POST"})

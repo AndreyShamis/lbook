@@ -121,9 +121,20 @@ class LogBookSetup
      * @ORM\Column(type="integer", name="cycles_count", nullable=true, options={"unsigned"=true, "default"="0"})
      */
     private $cyclesCount = 0;
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $extDefectsJql;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"="0"})
+     */
+    private $autoCycleReport;
+
 
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
+
 
 
     /**
@@ -432,5 +443,29 @@ class LogBookSetup
     public function setCyclesCount(int $cyclesCount): void
     {
         $this->cyclesCount = $cyclesCount;
+    }
+
+    public function getExtDefectsJql(): ?string
+    {
+        return $this->extDefectsJql;
+    }
+
+    public function setExtDefectsJql(?string $extDefectsJql): self
+    {
+        $this->extDefectsJql = $extDefectsJql;
+
+        return $this;
+    }
+
+    public function getAutoCycleReport(): bool
+    {
+        return $this->autoCycleReport;
+    }
+
+    public function setAutoCycleReport(bool $autoCycleReport): self
+    {
+        $this->autoCycleReport = $autoCycleReport;
+
+        return $this;
     }
 }

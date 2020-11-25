@@ -33,6 +33,8 @@ class LogBookSetupType extends AbstractType
 
         $builder
             //->add('owner')
+            ->add('extDefectsJql')
+            ->add('autoCycleReport')
             ->add('moderators')
             ->add('isPrivate')
             ->add('retentionPolicy')

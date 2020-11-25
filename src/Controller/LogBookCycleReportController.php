@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycleReport;
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
 use App\Form\LogBookCycleReportType;
@@ -65,9 +66,10 @@ class LogBookCycleReportController extends AbstractController
      * @Route("/new/cycle/{cycle}", name="log_book_cycle_report_new_with_cycle", methods={"GET","POST"})
      * @param Request $request
      * @param LogBookCycle|null $cycle
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function new(Request $request, LogBookCycle $cycle=null): Response
+    public function new(Request $request, LogBookCycle $cycle=null, LoggerInterface $logger): Response
     {
         /** @var LogBookCycleReport $logBookCycleReport */
         $logBookCycleReport = new LogBookCycleReport();
@@ -87,7 +89,7 @@ class LogBookCycleReportController extends AbstractController
                 //$logBookCycleReport->setBugsNotes($request->request->get('bugsNotes'));
             }
         } catch (\Throwable $ex) {
-
+            $logger->critical($ex->getMessage());
         }
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
         $form->handleRequest($request);
@@ -99,7 +101,6 @@ class LogBookCycleReportController extends AbstractController
                 $logBookCycleReport->addCycle($cycle);
                 $logBookCycleReport->setBuild($cycle->getBuild());
             }
-
             $reportNotes = $request->request->get('reportNotes');
             $logBookCycleReport->setReportNotes($reportNotes);
             $logBookCycleReport->setCyclesNotes($request->request->get('cyclesNotes'));
@@ -169,6 +170,7 @@ class LogBookCycleReportController extends AbstractController
      * @param Request $request
      * @param LogBookCycleReport $logBookCycleReport
      * @param CycleReportEditHistoryRepository $historyRepo
+     * @param LoggerInterface $logger
      * @return Response
      */
     public function edit(Request $request, LogBookCycleReport $logBookCycleReport, CycleReportEditHistoryRepository $historyRepo, LoggerInterface $logger): Response
@@ -183,7 +185,6 @@ class LogBookCycleReportController extends AbstractController
             $logBookCycleReport->setSuitesNotes($request->request->get('suitesNotes'));
             $logBookCycleReport->setTestsNotes($request->request->get('testsNotes'));
             $logBookCycleReport->setBugsNotes($request->request->get('bugsNotes'));
-
             try{
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
@@ -207,7 +208,6 @@ class LogBookCycleReportController extends AbstractController
                 $logger->critical('REPORT_DIFF:' .$ex->getMessage());
             }
             $this->getDoctrine()->getManager()->flush();
-
 
             return $this->redirectToRoute('log_book_cycle_report_calculate', ['id' => $logBookCycleReport->getId()]);
         }
@@ -269,24 +269,16 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookVerdictRepository $verdicts
      * @param SuiteExecutionRepository $suitesRepo
      * @param LogBookDefectRepository $defectsRepo
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo): Response
+    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
     {
         if (!$report->isLocked()) {
             $testsTotalEnabledInSuites = 0;
             //        $verdictPass = $verdicts->findOneOrCreate(['name' => 'PASS']);
-//        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
+            //        $verdictFail = $verdicts->findOneOrCreate(['name' => 'FAIL']);
             $suites = $report->getSuites($suitesRepo);
-//        $qb = $testRepo->createQueryBuilder('t')
-//            ->where('t.cycle IN (:cycles)')
-//            ->andWhere('t.disabled = :disabled')
-//            ->andWhere('t.verdict != :verdictPass')
-//            ->andWhere('t.suite_execution IN (:suite_executions)')
-//            ->orderBy('t.executionOrder', 'ASC')
-//            //->setParameter('cycle', $cycle->getId());
-//            ->setParameters(['cycles'=> $report->getCycles(), 'disabled' => 0, 'verdictPass' => $verdictPass, 'suite_executions' => $suites]);
-//        $tests_not_pass = $qb->getQuery()->execute();
 
             $tests_total = $tests_pass = $tests_fail = $tests_error = $tests_other = 0;
             /** @var SuiteExecution $suite */
@@ -304,7 +296,6 @@ class LogBookCycleReportController extends AbstractController
             $report->setTestsOther($tests_other);
             $report->setTestsTotal($tests_total);
             $report->setTestsTotalEnabledInSuites($testsTotalEnabledInSuites);
-
 
             $report->setSuitesCount(count($suites));
             $report->setUpdatedAt(new \DateTime());
@@ -340,21 +331,31 @@ class LogBookCycleReportController extends AbstractController
             try {
                 $jql = $report->getExtDefectsJql();
                 if(strlen($jql) > 10) {
+                    try {
+                        $cycles = $report->getCycles();
+                        if ($cycles !== null && count($cycles) > 0) {
+                            /** @var LogBookSetup $setup */
+                            $setup = $cycles[0]->getSetup();
+                            $setup->setExtDefectsJql($report->getExtDefectsJql());
+                            $setup->setAutoCycleReport(true);
+                        }
+                    } catch (\Throwable $ex) {
+                        $logger->critical($ex->getMessage());
+                    }
+
                     $defects = $this->getIssues($report, $defectsRepo);
                     if (count($defects)){
                         foreach ($defects as $defect){
                             $report->addDefect($defect);
                         }
                         if ($report->getBugsNotes() === null || $report->getBugsNotes() === '') {
-
                             $report->setBugsNotes('Attached ' . count($defects) . ' defects by ' . $jql);
                         }
                     }
                 }
-
-            } catch (\Throwable $ex) {}
-
-
+            } catch (\Throwable $ex) {
+                $logger->critical($ex->getMessage());
+            }
             $this->getDoctrine()->getManager()->flush();
         }
 

@@ -131,6 +131,11 @@ class LogBookSetup
      */
     private $autoCycleReport = false;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=LogBookUser::class, inversedBy="subscribedSetups")
+     * @ORM\JoinTable(name="log_book_setup_log_book_user_subscribers")
+     */
+    private $subscribers;
 
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
@@ -149,6 +154,7 @@ class LogBookSetup
         $this->setRetentionPolicy(7);
         $this->favoritedByUsers = new ArrayCollection();
         $this->cyclesCount = 0;
+        $this->subscribers = new ArrayCollection();
     }
 
     /**
@@ -465,6 +471,32 @@ class LogBookSetup
     public function setAutoCycleReport(bool $autoCycleReport): self
     {
         $this->autoCycleReport = $autoCycleReport;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookUser[]
+     */
+    public function getSubscribers(): Collection
+    {
+        return $this->subscribers;
+    }
+
+    public function addSubscriber(LogBookUser $subscriber): self
+    {
+        if (!$this->subscribers->contains($subscriber)) {
+            $this->subscribers[] = $subscriber;
+        }
+
+        return $this;
+    }
+
+    public function removeSubscriber(LogBookUser $subscriber): self
+    {
+        if ($this->subscribers->contains($subscriber)) {
+            $this->subscribers->removeElement($subscriber);
+        }
 
         return $this;
     }

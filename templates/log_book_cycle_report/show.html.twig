@@ -621,7 +621,7 @@
 
     <div class="print-disable">
         <a href="{{ path('log_book_cycle_report_index') }}">back to list</a> &nbsp;&nbsp;&nbsp;&nbsp;
-        {% if app.user.roles is defined and ('ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
+        {% if app.user.roles is defined and ('ROLE_FILTER_CREATOR' in app.user.roles or 'ROLE_SUPER_ADMIN' in app.user.roles or app.user == log_book_cycle_report.creator ) %}
             <a href="{{ path('log_book_cycle_report_edit', {'id': log_book_cycle_report.id}) }}">edit</a>
             <br/>
             {{ include('log_book_cycle_report/_delete_form.html.twig') }}

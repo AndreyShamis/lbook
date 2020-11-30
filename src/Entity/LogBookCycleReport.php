@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\LogBookCycleReportRepository;
-use App\Repository\SuiteExecutionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\SuiteExecutionRepository;
+use App\Repository\LogBookCycleReportRepository;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookCycleReportRepository::class)
@@ -159,6 +159,16 @@ class LogBookCycleReport
      * @ORM\Column(type="boolean", options={"default"="0"})
      */
     private $isLocked = false;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"="0"})
+     */
+    private $isAutoCreated = false;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"="0"})
+     */
+    private $isOfficial = false;
 
     /**
      * @ORM\OneToMany(targetEntity=CycleReportEditHistory::class, mappedBy="report", orphanRemoval=true)
@@ -560,9 +570,36 @@ class LogBookCycleReport
         $this->isLocked = $isLocked;
     }
 
-    public function __toString()
+    /**
+     * @return bool
+     */
+    public function isOfficial(): bool
     {
-        return $this->getName() . ' - ' . $this->getId();
+        return $this->isOfficial;
+    }
+
+    /**
+     * @param bool $isOfficial
+     */
+    public function setIsOfficial(bool $isOfficial): void
+    {
+        $this->isOfficial = $isOfficial;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoCreated(): bool
+    {
+        return $this->isAutoCreated;
+    }
+
+    /**
+     * @param bool $isAutoCreated
+     */
+    public function setIsAutoCreated(bool $isAutoCreated): void
+    {
+        $this->isAutoCreated = $isAutoCreated;
     }
 
     /**
@@ -594,5 +631,10 @@ class LogBookCycleReport
         }
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName() . ' - ' . $this->getId();
     }
 }

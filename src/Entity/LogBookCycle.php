@@ -340,6 +340,48 @@ class LogBookCycle
         return true;
     }
 
+    public function getSuitesPlatforms(): array
+    {
+        $ret = [];
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            $l = $suiteExecution->getPlatform();
+            if (!in_array($l, $ret)) {
+                $ret[] = $l;
+            }
+        }
+        return $ret;
+    }
+
+    public function getSuitesChips(): array
+    {
+        $ret = [];
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            $l = $suiteExecution->getChip();
+            if (!in_array($l, $ret)) {
+                $ret[] = $l;
+            }
+        }
+        return $ret;
+    }
+
+    public function getSuitesComponents(): array
+    {
+        $ret = [];
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            $al = $suiteExecution->getComponents();
+            foreach ($al as $l) {
+                if (!in_array($l, $ret)) {
+                    $ret[] = $l;
+                }
+            }
+
+        }
+        return $ret;
+    }
+
     public function getTestingLevels(): array
     {
         $ret = [];

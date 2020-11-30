@@ -2,19 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\LogBookCycleReport;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
 use App\Form\LogBookCycleReportType;
-use App\Repository\CycleReportEditHistoryRepository;
-use App\Repository\LogBookCycleReportRepository;
-use App\Repository\LogBookCycleRepository;
-use App\Repository\LogBookDefectRepository;
-use App\Repository\LogBookTestRepository;
-use App\Repository\LogBookVerdictRepository;
-use App\Repository\SuiteExecutionRepository;
+use App\Entity\LogBookCycleReport;
 use App\Service\PagePaginator;
 use Doctrine\ORM\UnitOfWork;
 use Exception;
@@ -26,6 +19,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use JiraRestApi\Issue\IssueService;
 use JiraRestApi\JiraException;
+use App\Repository\CycleReportEditHistoryRepository;
+use App\Repository\LogBookCycleReportRepository;
+use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookDefectRepository;
+use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookVerdictRepository;
+use App\Repository\SuiteExecutionRepository;
 
 /**
  * @Route("/reports")
@@ -285,16 +285,62 @@ class LogBookCycleReportController extends AbstractController
 
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
+        $entityManager = $this->getDoctrine()->getManager();
+
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
             if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {
                 $l = $cycle->getTestingLevels();
                 if (count($l) == 1 && in_array($l[0], ['nightly', 'weekly'])) {
+
+                    if (1 == 2) {
+                        $report = new LogBookCycleReport();
+                        try {
+                            $report->setIsAutoCreated(true);
+                            $report->addCycle($cycle);
+                            $report->setBuild($cycle->getBuild());
+                            $report->setDescription('Cycle executed on ' . $cycle->getBuild());
+                            /** @var SuiteExecution $some_suite */
+                            $some_suite = $cycle->getSuiteExecution()->first();
+                            $report->setMode($some_suite->getMode());
+                            $report->setName('[' . strtoupper($l[0]) . '][' . str_replace('_MODE', '', strtoupper($report->getMode())) . '] ' . $cycle->getName());
+
+                            //$logBookCycleReport->setReportNotes($reportNotes);
+                            $report->setCyclesNotes('Cycle started at  **' . $cycle->getTimeStart()->format('d/m/Y H:i:s') . '**  finished at **' . $cycle->getTimeEnd()->format('d/m/Y H:i:s') . '**');
+                            $report->setSuitesNotes('Suites count  **' . $cycle->getSuiteExecution()->count() . '**');
+                            $report->setTestsNotes('Tests count  **' . $cycle->getTestsCount() . '**');
+                            try {
+                                $report->setPlatforms($cycle->getSuitesPlatforms());
+                                $report->setChips($cycle->getSuitesChips());
+                                $report->setComponents($cycle->getSuitesComponents());
+                            } catch (\Throwable $ex) {
+                                $logger->critical('Failed to set Component/Chip/Platform:' .$ex->getMessage());
+                            }
+
+                            try {
+                                $user = $this->get('security.token_storage')->getToken()->getUser();
+                                $report->setCreator($user);
+                            } catch (\Throwable $ex) {
+                                $logger->critical('Failed to set Report Creator:' .$ex->getMessage());
+                            }
+
+                            $report->setReportNotes('');
+                            $report->setBugsNotes('');
+
+                            $entityManager->persist($report);
+
+                        } catch (\Throwable $ex) {
+                            $logger->critical('AUTO REPORT CREATOR:' .$ex->getMessage());
+                        }
+                    }
+
                     $cycles_ret[] = $cycle;
+
                 }
-                $a = 1;
             }
         }
+
+        $entityManager->flush();
 
         return $this->render('lbook/cycle/index.html.twig', [
             'size'      => count($cycles_ret),

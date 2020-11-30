@@ -29,6 +29,8 @@ class LogBookSetupType extends AbstractType
                 'class' => LogBookUser::class,
                 'data' => $options['user'],
             ));
+        } else {
+            $builder->add('owner');
         }
 
         $builder

@@ -20,9 +20,10 @@
             <th data-sorter="htmlSorter" data-sortable="true" title="Report Name" data-switchable="false" data-footer-formatter="totalFormatter">Report Name</th>
             <th data-sortable="true" title="Product version" data-switchable="true">Product Version</th>
 {#            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>#}
-            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle Name</th>
+
             <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">Cycle ID</th>
-            <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
+            <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Sum og tests time" data-footer-formatter="timeSumFormatter">Duration</th>
+            <th data-field="Period" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter" data-visible="false">Period</th>
             <th data-sortable="true" title="Suites count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Suites</th>
             <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Tests</th>
 {#            <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="true">Enabled</th>#}
@@ -43,10 +44,14 @@
 {#            <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>#}
             <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
             <th data-sortable="true" title="Components" data-switchable="true">Components</th>
+            <th data-sortable="true" title="Cycle" data-switchable="true">Cycle</th>
+            <th data-sortable="true" title="Setup" data-switchable="true">Setup</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="true">Created</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="true">Updated</th>
-            <th data-sortable="true" title="" data-switchable="true" data-visible="true">Locked</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time 2" data-visible="false">Created2</th>
+            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="false">Updated</th>
             <th data-sortable="true" title="Owner" data-switchable="true" data-visible="true">Owner</th>
+            <th data-sortable="true" title="" data-switchable="true" data-visible="false">Official</th>
+            <th data-sortable="true" title="" data-switchable="true" data-visible="false">Locked</th>
 {#            <th class="suite_list_options_column">Options</th>#}
         </tr>
         </thead>
@@ -77,15 +82,10 @@
                 <td><a title="{{ report.description }}" href="{{ path('log_book_cycle_report_show', { 'id': report.id }) }}">{{ report.name }}</a></td>
                 <td class="font11">{{ report.build }}</td>
 {#                <td class="font10">wip</td>#}
-                <td class="font9">
-                    {% if report.cycles[0].id is defined and report.cycles[0].name is defined %}
-                        <a href="{{ path('cycle_show_first', { 'id': report.cycles[0].id }) }}">{{ report.cycles[0].name|default('!NOT_FOUND') }}</a>
-                    {% else %}
-                        NOT_FOUND
-                    {% endif %}
-                </td>
+
                 <td class="font9">{% if report.cycles[0].id is defined %}{{ report.cycles[0].id }}{% endif %}</td>
-                <td><span data-title="{{ report.period }}">{{ report.duration |  executionTimeGenericShort}}</span></td>
+                <td><span data-title="{{ report.duration }}">{{ report.duration |  executionTimeGenericShort}}</span></td>
+                <td><span data-title="{{ report.period }}">{{ report.period |  executionTimeGenericShort}}</span></td>
                 <td>{{ report.suitesCount }}</td>
                 <td>{{ report.testsTotal }}</td>
 {#                <td>{{ report.testsCountEnabled }}</td>#}
@@ -106,10 +106,24 @@
 {#                <td class="font9">{{ report.branch }}</td>#}
                 <td class="font12">{{ report.mode | replace({'_mode': ''}) }}</td>
                 <td class="font12" title="{{ report.components | join('\n') }}">{{ report.components | length }}</td>
-                <td><span data-title="{{ report.createdAt|date('ymdHis') }}" title="Created at {{ report.createdAt|date('d/m/Y H:i:s') }}">{{ report.createdAt|time_diff}}</span></td>
+                <td class="font9">
+                    {% if report.cycles[0].id is defined and report.cycles[0].name is defined %}
+                        <a href="{{ path('cycle_show_first', { 'id': report.cycles[0].id }) }}">{{ report.cycles[0].name|default('!NOT_FOUND') }}</a>
+                    {% else %}
+                        NOT_FOUND
+                    {% endif %}
+                </td>
+                <td class="font9">
+                    {% if report.cycles[0].id is defined and report.cycles[0].name is defined %}
+                        <a href="{{ path('setup_show_first', { 'id': report.cycles[0].setup.id }) }}">{{ report.cycles[0].setup.name|default('') }}</a>
+                    {% endif %}
+                </td>
+                <td><span data-title="{{ report.createdAt|date('ymdHis') }}">{{ report.createdAt|date('Y/m/d') }}</span></td>
+                <td><span data-title="{{ report.createdAt|date('ymdHis') }}">{{ report.createdAt|time_diff}}</span></td>
                 <td><span class="font9" data-title="{{ report.updatedAt|date('ymdHis') }}">{{ report.updatedAt|date('Y/m/d H:i:s')}}</span></td>
+                <td>{% if report.isAutoCreated == 1 %}auto{% else %}{{ report.creator }}{% endif %}</td>
+                <td class="font9">{{ report.isOfficial ? 'Y':'N'  }}</td>
                 <td class="font9">{{ report.locked ? 'Y':'WIP'  }}</td>
-                <td>{{ report.creator }}</td>
             </tr>
         {% endfor %}
         </tbody>

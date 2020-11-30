@@ -85,6 +85,7 @@ security:
         - { path: ^/filters, role: ROLE_FILTER_CREATOR }
         - { path: ^/eventcmu(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/migration(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/reports/auto/create(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
 #        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }

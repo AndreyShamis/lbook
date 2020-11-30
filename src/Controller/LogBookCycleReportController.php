@@ -266,17 +266,19 @@ class LogBookCycleReportController extends AbstractController
     /**
      * @Route("/auto/create", name="log_book_cycle_report_auto_create", methods={"GET","POST"})
      * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookTestRepository $testRepo
+     * @param SuiteExecutionRepository $suitesRepo
+     * @param LogBookDefectRepository $defectsRepo
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function auto_create(LogBookCycleRepository $cycleRepo, LoggerInterface $logger): Response
+    public function auto_create(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
     {
         $time_limiter1 = new \DateTime('-2 hours');
         $time_limiter2 = new \DateTime('-40 hours');
         $qb = $cycleRepo->createQueryBuilder('c')
             ->where('c.tokenExpiration  < CURRENT_TIMESTAMP()')
             ->andWhere('c.timeEnd < :time_limiter1')
-            ->andWhere('c.timeEnd > :time_limiter2')
             ->andWhere('c.timeEnd > :time_limiter2')
             ->innerJoin('c.setup', 's')->andWhere('s.autoCycleReport = 1')
             ->setParameter('time_limiter1', $time_limiter1)
@@ -286,24 +288,26 @@ class LogBookCycleReportController extends AbstractController
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
         $entityManager = $this->getDoctrine()->getManager();
-
+        $i = 1;
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
             if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {
                 $l = $cycle->getTestingLevels();
-                if (count($l) == 1 && in_array($l[0], ['nightly', 'weekly'])) {
+                if (count($l) == 1 && in_array($l[0], [ 'nightly', 'weekly'])) {
 
-                    if (1 == 2) {
+                    if (1 == $i) {
+                        $i = 3;
                         $report = new LogBookCycleReport();
                         try {
                             $report->setIsAutoCreated(true);
                             $report->addCycle($cycle);
+                            $report->setExtDefectsJql($cycle->getSetup()->getExtDefectsJql());
                             $report->setBuild($cycle->getBuild());
                             $report->setDescription('Cycle executed on ' . $cycle->getBuild());
                             /** @var SuiteExecution $some_suite */
                             $some_suite = $cycle->getSuiteExecution()->first();
                             $report->setMode($some_suite->getMode());
-                            $report->setName('[' . strtoupper($l[0]) . '][' . str_replace('_MODE', '', strtoupper($report->getMode())) . '] ' . $cycle->getName());
+                            $report->setName('Job Report ' . ucfirst(strtolower($l[0])) . ' ' . ucfirst(str_replace('_mode', '', strtolower($report->getMode()))) . ' ' . $cycle->getBuild());
 
                             //$logBookCycleReport->setReportNotes($reportNotes);
                             $report->setCyclesNotes('Cycle started at  **' . $cycle->getTimeStart()->format('d/m/Y H:i:s') . '**  finished at **' . $cycle->getTimeEnd()->format('d/m/Y H:i:s') . '**');
@@ -317,16 +321,22 @@ class LogBookCycleReportController extends AbstractController
                                 $logger->critical('Failed to set Component/Chip/Platform:' .$ex->getMessage());
                             }
 
-                            try {
-                                $user = $this->get('security.token_storage')->getToken()->getUser();
-                                $report->setCreator($user);
-                            } catch (\Throwable $ex) {
-                                $logger->critical('Failed to set Report Creator:' .$ex->getMessage());
-                            }
+//                            try {
+//                                $user = $this->get('security.token_storage')->getToken()->getUser();
+//                                $report->setCreator($user);
+//                            } catch (\Throwable $ex) {
+//                                $logger->critical('Failed to set Report Creator:' .$ex->getMessage());
+//                            }
 
-                            $report->setReportNotes('');
+                            $report->setReportNotes('Report generated automatically');
                             $report->setBugsNotes('');
 
+
+                            $entityManager->persist($report);
+                            $this->calculateReport($report, $testRepo, $suitesRepo, $defectsRepo, $logger);
+
+                            $report->setIsAutoCreated(true);
+                            $report->setIsLocked(true);
                             $entityManager->persist($report);
 
                         } catch (\Throwable $ex) {
@@ -338,6 +348,7 @@ class LogBookCycleReportController extends AbstractController
 
                 }
             }
+            $cycle->setCalculateStatistic(false);
         }
 
         $entityManager->flush();
@@ -361,6 +372,13 @@ class LogBookCycleReportController extends AbstractController
      * @return Response
      */
     public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
+    {
+
+        $this->calculateReport($report, $testRepo, $suitesRepo, $defectsRepo, $logger);
+        return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
+    }
+
+    private function calculateReport(LogBookCycleReport $report, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger)
     {
         if (!$report->isLocked()) {
             $testsTotalEnabledInSuites = 0;
@@ -446,8 +464,6 @@ class LogBookCycleReportController extends AbstractController
             }
             $this->getDoctrine()->getManager()->flush();
         }
-
-        return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
     /**

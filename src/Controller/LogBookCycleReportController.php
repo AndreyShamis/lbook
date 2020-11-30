@@ -288,15 +288,15 @@ class LogBookCycleReportController extends AbstractController
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
         $entityManager = $this->getDoctrine()->getManager();
-        $i = 1;
+        $i = 0;
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
             if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {
                 $l = $cycle->getTestingLevels();
                 if (count($l) == 1 && in_array($l[0], [ 'nightly', 'weekly'])) {
 
-                    if (1 == $i) {
-                        $i = 3;
+                    if ($i < 3) {
+                        $i += 1;
                         $report = new LogBookCycleReport();
                         try {
                             $report->setIsAutoCreated(true);

@@ -59,7 +59,7 @@ class LogBookSetupController extends AbstractController
      * @param SuiteExecutionRepository $suiteRepo
      * @return Response
      */
-    public function indicator(LogBookSetup $setup = null, int $size= 10,
+    public function indicator(LogBookSetup $setup = null, int $size = 10,
                               LogBookCycle $mainCycle = null,
                               LogBookCycle $compareCycle = null,
                               LogBookCycleRepository $cycleRepo = null,
@@ -76,11 +76,11 @@ class LogBookSetupController extends AbstractController
             $testNames = [];
             $testNamesRemoved = [];
             $compareMode = false;
-            if ($setup === null || $cycleRepo === null ) {
+            if ($setup === null || $cycleRepo === null) {
                 throw new \RuntimeException('');
             }
 
-            if ($compareCycle !== null && $compareCycle->getId() > 0 && $mainCycle !== null && $mainCycle->getId() >0 && $mainCycle->getId() !== $compareCycle->getId()) {
+            if ($compareCycle !== null && $compareCycle->getId() > 0 && $mainCycle !== null && $mainCycle->getId() > 0 && $mainCycle->getId() !== $compareCycle->getId()) {
                 $compareMode = true;
                 $cycles = [];
             } else {
@@ -92,27 +92,27 @@ class LogBookSetupController extends AbstractController
                 $cycles = $qb->getQuery()->execute();
             }
 
-            if ($mainCycle !== null && $mainCycle->getId() > 0){
+            if ($mainCycle !== null && $mainCycle->getId() > 0) {
                 $qb_cycle = $cycleRepo->createQueryBuilder('t')
                     ->where('t.id = :mainCycle')
                     ->setParameter('mainCycle', $mainCycle->getId())
                     ->setMaxResults(1);
                 $tmp_cycles = $qb_cycle->getQuery()->execute();
-                foreach ($tmp_cycles as $tmpcycle){
+                foreach ($tmp_cycles as $tmpcycle) {
                     // Add only what not exist in cycles
-                    if(!in_array($tmpcycle, $cycles)) {
+                    if (!in_array($tmpcycle, $cycles)) {
                         array_push($cycles, $tmpcycle);
 
                     }
                 }
             }
-            if ($compareCycle !== null && $compareCycle->getId() > 0){
+            if ($compareCycle !== null && $compareCycle->getId() > 0) {
                 $qb_cycle2 = $cycleRepo->createQueryBuilder('t')
                     ->where('t.id = :compareCycle')
                     ->setParameter('compareCycle', $compareCycle->getId())
                     ->setMaxResults(1);
                 $tmp_cycles = $qb_cycle2->getQuery()->execute();
-                foreach ($tmp_cycles as $tmpcycle){
+                foreach ($tmp_cycles as $tmpcycle) {
                     array_push($cycles, $tmpcycle);
                 }
             }
@@ -143,10 +143,10 @@ class LogBookSetupController extends AbstractController
                         $secondKey = $tmpSuite->getProductVersion();
                     }
                     $work_arr[$firstKey][$secondKey][] = $tmpSuite;
-                    if (!in_array($secondKey, $productVersions)){
+                    if (!in_array($secondKey, $productVersions)) {
                         $productVersions[] = $secondKey;
                     }
-                    if (!in_array($firstKey, $suiteNames)){
+                    if (!in_array($firstKey, $suiteNames)) {
                         $suiteNames[] = $firstKey;
                     }
 //                    $tmpTests = $tmpSuite->getTests();
@@ -163,7 +163,7 @@ class LogBookSetupController extends AbstractController
             foreach ($tests as $test) {
                 $firstKey = $test->getName();
 
-                if (!in_array($firstKey, $testNames)){
+                if (!in_array($firstKey, $testNames)) {
                     $testNames[] = $firstKey;
                 }
                 if ($compareMode) {
@@ -173,17 +173,17 @@ class LogBookSetupController extends AbstractController
                 }
                 $work_arr[$firstKey][$secondKey][] = $test;
                 if ($mainCycle !== null) {
-                    if ($test->getCycle()->getId() === $mainCycle->getId() && $test->getVerdict()->getName() !== 'PASS'){
+                    if ($test->getCycle()->getId() === $mainCycle->getId() && $test->getVerdict()->getName() !== 'PASS') {
                         $testsNotPass[] = $test;
                     }
                 } else {
-                    if ($test->getVerdict()->getName() !== 'PASS'){
+                    if ($test->getVerdict()->getName() !== 'PASS') {
                         $testsNotPass[] = $test;
                     }
                 }
 
                 if ($test->getVerdict()->getName() !== 'PASS' && $test->getVerdict()->getName() !== 'UNKNOWN') {
-                    if ($test->getFailDescription() == ' '){
+                    if ($test->getFailDescription() == ' ') {
                         $test->parseFailDescription();
                         $em->persist($test);
                     }
@@ -208,7 +208,8 @@ class LogBookSetupController extends AbstractController
                             }
                         }
 
-                    } catch (\Throwable $ex) {}
+                    } catch (\Throwable $ex) {
+                    }
 
                 }
                 if ($issue_found) {
@@ -233,25 +234,25 @@ class LogBookSetupController extends AbstractController
             $secondCycleTestsExecuted = 0;
             $missing_in_a_exist_in_b = [];
             if ($compareMode) {
-                foreach ($mainCycle->getSuiteExecution() as $tmp){
+                foreach ($mainCycle->getSuiteExecution() as $tmp) {
                     $mainCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
                     $mainCycleTestsDefinedInsuite += $tmp->getTestsCount();
                     $mainCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
                     $mainCycleTestsExecuted += $tmp->getTotalExecutedTests();
                     $mainCycleTestsDisabledInSuite += $tmp->getTestsCountDisabled();
-                    if (!array_key_exists($tmp->getChip(),$mainCycleChips)) {
+                    if (!array_key_exists($tmp->getChip(), $mainCycleChips)) {
                         $mainCycleChips[$tmp->getChip()] = 1;
                     } else {
                         $mainCycleChips[$tmp->getChip()]++;
                     }
                 }
-                foreach ($compareCycle->getSuiteExecution() as $tmp){
+                foreach ($compareCycle->getSuiteExecution() as $tmp) {
                     $secondCycleSuiteName[] = $tmp->getName(); // . '_|_' . $tmp->getUuid();
                     $secondCycleTestsDefinedInsuite += $tmp->getTestsCount();
                     $secondCycleTestsEnabledInsuite += $tmp->getTestsCountEnabled();
                     $secondCycleTestsExecuted += $tmp->getTotalExecutedTests();
                     $secondCycleTestsDisabledInSuite += $tmp->getTestsCountDisabled();
-                    if (!array_key_exists($tmp->getChip(),$secondCycleChips)) {
+                    if (!array_key_exists($tmp->getChip(), $secondCycleChips)) {
                         $secondCycleChips[$tmp->getChip()] = 1;
                     } else {
                         $secondCycleChips[$tmp->getChip()]++;
@@ -310,8 +311,8 @@ class LogBookSetupController extends AbstractController
     public function indexJson(PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, int $page = 1): JsonResponse
     {
         $query = $setupRepo->createQueryBuilder('setups')
-           // ->select(array('setups.id', 'setups.disabled', 'setups.updatedAt'))
-              // ->addSelect(array('setups.updatedAt as updatedAtDiff'))
+            // ->select(array('setups.id', 'setups.disabled', 'setups.updatedAt'))
+            // ->addSelect(array('setups.updatedAt as updatedAtDiff'))
             ->where('setups.disabled = 0')
             ->orderBy('setups.updatedAt', 'DESC')
             ->addOrderBy('setups.id', 'DESC');
@@ -395,10 +396,10 @@ class LogBookSetupController extends AbstractController
         }
 
         return $this->render('lbook/setup/index.html.twig', [
-            'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
+            'size' => $totalPosts,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'iterator' => $iterator,
             'paginator' => $paginator,
             'favorite' => $favorite,
         ]);
@@ -444,10 +445,10 @@ class LogBookSetupController extends AbstractController
         }
 
         return $this->render('lbook/setup/report.html.twig', [
-            'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
+            'size' => $totalPosts,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'iterator' => $iterator,
             'paginator' => $paginator,
             'favorite' => true,
             'cyclesCount' => 7
@@ -512,6 +513,7 @@ class LogBookSetupController extends AbstractController
     {
         return $this->index($logger, $pagePaginator, $setupRepo, 1, true);
     }
+
     /**
      * Creates a new setup entity.
      *
@@ -588,15 +590,15 @@ class LogBookSetupController extends AbstractController
             $show_build = $this->showBuild($paginator);
             $show_user = $this->showUsers($paginator);
             return $this->render('lbook/setup/show.full.html.twig', array(
-                'setup'          => $setup,
-                'size'          => $totalPosts,
-                'maxPages'      => $maxPages,
-                'thisPage'      => $thisPage,
-                'iterator'      => $iterator,
-                'paginator'     => $paginator,
-                'delete_form'   => $deleteForm->createView(),
-                'show_build'    => $show_build,
-                'show_user'     => $show_user,
+                'setup' => $setup,
+                'size' => $totalPosts,
+                'maxPages' => $maxPages,
+                'thisPage' => $thisPage,
+                'iterator' => $iterator,
+                'paginator' => $paginator,
+                'delete_form' => $deleteForm->createView(),
+                'show_build' => $show_build,
+                'show_user' => $show_user,
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);
@@ -634,7 +636,8 @@ class LogBookSetupController extends AbstractController
                     $iterator->next();
                 }
             }
-        } catch (\Throwable $ex) { }
+        } catch (\Throwable $ex) {
+        }
         return $show_user;
     }
 
@@ -670,7 +673,8 @@ class LogBookSetupController extends AbstractController
                     $iterator->next();
                 }
             }
-        } catch (\Throwable $ex) { }
+        } catch (\Throwable $ex) {
+        }
         return $show_build;
     }
 
@@ -682,14 +686,14 @@ class LogBookSetupController extends AbstractController
     protected function setupNotFound(\Throwable $ex, LogBookSetup $setup = null): ?Response
     {
         /** @var Request $request */
-        $request= $this->get('request_stack')->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
         $possibleId = 0;
         $response = $otherResponse = null;
         $short_msg = 'Unknown error';
         try {
             $possibleId = $request->attributes->get('id');
             $response = new Response('', Response::HTTP_NOT_FOUND);
-            if ( $ex->getCode() > 0 && Response::$statusTexts[$ex->getCode()] !== '') {
+            if ($ex->getCode() > 0 && Response::$statusTexts[$ex->getCode()] !== '') {
                 $otherResponse = new Response('', $ex->getCode());
                 $short_msg = Response::$statusTexts[$ex->getCode()];
             } else {
@@ -701,7 +705,7 @@ class LogBookSetupController extends AbstractController
         if ($setup === null) {
             return $this->render('lbook/404.html.twig', array(
                 'short_message' => sprintf('Setup with provided ID:[%s] not found', $possibleId),
-                'message' =>  $ex->getMessage(),
+                'message' => $ex->getMessage(),
                 'ex' => $ex,
             ), $response);
         }
@@ -736,14 +740,13 @@ class LogBookSetupController extends AbstractController
             //$moderators = $obj->getModerators();
             $deleteForm = $this->createDeleteForm($obj);
             //if (in_array($user, $moderators)) {
-    //        if ($moderators->contains($user)) {
-    //            $deleteForm = $this->createDeleteForm($obj)->createView();
-    //        } else {
-    //            $deleteForm = null;
-    //        }
+            //        if ($moderators->contains($user)) {
+            //            $deleteForm = $this->createDeleteForm($obj)->createView();
+            //        } else {
+            //            $deleteForm = null;
+            //        }
 
-            $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
-             //   'user' => $user,
+            $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(//   'user' => $user,
             ));
             $editForm->handleRequest($request);
 
@@ -762,6 +765,32 @@ class LogBookSetupController extends AbstractController
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $obj);
         }
+    }
+
+    /**
+     *
+     * @Route("/subscribe/{id}", name="setup_subscribe", methods={"GET"})
+     * @param LogBookSetup|null $setup
+     * @return Response
+     */
+    public function subscribe(LogBookSetup $setup = null): Response
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $setup->addSubscriber($user);
+        return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
+    }
+
+    /**
+     *
+     * @Route("/unsubscribe/{id}", name="setup_unsubscribe", methods={"GET"})
+     * @param LogBookSetup|null $setup
+     * @return Response
+     */
+    public function unsubscribe(LogBookSetup $setup = null): Response
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $setup->removeSubscriber($user);
+        return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
     /**

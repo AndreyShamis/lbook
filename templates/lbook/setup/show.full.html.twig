@@ -77,7 +77,7 @@
             </td>
         </tr>
 
-        {% set already_printed = ['moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN', 'retentionPolicy', 'favoritedByUsers', 'extDefectsJql', 'autoCycleReport', 'cyclesCount'] %}
+        {% set already_printed = ['subscribers', 'moderators', 'id', 'name', 'cycles', 'nameShown', 'createdAt', 'updatedAt', 'owner', 'disabled', 'os', 'isPrivate', 'checkUpTime', 'MAX_NAME_LEN', 'MIN_NAME_LEN', 'retentionPolicy', 'favoritedByUsers', 'extDefectsJql', 'autoCycleReport', 'cyclesCount'] %}
         {% for key, value in setup|cast_to_array %}
             {% if key not in already_printed%}
                 <tr>

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LogBookSuiteInfoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,6 +41,16 @@ class LogBookSuiteInfo
 
 
     public static $MAX_NAME_LEN = 250;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=LogBookUser::class)
+     */
+    private $subscribers;
+
+    public function __construct()
+    {
+        $this->subscribers = new ArrayCollection();
+    }
 
     public static function validateName($newName): string
     {
@@ -97,6 +109,32 @@ class LogBookSuiteInfo
     public function setAssignee(?array $assignee): self
     {
         $this->assignee = $assignee;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LogBookUser[]
+     */
+    public function getSubscribers(): Collection
+    {
+        return $this->subscribers;
+    }
+
+    public function addSubscriber(LogBookUser $subscriber): self
+    {
+        if (!$this->subscribers->contains($subscriber)) {
+            $this->subscribers[] = $subscriber;
+        }
+
+        return $this;
+    }
+
+    public function removeSubscriber(LogBookUser $subscriber): self
+    {
+        if ($this->subscribers->contains($subscriber)) {
+            $this->subscribers->removeElement($subscriber);
+        }
 
         return $this;
     }

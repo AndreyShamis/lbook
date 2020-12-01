@@ -18,6 +18,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookMessageTypeRepository;
 use App\Repository\LogBookSetupRepository;
+use App\Repository\LogBookSuiteInfoRepository;
 use App\Repository\LogBookTargetRepository;
 use App\Repository\LogBookTestFailDescRepository;
 use App\Repository\LogBookTestInfoRepository;
@@ -88,6 +89,8 @@ class LogBookUploaderController extends AbstractController
     protected $testInfo;
     /** @var LogBookTestFailDescRepository $testFailDescRepo */
     protected $testFailDescRepo;
+    /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
+    protected $suiteInfoRepo;
 
     private $blackListLevels = array();
 
@@ -128,6 +131,7 @@ class LogBookUploaderController extends AbstractController
         $this->testTypeRepo = $this->em->getRepository('App:LogBookTestType');
         $this->testInfo = $this->em->getRepository('App:LogBookTestInfo');
         $this->testFailDescRepo = $this->em->getRepository('App:LogBookTestFailDesc');
+        $this->suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
     }
 
     /**
@@ -376,6 +380,16 @@ class LogBookUploaderController extends AbstractController
                     }
 
                     $suiteHost->setLastSuite($suiteExecution);
+
+                    try {
+                        $newSuiteInfo = $this->suiteInfoRepo->findOneOrCreate([
+                            'name' => $suiteExecution->getName(),
+                            'uuid' => $suiteExecution->getUuid(),
+                        ]);
+                    } catch (\Throwable $ex) {
+                        $fin_res['DEBUG'][] = $ex->getMessage();
+                    }
+
                     $tarLab = '';
                     try {
                         $tarLab = $suiteExecution->getPlatform() . '::' . $suiteExecution->getChip();
@@ -385,6 +399,7 @@ class LogBookUploaderController extends AbstractController
                     $suiteHost->setTargetLabel($tarLab);
                     $suiteHost->addTargetLabel($suiteExecution->getChip());
                     $suiteHost->addTargetLabel($suiteExecution->getPlatform());
+
                     $this->em->persist($suiteHost);
                     $this->em->flush();
                 }

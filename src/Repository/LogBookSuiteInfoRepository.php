@@ -35,7 +35,7 @@ class LogBookSuiteInfoRepository extends ServiceEntityRepository
 //            $entity = $this->findOneBy($criteria);
 //        }
         $criteria['name'] = LogBookSuiteInfo::validateName($criteria['name']);
-        $entity = $this->findOneBy([$criteria['name'], $criteria['uuid']]);
+        $entity = $this->findOneBy(['name' => $criteria['name'], 'uuid' => $criteria['uuid']]);
         if (null === $entity) {
             $entity = new LogBookSuiteInfo();
             $entity->setName($criteria['name']);

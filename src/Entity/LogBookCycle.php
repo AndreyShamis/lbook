@@ -104,7 +104,6 @@ class LogBookCycle
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
-     * //@Assert\DateTime()
      */
     protected $createdAt;
 
@@ -112,7 +111,6 @@ class LogBookCycle
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
-     * //@Assert\DateTime()
      */
     protected $updatedAt;
 
@@ -293,12 +291,30 @@ class LogBookCycle
      */
     private $logBookCycleReports;
 
+    /**
+     * 0 - new/unknown
+     * 1 - running
+     * 2 - running/ suite_started
+     * 3 - running/ suite_finished
+     * 10 - pre_finish
+     * 11 - finishing
+     * 12 - closed
+     */
+    /**
+     * @ORM\Column(type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $status = 0;
 
+
+
+    //-----------------------------------------------------------
     protected $calculateStatistic = true;
 
     protected $rate = 0;
 
-
+    /**
+     * @param float $r
+     */
     public function setRate(float $r) {
         $this->rate = round($r, 2);
     }
@@ -1304,6 +1320,18 @@ class LogBookCycle
             $this->logBookCycleReports->removeElement($logBookCycleReport);
             $logBookCycleReport->removeCycle($this);
         }
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

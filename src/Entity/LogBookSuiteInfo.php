@@ -6,6 +6,7 @@ use App\Repository\LogBookSuiteInfoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookSuiteInfoRepository::class)
@@ -124,7 +125,7 @@ class LogBookSuiteInfo
         return $this->subscribers;
     }
 
-    public function addSubscriber(LogBookUser $subscriber): self
+    public function addSubscriber(UserInterface $subscriber): self
     {
         if (!$this->subscribers->contains($subscriber)) {
             $this->subscribers[] = $subscriber;
@@ -133,7 +134,7 @@ class LogBookSuiteInfo
         return $this;
     }
 
-    public function removeSubscriber(LogBookUser $subscriber): self
+    public function removeSubscriber(UserInterface $subscriber): self
     {
         if ($this->subscribers->contains($subscriber)) {
             $this->subscribers->removeElement($subscriber);

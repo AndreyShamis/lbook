@@ -444,6 +444,11 @@ class LogBookUploaderController extends AbstractController
                 'name' => $suiteExecution->getName(),
                 'uuid' => $suiteExecution->getUuid(),
             ]);
+            $newSuiteInfo->setTestsCount($suiteExecution->getTestsCountEnabled());
+            if (array_key_exists('suite_dict', $data) && array_key_exists('assignees', $data['suite_dict'])) {
+                $newSuiteInfo->setAssignee($data['suite_dict']['assignees']);
+            }
+            $this->em->flush();
         } catch (\Throwable $ex) {
             $fin_res['DEBUG'][] = $ex->getMessage();
             $logger->critical($ex->getMessage());

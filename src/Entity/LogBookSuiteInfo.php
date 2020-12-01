@@ -91,6 +91,9 @@ class LogBookSuiteInfo
 
     public function getTestsCount(): ?int
     {
+        if ($this->testsCount === null) {
+            return 0;
+        }
         return $this->testsCount;
     }
 

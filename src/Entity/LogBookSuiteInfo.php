@@ -48,9 +48,68 @@ class LogBookSuiteInfo
      */
     private $subscribers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=SuiteExecution::class, mappedBy="suiteInfo")
+     */
+    private $suiteExecutions;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $testingLevel;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $setupConfig;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $stop_on_fail;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $stop_on_error;
+
+    /**
+     * @ORM\Column(type="bigint", options={"unsigned"=true}, nullable=true)
+     */
+    private $suite_timeout;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $hours_to_run;
+
+    /**
+     * @ORM\Column(type="bigint", options={"unsigned"=true}, nullable=true)
+     */
+    private $test_timeout;
+
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $labels = [];
+
+    /**
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    private $supported_farms = [];
+
     public function __construct()
     {
         $this->subscribers = new ArrayCollection();
+        $this->suiteExecutions = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString() : string
+    {
+        return $this->getName();
     }
 
     public static function validateName($newName): string
@@ -139,6 +198,145 @@ class LogBookSuiteInfo
         if ($this->subscribers->contains($subscriber)) {
             $this->subscribers->removeElement($subscriber);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|SuiteExecution[]
+     */
+    public function getSuiteExecutions(): Collection
+    {
+        return $this->suiteExecutions;
+    }
+
+    public function addSuiteExecution(SuiteExecution $suiteExecution): self
+    {
+        if (!$this->suiteExecutions->contains($suiteExecution)) {
+            $this->suiteExecutions[] = $suiteExecution;
+            $suiteExecution->setSuiteInfo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSuiteExecution(SuiteExecution $suiteExecution): self
+    {
+        if ($this->suiteExecutions->contains($suiteExecution)) {
+            $this->suiteExecutions->removeElement($suiteExecution);
+            // set the owning side to null (unless already changed)
+            if ($suiteExecution->getSuiteInfo() === $this) {
+                $suiteExecution->setSuiteInfo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTestingLevel(): ?string
+    {
+        return $this->testingLevel;
+    }
+
+    public function setTestingLevel(?string $testingLevel): self
+    {
+        $this->testingLevel = $testingLevel;
+
+        return $this;
+    }
+
+    public function getSetupConfig(): ?string
+    {
+        return $this->setupConfig;
+    }
+
+    public function setSetupConfig(?string $setupConfig): self
+    {
+        $this->setupConfig = $setupConfig;
+
+        return $this;
+    }
+
+    public function getStopOnFail(): ?bool
+    {
+        return $this->stop_on_fail;
+    }
+
+    public function setStopOnFail(?bool $stop_on_fail): self
+    {
+        $this->stop_on_fail = $stop_on_fail;
+
+        return $this;
+    }
+
+    public function getStopOnError(): ?bool
+    {
+        return $this->stop_on_error;
+    }
+
+    public function setStopOnError(?bool $stop_on_error): self
+    {
+        $this->stop_on_error = $stop_on_error;
+
+        return $this;
+    }
+
+    public function getSuiteTimeout(): ?int
+    {
+        return $this->suite_timeout;
+    }
+
+    public function setSuiteTimeout(?int $suite_timeout): self
+    {
+        $this->suite_timeout = $suite_timeout;
+
+        return $this;
+    }
+
+    public function getHoursToRun(): ?float
+    {
+        return $this->hours_to_run;
+    }
+
+    public function setHoursToRun(?float $hours_to_run): self
+    {
+        $this->hours_to_run = $hours_to_run;
+
+        return $this;
+    }
+
+    public function getTestTimeout(): ?int
+    {
+        return $this->test_timeout;
+    }
+
+    public function setTestTimeout(?int $test_timeout): self
+    {
+        $this->test_timeout = $test_timeout;
+
+        return $this;
+    }
+
+    public function getLabels(): ?array
+    {
+        return $this->labels;
+    }
+
+    public function setLabels(?array $labels): self
+    {
+        $this->labels = $labels;
+
+        return $this;
+    }
+
+    public function getSupportedFarms(): ?array
+    {
+        return $this->supported_farms;
+    }
+
+    public function setSupportedFarms(?array $supported_farms): self
+    {
+        $this->supported_farms = $supported_farms;
 
         return $this;
     }

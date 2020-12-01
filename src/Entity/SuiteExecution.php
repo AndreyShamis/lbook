@@ -262,6 +262,11 @@ class SuiteExecution
 
     protected $rate = 0;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=LogBookSuiteInfo::class, inversedBy="suiteExecutions")
+     */
+    private $suiteInfo;
+
     public function setRate(float $r) {
         $this->rate = round($r, 2);
     }
@@ -1119,6 +1124,18 @@ class SuiteExecution
     public function setBranchName(?string $branchName): void
     {
         $this->branchName = $branchName;
+    }
+
+    public function getSuiteInfo(): ?LogBookSuiteInfo
+    {
+        return $this->suiteInfo;
+    }
+
+    public function setSuiteInfo(?LogBookSuiteInfo $suiteInfo): self
+    {
+        $this->suiteInfo = $suiteInfo;
+
+        return $this;
     }
 
 

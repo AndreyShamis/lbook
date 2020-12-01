@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\LogBookSuiteInfo;
 use App\Entity\SuiteExecution;
 use App\Entity\SuiteExecutionSearch;
 use App\Form\SuiteExecutionSearchType;
 use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookSuiteInfoRepository;
 use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\DBAL\Types\Type;
@@ -408,10 +410,14 @@ class LogBookSuiteExecutionController extends AbstractController
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = 1;
+        $this->em = $this->getDoctrine()->getManager();
+        /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
+        $suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
         //$suite->calculateStatistic();
         return $this->render('lbook/suite/show.html.twig',
             [
                 'suite' => $suite,
+                'suiteInfo' => $suiteInfoRepo->findOneOrCreate(['name' => $suite->getName(), 'uuid' => $suite->getUuid()]),
                 'size'      => $totalPosts,
                 'maxPages'  => $maxPages,
                 'thisPage'  => $thisPage,
@@ -457,5 +463,45 @@ class LogBookSuiteExecutionController extends AbstractController
             [
                 'suite' => $suite
             ]);
+    }
+
+
+    /**
+     *
+     * @Route("/subscribe/{suite}", name="suite_subscribe", methods={"GET"})
+     * @param Request $request
+     * @param LogBookSuiteInfo|null $suite
+     * @return Response
+     */
+    public function subscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $suite->addSubscriber($user);
+        $this->getDoctrine()->getManager()->flush();
+
+        $referer = $request->headers->get('referer');
+        if ($referer === null) {
+            return $this->redirectToRoute('index');
+        }
+        return $this->redirect($referer);
+    }
+
+    /**
+     *
+     * @Route("/unsubscribe/{suite}", name="suite_unsubscribe", methods={"GET"})
+     * @param Request $request
+     * @param LogBookSuiteInfo|null $suite
+     * @return Response
+     */
+    public function unsubscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $suite->removeSubscriber($user);
+        $this->getDoctrine()->getManager()->flush();
+        $referer = $request->headers->get('referer');
+        if ($referer === null) {
+            return $this->redirectToRoute('index');
+        }
+        return $this->redirect($referer);
     }
 }

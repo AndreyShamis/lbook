@@ -1,7 +1,40 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
-    <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
+
+    <div class="row">
+        <div class="col-xs-9">
+            <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
+        </div>
+        <div class="col-xs-3">
+            <span style="float: right;">
+                {% if setup.subscribers.contains(app.user) %}
+                                <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
+                    <i class="ace-icon fa fa-flag bigger-110 blue"></i>
+                    Unsubscribe
+                </button>
+                {% else %}
+                <button class="btn btn-white btn-warning btn-bold" id="subscribe">
+                    <i class="ace-icon fa fa-flag-o bigger-110 orange"></i>
+                    Subscribe
+                </button>
+                {% endif %}
+                {% if setup.favoritedByUsers.contains(app.user) %}
+                    <button class="btn btn-white btn-info btn-bold" id="unfavorite">
+                    <i class="ace-icon fa fa-bookmark bigger-110 blue"></i>
+                    Unfavorite
+                </button>
+                {% else %}
+                    <button class="btn btn-white btn-warning btn-bold" id="favorite">
+                    <i class="ace-icon fa fa-bookmark-o bigger-110 orange"></i>
+                    Favorite
+                </button>
+                {% endif %}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+        </div>
+    </div>
+
     {% apply spaceless %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
@@ -253,6 +286,20 @@
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
+
+
+            $( "#unsubscribe" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_unsubscribe', { 'id': setup.id }) }}";
+            });
+            $( "#subscribe" ).bind( "click", function() {
+                window.location.href = "{{ path('setup_subscribe', { 'id': setup.id }) }}";
+            });
+            $( "#unfavorite" ).bind( "click", function() {
+                window.location.href = "{{ path('add_remove_setup_to_favorite', { 'setup': setup.id }) }}";
+            });
+            $( "#favorite" ).bind( "click", function() {
+                window.location.href = "{{ path('add_remove_setup_to_favorite', { 'setup': setup.id }) }}";
+            });
         });
     </script>
     {% endapply %}

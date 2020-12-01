@@ -777,6 +777,7 @@ class LogBookSetupController extends AbstractController
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->addSubscriber($user);
+        $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
@@ -790,6 +791,7 @@ class LogBookSetupController extends AbstractController
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->removeSubscriber($user);
+        $this->getDoctrine()->getManager()->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 

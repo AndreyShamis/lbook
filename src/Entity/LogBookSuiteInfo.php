@@ -32,7 +32,7 @@ class LogBookSuiteInfo
     /**
      * @ORM\Column(type="smallint", options={"unsigned"=true})
      */
-    private $testsCount;
+    private $testsCount = 0;
 
     /**
      * @ORM\Column(type="simple_array", nullable=true)

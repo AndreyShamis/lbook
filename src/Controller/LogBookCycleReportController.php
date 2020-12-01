@@ -274,11 +274,10 @@ class LogBookCycleReportController extends AbstractController
      */
     public function auto_create(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
     {
-        $time_limiter1 = new \DateTime('-2 hours');
+        $time_limiter1 = new \DateTime('-90 minutes');
         $time_limiter2 = new \DateTime('-40 hours');
         $qb = $cycleRepo->createQueryBuilder('c')
-            ->where('c.tokenExpiration  < CURRENT_TIMESTAMP()')
-            ->andWhere('c.timeEnd < :time_limiter1')
+            ->where('c.timeEnd <= :time_limiter1')
             ->andWhere('c.timeEnd > :time_limiter2')
             ->innerJoin('c.setup', 's')->andWhere('s.autoCycleReport = 1')
             ->setParameter('time_limiter1', $time_limiter1)
@@ -295,7 +294,7 @@ class LogBookCycleReportController extends AbstractController
                 $l = $cycle->getTestingLevels();
                 if (count($l) == 1 && in_array($l[0], [ 'nightly', 'weekly'])) {
 
-                    if ($i < 3) {
+                    if ($i < 5) {
                         $i += 1;
                         $report = new LogBookCycleReport();
                         try {

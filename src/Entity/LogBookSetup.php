@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -483,7 +484,7 @@ class LogBookSetup
         return $this->subscribers;
     }
 
-    public function addSubscriber(LogBookUser $subscriber): self
+    public function addSubscriber(UserInterface $subscriber): self
     {
         if (!$this->subscribers->contains($subscriber)) {
             $this->subscribers[] = $subscriber;
@@ -492,7 +493,7 @@ class LogBookSetup
         return $this;
     }
 
-    public function removeSubscriber(LogBookUser $subscriber): self
+    public function removeSubscriber(UserInterface $subscriber): self
     {
         if ($this->subscribers->contains($subscriber)) {
             $this->subscribers->removeElement($subscriber);

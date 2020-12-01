@@ -464,7 +464,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
     /**
      *
-     * @Route("/unsubscribe/{suite}", name="suite_unsubscribe", methods={"GET"})
+     * @Route("/unsubscribe/{suite}", name="suite_unsubscribe", methods={"GET", "POST"})
      * @param Request $request
      * @param LogBookSuiteInfo|null $suite
      * @return Response

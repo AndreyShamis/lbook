@@ -1,0 +1,14 @@
+Name: {{ suite.name }}
+Summary: {{ suite.summary }}
+UUID: {{ suite.uuid }}
+Testing Level: {{ suite.testingLevel }}
+Platform: {{ suite.platform }}
+Chip: {{ suite.chip }}
+Components: {{ suite.components|join(', ') }}
+BuildFlavor: {{ suite.buildType }}
+PACKAGE_MODE: {{ suite.packageMode }}
+PRODUCT_VERSION: {{ suite.productVersion }}
+CYCLE: {{ suite.cycle.name }}
+Setup: {{ suite.cycle.setup.name }}
+
+

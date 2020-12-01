@@ -506,8 +506,17 @@ class LogBookSuiteExecutionController extends AbstractController
             $subscribers = $newSuiteInfo->getSubscribers();
             foreach ($subscribers as $subscriber) {
                 $newEmail = new LogBookEmail();
-                $newEmail->setSubject($newSuiteInfo->getName() . ' finished PR:' . $suite->getPassRate() . '%.');
-                $newEmail->setBody('Summary: ' . $suite->getSummary() . ' .');
+                $newEmail->setSubject('['. $suite->getTestingLevel() .']['. str_replace('_mode', '', strtolower($suite->getPackageMode())) .']['. $newSuiteInfo->getName() . '] finished. Pass Rate:' . $suite->getPassRate() . '%');
+                try {
+                    $body = $this->get('twig')->render('lbook/email/suite_finished.html.twig', [
+                        'suite' => $suite,
+                        'suiteInfo' => $newSuiteInfo
+                    ]);
+                    $newEmail->setBody($body);
+                } catch (\Throwable $ex) {
+                    $logger->critical($ex->getMessage());
+                }
+
                 $newEmail->setRecipient($subscriber);
                 $em->persist($newEmail);
             }

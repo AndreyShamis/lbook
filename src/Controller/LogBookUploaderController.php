@@ -381,14 +381,7 @@ class LogBookUploaderController extends AbstractController
 
                     $suiteHost->setLastSuite($suiteExecution);
 
-                    try {
-                        $newSuiteInfo = $this->suiteInfoRepo->findOneOrCreate([
-                            'name' => $suiteExecution->getName(),
-                            'uuid' => $suiteExecution->getUuid(),
-                        ]);
-                    } catch (\Throwable $ex) {
-                        $fin_res['DEBUG'][] = $ex->getMessage();
-                    }
+
 
                     $tarLab = '';
                     try {
@@ -446,7 +439,16 @@ class LogBookUploaderController extends AbstractController
         } else {
             $fin_res['ERROR'] = 'Suite execution not created';
         }
+        try {
+            $newSuiteInfo = $this->suiteInfoRepo->findOneOrCreate([
+                'name' => $suiteExecution->getName(),
+                'uuid' => $suiteExecution->getUuid(),
+            ]);
+        } catch (\Throwable $ex) {
+            $fin_res['DEBUG'][] = $ex->getMessage();
+            $logger->critical($ex->getMessage());
 
+        }
         $response =  new JsonResponse($fin_res);
         $response->setEncodingOptions(JSON_PRETTY_PRINT);
         return $response;

@@ -70,7 +70,7 @@ class LogBookApiController extends AbstractController
                 $message->setStatus(2);
                 $EmailMessage = new \Swift_Message($message->getSubject());
                 $EmailMessage->setFrom('noreplay@intel.com', 'LogBook')
-                    ->setTo(getenv('ADMIN_EMAIL'))
+                    ->setTo($message->getRecipient()->getEmail())
                     ->setBody($message->getBody(), 'text/html')
 
                 ;

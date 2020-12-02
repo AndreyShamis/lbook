@@ -49,7 +49,7 @@ class LogBookApiController extends AbstractController
 
 
         try {
-            $messages = $emailRepo->findBy(['status' => 0], null, 2);
+            $messages = $emailRepo->findBy(['status' => 0], null, 20);
             foreach ($messages as $message) {
                 $message->setStatus(1);
 
@@ -61,20 +61,8 @@ class LogBookApiController extends AbstractController
                 $EmailMessage = new \Swift_Message($message->getSubject());
                 $EmailMessage->setFrom('noreplay@intel.com')
                     ->setTo(getenv('ADMIN_EMAIL'))
-                    ->setBody($message->getRecipient()->getEmail() . ' ' .
-                        $message->getBody(),
-                        'text/html'
-                    )
-                    /*
-                     * If you also want to include a plaintext version of the message
-                    ->addPart(
-                        $this->renderView(
-                            'emails/registration.txt.twig',
-                            array('name' => $name)
-                        ),
-                        'text/plain'
-                    )
-                    */
+                    ->setBody($message->getBody(), 'text/html')
+
                 ;
                 $ret = $mailer->send($EmailMessage);
                 $fin_res[] = [$message->getId(), $message->getSubject(), $ret];

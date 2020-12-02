@@ -1,5 +1,6 @@
 {% set url = app.request.scheme ~'://' ~  app.request.httpHost %}
 <style>
+    .red{color:#dd5a43!important}.red2{color:#e08374!important}.light-red{color:#f77!important}.blue{color:#478fca!important}.light-blue{color:#93cbf9!important}
     .well{border-radius:0}  .well h1,.well h2,.well h3,.well h4,.well h5,.well h6{margin-top:0}  .well h1,.well h2,.well h3{line-height:36px}  .lighter{font-weight:lighter}  h4.smaller{font-size:17px}  .green{color:#69aa46!important}.light-green{color:#b0d877!important}.orange{color:#ff892a!important}.orange2{color:#feb902!important}.light-orange{color:#fcac6f!important}.purple{color:#a069c3!important}.pink{color:#c6699f!important}.pink2{color:#d6487e!important}.brown{color:brown!important}.grey{color:#777!important}.light-grey{color:#bbb!important}
     hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}  .sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}
@@ -15,7 +16,9 @@
     a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}
     .text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}
     .text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}
-
+    .yellow{
+        color: #cccc00;
+    }
     .font-bold {
         font-weight: bold;
     }
@@ -24,18 +27,18 @@
     <div class="well">
         <h4 class="green smaller lighter">{{ suite.name }}</h4>
         {% if suite.passRate == 100 %}
-            Suite finished successfully
+            <h1 class="green">Suite finished successfully</h1>
         {% else %}
             Suite failed.
             Pass Rate <span class="{{ passRateToColor(suite.passRate) }}">{{ suite.passRate }}%</span>
         {% endif %}
-        <table><tr>
+        <table style="width: 100%"><tr>
                 <td>Total<span style="font-size: 8px;">Enabled/Executed</span></td>
-                <td>Pass</td>
-                <td>Fail</td>
-                <td>Error</td>
-                <td>Other</td>
-                <td>Disabled</td>
+                <td class="green"><strong>Pass</strong></td>
+                <td class="red"><strong>Fail</strong></td>
+                <td class="yellow"><strong>Error</strong></td>
+                <td class="grey"><strong>Other</strong></td>
+                <td class="light-grey"><strong>Disabled</strong></td>
             </tr>
             <tr>
                 <td>{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>

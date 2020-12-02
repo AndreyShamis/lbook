@@ -506,10 +506,11 @@ class LogBookSuiteExecutionController extends AbstractController
             $subscribers = $newSuiteInfo->getSubscribers();
             foreach ($subscribers as $subscriber) {
                 $newEmail = new LogBookEmail();
-                if ($suite->getPassRate() === 100) {
-                    $newEmail->setSubject('['. $newSuiteInfo->getName() . '] finished');
-                } else{
+                if ($suite->getPassRate() < 100) {
                     $newEmail->setSubject('['. $newSuiteInfo->getName() . '] failed. PR:' . $suite->getPassRate() . '%');
+                } else{
+                    $newEmail->setSubject('['. $newSuiteInfo->getName() . '] finished');
+
                 }
                 try {
                     $body = $this->get('twig')->render('lbook/email/suite_finished.html.twig', [

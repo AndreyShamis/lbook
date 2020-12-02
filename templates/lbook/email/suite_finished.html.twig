@@ -34,7 +34,7 @@
         {% endif %}
         <table style="width: 70%;text-align: center;"><tr>
                 <th></th>
-                <th><strong style="font-size: 24px;">Total</strong> <span style="font-size: 9px;">Enabled/Executed</span></th>
+                <th><strong style="font-size: 24px;">Total &nbsp;</strong> <span style="font-size: 9px;">Enabled/Executed</span></th>
                 <th><strong style="font-size: 24px;">Pass</strong></th>
                 <th><strong style="font-size: 24px;">Fail</strong></th>
                 <th><strong style="font-size: 24px;">Error</strong></th>
@@ -43,7 +43,7 @@
             </tr>
             <tr>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                <td>{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
+                <td style="text-align: center;font-size: 24px;">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span style="color: #00CC00;font-size: 24px;">{{ suite.passCount }}</span></td>
                 <td><span style="color: #d90e0e;font-size: 24px;">{{ suite.failCount }}</span></td>
                 <td><span style="color: #ffbc00;font-size: 24px;">{{ suite.errorCount }}</span></td>
@@ -59,20 +59,18 @@
 
 <table style="width: 100%">
     <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
-    <tr><th>Suite Name</th><td>{{ suite.name }}</td></tr>
+    <tr><th>Suite Name</th><td style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.name }}</td></tr>
     <tr><th>Product Version</th><td><strong style="font-size: 22px;">{{ suite.productVersion }}</strong></td></tr>
-    <tr><th>Testing Level</th><td>{{ suite.testingLevel | upper }}</td></tr>
-    <tr><th>Platform</th><td><strong style="color: {{ stringToColor(suite.platform) }};">{{ suite.platform }}</strong></td></tr>
-    <tr><th>Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};">{{ suite.chip }}</strong></td></tr>
+    <tr><th>Testing Level</th><td style="font-size: 22px;">{{ suite.testingLevel | upper }}</td></tr>
+    <tr><th>Platform</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.platform }}</strong></td></tr>
+    <tr><th>Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.chip }}</strong></td></tr>
     <tr><th>Components</th><td>{{ suite.components|join(', ')}}</td></tr>
     <tr><th>BuildFlavor</th><td>{{ suite.buildType }}</td></tr>
+    <tr><th>Branch</th><td style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.branchName }}</td></tr>
     <tr><th>Package mode</th><td>{{ suite.packageMode }}</td></tr>
     <tr><th>Job Name</th><td>{{ suite.jobName }}  - <a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
     <tr><th>Time Start</th><td>{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
     <tr><th>Time End</th><td>{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
-    <tr><th></th><td></td></tr>
-    <tr><th>Summary</th><td>{{ suite.summary }}</td></tr>
-    <tr><th>UUID</th><td>{{ suite.uuid }}</td></tr>
     <tr><th></th><td></td></tr>
     <tr><th style="vertical-align: top;">Links</th><td>
             <table style="width: 100%">
@@ -80,10 +78,14 @@
                 <tr><td>Cycle</td><td><a href="{{ url }}{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a></td></tr>
                 <tr><td>Setup</td><td><a href="{{ url }}{{ path('setup_show_first', { 'id': suite.cycle.setup.id }) }}">{{ suite.cycle.setup.name }}</a></td></tr>
                 {% if suite.jiraKey | length > 1 %}
-                <tr><td>JIRA url</td><td><a href="{{ jira_test_set_url }}">{{ suite.jiraKey }}</a></td></tr>
+                    <tr><td>JIRA url</td><td><a href="{{ jira_test_set_url }}">{{ suite.jiraKey }}</a></td></tr>
                 {% endif %}
             </table>
         </td></tr>
+    <tr><th></th><td></td></tr>
+    <tr><th>Summary</th><td>{{ suite.summary }}</td></tr>
+    <tr><th>UUID</th><td>{{ suite.uuid }}</td></tr>
+
 </table>
 <br/><br/><br/><br/>
     <table style="width: 100%">

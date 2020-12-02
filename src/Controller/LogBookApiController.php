@@ -47,9 +47,19 @@ class LogBookApiController extends AbstractController
     {
         $fin_res = [];
 
+        try {
+            $messages = $emailRepo->findBy(['status' => 4]);
+            foreach ($messages as $message) {
+                $message->setStatus(10);
+                $this->em->remove($message);
+            }
+            $this->em->flush();
+        } catch (\Throwable $ex) {
+                $logger->critical('BOT:' . $ex->getMessage());
+        }
 
         try {
-            $messages = $emailRepo->findBy(['status' => 0], null, 20);
+            $messages = $emailRepo->findBy(['status' => 0], null, 30);
             foreach ($messages as $message) {
                 $message->setStatus(1);
 
@@ -59,7 +69,7 @@ class LogBookApiController extends AbstractController
                 $this->em->refresh($message);
                 $message->setStatus(2);
                 $EmailMessage = new \Swift_Message($message->getSubject());
-                $EmailMessage->setFrom('noreplay@intel.com')
+                $EmailMessage->setFrom('noreplay@intel.com', 'LogBook')
                     ->setTo(getenv('ADMIN_EMAIL'))
                     ->setBody($message->getBody(), 'text/html')
 

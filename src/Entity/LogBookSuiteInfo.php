@@ -106,7 +106,7 @@ class LogBookSuiteInfo
     /**
      * @ORM\Column(type="bigint", options={"unsigned"=true, "default"="0"})
      */
-    private $creationCount;
+    private $creationCount = 0;
 
     public function __construct()
     {

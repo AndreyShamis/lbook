@@ -25,19 +25,19 @@
 </style>
 {% apply spaceless %}
     <div class="well">
-        <h4 class="green smaller lighter">{{ suite.name }}</h4>
+        <h4 class="smaller lighter">{{ suite.name }}</h4>
         {% if suite.passRate == 100 %}
-            <h1 class="green">Suite finished successfully</h1>
+            <h1 class="green" style="color: #69aa46;">Suite finished successfully</h1>
         {% else %}
-            Suite failed.
+            <h1 class="green" style="color: red;">Suite failed !</h1>
             Pass Rate <span class="{{ passRateToColor(suite.passRate) }}">{{ suite.passRate }}%</span>
         {% endif %}
         <table style="width: 100%"><tr>
-                <td>Total<span style="font-size: 8px;">Enabled/Executed</span></td>
-                <td class="green"><strong>Pass</strong></td>
-                <td class="red"><strong>Fail</strong></td>
-                <td class="yellow"><strong>Error</strong></td>
-                <td class="grey"><strong>Other</strong></td>
+                <td>Total <span style="font-size: 9px;">Enabled/Executed</span></td>
+                <td><strong style="color: #00BE67;">Pass</strong></td>
+                <td><strong>Fail</strong></td>
+                <td><strong>Error</strong></td>
+                <td><strong>Other</strong></td>
                 <td class="light-grey"><strong>Disabled</strong></td>
             </tr>
             <tr>
@@ -46,7 +46,7 @@
                 <td><span class="{{  failRateToColor(suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</span></td>
                 <td><span class="{{  failRateToColor(suite.errorRate) }}" data-percent="{{ suite.errorCount }}">{{ suite.errorCount }}</span></td>
                 <td><span class="{{  failRateToColor(suite.otherRate) }}" data-percent="{{ suite.otherCount }}">{{ suite.otherCount }}</span></td>
-                <td><span>{{ suite.testsCountDisabled }}</span></td>
+                <td><span style="color: grey;">{{ suite.testsCountDisabled }}</span></td>
             </tr>
         </table>
     </div>
@@ -56,38 +56,34 @@
 {% endif %}
 
 <table style="width: 100%">
-    <tr><td style="width: 20%"></td><td style="width: 80%"></td></tr>
-    <tr><td>Name</td><td>{{ suite.name }}</td></tr>
-    <tr><td>Summary</td><td>{{ suite.summary }}</td></tr>
-    <tr><td>UUID</td><td>{{ suite.uuid }}</td></tr>
-    <tr><td>Testing Level</td><td>{{ suite.testingLevel }}</td></tr>
-    <tr><td>Platform</td><td>{{ suite.platform }}</td></tr>
-    <tr><td>Chip</td><td>{{ suite.chip }}</td></tr>
-    <tr><td>Components</td><td>{{ suite.components|join(', ')}}</td></tr>
-    <tr><td>BuildFlavor</td><td>{{ suite.buildType }}</td></tr>
-    <tr><td>Package mode</td><td>{{ suite.packageMode }}</td></tr>
-    <tr><td>PRODUCT_VERSION</td><td>{{ suite.productVersion }}</td></tr>
-    <tr><td>Job Name</td><td>{{ suite.jobName }}</td></tr>
-    <tr><td>Time Start</td><td>{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
-    <tr><td>Time End</td><td>{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
-    <tr><td>Jira Urk</td><td>{{ jira_test_set_url }}</td></tr>
-    <tr><td></td><td></td></tr>
-    <tr><td>Links</td><td>
+    <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
+    <tr><th>Name</th><td>{{ suite.name }}</td></tr>
+    <tr><th>Summary</th><td>{{ suite.summary }}</td></tr>
+    <tr><th>UUID</th><td>{{ suite.uuid }}</td></tr>
+    <tr><th>Testing Level</th><td>{{ suite.testingLevel | upper }}</td></tr>
+    <tr><th>Platform</th><td>{{ suite.platform }}</td></tr>
+    <tr><th>Chip</th><td>{{ suite.chip }}</td></tr>
+    <tr><th>Components</th><td>{{ suite.components|join(', ')}}</td></tr>
+    <tr><th>BuildFlavor</th><td>{{ suite.buildType }}</td></tr>
+    <tr><th>Package mode</th><td>{{ suite.packageMode }}</td></tr>
+    <tr><th>PRODUCT_VERSION</th><td>{{ suite.productVersion }}</td></tr>
+    <tr><th>Job Name</th><td>{{ suite.jobName }}  - <a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
+    <tr><th>Time Start</th><td>{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
+    <tr><th>Time End</th><td>{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
+    <tr><th></th><td></td></tr>
+    <tr><th style="vertical-align: top;">Links</th><td>
             <table style="width: 100%">
                 <tr><td>Logbook</td><td><a href="{{ url }}{{ path('suite_show', { 'id': suite.id }) }}">{{ suite.name }}</a></td></tr>
                 <tr><td>Cycle</td><td><a href="{{ url }}{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a></td></tr>
                 <tr><td>Setup</td><td><a href="{{ url }}{{ path('setup_show_first', { 'id': suite.cycle.setup.id }) }}">{{ suite.cycle.setup.name }}</a></td></tr>
-                <tr><td>CI URL</td><td><a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
+                {% if suite.jiraKey | length > 1 %}
                 <tr><td>JIRA url</td><td><a href="{{ jira_test_set_url }}">{{ suite.jiraKey }}</a></td></tr>
+                {% endif %}
             </table>
         </td></tr>
 </table>
-<br/>
-<br/>
+<br/><br/><br/><br/>
     <table style="width: 100%">
-        <tr><td style="width: 100%;text-align: center;"><a style="font-size: 28px;" href="{{ url }}{{ path('suite_unsubscribe', { 'suite': suite.id }) }}">Unsubscribe</a>
-            </td></tr>
-
-    </table>
-<br/>
+        <tr><td style="width: 100%;text-align: center;"><a style="font-size: 28px;" href="{{ url }}{{ path('suite_unsubscribe', { 'suite': suite.id }) }}">Unsubscribe</a></td></tr></table>
+    <br/><br/>
 {% endapply %}

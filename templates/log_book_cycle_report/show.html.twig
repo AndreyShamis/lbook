@@ -485,10 +485,10 @@
                 <td title="{{ suite.uuid }}"><a href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
 {#                <td><a title="{{ suite.uuid }}" href="{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.summary }}</a></td>#}
                 <td title="Tests count in suite {{ suite.testsCount }}, disabled {{ suite.testsCountDisabled }}">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
-                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</td>
-                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate  | round(0, 'floor') }}%</td>
-                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</td>
-                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate | round(0, 'ceil')}}%</td>
+                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</span></td>
+                <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate  | round(0, 'floor') }}%</span></td>
+                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</span></td>
+                <td><span class="{{ passRateToColor(100 - suite.failRate) }}" data-percent="{{ suite.failRate }}">{{ suite.failRate | round(0, 'ceil')}}%</span></td>
                 <td>{{ suite.testingLevel }}</td>
                 <td>{{ suite.platform }}</td>
                 <td>{{ suite.chip }}</td>

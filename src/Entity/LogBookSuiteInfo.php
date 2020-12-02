@@ -98,6 +98,16 @@ class LogBookSuiteInfo
      */
     private $supported_farms = [];
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $lastSeen;
+
+    /**
+     * @ORM\Column(type="bigint", options={"unsigned"=true, "default"="0"})
+     */
+    private $creationCount;
+
     public function __construct()
     {
         $this->subscribers = new ArrayCollection();
@@ -337,6 +347,37 @@ class LogBookSuiteInfo
     public function setSupportedFarms(?array $supported_farms): self
     {
         $this->supported_farms = $supported_farms;
+
+        return $this;
+    }
+
+    public function getLastSeen(): \DateTimeInterface
+    {
+        return $this->lastSeen;
+    }
+
+    public function setLastSeen(\DateTimeInterface $lastSeen): self
+    {
+        $this->lastSeen = $lastSeen;
+
+        return $this;
+    }
+
+    public function getCreationCount(): int
+    {
+        return $this->creationCount;
+    }
+
+    public function setCreationCount(int $creationCount): self
+    {
+        $this->creationCount = $creationCount;
+
+        return $this;
+    }
+
+    public function increaseCreation(): self
+    {
+        $this->creationCount += 1;
 
         return $this;
     }

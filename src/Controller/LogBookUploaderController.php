@@ -482,6 +482,7 @@ class LogBookUploaderController extends AbstractController
                 }
             }
             $newSuiteInfo->addSuiteExecution($suiteExecution);
+            $newSuiteInfo->increaseCreation();
             $this->em->flush();
         } catch (\Throwable $ex) {
             $fin_res['DEBUG'][] = $ex->getMessage();

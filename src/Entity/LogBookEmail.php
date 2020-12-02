@@ -33,6 +33,20 @@ class LogBookEmail
      */
     private $recipient;
 
+    /**
+     *  0 - new
+     *  1 - starting work on it for send
+     *  2 - sending
+     *  3 - failure
+     *  4 - finished
+     *  10 - starting work for delete
+     */
+    /**
+     * @ORM\Column(type="smallint", options={"unsigned"=true, "default"="0"})
+     */
+    private $status = 0;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,6 +84,18 @@ class LogBookEmail
     public function setRecipient(?LogBookUser $recipient): self
     {
         $this->recipient = $recipient;
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

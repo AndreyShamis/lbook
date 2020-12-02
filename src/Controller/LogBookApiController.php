@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookCycle;
 use App\Entity\SuiteExecution;
+use App\Repository\LogBookEmailRepository;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +35,69 @@ class LogBookApiController extends AbstractController
         $this->em = $this->getDoctrine()->getManager();
 
     }
+
+
+    /**
+     *
+     * @Route("/send_emails", name="send_emails", methods={"GET", "POST"})
+     * @param LoggerInterface $logger
+     * @return JsonResponse
+     */
+    public function send_emails(LogBookEmailRepository $emailRepo, \Swift_Mailer $mailer, LoggerInterface $logger): ?JsonResponse
+    {
+        $fin_res = [];
+
+
+        try {
+            $messages = $emailRepo->findBy(['status' => 0], null, 2);
+            foreach ($messages as $message) {
+                $message->setStatus(1);
+
+            }
+            $this->em->flush();
+            foreach ($messages as $message) {
+                $this->em->refresh($message);
+                $message->setStatus(2);
+                $EmailMessage = new \Swift_Message($message->getSubject());
+                $EmailMessage->setFrom('logbook@intel.com')
+                    ->setTo('andrey.shamis@intel.com')
+                    ->setBody($message->getRecipient()->getEmail() . ' ' .
+                        $message->getBody(),
+                        'text/html'
+                    )
+                    /*
+                     * If you also want to include a plaintext version of the message
+                    ->addPart(
+                        $this->renderView(
+                            'emails/registration.txt.twig',
+                            array('name' => $name)
+                        ),
+                        'text/plain'
+                    )
+                    */
+                ;
+                $ret = $mailer->send($EmailMessage);
+                $fin_res[] = [$message->getId(), $message->getSubject(), $ret];
+                if ($ret > 0) {
+                    $message->setStatus(4);
+                } else {
+                    $message->setStatus(3);
+                }
+                $this->em->flush();
+            }
+
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            $logger->critical('BOT SEND_EMAIL:' . $ex->getMessage());
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
 
     /**
      * @Route("/cpu_load", name="api_get_cpu_load_avg", methods={"GET", "POST"})

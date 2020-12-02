@@ -444,43 +444,47 @@ class LogBookUploaderController extends AbstractController
                 'name' => $suiteExecution->getName(),
                 'uuid' => $suiteExecution->getUuid(),
             ]);
-            $newSuiteInfo->setTestsCount($suiteExecution->getTestsCountEnabled());
-            if (array_key_exists('suite_dict', $data)) {
-                if (array_key_exists('assignees', $data['suite_dict'])) {
-                    $newSuiteInfo->setAssignee($data['suite_dict']['assignees']);
-                }
-                if (array_key_exists('labels', $data['suite_dict'])) {
-                    $newSuiteInfo->setLabels($data['suite_dict']['labels']);
-                }
-                if (array_key_exists('hours_to_run', $data['suite_dict'])) {
-                    $newSuiteInfo->setHoursToRun($data['suite_dict']['hours_to_run']);
-                }
-                if (array_key_exists('setup_config_path', $data['suite_dict'])) {
-                    $newSuiteInfo->setSetupConfig($data['suite_dict']['setup_config_path']);
-                }
-                if (array_key_exists('stop_on_error', $data['suite_dict'])) {
-                    $newSuiteInfo->setStopOnError($data['suite_dict']['stop_on_error']);
-                }
-                if (array_key_exists('stop_on_fail', $data['suite_dict'])) {
-                    $newSuiteInfo->setStopOnFail($data['suite_dict']['stop_on_fail']);
-                }
-                try {
-                    if (array_key_exists('supported_farms', $data['suite_dict'])) {
-                        $newSuiteInfo->setSupportedFarms($data['suite_dict']['supported_farms']);
+            $bName = $suiteExecution->getBranchName();
+            if ($bName === null || $bName === 'master' || $bName === '') {
+                $newSuiteInfo->setTestsCount($suiteExecution->getTestsCountEnabled());
+                if (array_key_exists('suite_dict', $data)) {
+                    if (array_key_exists('assignees', $data['suite_dict'])) {
+                        $newSuiteInfo->setAssignee($data['suite_dict']['assignees']);
                     }
-                } catch (\Throwable $ex) {
+                    if (array_key_exists('labels', $data['suite_dict'])) {
+                        $newSuiteInfo->setLabels($data['suite_dict']['labels']);
+                    }
+                    if (array_key_exists('hours_to_run', $data['suite_dict'])) {
+                        $newSuiteInfo->setHoursToRun($data['suite_dict']['hours_to_run']);
+                    }
+                    if (array_key_exists('setup_config_path', $data['suite_dict'])) {
+                        $newSuiteInfo->setSetupConfig($data['suite_dict']['setup_config_path']);
+                    }
+                    if (array_key_exists('stop_on_error', $data['suite_dict'])) {
+                        $newSuiteInfo->setStopOnError($data['suite_dict']['stop_on_error']);
+                    }
+                    if (array_key_exists('stop_on_fail', $data['suite_dict'])) {
+                        $newSuiteInfo->setStopOnFail($data['suite_dict']['stop_on_fail']);
+                    }
+                    try {
+                        if (array_key_exists('supported_farms', $data['suite_dict'])) {
+                            $newSuiteInfo->setSupportedFarms($data['suite_dict']['supported_farms']);
+                        }
+                    } catch (\Throwable $ex) {
 
-                }
-                if (array_key_exists('suite_timeout', $data['suite_dict'])) {
-                    $newSuiteInfo->setSuiteTimeout($data['suite_dict']['suite_timeout']);
-                }
-                if (array_key_exists('test_timeout', $data['suite_dict'])) {
-                    $newSuiteInfo->setTestTimeout($data['suite_dict']['test_timeout']);
-                }
-                if (array_key_exists('testing_level', $data['suite_dict'])) {
-                    $newSuiteInfo->setTestingLevel($data['suite_dict']['testing_level']);
+                    }
+                    if (array_key_exists('suite_timeout', $data['suite_dict'])) {
+                        $newSuiteInfo->setSuiteTimeout($data['suite_dict']['suite_timeout']);
+                    }
+                    if (array_key_exists('test_timeout', $data['suite_dict'])) {
+                        $newSuiteInfo->setTestTimeout($data['suite_dict']['test_timeout']);
+                    }
+                    if (array_key_exists('testing_level', $data['suite_dict'])) {
+                        $newSuiteInfo->setTestingLevel($data['suite_dict']['testing_level']);
+                    }
                 }
             }
+
             $newSuiteInfo->addSuiteExecution($suiteExecution);
             $newSuiteInfo->increaseCreation();
             $this->em->flush();

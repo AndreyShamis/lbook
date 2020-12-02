@@ -25,22 +25,24 @@
 </style>
 {% apply spaceless %}
     <div class="well">
-        <h4 class="smaller lighter">{{ suite.name }}</h4>
+        <h4 class="smaller lighter"></h4>
         {% if suite.passRate == 100 %}
-            <h1 class="green" style="color: #69aa46;">Suite finished successfully</h1>
+            <h1 style="color: #69aa46;">Suite finished successfully</h1>
         {% else %}
-            <h1 class="green" style="color: red;">Suite failed !</h1>
+            <h1 style="color: red;">Suite failed !</h1>
             Pass Rate <span class="{{ passRateToColor(suite.passRate) }}">{{ suite.passRate }}%</span>
         {% endif %}
-        <table style="width: 100%"><tr>
-                <td>Total <span style="font-size: 9px;">Enabled/Executed</span></td>
-                <td><strong style="color: #00BE67;">Pass</strong></td>
-                <td><strong>Fail</strong></td>
-                <td><strong>Error</strong></td>
-                <td><strong>Other</strong></td>
-                <td class="light-grey"><strong>Disabled</strong></td>
+        <table style="width: 70%"><tr>
+                <th></th>
+                <th><strong>Total</strong> <span style="font-size: 9px;">Enabled/Executed</span></th>
+                <th><strong>Pass</strong></th>
+                <th><strong>Fail</strong></th>
+                <th><strong>Error</strong></th>
+                <th><strong>Other</strong></th>
+                <th><strong>Disabled</strong></th>
             </tr>
             <tr>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td>{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
                 <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</span></td>
                 <td><span class="{{  failRateToColor(suite.failRate) }}" data-percent="{{ suite.failCount }}">{{ suite.failCount }}</span></td>
@@ -57,19 +59,20 @@
 
 <table style="width: 100%">
     <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
-    <tr><th>Name</th><td>{{ suite.name }}</td></tr>
-    <tr><th>Summary</th><td>{{ suite.summary }}</td></tr>
-    <tr><th>UUID</th><td>{{ suite.uuid }}</td></tr>
+    <tr><th>Suite Name</th><td>{{ suite.name }}</td></tr>
+    <tr><th>Product Version</th><td><strong>{{ suite.productVersion }}</strong></td></tr>
     <tr><th>Testing Level</th><td>{{ suite.testingLevel | upper }}</td></tr>
-    <tr><th>Platform</th><td>{{ suite.platform }}</td></tr>
-    <tr><th>Chip</th><td>{{ suite.chip }}</td></tr>
+    <tr><th>Platform</th><td><strong style="color: {{ stringToColor(suite.platform) }};">{{ suite.platform }}</strong></td></tr>
+    <tr><th>Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};">{{ suite.chip }}</strong></td></tr>
     <tr><th>Components</th><td>{{ suite.components|join(', ')}}</td></tr>
     <tr><th>BuildFlavor</th><td>{{ suite.buildType }}</td></tr>
     <tr><th>Package mode</th><td>{{ suite.packageMode }}</td></tr>
-    <tr><th>PRODUCT_VERSION</th><td>{{ suite.productVersion }}</td></tr>
     <tr><th>Job Name</th><td>{{ suite.jobName }}  - <a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
     <tr><th>Time Start</th><td>{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
     <tr><th>Time End</th><td>{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
+    <tr><th></th><td></td></tr>
+    <tr><th>Summary</th><td>{{ suite.summary }}</td></tr>
+    <tr><th>UUID</th><td>{{ suite.uuid }}</td></tr>
     <tr><th></th><td></td></tr>
     <tr><th style="vertical-align: top;">Links</th><td>
             <table style="width: 100%">

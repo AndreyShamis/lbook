@@ -445,7 +445,7 @@ class LogBookUploaderController extends AbstractController
                 'uuid' => $suiteExecution->getUuid(),
             ]);
             $bName = $suiteExecution->getBranchName();
-            if ($bName === null || $bName === 'master' || $bName === '') {
+            //if ($bName === null || $bName === 'master' || $bName === '') {
                 $newSuiteInfo->setTestsCount($suiteExecution->getTestsCountEnabled());
                 if (array_key_exists('suite_dict', $data)) {
                     if (array_key_exists('assignees', $data['suite_dict'])) {
@@ -486,7 +486,7 @@ class LogBookUploaderController extends AbstractController
                         $newSuiteInfo->setTestingLevel($data['suite_dict']['testing_level']);
                     }
                 }
-            }
+            //}
             $newSuiteInfo->setLastSeen(new DateTime());
             $newSuiteInfo->addSuiteExecution($suiteExecution);
             $newSuiteInfo->increaseCreation();

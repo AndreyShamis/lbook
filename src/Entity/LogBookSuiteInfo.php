@@ -400,6 +400,9 @@ class LogBookSuiteInfo
      */
     public function setSuiteMode(?string $suiteMode): void
     {
+        if (mb_strlen($suiteMode) > 20) {
+            $suiteMode = mb_substr($suiteMode, 0, 20);
+        }
         $this->suiteMode = $suiteMode;
     }
 

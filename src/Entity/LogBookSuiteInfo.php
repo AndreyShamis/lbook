@@ -108,6 +108,11 @@ class LogBookSuiteInfo
      */
     private $creationCount = 0;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $suiteMode;
+
     public function __construct()
     {
         $this->subscribers = new ArrayCollection();
@@ -381,4 +386,22 @@ class LogBookSuiteInfo
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSuiteMode(): ?string
+    {
+        return $this->suiteMode;
+    }
+
+    /**
+     * @param mixed $suiteMode
+     */
+    public function setSuiteMode(?string $suiteMode): void
+    {
+        $this->suiteMode = $suiteMode;
+    }
+
+
 }

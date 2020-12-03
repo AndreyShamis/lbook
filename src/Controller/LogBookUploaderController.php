@@ -470,9 +470,12 @@ class LogBookUploaderController extends AbstractController
                         if (array_key_exists('supported_farms', $data['suite_dict'])) {
                             $newSuiteInfo->setSupportedFarms($data['suite_dict']['supported_farms']);
                         }
-                    } catch (\Throwable $ex) {
-
-                    }
+                    } catch (\Throwable $ex) {}
+                    try {
+                        if (array_key_exists('mode', $data['suite_dict'])) {
+                            $newSuiteInfo->setSuiteMode($data['suite_dict']['mode']);
+                        }
+                    } catch (\Throwable $ex) {}
                     if (array_key_exists('suite_timeout', $data['suite_dict'])) {
                         $newSuiteInfo->setSuiteTimeout($data['suite_dict']['suite_timeout']);
                     }

@@ -484,7 +484,7 @@ class LogBookUploaderController extends AbstractController
                     }
                 }
             }
-
+            $newSuiteInfo->setLastSeen(new DateTime());
             $newSuiteInfo->addSuiteExecution($suiteExecution);
             $newSuiteInfo->increaseCreation();
             $this->em->flush();

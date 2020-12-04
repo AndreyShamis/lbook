@@ -473,9 +473,17 @@ class LogBookSuiteExecutionController extends AbstractController
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $suite->removeSubscriber($user);
+
         $this->getDoctrine()->getManager()->flush();
         $referer = $request->headers->get('referer');
         if ($referer === null) {
+            try {
+                $executions = $suite->getSuiteExecutions();
+                if (count($executions)) {
+                    $lastExecution = $executions->first();
+                    return $this->redirectToRoute('suite_show',  ['id' => $lastExecution->getId()]);
+                }
+            } catch (\Throwable $ex) {}
             return $this->redirectToRoute('index');
         }
         return $this->redirect($referer);

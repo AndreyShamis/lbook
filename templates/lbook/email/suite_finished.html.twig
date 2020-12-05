@@ -77,7 +77,7 @@
     <tr><th>Platform</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.platform }}</strong></td></tr>
     <tr><th>Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.chip }}</strong></td></tr>
     <tr><th>Components</th><td>{{ suite.components|join(', ')}}</td></tr>
-    <tr><th>Assignee</th><td>{{ suiteInfo.assignee .|join('; ')}}</td></tr>
+    <tr><th>Assignee</th><td>{{ suiteInfo.assignee |join('; ')}}</td></tr>
     <tr><th>BuildFlavor</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.buildType }}</strong></td></tr>
     <tr><th>Branch</th><td style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.branchName }}</td></tr>
     <tr><th>Package mode</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.packageMode }}</strong></td></tr>

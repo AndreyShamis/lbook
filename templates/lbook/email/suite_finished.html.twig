@@ -1,89 +1,57 @@
 {% set url = app.request.scheme ~'://' ~  app.request.httpHost %}
-<style>
-    .red{color:#dd5a43!important}.red2{color:#e08374!important}.light-red{color:#f77!important}.blue{color:#478fca!important}.light-blue{color:#93cbf9!important}
-    .well{border-radius:0}  .well h1,.well h2,.well h3,.well h4,.well h5,.well h6{margin-top:0}  .well h1,.well h2,.well h3{line-height:36px}  .lighter{font-weight:lighter}  h4.smaller{font-size:17px}  .green{color:#69aa46!important}.light-green{color:#b0d877!important}.orange{color:#ff892a!important}.orange2{color:#feb902!important}.light-orange{color:#fcac6f!important}.purple{color:#a069c3!important}.pink{color:#c6699f!important}.pink2{color:#d6487e!important}.brown{color:brown!important}.grey{color:#777!important}.light-grey{color:#bbb!important}
-    hr{margin-top:20px;margin-bottom:20px;border:0;border-top:1px solid #eee}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}  .sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}[role=button]{cursor:pointer}
-    .h1,.h2,.h3,.h4,.h5,.h6,h1,h2,h3,h4,h5,h6{font-family:inherit;font-weight:500;line-height:1.1;color:inherit}
-    .h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-weight:400;line-height:1;color:#777}
-    .h1,.h2,.h3,h1,h2,h3{margin-top:20px;margin-bottom:10px}.h1 .small,.h1 small,.h2 .small,.h2 small,.h3 .small,.h3 small,h1 .small,h1 small,h2 .small,h2 small,h3 .small,h3 small{font-size:65%}
-    .h4,.h5,.h6,h4,h5,h6{margin-top:10px;margin-bottom:10px}.h4 .small,.h4 small,.h5 .small,.h5 small,.h6 .small,.h6 small,h4 .small,h4 small,h5 .small,h5 small,h6 .small,h6 small{font-size:75%}
-    .h1,h1{font-size:36px}.h2,h2{font-size:30px}.h3,h3{font-size:24px}.h4,h4{font-size:18px}.h5,h5{font-size:14px}.h6,h6{font-size:12px}p{margin:0 0 10px}
-    .lead{margin-bottom:20px;font-size:16px;font-weight:300;line-height:1.4}@media (min-width:768px){.lead{font-size:21px}}.small,small{font-size:85%}
-    .mark,mark{padding:.2em;background-color:#fcf8e3}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}
-    .text-justify{text-align:justify}.text-nowrap{white-space:nowrap}.text-lowercase{text-transform:lowercase}.text-uppercase{text-transform:uppercase}
-    .text-capitalize{text-transform:capitalize}.text-muted{color:#777}.text-primary{color:#337ab7}
-    a.text-primary:focus,a.text-primary:hover{color:#286090}.text-success{color:#3c763d}a.text-success:focus,a.text-success:hover{color:#2b542c}
-    .text-info{color:#31708f}a.text-info:focus,a.text-info:hover{color:#245269}.text-warning{color:#8a6d3b}a.text-warning:focus,a.text-warning:hover{color:#66512c}
-    .text-danger{color:#a94442}a.text-danger:focus,a.text-danger:hover{color:#843534}.bg-primary{color:#fff;background-color:#337ab7}a.bg-primary:focus,a.bg-primary:hover{background-color:#286090}.bg-success{background-color:#dff0d8}a.bg-success:focus,a.bg-success:hover{background-color:#c1e2b3}.bg-info{background-color:#d9edf7}a.bg-info:focus,a.bg-info:hover{background-color:#afd9ee}.bg-warning{background-color:#fcf8e3}a.bg-warning:focus,a.bg-warning:hover{background-color:#f7ecb5}.bg-danger{background-color:#f2dede}a.bg-danger:focus,a.bg-danger:hover{background-color:#e4b9b9}
-    .yellow{
-        color: #cccc00;
-    }
-    .font-bold {
-        font-weight: bold;
-    }
-</style>
-{% apply spaceless %}
-    <div class="well">
-        <h4 class="smaller lighter"></h4>
-        {% if suite.passRate == 100 %}
-            <h1 style="color: #69aa46;">Suite finished successfully</h1>
-        {% else %}
-            <h1 style="color: red;">Suite failed !</h1>
-            Pass Rate <span class="{{ passRateToColor(suite.passRate) }}">{{ suite.passRate }}%</span>
-        {% endif %}
-        {% set aborted = suite.testsCountEnabled - suite.totalExecutedTests %}
-        <table style="width: 70%;text-align: center;"><tr>
-                <th></th>
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Total &nbsp;</strong> <span style="font-size: 9px;">Enabled/Executed</span></th>
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Pass</strong></th>
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Fail</strong></th>
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Error</strong></th>
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Other</strong></th>
-                {% if suite.testsCountDisabled > 0 %}
-                    <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Disabled</strong></th>
-                {% endif %}
-                {% if aborted > 0 %}
-                <th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Aborted</strong></th>
-                {% endif %}
-            </tr>
-            <tr>
-                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                <td style="text-align: center;font-size: 25px;">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
-                <td><span style="color: #00CC00;font-size: 24px;">{{ suite.passCount }}</span></td>
-                <td><span style="color: #d90e0e;font-size: 24px;">{{ suite.failCount }}</span></td>
-                <td><span style="color: #ffbc00;font-size: 24px;">{{ suite.errorCount }}</span></td>
-                <td><span style="color: #a535ff;font-size: 24px;">{{ suite.otherCount }}</span></td>
-                {% if suite.testsCountDisabled > 0 %}
-                    <td><span style="color: grey;font-size: 24px;">{{ suite.testsCountDisabled }}</span></td>
-                {% endif %}
-                {% if aborted > 0 %}
-                    <td><span style="color: grey;font-size: 24px;">{{ aborted }}</span></td>
-                {% endif %}
-
-            </tr>
-        </table>
-    </div>
 {% set jira_domain = parseDomain(suite.testSetUrl) %}
 {% if jira_domain | length > 0 %}
     {%  set jira_test_set_url = 'http://' ~  jira_domain ~ '/browse/' ~ suite.jiraKey %}
 {% endif %}
-
-<table style="width: 100%">
+<style>
+    span{font-weight: bolder;}
+    a{font-weight: bolder;font-size: 16px;}
+    th{font-size: 24px;}
+</style>
+{% apply spaceless %}
+    <div>
+        {% if suite.passRate == 100 %}
+            <div style="font-size: 32px;color: #69aa46;padding-left: 100px;">Suite finished successfully</div>
+        {% else %}
+            <div style="font-size: 32px;color: red;padding-left: 100px;">Suite failed! Pass Rate {{ suite.passRate }}%</div>
+        {% endif %}
+        {% set aborted = suite.testsCountEnabled - suite.totalExecutedTests %}
+        <table style="width: 70%;text-align: center;"><tr>
+                <td rowspan="3">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <th style="background-color: #9fffeb;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Total &nbsp;</strong> <span style="font-size: 9px;">Enabled/Executed</span></th>
+                <th style="background-color: #9fffeb;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Pass</strong></th>
+                <th style="background-color: #9fffeb;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Fail</strong></th>
+                <th style="background-color: #9fffeb;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Error</strong></th>
+                <th style="background-color: #9fffeb;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Other</strong></th>
+                {% if suite.testsCountDisabled > 0 %}<th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Disabled</strong></th>{% endif %}
+                {% if aborted > 0 %}<th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Aborted</strong></th>{% endif %}
+            </tr>
+            <tr>
+                <td style="text-align: center;font-size: 40px;border: 1px solid #23e6ff;">{{ suite.testsCountEnabled }}/{{ suite.totalExecutedTests }}</td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #00CC00;font-size: 36px;font-weight: bolder;">{{ suite.passCount }}</span></td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #d90e0e;font-size: 36px;font-weight: bolder;">{{ suite.failCount }}</span></td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #ffbc00;font-size: 36px;font-weight: bolder;">{{ suite.errorCount }}</span></td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #a535ff;font-size: 36px;font-weight: bolder;">{{ suite.otherCount }}</span></td>
+                {% if suite.testsCountDisabled > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: grey;font-size: 36px;">{{ suite.testsCountDisabled }}</span></td>{% endif %}
+                {% if aborted > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: grey;font-size: 36px;">{{ aborted }}</span></td>{% endif %}
+            </tr>
+        </table>
+    </div>
+<br/>
+<table style="width: 100%;padding-left: 100px;">
     <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
     <tr><th>Suite Name</th><td style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.name }}</td></tr>
     <tr><th>Product Version</th><td><strong style="font-size: 22px;">{{ suite.productVersion }}</strong></td></tr>
     <tr><th>Testing Level</th><td style="font-size: 22px;">{{ suite.testingLevel | upper }}</td></tr>
-    <tr><th>Platform</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.platform }}</strong></td></tr>
-    <tr><th>Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.chip }}</strong></td></tr>
-    <tr><th>Components</th><td>{{ suite.components|join(', ')}}</td></tr>
-    <tr><th>Assignee</th><td>{{ suiteInfo.assignee |join('; ')}}</td></tr>
+    <tr><th>Platform/Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.platform }}</strong> / <strong style="color: {{ stringToColor(suite.chip) }};font-size: 20px;">{{ suite.chip }}</strong></td></tr>
     <tr><th>BuildFlavor</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.buildType }}</strong></td></tr>
-    <tr><th>Branch</th><td style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.branchName }}</td></tr>
+    <tr><th>Branch</th><td style="color: {{ stringToColor(suite.branchName) }};font-size: 20px;">{{ suite.branchName }}</td></tr>
     <tr><th>Package mode</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.packageMode }}</strong></td></tr>
-    <tr><th>Job Name</th><td>{{ suite.jobName }}  - <a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
-    <tr><th>Time Start</th><td>{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
-    <tr><th>Time End</th><td>{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
+    <tr><th>Components</th><td><strong>{{ suite.components|join(', ')}}</strong></td></tr>
+    <tr><th>Assignee</th><td>{{ suiteInfo.assignee |join('; ')}}</td></tr>
+    <tr><th>CI Job</th><td><a href="{{ suite.ciUrl }}">{{ suite.ciUrl }}</a></td></tr>
+    <tr><th>Time Start</th><td style="font-size: 18px;color: #1b6aaa;">{{ suite.startedAt |date('Y-m-d H:i') }}</td></tr>
+    <tr><th>Time End</th><td style="font-size: 18px;color: #1b6aaa;">{{ suite.finishedAt |date('Y-m-d H:i') }}</td></tr>
     <tr><th></th><td></td></tr>
     <tr><th style="vertical-align: top;">Links</th><td>
             <table style="width: 100%">

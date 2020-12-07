@@ -548,4 +548,30 @@ class LogBookSuiteExecutionController extends AbstractController
                 'suite' => $suite
             ]);
     }
+
+    /**
+     * @Route("/debugclose/{id}", name="suite_close_aa", methods="GET|POST")
+     * @param SuiteExecution $suite
+     * @param LoggerInterface $logger
+     * @param LogBookSuiteInfoRepository $suiteInfoRepo
+     * @return Response
+     */
+    public function close_aaa(SuiteExecution $suite, LoggerInterface $logger, LogBookSuiteInfoRepository $suiteInfoRepo): Response
+    {
+
+        $em = $this->getDoctrine()->getManager();
+
+            $newSuiteInfo = $suiteInfoRepo->findOneOrCreate([
+                'name' => $suite->getName(),
+                'uuid' => $suite->getUuid(),
+            ]);
+
+
+        return $this->render('lbook/email/suite_finished.html.twig',
+            [
+                'suite' => $suite,
+                'suiteInfo' => $newSuiteInfo
+            ]);
+
+    }
 }

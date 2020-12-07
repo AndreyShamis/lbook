@@ -90,9 +90,9 @@
                 {% if suite.cycle is defined and suite.cycle.id is defined %}
                     <tr><th style="text-align: left;">LogBook Suite Tests</th><td><a href="{{ url }}{{ path('cycle_suite_show_first', {'cycle': suite.cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td></tr>
                 {% endif %}
-                <tr><th style="text-align: left;">LogBook Cycle</th><td style="text-align: right;"><a href="{{ url }}{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a></td></tr>
-                <tr><th style="text-align: left;">LogBook Setup</th><td style="text-align: right;"><a href="{{ url }}{{ path('setup_show_first', { 'id': suite.cycle.setup.id }) }}">{{ suite.cycle.setup.name }}</a></td></tr>
-                <tr><th style="text-align: left;">LogBook Suite info</th><td style="text-align: right;"><a href="{{ url }}{{ path('suite_show', { 'id': suite.id }) }}">{{ suite.uuid }}</a></td></tr>
+                <tr><th style="text-align: left;">LogBook Cycle</th><td><a href="{{ url }}{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a></td></tr>
+                <tr><th style="text-align: left;">LogBook Setup</th><td><a href="{{ url }}{{ path('setup_show_first', { 'id': suite.cycle.setup.id }) }}">{{ suite.cycle.setup.name }}</a></td></tr>
+                <tr><th style="text-align: left;">LogBook Suite info</th><td><a href="{{ url }}{{ path('suite_show', { 'id': suite.id }) }}">{{ suite.uuid }}</a></td></tr>
                 {% if suite.jiraKey | length > 1 %}
                     <tr><th>JIRA url</th><td><a href="{{ jira_test_set_url }}">{{ suite.jiraKey }}</a></td></tr>
                 {% endif %}

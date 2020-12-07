@@ -1,0 +1,9 @@
+{% set url = app.request.scheme ~'://' ~  app.request.httpHost %}
+<div style="font-size: 24px;font-weight: bolder">Report created</div>
+<br/>
+<table style="width: 100%;">
+    <tr><th>Report URL</th><td style="color: {{ stringToColor(report.description) }};font-size: 20px;"><a href="{{ url }}{{ path('log_book_cycle_report_show', {'id': report.id }) }}">{{ report.name }}</a></td></tr>
+    <tr><th>Product Version</th><td><strong style="font-size: 22px;">{{ report.build.name | default('Missing') }}</strong></td></tr>
+    <tr><th>Testing Level</th><td style="font-size: 22px;">{{ report.description }}</td></tr>
+    <tr><th>Platform/Chip</th><td><strong style="color: {{ stringToColor(report.platforms | join(';')) }};font-size: 20px;">{{ report.platforms | join(';')}}</strong> / <strong style="color: {{ stringToColor(report.chips | join(';')) }};font-size: 20px;">{{ report.chips| join(';') }}</strong></td></tr>
+</table>

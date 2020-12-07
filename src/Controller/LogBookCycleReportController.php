@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookEmail;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Entity\SuiteExecution;
@@ -338,6 +339,54 @@ class LogBookCycleReportController extends AbstractController
                             $report->setIsLocked(true);
                             $entityManager->persist($report);
 
+                            try {
+                                $body = '';
+                                try {
+                                    $body = $this->get('twig')->render('lbook/email/report_created.html.twig', [
+                                        'report' => $report,
+                                    ]);
+                                } catch (\Throwable $ex) {
+                                    $logger->critical($ex->getMessage());
+                                }
+
+                                foreach ($cycle->getSetup()->getModerators() as $tmp_user) {
+                                    try {
+                                        $newEmail = new LogBookEmail();
+                                        $newEmail->setRecipient($tmp_user);
+                                        $newEmail->setBody($body);
+                                        $newEmail->setSubject('Report created');
+                                        $entityManager->persist($newEmail);
+                                    } catch (\Throwable $ex) {
+                                        $logger->critical($ex->getMessage());
+                                    }
+                                }
+
+                                foreach ($cycle->getSetup()->getSubscribers() as $tmp_user) {
+                                    try {
+                                        $newEmail = new LogBookEmail();
+                                        $newEmail->setRecipient($tmp_user);
+                                        $newEmail->setBody($body);
+                                        $newEmail->setSubject('Report created');
+                                        $entityManager->persist($newEmail);
+                                    } catch (\Throwable $ex) {
+                                        $logger->critical($ex->getMessage());
+                                    }
+                                }
+
+                                try {
+                                    $newEmail = new LogBookEmail();
+                                    $newEmail->setSubject('Report created');
+                                    $newEmail->setRecipient($cycle->getSetup()->getOwner());
+                                    $newEmail->setBody($body);
+                                    $entityManager->persist($newEmail);
+                                } catch (\Throwable $ex) {
+                                    $logger->critical($ex->getMessage());
+                                }
+                                
+                            } catch (\Throwable $ex) {
+                                $logger->critical($ex->getMessage());
+                            }
+
                         } catch (\Throwable $ex) {
                             $logger->critical('AUTO REPORT CREATOR:' .$ex->getMessage());
                         }
@@ -358,6 +407,26 @@ class LogBookCycleReportController extends AbstractController
             'thisPage'  => 1,
             'iterator'  => $cycles_ret
         ]);
+    }
+
+    /**
+     * @Route("/auto/createdebug/{id}", name="log_book_cycle_report_auto_create_debug", methods={"GET","POST"})
+
+     * @return Response
+     */
+    public function create_debug(LogBookCycleReport $report, LoggerInterface $logger): Response
+    {
+
+        //$em = $this->getDoctrine()->getManager();
+
+
+
+
+        return $this->render('lbook/email/report_created.html.twig',
+            [
+                'report' => $report,
+            ]);
+
     }
 
     /**

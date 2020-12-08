@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\LogBookUser;
 use App\Model\OsType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -13,6 +14,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class LogBookSetupType extends AbstractType
 {
+
+    protected $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -33,11 +42,24 @@ class LogBookSetupType extends AbstractType
             $builder->add('owner');
         }
 
+        $builder->add('moderators',null,
+            array(
+                //'expanded' => true,             // false will convert to checkbox
+                'label' => ' ',
+                'choices' => $this->entityManager->getRepository(LogBookUser::class)->findAll(), //; //$setup->getModerators(),
+                    'choice_label' => 'username',
+                    'choice_value' => 'Id',
+                'multiple'=> true,
+                'attr' => array(
+                    'style' => 'width:600px;display: none;', // min-height:180px;
+                    'class' => 'multiselect')
+            )
+        );
+
         $builder
             //->add('owner')
             ->add('extDefectsJql')
             ->add('autoCycleReport')
-            ->add('moderators')
             ->add('isPrivate')
             ->add('retentionPolicy')
         ;

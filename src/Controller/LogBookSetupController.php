@@ -746,7 +746,8 @@ class LogBookSetupController extends AbstractController
             //            $deleteForm = null;
             //        }
 
-            $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(//   'user' => $user,
+            $editForm = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
+                //   'user' => $user,
             ));
             $editForm->handleRequest($request);
 

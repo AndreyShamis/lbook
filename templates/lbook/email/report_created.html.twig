@@ -4,6 +4,72 @@
 <table style="width: 100%;">
     <tr><th>Report URL</th><td style="color: {{ stringToColor(report.description) }};font-size: 20px;"><a href="{{ url }}{{ path('log_book_cycle_report_show', {'id': report.id }) }}">{{ report.name }}</a></td></tr>
     <tr><th>Product Version</th><td><strong style="font-size: 22px;">{{ report.build.name | default('Missing') }}</strong></td></tr>
-    <tr><th>Testing Level</th><td style="font-size: 22px;">{{ report.description }}</td></tr>
-    <tr><th>Platform/Chip</th><td><strong style="color: {{ stringToColor(report.platforms | join(';')) }};font-size: 20px;">{{ report.platforms | join(';')}}</strong> / <strong style="color: {{ stringToColor(report.chips | join(';')) }};font-size: 20px;">{{ report.chips| join(';') }}</strong></td></tr>
+    {% if report.cycles[0].suiteExecution[0] is defined %}
+    <tr><th>Testing Level</th><td style="font-size: 22px;">{{ report.cycles[0].suiteExecution[0].testingLevel }}</td></tr>
+    {% endif %}
+    <tr><th>Mode</th><td style="font-size: 22px;">{{ report.mode }}</td></tr>
+    {% if report.defects | length %}
+        <tr>
+            <th>Related Defects Added</th>
+            <td><span class="font38 red2">{{ report.defects | length }}</span></td>
+        </tr>
+    {% endif %}
+    <tr>
+        <th style="vertical-align: top;">Components</th>
+        <td>
+            {{ report.components|map((x) => '<span class="label label-info label-white middle" style="color:' ~ stringToColor(x ~ report.components | length ~ x | length ~ x) ~ '!important;">' ~ x ~ '</span>') | join('<br/>') | raw }}</td>
+    </tr>
+    <tr style="vertical-align: top;"><th>Description</th><td style="font-size: 22px;">{{ report.description }}</td></tr>
+    <tr style="vertical-align: top;"><th>Platform/Chip</th>
+        <td><table style="width: 100%">
+                <tr><td><strong style="color: {{ stringToColor(report.platforms | join(';')) }};font-size: 20px;">{{ report.platforms | join('<br/>' | raw)}}</strong></td>
+                    <td><strong style="color: {{ stringToColor(report.chips | join(';')) }};font-size: 20px;">{{ report.chips| join('<br/>')  | raw }}</strong></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <th>Time</th>
+        <td class="font14">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 50%;">Period : {{ report.period |  executionTimeGenericShort }}</td>
+                    <td style="width: 50%;">Duration {{ report.duration |  executionTimeGenericShort }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 </table>
+
+<div class="hr hr32 hr-dotted"></div>
+
+{% if report.reportNotes %}
+    <div class="well well-lg">
+        <h4 class="blue">Report Notes</h4>
+        {% apply markdown_to_html %}{{ report.reportNotes }}{% endapply %}
+    </div>
+    <div class="hr hr32 hr-dotted"></div>
+{% endif %}
+
+{% if report.cyclesNotes %}
+    <div class="well well-lg">
+        <h4 class="blue">Cycle Notes</h4>
+        {% apply markdown_to_html %}{{ report.cyclesNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
+{% endif %}
+
+<div class="well well-lg">
+    <h4 class="blue">Suite Notes</h4>
+    {% apply markdown_to_html %}{{ report.suitesNotes }}{% endapply %}
+</div>
+<div class="hr hr20 hr-double"></div>
+
+
+{% if report.bugsNotes %}
+    <div class="well well-lg">
+        <h4 class="blue">Bugs Notes</h4>
+        {% apply markdown_to_html %}{{ report.bugsNotes }}{% endapply %}
+    </div>
+    <div class="hr hr20 hr-double"></div>
+{% endif %}

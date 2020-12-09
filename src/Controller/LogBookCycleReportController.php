@@ -419,9 +419,6 @@ class LogBookCycleReportController extends AbstractController
 
         //$em = $this->getDoctrine()->getManager();
 
-
-
-
         return $this->render('lbook/email/report_created.html.twig',
             [
                 'report' => $report,

@@ -341,6 +341,7 @@ class LogBookCycleReportController extends AbstractController
 
                             try {
                                 $body = '';
+                                $subject = 'Report [' . $report->getName() . '] created';
                                 try {
                                     $body = $this->get('twig')->render('lbook/email/report_created.html.twig', [
                                         'report' => $report,
@@ -354,7 +355,7 @@ class LogBookCycleReportController extends AbstractController
                                         $newEmail = new LogBookEmail();
                                         $newEmail->setRecipient($tmp_user);
                                         $newEmail->setBody($body);
-                                        $newEmail->setSubject('Report created');
+                                        $newEmail->setSubject($subject);
                                         $entityManager->persist($newEmail);
                                     } catch (\Throwable $ex) {
                                         $logger->critical($ex->getMessage());
@@ -366,7 +367,7 @@ class LogBookCycleReportController extends AbstractController
                                         $newEmail = new LogBookEmail();
                                         $newEmail->setRecipient($tmp_user);
                                         $newEmail->setBody($body);
-                                        $newEmail->setSubject('Report created');
+                                        $newEmail->setSubject($subject);
                                         $entityManager->persist($newEmail);
                                     } catch (\Throwable $ex) {
                                         $logger->critical($ex->getMessage());
@@ -375,7 +376,7 @@ class LogBookCycleReportController extends AbstractController
 
                                 try {
                                     $newEmail = new LogBookEmail();
-                                    $newEmail->setSubject('Report created');
+                                    $newEmail->setSubject($subject);
                                     $newEmail->setRecipient($cycle->getSetup()->getOwner());
                                     $newEmail->setBody($body);
                                     $entityManager->persist($newEmail);

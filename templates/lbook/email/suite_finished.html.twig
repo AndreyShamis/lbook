@@ -47,6 +47,7 @@
     <tr><th>Platform/Chip</th><td><strong style="color: {{ stringToColor(suite.platform) }};font-size: 20px;">{{ suite.platform }}</strong> / <strong style="color: {{ stringToColor(suite.chip) }};font-size: 20px;">{{ suite.chip }}</strong></td></tr>
     <tr><th>BuildFlavor</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.buildType }}</strong></td></tr>
     <tr><th>Branch</th><td style="color: {{ stringToColor(suite.branchName) }};font-size: 20px;">{{ suite.branchName }}</td></tr>
+    <tr><th>Host</th><td style="color: {{ stringToColor(suite.host.name) }};font-size: 20px;">{{ suite.host.name }}</td></tr>
     <tr><th>Package mode</th><td><strong style="color: #1b6aaa;font-size: 20px;">{{ suite.packageMode }}</strong></td></tr>
     <tr><th>Components</th><td><strong>{{ suite.components|join(', ')}}</strong></td></tr>
     <tr><th>Assignee</th><td>{{ suiteInfo.assignee |join('; ')}}</td></tr>

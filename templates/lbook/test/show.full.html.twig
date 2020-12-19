@@ -262,7 +262,7 @@
             </div>
 
             <div class="widget-body" style="display: block;">
-                {% if iterator | length < 40 and test.logFileSize > 250000 %}
+                {% if iterator | length < 400 and test.logFileSize > 300000 %}
                     <i class="ace-icon fa fa-exclamation-circle orange font16"></i>
                     <span class="red2 font16"> Note, the log was shorten due to it size, press <a href="{{ path('show_log', {'id': test.id }) }}">here</a> to see full log.</span>
                 {% endif %}

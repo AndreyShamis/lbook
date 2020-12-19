@@ -245,6 +245,8 @@
         <div class="col-sm-12 text-center">{% include "lbook/double.paginator.html.twig" %}</div>
     </div>
     <div class="row">
+
+
         <div class="widget-box transparent">
             <div class="widget-header widget-header-flat">
                 <h4 class="widget-title lighter">
@@ -260,6 +262,10 @@
             </div>
 
             <div class="widget-body" style="display: block;">
+                {% if iterator | length < 40 and test.logFileSize > 250000 %}
+                    <i class="ace-icon fa fa-exclamation-circle orange font16"></i>
+                    <span class="red2 font16"> Note, the log was shorten due to it size, press <a href="{{ path('show_log', {'id': test.id }) }}">here</a> to see full log.</span>
+                {% endif %}
                 <div class="widget-main no-padding testLog">
                     {% include "lbook/search.html.twig" %}
                     {% apply spaceless %}
@@ -292,6 +298,7 @@
                             </tbody>
                         </table>
                     {% endapply %}
+
                 </div><!-- /.widget-main -->
                 <div class="widget-toolbox padding-8 text-center">
                     <div>{% include "lbook/double.paginator.html.twig" %}</div>

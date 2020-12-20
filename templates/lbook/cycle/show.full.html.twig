@@ -207,6 +207,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <th title="Pass">Pass</th>
                                     <th title="Pass Rate">Pass Rate</th>
                                     <th title="Testing Level">TL</th>
+                                    <th>Duration</th>
                                     <th>Chip</th>
                                     <th>Platform</th>
                                     <th title="Build Flavor">BF</th>
@@ -253,6 +254,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</span></td>
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</span></td>
                                     <td>{{ suite.testingLevel }}</td>
+                                    <td>{{ suite.runTime | executionTimeGenericShort }}</td>
                                     <td>{{ suite.chip }}</td>
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.buildType }}</td>

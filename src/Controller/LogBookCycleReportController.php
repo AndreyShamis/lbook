@@ -307,7 +307,7 @@ class LogBookCycleReportController extends AbstractController
                             /** @var SuiteExecution $some_suite */
                             $some_suite = $cycle->getSuiteExecution()->first();
                             $report->setMode($some_suite->getMode());
-                            $report->setName('Job Report ' . ucfirst(strtolower($l[0])) . ' ' . ucfirst(str_replace('_mode', '', strtolower($report->getMode()))) . ' ' . $cycle->getBuild());
+                            $report->setName('Job Report ['. $some_suite->getPlatform() . '] ' . ucfirst(strtolower($l[0])) . ' ' . ucfirst(str_replace('_mode', '', strtolower($report->getMode()))) . ' ' . $cycle->getBuild());
 
                             //$logBookCycleReport->setReportNotes($reportNotes);
                             $report->setCyclesNotes('Cycle started at  **' . $cycle->getTimeStart()->format('d/m/Y H:i:s') . '**  finished at **' . $cycle->getTimeEnd()->format('d/m/Y H:i:s') . '**');

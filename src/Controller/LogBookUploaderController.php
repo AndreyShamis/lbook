@@ -1358,7 +1358,7 @@ class LogBookUploaderController extends AbstractController
         $tmpTestNameFlag_AutotestTestPrint = false;
         $tmpTestNameFlag_ControlTestPrint = false;
 
-        $testVerdict = null;
+        $testVerdict = $this->parseVerdict('UNKNOWN');
 
         $controlFile = $controlFullFile = $controlVersion = $testVersion = '';
 
@@ -1378,11 +1378,14 @@ class LogBookUploaderController extends AbstractController
         }
 
         $skip_counter = 0;  // used for Not to skip first logs
+        $countLines = count($newTempArr);
+        $lineCounter = 0;
         /**
          * If in previous FOR used "&" and use same array
          * Dont remove & from  &$value -> will cause to additional duplicated line
          */
         foreach ($newTempArr as $key => $value) {
+            $lineCounter += 1;
             preg_match_all('/(\d{2,2}[.|:| |\/|\d]*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
             //preg_match_all('/(\d{2,}.*\d{2,3})\s*([A-Z]+)\s*\|\s*(.*)/s', $value,$oneLine);
             //preg_match_all('/(?'TIME'^\d{2,2}.[^\|]*\d{2,3})\s+(?'LEVEL'[A-Z]+)\s*\|\s*(?'MSG'.*)/s', $value,$oneLine); https://regex101.com/r/9T3jd8/2
@@ -1408,7 +1411,10 @@ class LogBookUploaderController extends AbstractController
                     if ($msgType_str === 'INFO') {
                         preg_match('/END\s*([A-Za-z\_]*)/', $msg_str, $possibleVerdict);
                         if (\count($possibleVerdict) === 2) {
-                            $testVerdict = $this->parseVerdict($possibleVerdict[1]);
+                            $possibleVerdictTmp = $this->parseVerdict($possibleVerdict[1]);
+                            if ($possibleVerdictTmp->getName() !== 'UNKNOWN' && $testVerdict->getName() === 'UNKNOWN') {
+                                $testVerdict = $possibleVerdictTmp;
+                            }
                             if ($testVerdict !== null) {
                                 $verName = $testVerdict->getName();
                                 if ($verName === 'ABORT' || $verName === 'PASS' || $verName === 'ERROR' || $verName === 'FAIL' || $verName === 'TEST_NA') {
@@ -1438,17 +1444,21 @@ class LogBookUploaderController extends AbstractController
                     /** @var string $preparedLevelName */
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
-                        // In case this log LEVEL ignored for DB insert
-                        if ($skip_counter > 40) {
-                            continue;
+                        if ($lineCounter > ($countLines - 20 && (($countLines - 20) > 0)) ) {
+                        } else {
+                            // In case this log LEVEL ignored for DB insert
+                            if ($skip_counter > 40) {
+                                continue;
+                            }
+                            if ($preparedLevelName === 'DEBUG' && $skip_counter > 8) {
+                                continue;
+                            }
+                            if ($preparedLevelName === 'INFO' && $skip_counter > 8) {
+                                continue;
+                            }
+                            $skip_counter++;
                         }
-                        if ($preparedLevelName === 'DEBUG' && $skip_counter > 8) {
-                            continue;
-                        }
-                        if ($preparedLevelName === 'INFO' && $skip_counter > 8) {
-                            continue;
-                        }
-                        $skip_counter++;
+
                     }
 
                     $ret_data[$counter] = array(

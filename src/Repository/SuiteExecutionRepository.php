@@ -174,6 +174,8 @@ class SuiteExecutionRepository extends ServiceEntityRepository
             }
             if (array_key_exists('branchName', $criteria) && strlen(trim($criteria['branchName'])) > 2) {
                 $entity->setBranchName(substr(trim($criteria['branchName']),0, 49));
+            } else {
+                $entity->setBranchName(substr(trim($entity->getBranchName()),0, 49));
             }
             if (array_key_exists('test_environments', $criteria)) {
                 $entity->setTestEnvironments($criteria['test_environments']);

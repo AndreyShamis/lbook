@@ -1138,5 +1138,12 @@ class SuiteExecution
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getExecutedOn(): string
+    {
+        return '';
+    }
 
 }

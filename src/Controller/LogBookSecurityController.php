@@ -32,25 +32,33 @@ class LogBookSecurityController extends AbstractController
      * @param $user
      * @param $password
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param int $serverIndex
      * @return array
-     * @throws \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @throws \Symfony\Component\Ldap\Exception\NotBoundException
-     * @throws \Symfony\Component\Ldap\Exception\LdapException
      */
-    protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder): array
+    protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder, $serverIndex = 0): array
     {
+        $user_src = $user;
+        $pass_src = $password;
         $ret_arr = array();
         try {
-            $ldap_server = getenv('LDAP_SERVER');
-            $dn = getenv('LDAP_DN');
+            if ($serverIndex === 0) {
+                $ldap_server = getenv('LDAP_SERVER');
+                $dn = getenv('LDAP_DN');
+                $LDAP_DEFAULT_DOMAIN = getenv('LDAP_DEFAULT_DOMAIN');
+                $LDAP_ID_STR = getenv('LDAP_ID_STR');
 
-            $LDAP_DEFAULT_DOMAIN = getenv('LDAP_DEFAULT_DOMAIN');
+            } else {
+                $ldap_server = getenv('LDAP_SERVER_2');
+                $dn = getenv('LDAP_DN_2');
+                $LDAP_DEFAULT_DOMAIN = getenv('LDAP_DEFAULT_DOMAIN_2');
+                $LDAP_ID_STR = getenv('LDAP_ID_STR_2');
+            }
+            
             $LDAP_USERNAME_STR = getenv('LDAP_USERNAME_STR');
             $LDAP_EMAIL_STR = getenv('LDAP_EMAIL_STR');
             $LDAP_FULLNAME_STR = getenv('LDAP_FULLNAME_STR');
             $LDAP_LASTNAME_STR = getenv('LDAP_LASTNAME_STR');
             $LDAP_FIRSTNAME_STR = getenv('LDAP_FIRSTNAME_STR');
-            $LDAP_ID_STR = getenv('LDAP_ID_STR');
             $LDAP_MOBILE_STR = getenv('LDAP_MOBILE_STR');
             $LDAP_SITECODE_STR = getenv('LDAP_SITECODE_STR');
 
@@ -83,7 +91,12 @@ class LogBookSecurityController extends AbstractController
                 $ret_arr['ldapUser'] = true;
             }
         } catch (ConnectionException $ex) {
-            throw new AuthenticationException('LDAP: ' . $ex->getMessage());
+            if ($serverIndex === 1) {
+                throw new AuthenticationException('LDAP: ' . $ex->getMessage());
+            } else {
+                return $this->ldapLogin($user_src, $pass_src, $passwordEncoder, 1);
+            }
+
         }
         return $ret_arr;
     }
@@ -117,7 +130,7 @@ class LogBookSecurityController extends AbstractController
                         $user = $userRepo->loadUserByUsername($user_name);
                     } catch (\Throwable $ex){}
                     if ($user === null || ($user !== null && $user->isLdapUser())) {
-                        $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder);
+                        $ldapUserArr = $this->ldapLogin($user_name, $password, $passwordEncoder, 0);
                         if (\is_array($ldapUserArr)) {
                             $ldapLogin = true;
                             $user = $userRepo->loadUserByUsername($ldapUserArr['username']);

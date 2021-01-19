@@ -49,6 +49,12 @@ class LogBookSuiteInfo
     private $subscribers;
 
     /**
+     * @ORM\ManyToMany(targetEntity=LogBookUser::class)
+     * @ORM\JoinTable(name="log_book_setup_log_book_user_fail_subscribers")
+     */
+    private $failureSubscribers;
+
+    /**
      * @ORM\OneToMany(targetEntity=SuiteExecution::class, mappedBy="suiteInfo")
      */
     private $suiteExecutions;
@@ -116,6 +122,7 @@ class LogBookSuiteInfo
     public function __construct()
     {
         $this->subscribers = new ArrayCollection();
+        $this->failureSubscribers = new ArrayCollection();
         $this->suiteExecutions = new ArrayCollection();
     }
 
@@ -217,6 +224,31 @@ class LogBookSuiteInfo
         return $this;
     }
 
+    /**
+     * @return Collection|LogBookUser[]
+     */
+    public function getFailureSubscribers(): Collection
+    {
+        return $this->failureSubscribers;
+    }
+
+    public function addFailureSubscriber(UserInterface $subscriber): self
+    {
+        if (!$this->failureSubscribers->contains($subscriber)) {
+            $this->failureSubscribers[] = $subscriber;
+        }
+
+        return $this;
+    }
+
+    public function removeFailureSubscriber(UserInterface $subscriber): self
+    {
+        if ($this->failureSubscribers->contains($subscriber)) {
+            $this->failureSubscribers->removeElement($subscriber);
+        }
+
+        return $this;
+    }
     /**
      * @return Collection|SuiteExecution[]
      */

@@ -8,6 +8,17 @@
         <div class="col-xs-3">
             <span style="float: right;">
                 {% if suiteInfo is not null %}
+                    {% if app.user is not null and suiteInfo.failureSubscribers.contains(app.user) %}
+                        <button class="btn btn-white btn-info btn-bold" id="fail_unsubscribe">
+                        <i class="ace-icon fa fa-flag bigger-110 blue"></i>
+                        Unsubscribe on Fail
+                    </button>
+                    {% else %}
+                        <button class="btn btn-white btn-warning btn-bold" id="fail_subscribe">
+                        <i class="ace-icon fa fa-flag-o bigger-110 orange"></i>
+                        Subscribe on Fail
+                    </button>
+                    {% endif %}
                     {% if app.user is not null and suiteInfo.subscribers.contains(app.user) %}
                         <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
                         <i class="ace-icon fa fa-flag bigger-110 blue"></i>
@@ -120,13 +131,10 @@
     <script>
         $(document).ready(function() {
             {% if suiteInfo is not null %}
-
-            $( "#unsubscribe" ).bind( "click", function() {
-                window.location.href = "{{ path('suite_unsubscribe', { 'suite': suiteInfo.id }) }}";
-            });
-            $( "#subscribe" ).bind( "click", function() {
-                window.location.href = "{{ path('suite_subscribe', { 'suite': suiteInfo.id }) }}";
-            });
+            $( "#unsubscribe" ).bind( "click", function() { window.location.href = "{{ path('suite_unsubscribe', { 'suite': suiteInfo.id }) }}"; });
+            $( "#subscribe" ).bind( "click", function() { window.location.href = "{{ path('suite_subscribe', { 'suite': suiteInfo.id }) }}"; });
+            $( "#fail_unsubscribe" ).bind( "click", function() { window.location.href = "{{ path('fail_suite_unsubscribe', { 'suite': suiteInfo.id }) }}"; });
+            $( "#fail_subscribe" ).bind( "click", function() { window.location.href = "{{ path('fail_suite_subscribe', { 'suite': suiteInfo.id }) }}"; });
             {% endif %}
         });
     </script>

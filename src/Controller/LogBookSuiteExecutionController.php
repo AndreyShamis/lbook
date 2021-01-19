@@ -557,13 +557,49 @@ class LogBookSuiteExecutionController extends AbstractController
             ]);
 
             $subscribers = $newSuiteInfo->getSubscribers();
+            $fail_subscribers = $newSuiteInfo->getFailureSubscribers();
+
             foreach ($subscribers as $subscriber) {
+                if ( $subscriber->getEmail() === null) {
+                    continue;
+                }
                 $newEmail = new LogBookEmail();
                 if ($suite->getPassRate() < 100) {
                     $newEmail->setSubject('['. $newSuiteInfo->getName() . '] failed. PR:' . $suite->getPassRate() . '%');
                 } else{
                     $newEmail->setSubject('['. $newSuiteInfo->getName() . '] finished');
 
+                }
+                try {
+                    if ( $fail_subscribers->contains($subscriber) ) {
+                        # For those who subscribed to failure (only)
+                        continue;
+                    }
+                } catch (\Throwable $ex) {}
+
+                try {
+                    $body = $this->get('twig')->render('lbook/email/suite_finished.html.twig', [
+                        'suite' => $suite,
+                        'suiteInfo' => $newSuiteInfo
+                    ]);
+                    $newEmail->setBody($body);
+                } catch (\Throwable $ex) {
+                    $logger->critical($ex->getMessage());
+                }
+
+                $newEmail->setRecipient($subscriber);
+                $em->persist($newEmail);
+            }
+
+            foreach ($fail_subscribers as $subscriber) {
+                if ( $subscriber->getEmail() === null) {
+                    continue;
+                }
+                $newEmail = new LogBookEmail();
+                if ($suite->getPassRate() < 100) {
+                    $newEmail->setSubject('['. $newSuiteInfo->getName() . '] failed. PR:' . $suite->getPassRate() . '%');
+                } else{
+                    continue;
                 }
                 try {
                     $body = $this->get('twig')->render('lbook/email/suite_finished.html.twig', [

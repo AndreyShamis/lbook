@@ -12,29 +12,20 @@
         </a>
         <b class="arrow"></b>
     </li>
-    {#{{asset(('user'))}}#}
-    {#<br/>#}
-    {#<br/>#}
-    {#{{(path('user_index'))}}#}
-    {#<br/>#}
-    {#<br/>#}
-    {#{{asset(path('user_index'))}}#}
 
-    {#{{absolute_url(asset(('user')))}}#}
-    {#<br/>#}
-    {#<br/>#}
-    {#{{absolute_url(path('user_index'))}}#}
-    {#<br/>#}
-    {#<br/>#}
-    {#{{absolute_url(asset(path('user_index')))}}#}
     <li class="{% if route starts with 'setup_' %}active{% endif %}">
         <a href="{{asset(path('setup_index_first'))}}">
             <i class="menu-icon fa fa-desktop"></i>
             <span class="menu-text" title="Setups"> Setups </span>
-        </a>
-
-        <b class="arrow"></b>
+        </a><b class="arrow"></b>
     </li>
+    <li class="{% if route starts with 'show_first_favorite' %}active{% endif %}">
+        <a href="{{asset(path('show_first_favorite'))}}">
+            <i class="menu-icon fa fa-bookmark"></i>
+            <span class="menu-text" title="Favorite Setups"> Favorite Setups </span>
+        </a><b class="arrow"></b>
+    </li>
+
     <li class="{% if route starts with 'suites_' %}active{% endif %}">
         <a href="{{asset(path('suite_index'))}}">
             <i class="menu-icon fa fa-list-alt"></i>
@@ -193,9 +184,6 @@
             {% endif %}
         </ul>
     </li>
-
-
-
 </ul><!-- /.nav-list -->
 
 <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">

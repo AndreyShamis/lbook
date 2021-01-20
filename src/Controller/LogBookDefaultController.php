@@ -25,20 +25,21 @@ class LogBookDefaultController extends AbstractController
      */
     public function index(SuiteExecutionRepository $suites): Response
     {
-        $my_suites = $suites->findSuitesInProgress();
-        $sanity = $suites->findSanitySuitesInProgress();
-        $integration = $suites->findIntegrationSuitesInProgress();
-        $nightly = $suites->findNightlySuitesInProgress();
-        $weekly = $suites->findWeeklySuitesInProgress();
-
-        return $this->render('lbook/default/index.html.twig',
-            [
-                'suites' => $my_suites,
-                'sanity' => $sanity,
-                'integration' => $integration,
-                'nightly' => $nightly,
-                'weekly' => $weekly,
-            ]);
+        return $this->redirectToRoute('show_first_favorite');
+//        $my_suites = $suites->findSuitesInProgress();
+//        $sanity = $suites->findSanitySuitesInProgress();
+//        $integration = $suites->findIntegrationSuitesInProgress();
+//        $nightly = $suites->findNightlySuitesInProgress();
+//        $weekly = $suites->findWeeklySuitesInProgress();
+//
+//        return $this->render('lbook/default/index.html.twig',
+//            [
+//                'suites' => $my_suites,
+//                'sanity' => $sanity,
+//                'integration' => $integration,
+//                'nightly' => $nightly,
+//                'weekly' => $weekly,
+//            ]);
     }
 
     /**

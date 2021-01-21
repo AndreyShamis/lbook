@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookUser;
 use App\Repository\LogBookUserRepository;
+use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -91,12 +92,17 @@ class LogBookSecurityController extends AbstractController
                 $ret_arr['ldapUser'] = true;
             }
         } catch (ConnectionException $ex) {
-            if ($serverIndex === 1) {
+            if ($serverIndex === 1 || !getenv('LDAP_SERVER_2') || getenv('LDAP_SERVER_2') === '') {
                 throw new AuthenticationException('LDAP: ' . $ex->getMessage());
             } else {
                 return $this->ldapLogin($user_src, $pass_src, $passwordEncoder, 1);
             }
-
+        } catch (LdapException $ex) {
+            if ($serverIndex === 1 || !getenv('LDAP_SERVER_2') || getenv('LDAP_SERVER_2') === '') {
+                throw new AuthenticationException('LDAP: LdapException - ' . $ex->getMessage());
+            } else {
+                return $this->ldapLogin($user_src, $pass_src, $passwordEncoder, 1);
+            }
         }
         if (count($ret_arr) === 0) {
             throw new AuthenticationException('LDAP: nothing found - Server index ' . $serverIndex);

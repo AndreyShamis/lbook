@@ -166,6 +166,45 @@ class LogBookApiController extends AbstractController
         return new JsonResponse($fin_res);
     }
 
+
+    /**
+     * @Route("/suite_eta_runtime", name="api_suite_eta_runtime", methods={"POST", "GET"})
+     * @param SuiteExecutionRepository $suites
+     * @return Response
+     */
+    public function getSuiteEtaRunTime(Request $request, SuiteExecutionRepository $suites=null): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        //$data = ['uuid_list' => ['7e3f6cbf-df44-4565-81c8-15c19b064980',  '492d6bb0-2ea4-11e9-b210-d663bd873d93', 'f63849bc-5ae0-4044-85a6-54bd4dfc64f7', 'fec55a68-f259-462a-ab1e-a3ad62715f0f', 'd8ec4f9a-d310-4ac4-88fc-00fd675be879',]]; //
+            // json_decode($request->getContent(), true);
+
+        $uuid_list = $data['uuid_list'];
+        $qb = $this->em->createQueryBuilder();
+        $rs = $qb
+            ->select($qb->expr()->avg('s.finishedAt-s.startedAt'))
+            ->addSelect('s.name')
+            ->addSelect('s.uuid')
+            ->from('App:SuiteExecution','s')
+            ->where('s.uuid IN (:uuid_list)')
+            ->setMaxResults(100)
+            ->orderBy('s.id', 'DESC')
+            ->groupBy('s.suiteInfo')
+            ->setParameter('uuid_list', $uuid_list)
+            ->setMaxResults(1000)
+            ->getQuery()
+            ->getResult();
+        $ret = [];
+        foreach ($rs as $key => $value) {
+            //$fvalue['uuid'] = $value['uuid'];
+            $f_value['name'] = $value['name'];
+            $f_value['avg_run_rime'] = round((float)$value[1]/60);
+            $ret[$value['uuid']] = $f_value;
+        }
+        $response =  new JsonResponse($ret);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+    }
+
     /**
      *
      * @Route("/execution/publisher/count/{state}", name="count_suites_for_publisher", methods={"GET", "POST"})

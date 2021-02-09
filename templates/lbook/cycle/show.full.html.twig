@@ -422,7 +422,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
         <thead>
         <tr>
             {% if cycle_show_test_id_show == true %}
-                <th data-sortable="true" data-field="id">ID</th>
+                <th data-sortable="true" data-field="id" data-visible="false">ID</th>
             {% endif %}
             <th data-sortable="true" data-field="executionOrder" title="Test order">Order</th>
             <th data-sortable="true" data-field="name" data-sorter="htmlSorter" title="Test Name" data-footer-formatter="totalFormatter">Test Name</th>
@@ -434,7 +434,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                 <th data-sortable="true" data-field="timeEnd" data-sorter="dataTitleDateSorter" title="Test end time">End</th>
             {% endif %}
             {% if cycle_show_test_time_ratio_show == true %}
-                <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle">% time</th>
+                <th data-sorter="dataTitleIntSorter" data-sortable="true" data-field="time_ratio" title="Shows percentage of time in whole cycle" data-visible="false">% time</th>
             {% endif %}
             {% if suitesCount > 0 %}
             <th data-sortable="true" data-field="Suite" title="Suite Execution">Suite</th>
@@ -442,7 +442,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             <th data-sortable="true" data-field="Platform" title="Platform">Platform</th>
             <th data-sortable="true" data-field="Chip" title="Chip">Chip</th>
             <th data-sortable="true" data-field="Components" title="Components" data-visible="false">Components</th>
-            <th data-sortable="true" data-field="Host" title="Host" data-visible="false">Host</th>
+            <th data-sortable="true" data-field="Host" title="Host" data-visible="true">Host</th>
             {% endif %}
             {% if show_metadata == true %}
                 {% for key, item in additional_cols %}

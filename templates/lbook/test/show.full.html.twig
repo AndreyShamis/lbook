@@ -182,9 +182,10 @@
                     {% endif %}
 
                     {% if test.testInfo is defined and test.testInfo.id is defined %}
+
                         <div id="testInfo" class="tab-pane">
                             <ul>
-                                <li>Test Name: {{ test.testInfo.name }}</li>
+                                <li>Test Name: <a href="{{ path('log_book_test_info_show', {'id': test.testInfo.id}) }}">{{ test.testInfo.name }}</a></li>
                                 <li>Test Path: {{ test.testInfo.path ? test.testInfo.path : 'null' }}</li>
                             </ul>
                         </div>

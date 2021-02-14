@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New LogBookTestInfo{% endblock %}
+
+{% block body %}
+    <h1>Create new LogBookTestInfo</h1>
+
+    {{ include('log_book_test_info/_form.html.twig') }}
+
+    <a href="{{ path('log_book_test_info_index') }}">back to list</a>
+{% endblock %}

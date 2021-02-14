@@ -1,0 +1,26 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}LogBook TestInfo index{% endblock %}
+{% block content %}
+    <h4>LogBook TestInfo index</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Path</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log_book_test_info in log_book_test_infos %}
+            <tr>
+                <td><a href="{{ path('log_book_test_info_show', {'id': log_book_test_info.id}) }}">{{ log_book_test_info.id }}</a></td>
+                <td>{{ log_book_test_info.name }}</td>
+                <td>{{ log_book_test_info.path }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4">no records found</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{#    <a href="{{ path('log_book_test_info_new') }}">Create new</a>#}
+{% endblock %}

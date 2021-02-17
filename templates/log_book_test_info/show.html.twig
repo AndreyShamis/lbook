@@ -27,15 +27,25 @@
         <th>ID</th>
         <th>Cycle</th>
         <th>Setup</th>
+        <th>Order</th>
+        <th>Runtime</th>
+        <th>Start</th>
+        <th>End</th>
+        <th title="Runtime % in cycle">%</th>
         <th>Verdict</th>
     </tr>
     </thead>
     <tbody>
     {% for log_book_test in log_book_test_info.logBookTests %}
         <tr>
-            <td><a href="{{ path('test_show_first', {'id': log_book_test.id}) }}">{{ log_book_test.id }}</a></td>
-            <td>{{ log_book_test.cycle.name }}</td>
+            <td><a title="{{ log_book_test.testType | default('TEST') }} - {{ log_book_test.testInfo.path | default('') }}" href="{{ path('test_show_first', {'id': log_book_test.id}) }}">{{ log_book_test.id }}</a></td>
+            <td><a href="{{ path('cycle_show_first', { 'id': log_book_test.cycle.id }) }}">{{ log_book_test.cycle.name }}</a></td>
             <td>{{ log_book_test.setup.name }}</td>
+            <td>{{ log_book_test.executionOrder }}</td>
+            <td><span data-title="{{ log_book_test.timeRun }}">{{ log_book_test.timeRun | ExecutionTimeGeneric}}</span></td>
+            <td>{% if log_book_test.timeStart %}<span data-title="{{ log_book_test.timeStart|date('ymdHis') }}">{{ log_book_test.timeStart|date('m-d H:i:s') }}</span>{% endif %}</td>
+            <td>{% if log_book_test.timeEnd %}<span data-title="{{ log_book_test.timeEnd|date('ymdHis') }}">{{ log_book_test.timeEnd|date('H:i:s') }}</span>{% endif %}</td>
+            <td><span data-title="{{ log_book_test.timeRun }}"></span>{{ getPercentage(log_book_test.timeRun, log_book_test.cycle.testsTimeSum) }}%</td>
             <td><span class="badge {{ verdictToBadge(log_book_test.verdict)}}">{{ log_book_test.verdict }}</span></td>
         </tr>
     {% else %}

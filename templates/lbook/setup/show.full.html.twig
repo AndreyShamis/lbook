@@ -184,7 +184,7 @@
                     <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}" data-title="{{ cycle.id }}">{{ cycle.id }}</a>
                 </td>
                 <td title="{{ cycle.name }}">
-                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 65, "...") }}</a>
+                    <a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 90, "...") }}</a>
                 </td>
                 <td>{{ cycle.suiteExecution | length }}</td>
                 <td class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.testsCount }}</td>

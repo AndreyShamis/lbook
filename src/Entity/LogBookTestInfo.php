@@ -34,6 +34,7 @@ class LogBookTestInfo
 
     /**
      * @ORM\OneToMany(targetEntity=LogBookTest::class, mappedBy="testInfo", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"id" = "desc"})
      */
     private $logBookTests;
 

@@ -776,9 +776,6 @@ class LogBookUploaderController extends AbstractController
 
                 try {
                     $test_path = LogBookCommon::get($test->getMetaData(), 'CONTROL_FILE_SHOW_OPT', null);
-                    if ( $test_path === null) {
-                        $test_path = LogBookCommon::get($test->getMetaData(), 'CONTROL FILE', null);
-                    }
                     $testInfo = $this->testInfo->findOneOrCreate([
                         'name' => $test->getName(),
                         'path' => $test_path
@@ -1450,17 +1447,17 @@ class LogBookUploaderController extends AbstractController
                     /** @var string $preparedLevelName */
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
-                        if ($lineCounter > ($countLines - 20 && (($countLines - 20) > 0)) ) {
+                        if ($lineCounter > ($countLines - 500) && ($countLines - 500) > 0 ) {
                             # we allow to add last 20 lines
                         } else {
                             // In case this log LEVEL ignored for DB insert
-                            if ($skip_counter > 40) {
+                            if ($skip_counter > 180) {
                                 continue;
                             }
-                            if ($preparedLevelName === 'DEBUG' && $skip_counter > 8) {
+                            if ($preparedLevelName === 'DEBUG' && $skip_counter > 80) {
                                 continue;
                             }
-                            if ($preparedLevelName === 'INFO' && $skip_counter > 8) {
+                            if ($preparedLevelName === 'INFO' && $skip_counter > 80) {
                                 continue;
                             }
                             $skip_counter++;

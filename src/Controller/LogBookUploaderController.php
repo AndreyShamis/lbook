@@ -776,8 +776,12 @@ class LogBookUploaderController extends AbstractController
 
                 try {
                     $test_path = LogBookCommon::get($test->getMetaData(), 'CONTROL_FILE_SHOW_OPT', null);
-                    if ( $test_path === null) {
+                    $logger->alert('[CONTROL_FILE_SHOW_OPT] 1 Found Exception:' . $test_path, $test->getMetaData());
+
+                    if ( $test_path === null ) {
                         $test_path = LogBookCommon::get($test->getMetaData(), 'CONTROL FILE', null);
+                        $logger->alert('[CONTROL_FILE_SHOW_OPT] 2 Found Exception:' . $test_path, []);
+
                     }
                     $testInfo = $this->testInfo->findOneOrCreate([
                         'name' => $test->getName(),
@@ -1450,7 +1454,7 @@ class LogBookUploaderController extends AbstractController
                     /** @var string $preparedLevelName */
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
                     if (isset($this->blackListLevels[$preparedLevelName])) {
-                        if ($lineCounter > ($countLines - 20 && (($countLines - 20) > 0)) ) {
+                        if ($lineCounter > ($countLines - 100) && ($countLines - 100) > 0 ) {
                             # we allow to add last 20 lines
                         } else {
                             // In case this log LEVEL ignored for DB insert

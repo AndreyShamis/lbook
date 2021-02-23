@@ -823,14 +823,14 @@ class LogBookUploaderController extends AbstractController
                 if ($suite_execution !== null && $suite_execution->getPublish()) {
                     $daysToAdd = $setup->getRetentionPolicy();
                     if ($suite_execution->getTestingLevel() === 'weekly') {
-                        $cycle->setRetentionPolicy(max($daysToAdd, 160));
-                        $cycle->setTokenExpiration(new \DateTime('+30 hours'));
+                        $cycle->setRetentionPolicy(max($daysToAdd, 130));
+                        $cycle->setTokenExpiration(new \DateTime('+20 hours'));
                     } else if ($suite_execution->getTestingLevel() === 'nightly') {
-                        $cycle->setRetentionPolicy(max($daysToAdd, 120));
-                        $cycle->setTokenExpiration(new \DateTime('+10 hours'));
+                        $cycle->setRetentionPolicy(max($daysToAdd, 90));
+                        $cycle->setTokenExpiration(new \DateTime('+8 hours'));
                     } else {
                         if (strpos($suite_execution->getJobName(), 'build_and_promote') !== false) {
-                            $cycle->setRetentionPolicy(max($daysToAdd, 7));
+                            $cycle->setRetentionPolicy(max($daysToAdd, 45));
                         } else {
                             $cycle->setRetentionPolicy(max($daysToAdd, 60));
                         }

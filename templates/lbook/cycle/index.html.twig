@@ -54,7 +54,7 @@
                data-detail-formatter="detailFormatter"
                data-show-export="true"
                data-toolbar="#cycleIndexToolbar"
-               data-page-size="30" data-page-list="[20, 25, 30, 50, 100, 300, 500, 1000, 'ALL']" data-sort-order="desc">
+               data-page-size="30" data-page-list="[20, 25, 30, 50, 100, 300, 500, 1000, 2000, 3000, 'ALL']" data-sort-order="desc">
             <thead>
             <tr>
                 <th data-field="TimeDiff" data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false"></th>
@@ -81,7 +81,7 @@
                 <tr>
                     <td>{%  if date(cycle.updatedAt) > date('-30minutes') %}<i class="normal-icon ace-icon fa fa-clock-o pink bigger-130"></i>{% endif %}</td>
                     <td>{{ cycle.id }}</td>
-                    <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                    <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 100, "...") }}</a></td>
                     <td title="{{ cycle.setup }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id  }) }}">{{ shortString(cycle.setup, 35, "...") }}</a></td>
                     <td>{{ cycle.testsCount }}</td>
                     {#<td>{{ cycle.tests | length }}</td>#}

@@ -59,12 +59,13 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             <div class="tabbable">
                 <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="testInfoNav">
                     <li class="active"><a data-toggle="tab" href="#main">Main</a></li>
+                    {% if suitesCount > 0 %}
+                        <li class=""><a data-toggle="tab" href="#suites">Suites ({{ suitesCount }})</a></li>
+                    {% endif %}
+
+                    <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
                     {% if cycle.metaData %}
                         <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ cycle.metaData | length }})</a></li>
-                    {% endif %}
-                    <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
-                    {% if suitesCount > 0 %}
-                        <li class=""><a data-toggle="tab" href="#suites">Suites</a></li>
                     {% endif %}
                     {% if errors_found %}
                         <li class=""><a data-toggle="tab" href="#failures">Failures</a></li>

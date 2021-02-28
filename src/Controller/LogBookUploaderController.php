@@ -259,6 +259,7 @@ class LogBookUploaderController extends AbstractController
     {
         $created = false;
         $token = null;
+        $setupName = $cycleName = null;
         $ip = $request->getClientIp();
         $suiteExecution = null;
         $fin_res['DEBUG'] = array();
@@ -268,6 +269,12 @@ class LogBookUploaderController extends AbstractController
         }
         if (array_key_exists('token', $data)) {
             $token = $data['token'];
+        }
+        if (array_key_exists('setup_name', $data)) {
+            $setupName = $data['setup_name'];
+        }
+        if (array_key_exists('cycle_name', $data)) {
+            $cycleName = $data['cycle_name'];
         }
         try {
             if (!array_key_exists('hostname', $data)) {
@@ -319,8 +326,26 @@ class LogBookUploaderController extends AbstractController
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
             try {
-                if ( $token !== null ) {
-                    $cycle = $this->cycleRepo->findByToken($token);
+                if ( $token !== null && $setupName !== null && $setupName !== '' ) {
+                    $setup = $this->setupRepo->findByName($setupName);
+                    $cycle = $this->cycleRepo->findByToken($token, $setup);
+                    if ($cycle === null) {
+                        /* create new cycle -> Need Parse Setup  */
+                        if ($setup === null) {
+                            if (\strlen($setupName) < LogBookSetup::$MIN_NAME_LEN) {
+                                $setupName = $this->generateSetupName();
+                            }
+                            $setup = $this->setupRepo->findOneOrCreate(['name' => $setupName]);
+                        }
+                        if ($cycleName === '') {
+                            $cycleName = $this->generateCycleName();
+                        }
+                        $cycle = $this->cycleRepo->findOneOrCreate(array(
+                            'name' => $cycleName,
+                            'setup' => $setup,
+                            'uploadToken' => $token,
+                        ), false);
+                    }
                     if ($cycle !== null) {
                         $suiteExecution->setCycle($cycle);
                     }

@@ -258,6 +258,7 @@ class LogBookUploaderController extends AbstractController
     public function createSuiteExecution(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
     {
         $created = false;
+        $token = null;
         $ip = $request->getClientIp();
         $suiteExecution = null;
         $fin_res['DEBUG'] = array();
@@ -265,7 +266,9 @@ class LogBookUploaderController extends AbstractController
         if ($data === null) {
             $data = array();
         }
-
+        if (array_key_exists('token', $data)) {
+            $token = $data['token'];
+        }
         try {
             if (!array_key_exists('hostname', $data)) {
                 $data['hostname'] = $ip;
@@ -315,6 +318,17 @@ class LogBookUploaderController extends AbstractController
         try {
             $suiteExecution = $this->suiteExecutionRepo->findOneOrCreate($data);
             $created = true;
+            try {
+                if ( $token !== null ) {
+                    $cycle = $this->cycleRepo->findByToken($token);
+                    if ($cycle !== null) {
+                        $suiteExecution->setCycle($cycle);
+                    }
+                }
+            }catch (\Throwable $ex) {
+                $logger->critical('Failed to set cycle for suite:[' . $token . ']', $ex->getTrace());
+            }
+
             $logger->notice('NEW_SUITE:',
                 array(
                     'name' => $suiteExecution->getName(),

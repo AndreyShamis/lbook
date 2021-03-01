@@ -3,7 +3,11 @@
 {% block content %}
     <div class="row">
         <div class="col-xs-9">
-            <h3 style="margin-top: 0 !important;">Suite Execution [{{ suite.id }}] : {{ suite.name }}</h3>
+            <h3 style="margin-top: 0 !important;">Suite Execution [{{ suite.id }}] : {{ suite.name }}
+            {% if suite.suiteInfo is not null and suite.suiteInfo.id is defined %}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{{ path('log_book_suite_info_show', {'id': suite.suiteInfo.id}) }}"> Info {{ suite.suiteInfo.id }}</a>
+            {% endif %}
+            </h3>
         </div>
         <div class="col-xs-3">
             <span style="float: right;">

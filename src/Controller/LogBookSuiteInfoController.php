@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\LogBookSuiteInfo;
 use App\Form\LogBookSuiteInfoType;
 use App\Repository\LogBookSuiteInfoRepository;
+use App\Repository\SuiteExecutionRepository;
+use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,11 +52,48 @@ class LogBookSuiteInfoController extends AbstractController
 
     /**
      * @Route("/{id}", name="log_book_suite_info_show", methods={"GET"})
+     * @param LogBookSuiteInfo $suite
+     * @param PagePaginator $pagePaginator
+     * @param SuiteExecutionRepository $suites
+     * @param int $size
+     * @return Response
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function show(LogBookSuiteInfo $logBookSuiteInfo): Response
+    public function show(LogBookSuiteInfo $suite, PagePaginator $pagePaginator,  SuiteExecutionRepository $suites, int $size = 2000 ): Response
     {
+
+        //        $this->denyAccessUnlessGranted('view', $suite);
+        $query = $suites->createQueryBuilder('suite_execution')
+//            ->where('suite_execution.disabled = 0')
+            ->orderBy('suite_execution.updatedAt', 'DESC')
+            ->where('suite_execution.name = :name')
+            ->andWhere('suite_execution.uuid = :uuid')
+            ->setParameter('name', $suite->getName())
+            ->setParameter('uuid', $suite->getUuid())
+//            ->addOrderBy('suite_execution.cycle', 'DESC')
+        ;
+
+        $paginator = $pagePaginator->paginate($query, 1, $size);
+        $totalPosts = $paginator->count();
+        /** @var \ArrayIterator $iterator */
+        $iterator = $paginator->getIterator();
+
+        $maxPages = ceil($totalPosts / $size);
+        $thisPage = 1;
+        $this->em = $this->getDoctrine()->getManager();
+        /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
+        $suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
+        //$suite->calculateStatistic();
+
+
         return $this->render('log_book_suite_info/show.html.twig', [
-            'log_book_suite_info' => $logBookSuiteInfo,
+            'suite' => $suite,
+            'suiteInfo' => $suiteInfoRepo->findOneOrCreate(['name' => $suite->getName(), 'uuid' => $suite->getUuid()]),
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
         ]);
     }
 

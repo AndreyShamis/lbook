@@ -8,70 +8,50 @@
             <tr>
                 <th>Id</th>
                 <td>{{ suite.id }}</td>
-            </tr>
-            <tr>
                 <th>Name</th>
                 <td>{{ suite.name }}</td>
-            </tr>
-            <tr>
                 <th>Uuid</th>
                 <td>{{ suite.uuid }}</td>
             </tr>
             <tr>
                 <th>Tests Count</th>
                 <td>{{ suite.testsCount }}</td>
-            </tr>
-            <tr>
                 <th>Assignee</th>
-                <td>{{ suite.assignee | join(';') }}</td>
-            </tr>
-            <tr>
+                <td>{{ suite.assignee | join('; ') }}</td>
                 <th>Testing Level</th>
                 <td>{{ suite.testingLevel }}</td>
             </tr>
             <tr>
                 <th>Setup Config</th>
                 <td>{{ suite.setupConfig }}</td>
-            </tr>
-            <tr>
                 <th>Stop_on_fail</th>
                 <td>{{ suite.stopOnFail ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
                 <th>Stop_on_error</th>
                 <td>{{ suite.stopOnError ? 'Yes' : 'No' }}</td>
             </tr>
             <tr>
                 <th>Suite_timeout</th>
                 <td>{{ suite.suiteTimeout }}</td>
-            </tr>
-            <tr>
                 <th>Hours_to_run</th>
                 <td>{{ suite.hoursToRun }}</td>
-            </tr>
-            <tr>
                 <th>Test_timeout</th>
                 <td>{{ suite.testTimeout }}</td>
             </tr>
             <tr>
                 <th>Labels</th>
-                <td>{{ suite.labels | join(';') }}</td>
-            </tr>
-            <tr>
+                <td>{{ suite.labels | join('; ') }}</td>
                 <th>Supported_farms</th>
-                <td>{{ suite.supportedFarms | join(';') }}</td>
-            </tr>
-            <tr>
+                <td>{{ suite.supportedFarms | join('; ') }}</td>
                 <th>LastSeen</th>
                 <td>{{ suite.lastSeen ? suite.lastSeen|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
                 <th>CreationCount</th>
                 <td>{{ suite.creationCount }}</td>
-            </tr>
-            <tr>
                 <th>SuiteMode</th>
                 <td>{{ suite.suiteMode }}</td>
+                <th></th>
+                <td></td>
             </tr>
         </tbody>
     </table>

@@ -1,0 +1,68 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}Suites{% endblock %}
+{% block content %}
+    <h1>LogBookSuiteInfo index</h1>
+
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="suitesTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#suitesTableToolbar"
+           data-show-refresh="true"
+           data-key-events="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="20" data-page-list="[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000]" data-sort-order="desc">
+        <thead>
+            <tr>
+                <th data-sortable="true">ID</th>
+                <th data-sortable="true">Name</th>
+                <th data-sortable="true">UUID</th>
+                <th data-sortable="true" title="Tests count">Tests</th>
+                <th data-sortable="true">Suite Timeout</th>
+                <th data-sortable="true">Test Timeout</th>
+                <th data-sortable="true">Assignee</th>
+                <th data-sortable="true" title="Testing Level">Level</th>
+                <th data-sortable="true" data-visible="false">Setup Config</th>
+                <th data-sortable="true" data-visible="false" title="Stop on fail">Stop on fail</th>
+                <th data-sortable="true" data-visible="false" title="Stop on error">Stop on error</th>
+                <th data-sortable="true" data-visible="false" title="Hours_to_run">SST</th>
+                <th data-sortable="true" data-visible="false">Labels</th>
+                <th data-sortable="true" data-visible="true" title="Supported farms">FARMs</th>
+                <th data-sortable="true" title="LastSeen">Last</th>
+                <th data-sortable="true" data-visible="true" title="CreationCount">Creations</th>
+                <th data-sortable="true" title="Suite Mode">Mode</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log_book_suite_info in log_book_suite_infos %}
+            <tr>
+                <td><a href="{{ path('log_book_suite_info_show', {'id': log_book_suite_info.id}) }}">{{ log_book_suite_info.id }}</a></td>
+                <td>{{ log_book_suite_info.name }}</td>
+                <td class="font8">{{ log_book_suite_info.uuid }}</td>
+                <td>{{ log_book_suite_info.testsCount }}</td>
+                <td>{{ log_book_suite_info.suiteTimeout }}</td>
+                <td>{{ log_book_suite_info.testTimeout }}</td>
+                <td class="font8">{{ log_book_suite_info.assignee | join(';') }}</td>
+                <td class="font10">{{ log_book_suite_info.testingLevel }}</td>
+                <td class="font10">{{ log_book_suite_info.setupConfig }}</td>
+                <td class="font10">{{ log_book_suite_info.stopOnFail ? 'Yes' : 'No' }}</td>
+                <td class="font10">{{ log_book_suite_info.stopOnError ? 'Yes' : 'No' }}</td>
+                <td class="font10">{{ log_book_suite_info.hoursToRun }}</td>
+                <td class="font10">{{ log_book_suite_info.labels| join(';') }}</td>
+                <td class="font10">{{ log_book_suite_info.supportedFarms | join(';')}}</td>
+                <td class="font10">{{ log_book_suite_info.lastSeen ? log_book_suite_info.lastSeen|date('Y-m-d H:i:s') : '' }}</td>
+                <td class="font10">{{ log_book_suite_info.creationCount }}</td>
+                <td class="font10">{{ log_book_suite_info.suiteMode }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="18">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{#    <a href="{{ path('log_book_suite_info_new') }}">Create new</a>#}
+{% endblock %}

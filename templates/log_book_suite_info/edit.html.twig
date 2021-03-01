@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit LogBookSuiteInfo{% endblock %}
+
+{% block body %}
+    <h1>Edit LogBookSuiteInfo</h1>
+
+    {{ include('log_book_suite_info/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('log_book_suite_info_index') }}">back to list</a>
+
+    {{ include('log_book_suite_info/_delete_form.html.twig') }}
+{% endblock %}

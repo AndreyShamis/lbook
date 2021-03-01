@@ -388,7 +388,7 @@ class LogBookSuiteInfo
         return $this;
     }
 
-    public function getLastSeen(): \DateTimeInterface
+    public function getLastSeen(): ?\DateTimeInterface
     {
         return $this->lastSeen;
     }

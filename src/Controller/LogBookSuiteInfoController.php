@@ -17,42 +17,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LogBookSuiteInfoController extends AbstractController
 {
-    /**
-     * @Route("/{filter<\w*>}", name="log_book_suite_info_index", methods={"GET"})
-     */
-    public function index(LogBookSuiteInfoRepository $logBookSuiteInfoRepository, string $filter = ''): Response
-    {
-        return $this->render('log_book_suite_info/index.html.twig', [
-            'log_book_suite_infos' => $logBookSuiteInfoRepository->findAll(),
-            'filter' => $filter
-        ]);
-    }
-
-//    /**
-//     * @Route("/new", name="log_book_suite_info_new", methods={"GET","POST"})
-//     */
-//    public function new(Request $request): Response
-//    {
-//        $logBookSuiteInfo = new LogBookSuiteInfo();
-//        $form = $this->createForm(LogBookSuiteInfoType::class, $logBookSuiteInfo);
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $entityManager = $this->getDoctrine()->getManager();
-//            $entityManager->persist($logBookSuiteInfo);
-//            $entityManager->flush();
-//
-//            return $this->redirectToRoute('log_book_suite_info_index');
-//        }
-//
-//        return $this->render('log_book_suite_info/new.html.twig', [
-//            'log_book_suite_info' => $logBookSuiteInfo,
-//            'form' => $form->createView(),
-//        ]);
-//    }
 
     /**
-     * @Route("/{id}", name="log_book_suite_info_show", methods={"GET"})
+     * @Route("/show/{id}", name="log_book_suite_info_show", methods={"GET"})
      * @param LogBookSuiteInfo $suite
      * @param PagePaginator $pagePaginator
      * @param SuiteExecutionRepository $suites
@@ -97,6 +64,50 @@ class LogBookSuiteInfoController extends AbstractController
             'paginator' => $paginator,
         ]);
     }
+
+    /**
+     * @Route("/", name="log_book_suite_info_index", methods={"GET"})
+     */
+    public function index(LogBookSuiteInfoRepository $logBookSuiteInfoRepository): Response
+    {
+        return $this->index_filter($logBookSuiteInfoRepository, '');
+    }
+
+    /**
+     * @Route("/filter/{filter<.*>}", name="log_book_suite_info_index_filter", methods={"GET"})
+     */
+    public function index_filter(LogBookSuiteInfoRepository $logBookSuiteInfoRepository, string $filter = ''): Response
+    {
+        return $this->render('log_book_suite_info/index.html.twig', [
+            'log_book_suite_infos' => $logBookSuiteInfoRepository->findAll(),
+            'filter' => $filter
+        ]);
+    }
+
+//    /**
+//     * @Route("/new", name="log_book_suite_info_new", methods={"GET","POST"})
+//     */
+//    public function new(Request $request): Response
+//    {
+//        $logBookSuiteInfo = new LogBookSuiteInfo();
+//        $form = $this->createForm(LogBookSuiteInfoType::class, $logBookSuiteInfo);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $entityManager = $this->getDoctrine()->getManager();
+//            $entityManager->persist($logBookSuiteInfo);
+//            $entityManager->flush();
+//
+//            return $this->redirectToRoute('log_book_suite_info_index');
+//        }
+//
+//        return $this->render('log_book_suite_info/new.html.twig', [
+//            'log_book_suite_info' => $logBookSuiteInfo,
+//            'form' => $form->createView(),
+//        ]);
+//    }
+
+
 
 //    /**
 //     * @Route("/{id}/edit", name="log_book_suite_info_edit", methods={"GET","POST"})

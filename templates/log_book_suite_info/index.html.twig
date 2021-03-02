@@ -68,7 +68,7 @@
             $( "#suitesTableToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
                 value = $("input:text.form-control").val();
                 if (value.length > 0) {
-                    location.href = '/suite/' + value;
+                    location.href = '/suite/filter/' + value;
 
                 } else {
                     location.reload();

@@ -26,14 +26,20 @@
         </a><b class="arrow"></b>
     </li>
 
-    <li class="{% if route starts with 'suites_' %}active{% endif %}">
-        <a href="{{asset(path('suite_index'))}}">
+    <li class="{% if route starts with 'log_book_suite_' %}active{% endif %}">
+        <a href="{{asset(path('log_book_suite_info_index'))}}">
             <i class="menu-icon fa fa-list-alt"></i>
             <span class="menu-text bigger-120" title="Suites"> Suites </span>
         </a>
         <b class="arrow"></b>
     </li>
-
+    <li class="{% if route starts with 'suites_' %}active{% endif %}">
+        <a href="{{asset(path('suite_index'))}}">
+            <i class="menu-icon fa fa-list-alt"></i>
+            <span class="menu-text bigger-120" title="Suites"> Suite Executions</span>
+        </a>
+        <b class="arrow"></b>
+    </li>
     <li class="{% if route starts with 'log_book_cycle_report_' %}active{% endif %}">
         <a href="{{asset(path('log_book_cycle_report_index'))}}">
             <i class="menu-icon fa fa-book"></i>

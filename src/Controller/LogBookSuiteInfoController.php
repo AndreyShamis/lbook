@@ -18,12 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class LogBookSuiteInfoController extends AbstractController
 {
     /**
-     * @Route("/", name="log_book_suite_info_index", methods={"GET"})
+     * @Route("/{filter<\w*>}", name="log_book_suite_info_index", methods={"GET"})
      */
-    public function index(LogBookSuiteInfoRepository $logBookSuiteInfoRepository): Response
+    public function index(LogBookSuiteInfoRepository $logBookSuiteInfoRepository, string $filter = ''): Response
     {
         return $this->render('log_book_suite_info/index.html.twig', [
             'log_book_suite_infos' => $logBookSuiteInfoRepository->findAll(),
+            'filter' => $filter
         ]);
     }
 

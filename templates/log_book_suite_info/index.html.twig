@@ -1,8 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}Suites{% endblock %}
 {% block content %}
-    <h1>LogBookSuiteInfo index</h1>
-
+    <h4>Suite List</h4>
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="suitesTable" data-pagination="true" data-search="true" data-toggle="table"
            data-toolbar="#suitesTableToolbar"
@@ -22,7 +21,7 @@
                 <th data-sortable="true" title="Tests count">Tests</th>
                 <th data-sortable="true">Suite Timeout</th>
                 <th data-sortable="true">Test Timeout</th>
-                <th data-sortable="true">Assignee</th>
+                <th data-sortable="true" data-visible="false">Assignee</th>
                 <th data-sortable="true" title="Testing Level">Level</th>
                 <th data-sortable="true" data-visible="false">Setup Config</th>
                 <th data-sortable="true" data-visible="false" title="Stop on fail">Stop on fail</th>
@@ -63,6 +62,31 @@
         {% endfor %}
         </tbody>
     </table>
+    <script>
 
+        $(document).ready(function() {
+            $( "#suitesTableToolbar, button[name = 'refresh'].btn" ).bind( "click", function() {
+                value = $("input:text.form-control").val();
+                if (value.length > 0) {
+                    location.href = '/suite/' + value;
+
+                } else {
+                    location.reload();
+
+                }
+
+            });
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
+
+            } catch (e) {}
+            {% if filter | length > 0 %}
+            $("input:text.form-control").val('{{ filter }}');
+            $("input:text.form-control").keyup();
+            {% endif %}
+
+        });
+    </script>
 {#    <a href="{{ path('log_book_suite_info_new') }}">Create new</a>#}
 {% endblock %}

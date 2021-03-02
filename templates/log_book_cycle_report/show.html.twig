@@ -89,7 +89,7 @@
                                             <span class="line-height-1 bigger-170 green">{{ log_book_cycle_report.testsTotalEnabledInSuites }}</span><br>
                                             <span class="line-height-1 smaller-90">Enabled</span>
                                         </span>
-                                        <span class="btn btn-app btn-app btn-light">
+                                        <span class="btn btn-app btn-app btn-light" title="running ratio  - number of executed tests / total number of enabled tests.">
                                             <span class="line-height-1 bigger-170 brown">{{ getPercentage(log_book_cycle_report.testsTotal, log_book_cycle_report.testsTotalEnabledInSuites ) | round(0, 'floor')}}%</span><br>
                                             <span class="line-height-1 smaller-80">Ratio</span>
                                         </span>

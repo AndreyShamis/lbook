@@ -21,26 +21,42 @@
     </table>
 
     <a href="{{ path('log_book_test_info_index') }}">back to list</a>
-<table class="table">
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="testsTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#testsTableToolbar"
+           data-show-refresh="true"
+           data-key-events="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="20" data-page-list="[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000]" data-sort-order="desc">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Cycle</th>
-        <th>Setup</th>
-        <th>Order</th>
-        <th>Runtime</th>
-        <th>Start</th>
-        <th>End</th>
-        <th title="Runtime % in cycle">%</th>
-        <th>Verdict</th>
+        <th data-sortable="true">ID</th>
+        <th data-sortable="true">Suite</th>
+        <th data-sortable="true">Cycle</th>
+        <th data-sortable="true">Branch</th>
+        <th data-sortable="true">Setup</th>
+        <th data-sortable="true">Host</th>
+        <th data-sortable="true" data-visible="false">Order</th>
+        <th data-sortable="true">Runtime</th>
+        <th data-sortable="true">Start</th>
+        <th data-sortable="true" data-visible="false">End</th>
+        <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
+        <th data-sortable="true">Verdict</th>
     </tr>
     </thead>
     <tbody>
-    {% for log_book_test in log_book_test_info.logBookTests %}
+    {% for log_book_test in log_book_test_info.logBookTests | slice(0, 5000) %}
         <tr>
             <td><a title="{{ log_book_test.testType | default('TEST') }} - {{ log_book_test.testInfo.path | default('') }}" href="{{ path('test_show_first', {'id': log_book_test.id}) }}">{{ log_book_test.id }}</a></td>
+            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.name : '' }}</td>
             <td><a href="{{ path('cycle_show_first', { 'id': log_book_test.cycle.id }) }}">{{ log_book_test.cycle.name }}</a></td>
+            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.branchName : '' }}</td>
             <td>{{ log_book_test.setup.name }}</td>
+            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.host.name : '' }}</td>
             <td>{{ log_book_test.executionOrder }}</td>
             <td><span data-title="{{ log_book_test.timeRun }}">{{ log_book_test.timeRun | ExecutionTimeGeneric}}</span></td>
             <td>{% if log_book_test.timeStart %}<span data-title="{{ log_book_test.timeStart|date('ymdHis') }}">{{ log_book_test.timeStart|date('m-d H:i:s') }}</span>{% endif %}</td>

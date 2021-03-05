@@ -54,7 +54,7 @@
             <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time diff">UpdDiff</th>
             <th data-sortable="true" title="Node" data-switchable="true">Node</th>
             <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true" data-visible="false">S</th>
-            <th data-sortable="true" title="Owners" data-switchable="true" data-visible="true">Owner</th>
+            <th data-sortable="true" title="Owners" data-switchable="true" data-visible="false">Owner</th>
             <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true" data-footer-formatter="totalFormatter">Pub</th>
 {#            <th class="suite_list_options_column">Options</th>#}
         </tr>
@@ -90,9 +90,13 @@
 {#                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>#}
 {#                    {% endif %}#}
 {#                </td>#}
-                <td class="font7">{{ suiteExecution.id }}</td>
+                <td class="font8"><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.id }}</a></td>
                 <td class="font8">{{ suiteExecution.uuid }}</td>
-                <td><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.name }}</a></td>
+                <td>{% if suiteExecution.cycle is not null and suiteExecution.cycle.id is not null %}
+                        <a href="{{ path('cycle_suite_show_first', { 'cycle': suiteExecution.cycle.id, 'suite': suiteExecution.id }) }}">{{ suiteExecution.name }}</a>
+                    {% else %}
+                        {{ suiteExecution.name }}
+                    {% endif %}
                 <td class="font9">{{ suiteExecution.productVersion }}</td>
                 <td class="font10">{{ suiteExecution.testingLevel }}</td>
                 <td class="font9">

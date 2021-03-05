@@ -40,6 +40,17 @@
                         <li class="" title="Test Info"><a data-toggle="tab" href="#testInfo">Test Info [{{ test.testInfo.id }}]</a></li>
                     {% endif %}
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
+
+                    <label class="pull-right inline">
+                        <small class="muted">Platform:</small>
+
+                        <span class="label label-info label-white middle" style="background-color: {{ stringToColor(suite.platform) }} !important;">{{ suite.platform | default('') }}</span>
+                        <span class="lbl middle"></span>
+                        <small class="muted">Chip:</small>
+
+                        <span class="label label-purple label-white middle" style="background-color: {{ stringToColor(suite.chip) }} !important;">{{ suite.chip | default('') }}</span>
+                        <span class="lbl middle"></span>
+                    </label>
                 </ul>
 
                 <div class="tab-content">
@@ -75,20 +86,31 @@
                             </tr>
                             <tr>
                                 <th>Suite</th>
-                                <td>{{ test.suiteName }}</td>
-                                <th>Type</th>
-                                <td>{{ test.testType }}</td>
+                                <td>{{ test.suiteExecution.id | default('')}}  &nbsp;&nbsp;&nbsp; <strong>{{ test.suiteName }}</strong></td>
+                                <th>Time start</th>
+                                <td>
+                                    <i class="ace-icon fa fa-calendar"></i>
+                                    <span class="blue" title="Start time">{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</span>
+                                </td>
                                 <th>File Size</th>
                                 <td>{{ formatBytes(test.logFileSize) }} ( {{ test.logFileSize }} )</td>
                             </tr>
                             <tr>
-                                <th>Chip</th>
-                                <td>{{ test.suiteExecution.chip | default('') }}</td>
-                                <th>Time start / Time end</th>
+                                <th>Verdict</th>
+                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span>
+
+                                    {% if suite.host and suite.host.ip is defined %}
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Host :</strong>
+                                        <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
+                                    {% endif %}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Type :</strong>
+                                    {{ test.testType }}
+                                </td>
+{#                                <th>Chip</th>#}
+{#                                <td>{{ test.suiteExecution.chip | default('') }}</td>#}
+                                <th>Time end</th>
                                 <td>
-                                    <i class="ace-icon fa fa-calendar"></i>
-                                    <span class="blue" title="Start time">{% if test.timeStart %}{{ test.timeStart|date('Y-m-d H:i:s') }}{% endif %}</span>
-                                    /
+
                                     <i class="ace-icon fa fa-calendar"></i>
                                     <span class="blue" title="End time">{% if test.timeEnd %}{{ test.timeEnd|date('Y-m-d H:i:s') }}{% endif %}</span>
                                 </td>
@@ -103,16 +125,16 @@
  </span>
                                 </td>
                             </tr>
-                            <tr>
-                                <th>Platform</th>
-                                <td>{{ test.suiteExecution.platform | default('')  }}</td>
-                                <th>Verdict</th>
-                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span>
+{#                            <tr>#}
+{#                                <th>Platform</th>#}
+{#                                <td>{{ test.suiteExecution.platform | default('')  }}</td>#}
+{#                                <th>Verdict</th>#}
+{#                                <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span>#}
 
-                                </td>
-                                <th></th>
-                                <td></td>
-                            </tr>
+{#                                </td>#}
+{#                                <th></th>#}
+{#                                <td></td>#}
+{#                            </tr>#}
                             {% set fnParsed = test.failDescription %}
                             {% set fParsed = test.failDescription(true) %}
 
@@ -233,12 +255,38 @@
         </li>
 
         <li class="next">
-            {% if test_right!= null %}
+            {% if test_right != null %}
                 <a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>
             {% endif %}
         </li>
     </ul>
-
+    {% set test_index = test.suiteExecution.tests.indexOf(test) %}
+    {% set test_count = test.suiteExecution.tests.count %}
+    {% set test_left_new = test.suiteExecution.tests.get(test_index - 1) %}
+    {% set test_right_new = test.suiteExecution.tests.get(test_index + 1) %}
+    {% if test_left_new is not null and (test_left is not null and test_left_new.id != test_left.id) %}
+    {% else %}
+        {% set test_left_new = null  %}
+    {% endif %}
+    {% if test_right_new is not null and (test_right is not null and test_right_new.id != test_right.id)  %}
+    {% else %}
+        {% set test_right_new = null  %}
+    {% endif %}
+    {% if test_right_new is not null or test_left_new  is not null %}
+    <ul class="pager" style="margin: 5px 0;">
+        <li class="previous">
+            {% if test_left_new is not null %}
+                <a title="To previous test in this suite " href="{{ path('test_show_first', {'id': test_left_new.id } ) }}">← {{ test_left_new.name }}</a>
+            {% endif %}
+        </li>
+        {{ test_index }}/ {{ test_count }}
+        <li class="next">
+            {% if test_right_new is not null %}
+                <a title="To next test in this suite" href="{{ path('test_show_first', {'id': test_right_new.id } ) }}">{{ test_right_new.name }} →</a>
+            {% endif %}
+        </li>
+    </ul>
+    {% endif %}
     {% set logs = test.logs %}
     {% set pagePath = "test_show" %}
     {% set objId = test.id %}

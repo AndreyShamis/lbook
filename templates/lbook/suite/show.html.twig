@@ -44,16 +44,15 @@
     <table class="records_list table table-striped table-condensed">
         <tbody>
         <tr>
-            <th>Id</th>
-            <td>{{ suite.id }}
+            <th>{{ suite.id }}</th>
+            <td>
 
                 {% if suite.cycle.id is defined %}
+                    Cycle:
+                    {{ suite.cycle.id }}:<a title="{{ suite.cycle.name }}" href="{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">View cycle tests cycle</a>
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    Cycle :
-                    {{ suite.cycle.id }}:<a href="{{ path('cycle_show_first', { 'id': suite.cycle.id }) }}">{{ suite.cycle.name }}</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    Suite Cycle :
-                    {{ suite.cycle.id }}:<a href="{{ path('cycle_suite_show_first', { 'cycle': suite.cycle.id, 'suite': suite.id }) }}">{{ suite.cycle.name }}</a>
+                    Suite:
+                    {{ suite.cycle.id }}:<a href="{{ path('cycle_suite_show_first', { 'cycle': suite.cycle.id, 'suite': suite.id }) }}">View only Suite tests</a>
                 {% endif %}
             </td>
             <th>Testing Level</th>

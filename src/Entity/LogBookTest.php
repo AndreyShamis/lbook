@@ -155,7 +155,7 @@ class LogBookTest
 
     /**
      * @ORM\OneToOne(targetEntity=LogBookTestMD::class, cascade={"persist", "remove"}, orphanRemoval=true)
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $newMetaData;
 

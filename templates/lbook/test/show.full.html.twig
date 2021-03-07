@@ -22,6 +22,9 @@
         </div>
     </div>
     {% set suite = '' %}
+    {% set test_index_cycle = test.cycle.tests.indexOf(test) %}
+    {% set test_left = test.cycle.tests.get(test_index_cycle - 1) %}
+    {% set test_right = test.cycle.tests.get(test_index_cycle + 1) %}
     {% if test.suiteExecution %}
         {% set suite = test.suiteExecution %}
         {% set test_index = test.suiteExecution.tests.indexOf(test) %}
@@ -228,8 +231,8 @@
     {#{% set search_value = test.verdict.name %}#}
     {#{% endif %}#}
     <ul class="pager" style="margin: 5px 0;">
-        <li class="previous" style="font-size:11px !important;">{% if test_left != null %}<a href="{{ path('test_show_first', {'id': test_left.id } ) }}">← {{ test_left.name }}</a>{% endif %}</li>
-        <li class="next" style="font-size:11px !important;">{% if test_right != null %}<a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>{% endif %}</li>
+        <li class="previous" style="font-size:11px !important;">{% if test_left is not null %}<a href="{{ path('test_show_first', {'id': test_left.id } ) }}"> ← {{ test_left.name }}</a>{% endif %}</li>
+        <li class="next" style="font-size:11px !important;">{% if test_right is not null %}<a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} → </a>{% endif %}</li>
     </ul>
     {% if suite %}
 

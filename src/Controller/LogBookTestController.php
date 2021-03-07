@@ -714,55 +714,6 @@ class LogBookTestController extends AbstractController
             }
 
             $thisPage = $page;
-            $test_left = $test_right = null;
-//            $deleteForm = $this->createDeleteForm($test);
-            $cycle = $test->getCycle();
-            $tests_count = $cycle->getTestsCount();
-            $max_res = 2;
-            if ($tests_count <= 1){
-                /** If one or zero tests in cycle - there is no test on right or on left */
-                $max_res = 0;
-            } else if ($test->getExecutionOrder() === 0) {
-                /** If test_count 2 or more and execution order is 0 - there is no test on left */
-                $max_res = 1;
-            } elseif ($tests_count -1 === $test->getExecutionOrder()){
-                /** If test_count 2 or more and execution order is same as test_count - there is no test on right */
-                $max_res = 1;
-            }
-            try {
-                if ($max_res > 0) {
-                    $qbq = $testRepo->createQueryBuilder('t')
-                        ->where('t.cycle = :cycle_id')
-                        ->andWhere('t.disabled = 0')
-                        ->andWhere('t.forDelete = 0')
-                        ->andWhere('t.executionOrder = :order_lower or t.executionOrder = :order_upper')
-                        ->orderBy('t.executionOrder', 'ASC')
-                        ->setParameters(array(
-                            'cycle_id' => $cycle->getId(),
-                            'order_lower' => $test->getExecutionOrder() - 1,
-                            'order_upper' => $test->getExecutionOrder() + 1
-                        ))
-                        ->setCacheable(true)
-                        ->setLifetime(30)
-                        ->setMaxResults($max_res)
-                        ->getQuery();
-                    /** @var array $tests */
-                    $tests = $qbq->execute();
-                    if (\count($tests) === 2) {
-                        [$test_left, $test_right] = $tests;
-                    } elseif (\count($tests) === 1) {
-                        /** @var LogBookTest $someTest */
-                        $someTest = $tests[0];
-                        if ($someTest->getExecutionOrder() < $test->getExecutionOrder()) {
-                            $test_left = $someTest;
-                        } else {
-                            $test_right = $someTest;
-                        }
-                    }
-                }
-            } catch (\Exception $ex) {
-                throw new \RuntimeException($ex->getMessage());
-            }
 
             return $this->render('lbook/test/show.full.html.twig', array(
                 'test'          => $test,
@@ -771,8 +722,6 @@ class LogBookTestController extends AbstractController
                 'thisPage'      => $thisPage,
                 'iterator'      => $iterator,
                 'paginator'     => $paginator,
-                'test_left'     => $test_left,
-                'test_right'    => $test_right,
 //                'delete_form'   => $deleteForm->createView(),
                 'file_exist'    => $this->isTestFileExist($test),
             ));

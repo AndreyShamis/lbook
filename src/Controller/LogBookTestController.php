@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Entity\LogBookCycle;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookTestFailDesc;
-use App\Entity\LogBookTestMD;
-use App\Entity\LogBookVerdict;
 use App\Entity\TestSearch;
 use App\Form\TestSearchType;
 use App\Repository\LogBookCycleRepository;
@@ -17,7 +15,6 @@ use App\Repository\LogBookTestMDRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\LogBookTestTypeRepository;
 use App\Repository\LogBookVerdictRepository;
-use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
@@ -692,15 +689,33 @@ class LogBookTestController extends AbstractController
             if (!$test) {
                 throw new \RuntimeException('');
             }
-
+            $totalPosts = 0;
             $qb = $logRepo->createQueryBuilder('log_book_message')
                 ->where('log_book_message.test = :test')
                 ->setCacheable(true)
                 ->setLifetime(120)
                 ->orderBy('log_book_message.chain', 'ASC')
                 ->setParameter('test', $test->getId());
-            $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
-            $totalPosts = $paginator->count(); // Count of ALL posts (ie: `20` posts)
+            $res = $qb->getQuery()->execute();
+            if (count($res) === 0) {
+                $em = $this->getDoctrine()->getManager();
+                /** @var ClassMetadataInfo $classMetaData */
+                $classMetaData = $em->getClassMetadata('App:LogBookMessage');
+                $classMetaData->setPrimaryTable(['name' => $test->getDbNameWithPrefix()]);
+                $logRepo->createCustomTable($test->getDbPrefix());
+
+//                $qb = $logRepo->createQueryBuilder('log_book_message')
+//                    ->where('log_book_message.test = :test')
+//                    ->setCacheable(true)
+//                    ->setLifetime(120)
+//                    ->orderBy('log_book_message.chain', 'ASC')
+//                    ->setParameter('test', $test->getId());
+                $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
+                $totalPosts = $paginator->count();
+            } else {
+                $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
+                $totalPosts = $paginator->count();
+            }
             $iterator = $paginator->getIterator(); # ArrayIterator
 
             $impossibleSize = $this->log_size * ($page-1) + 1;

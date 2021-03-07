@@ -9,6 +9,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookMessage;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Utils\RandomString;
@@ -45,6 +46,7 @@ class UploaderTest extends LogBookApplicationTestCase
         );
         $postHeader = array('HTTP_REFERER' => '/upload/new_cli',);
         $testRepo = self::$entityManager->getRepository(LogBookTest::class);
+        $logsRepo = self::$entityManager->getRepository(LogBookMessage::class);
         $passTestName = 'network_WiFi_Perf.11g';
         $passFileName = 'PASS__' . $passTestName;
         $errorTestName = 'network_WiFi_BluetoothStreamPerf.11a';
@@ -85,6 +87,9 @@ class UploaderTest extends LogBookApplicationTestCase
         $cycle = $test->getCycle();
         /** @var LogBookSetup $setup */
         $setup = $cycle->getSetup();
+        $logsRepo->setCustomTable($cycle->getDbName());
+
+        $test = $testRepo->find($testId);
 
         //echo "Setup cycles count " . count($setup->getCycles()) . "\n";
         $this->assertSame($setupName, $setup->getName(), 'Check that AutoGEN Setup name is same: Actual: ' . $setup->getName() . ', expected ' . $setupName . 'Current testID:' . $testId);

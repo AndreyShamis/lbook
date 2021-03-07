@@ -108,6 +108,7 @@ class LogBookSetupRepository extends ServiceEntityRepository
      */
     public function delete(LogBookSetup $setup): void
     {
+        $setupId = $setup->getId();
         /** @var LogBookCycleRepository $cycleRepo */
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */
@@ -149,6 +150,12 @@ class LogBookSetupRepository extends ServiceEntityRepository
         }
         if (!$cycleDeleteErrorFound) {
             $this->_em->remove($setup);
+        }
+        try{
+            $sql = 'DROP TABLE log_book_message_' . $setupId;
+            $this->_em->getConnection()->prepare($sql)->execute();
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[SETUP][DELETE]: Cannot drop table :' . $setupId );
         }
         $this->_em->flush($setup);
     }

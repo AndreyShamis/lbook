@@ -447,6 +447,17 @@ class LogBookTest
         return $this->cycle;
     }
 
+    public function getDbNameWithPrefix(): string
+    {
+        return 'log_book_message_' . $this->getDbPrefix();
+    }
+
+
+    public function getDbPrefix(): string
+    {
+        return (string)$this->getCycle()->getSetup()->getId();
+    }
+
     /**
      * @param LogBookCycle $cycle
      */

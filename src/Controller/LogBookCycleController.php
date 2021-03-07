@@ -741,7 +741,11 @@ class LogBookCycleController extends AbstractController
             $path = $this->getLogsFolder($cycle);
 
             $zip = new \ZipArchive();
-            $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
+            if ($suite !== null) {
+                $zipName = sprintf('%d__%d__%d__%s_%s_%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $suite->getId(), $suite->getName(), $suite->getUuid(), $suite->getBuildType());
+            } else {
+                $zipName = sprintf('%d__%d__%s.zip', $cycle->getSetup()->getId(), $cycle->getId(), $cycle->getName());
+            }
             $zipName = preg_replace('/[^a-zA-Z0-9\-\_\.\(\)\s]/', '', $zipName);
 
             $zip->open($zipName,  \ZipArchive::CREATE | \ZipArchive::OVERWRITE);

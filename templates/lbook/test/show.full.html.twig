@@ -23,8 +23,13 @@
     </div>
     {% set suite = '' %}
     {% if test.suiteExecution %}
-    {% set suite = test.suiteExecution %}
+        {% set suite = test.suiteExecution %}
+        {% set test_index = test.suiteExecution.tests.indexOf(test) %}
+        {% set test_count = test.suiteExecution.tests.count %}
+        {% set test_left_new = test.suiteExecution.tests.get(test_index - 1) %}
+        {% set test_right_new = test.suiteExecution.tests.get(test_index + 1) %}
     {% endif %}
+
     <div class="row">
         <div class="col-sm-12">
             <div class="tabbable">
@@ -34,7 +39,7 @@
                         <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ test.metaData | length }})</a></li>
                     {% endif %}
                     {% if suite %}
-                        <li class="" title="Suite {{ suite.summary }}"><a data-toggle="tab" href="#suiteExecution">{{ suite.id }} - {{ suite.name }} - {{ suite.passRate }}%</a></li>
+                        <li class="" title="Suite {{ suite.summary }}"><a data-toggle="tab" href="#suiteExecution">{{ suite.id }} [{{ test_index + 1 }}/{{ test_count }}] - {{ suite.name }} - {{ suite.passRate }}%</a></li>
                     {% endif %}
                     {% if test.testInfo is defined and test.testInfo.id is defined %}
                         <li class="" title="Test Info"><a data-toggle="tab" href="#testInfo">Test Info [{{ test.testInfo.id }}]</a></li>
@@ -42,11 +47,20 @@
                     <li class=""><a data-toggle="tab" href="#other">Other</a></li>
                     {% if suite %}
                     <label class="pull-right inline">
+                        {% if suite.host and suite.host.ip is defined %}
+                            <small class="muted">Host:</small>
+                            <span class="label label-info label-white middle" style="color: {{ stringToColor(suite.host.ip| default('')) }} !important;" title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
+                            <span class="lbl middle"></span>
+
+                        {% endif %}
+                        <small class="muted">Build Flavor:</small>
+                        <span class="label label-info label-white middle" style="color: {{ stringToColor(suite.buildType| default('')) }} !important;">{{ suite.buildType | default('') }}</span>
+                        <span class="lbl middle"></span>
                         <small class="muted">Platform:</small>
-                        <span class="label label-info label-white middle" style="background-color: {{ stringToColor(suite.platform| default('')) }} !important;">{{ suite.platform | default('') }}</span>
+                        <span class="label label-info label-white middle" style="color: {{ stringToColor(suite.platform| default('')) }} !important;">{{ suite.platform | default('') }}</span>
                         <span class="lbl middle"></span>
                         <small class="muted">Chip:</small>
-                        <span class="label label-purple label-white middle" style="background-color: {{ stringToColor(suite.chip| default('')) }} !important;">{{ suite.chip | default('') }}</span>
+                        <span class="label label-purple label-white middle" style="color: {{ stringToColor(suite.chip| default('')) }} !important;">{{ suite.chip | default('') }}</span>
                         <span class="lbl middle"></span>
                     </label>
                     {% endif %}
@@ -96,10 +110,6 @@
                             <tr>
                                 <th>Verdict</th>
                                 <td><span class="badge {{ verdictToBadge(test.verdict)}}">{{ test.verdict }}</span>
-                                    {% if suite and suite.host and suite.host.ip is defined %}
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Host :</strong>
-                                        <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
-                                    {% endif %}
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Type :</strong>
                                     {{ test.testType }}
                                 </td>
@@ -218,27 +228,25 @@
     {#{% set search_value = test.verdict.name %}#}
     {#{% endif %}#}
     <ul class="pager" style="margin: 5px 0;">
-        <li class="previous">{% if test_left != null %}<a href="{{ path('test_show_first', {'id': test_left.id } ) }}">← {{ test_left.name }}</a>{% endif %}</li>
-        <li class="next">{% if test_right != null %}<a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>{% endif %}</li>
+        <li class="previous" style="font-size:11px !important;">{% if test_left != null %}<a href="{{ path('test_show_first', {'id': test_left.id } ) }}">← {{ test_left.name }}</a>{% endif %}</li>
+        <li class="next" style="font-size:11px !important;">{% if test_right != null %}<a href="{{ path('test_show_first', {'id': test_right.id } ) }}">{{ test_right.name }} →</a>{% endif %}</li>
     </ul>
     {% if suite %}
-        {% set test_index = test.suiteExecution.tests.indexOf(test) %}
-        {% set test_count = test.suiteExecution.tests.count %}
-        {% set test_left_new = test.suiteExecution.tests.get(test_index - 1) %}
-        {% set test_right_new = test.suiteExecution.tests.get(test_index + 1) %}
-        {% if test_left_new is not null and (test_left is not null and test_left_new.id != test_left.id) %}
+
+        {% if test_left_new is not null %}
+{#            and (test_left is not null and test_left_new.id != test_left.id) %}#}
         {% else %}
             {% set test_left_new = null  %}
         {% endif %}
-        {% if test_right_new is not null and (test_right is not null and test_right_new.id != test_right.id)  %}
+        {% if test_right_new is not null %}
+{#            and (test_right is not null and test_right_new.id != test_right.id)  %}#}
         {% else %}
             {% set test_right_new = null  %}
         {% endif %}
         {% if test_right_new is not null or test_left_new  is not null %}
         <ul class="pager" style="margin: 5px 0;">
-            <li class="previous">{% if test_left_new is not null %}<a title="To previous test in this suite " href="{{ path('test_show_first', {'id': test_left_new.id } ) }}">← {{ test_left_new.name }}</a>{% endif %}</li>
-            {{ test_index }}/ {{ test_count }}
-            <li class="next">{% if test_right_new is not null %}<a title="To next test in this suite" href="{{ path('test_show_first', {'id': test_right_new.id } ) }}">{{ test_right_new.name }} →</a>{% endif %}</li>
+            <li class="previous" style="font-size:11px !important;">{% if test_left_new is not null %}<a title="To previous test in this suite " href="{{ path('test_show_first', {'id': test_left_new.id } ) }}">{{ test_index }} ← {{ test_left_new.name }}</a>{% endif %}</li>
+            <li class="next" style="font-size:11px !important;">{% if test_right_new is not null %}<a title="To next test in this suite" href="{{ path('test_show_first', {'id': test_right_new.id } ) }}">{{ test_right_new.name }} → {{ test_index + 2 }}</a>{% endif %}</li>
         </ul>
         {% endif %}
     {% endif %}

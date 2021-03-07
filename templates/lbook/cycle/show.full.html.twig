@@ -640,9 +640,12 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
 
             drawEasyPieChart();
             $( "#saveCycleAsArchive" ).bind( "click", function() {
+                {% if suiteMode %}
+                window.location.href = "{{ path('cycle_suite_download', { 'id': cycle.id , 'suite': suite.id}) }}";
+                {% else %}
                 window.location.href = "{{ path('cycle_download', { 'id': cycle.id }) }}";
+                {% endif %}
             });
-
 
             {% if cycle.logBookCycleReports  | length == 0 %}
 

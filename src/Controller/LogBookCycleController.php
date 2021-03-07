@@ -714,11 +714,24 @@ class LogBookCycleController extends AbstractController
     /**
      * Download full cycle as archive
      *
-     * @Route("/{id}/download", name="cycle_download", methods={"GET"})
+     * @Route("/{id}/suite/{suite}/download", name="cycle_suite_download", methods={"GET"})
      * @param LogBookCycle|null $cycle
      * @return Response
      */
-    public function downloadArchive(LogBookCycle $cycle = null): Response
+    public function downloadArchiveForSuite(LogBookCycle $cycle = null, SuiteExecution $suite = null): Response
+    {
+        return $this->downloadArchive($cycle, $suite);
+    }
+
+    /**
+     * Download full cycle as archive
+     *
+     * @Route("/{id}/download", name="cycle_download", methods={"GET"})
+     * @param LogBookCycle|null $cycle
+     * @param SuiteExecution|null $suite
+     * @return Response
+     */
+    public function downloadArchive(LogBookCycle $cycle = null, SuiteExecution $suite = null): Response
     {
         try {
             if (!$cycle) {
@@ -737,9 +750,11 @@ class LogBookCycleController extends AbstractController
             foreach ($cycle->getTests() as $test) {
                 $log_path = $path . $test->getLogFile();
                 if ($fileSystem->exists($log_path)) {
-                    $fixedFileName = str_replace(array('/', '\\'), '_', $test->getName());
-                    $newFileName = $test->getExecutionOrder() . '__' . $fixedFileName . '.txt';
-                    $zip->addFromString(basename($newFileName),  file_get_contents($log_path));
+                    if ($suite === null || ($suite !== null && $suite->getTests()->contains($test))) {
+                        $fixedFileName = str_replace(array('/', '\\'), '_', $test->getName());
+                        $newFileName = $test->getExecutionOrder() . '__' . $fixedFileName . '.txt';
+                        $zip->addFromString(basename($newFileName), file_get_contents($log_path));
+                    }
                 }
             }
 

@@ -94,6 +94,17 @@ class LogBookTestRepository extends ServiceEntityRepository
         /**
          * Additional clean | optional and may be removed
          */
+        $classMetaData = $this->_em->getClassMetadata('App:LogBookMessage');
+        if ($cycle->getDbName() !== null) {
+            $classMetaData->setPrimaryTable(['name' => $cycle->getDbName()]);
+            $logsRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
+            foreach ($cycle->getTests() as $test) {
+                $logsRepo->createQueryBuilder('m')
+                    ->delete()
+                    ->where('m.test = :test_id')
+                    ->setParameter('test_id', $test->getId())->setMaxResults(2000);
+            }
+        }
         $qd = $this->createQueryBuilder('t')
             ->delete()
             ->where('t.cycle = :cycle')

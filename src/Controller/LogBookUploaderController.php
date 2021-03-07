@@ -715,6 +715,18 @@ class LogBookUploaderController extends AbstractController
                         }
                     }
                 }
+                try {
+
+                    if ($cycle->getDbName() === null) {
+                        $cycle->setDbName($this->logsRepo->createCustomTable((string)$cycle->getSetup()->getId()));
+                        //$this->logsRepo->setCustomTable($cycle->getDbName());
+                    } else {
+                        $this->logsRepo->setCustomTable($cycle->getDbName());
+                    }
+                } catch (\Throwable $ex) {
+                    $logger->critical('[setDbName] Found Exception:' . $ex->getMessage(), $ex->getTrace());
+                }
+
                 $this->cycleMetaDataHandler($cycle_metadata, $cycle, $obj);
 
                 $new_file = $this->fileHandler($file, $setup, $cycle, $obj, $logger, $remote_ip);

@@ -6,14 +6,29 @@ use App\Entity\LogBookMessage;
 use App\Entity\LogBookTest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class LogBookMessageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LogBookMessage::class);
+    }
+
+    public function createCustomTable(string $table_prefix) {
+        try {
+//            $productM = $this->_em->getRepository('App:LogBookMessage');
+            $classMetaData = $this->_em->getClassMetadata('App:LogBookMessage');
+            $classMetaData->setPrimaryTable(['name' => 'log_book_message_' . $table_prefix]);
+            $schemaTool = new SchemaTool($this->_em);
+            $schemaTool->createSchema(array($classMetaData));
+        } catch (\Throwable $ex) {
+
+        }
+
     }
 
     /**

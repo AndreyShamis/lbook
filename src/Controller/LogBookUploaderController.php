@@ -1515,6 +1515,9 @@ class LogBookUploaderController extends AbstractController
                 } catch (\Exception $ex) {
                     $logger->alert('[parseFile] Fail in create log_criteria', array('ex' => $ex));
                 }
+                try {
+                    $this->logsRepo->createCustomTable((string)$test->getCycle()->getSetup()->getId());
+                } catch (\Throwable $ex) {}
 
                 /** @var LogBookMessage $log */
                 $log = $this->logsRepo->create($ret_data[$counter], false, $insertTests);

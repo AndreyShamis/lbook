@@ -115,6 +115,8 @@ class LogBookCycleRepository extends ServiceEntityRepository
         $testRepo = $this->getEntityManager()->getRepository('App:LogBookTest');
         /** @var SuiteExecutionRepository $suiteRepo */
         $suiteRepo = $this->getEntityManager()->getRepository('App:SuiteExecution');
+        $logsRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
+        $logsRepo->createCustomTable((string)$cycle->getId());
         $testRepo->deleteByCycle($cycle);
         $logs = $setup_path = '';
         try {

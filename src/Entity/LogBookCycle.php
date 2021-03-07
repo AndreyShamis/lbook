@@ -305,7 +305,10 @@ class LogBookCycle
      */
     private $status = 0;
 
-
+    /**
+     * @ORM\Column(name="db_name", type="string", type="string", length=150)
+     */
+    private $dbName = null;
 
     //-----------------------------------------------------------
     protected $calculateStatistic = true;
@@ -343,6 +346,22 @@ class LogBookCycle
         $this->tests = new ArrayCollection();
         $this->suiteExecution = new ArrayCollection();
         $this->logBookCycleReports = new ArrayCollection();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDbName(): ?string
+    {
+        return $this->dbName;
+    }
+
+    /**
+     * @param string|null $dbName
+     */
+    public function setDbName(string $dbName = null): void
+    {
+        $this->dbName = $dbName;
     }
 
     public function isAllSuitesFinished(): bool

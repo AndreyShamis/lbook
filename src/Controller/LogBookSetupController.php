@@ -589,6 +589,24 @@ class LogBookSetupController extends AbstractController
             $deleteForm = $this->createDeleteForm($setup);
             $show_build = $this->showBuild($paginator);
             $show_user = $this->showUsers($paginator);
+            $table_name = '';
+            $table_size = -1;
+            try{
+                $sql = '
+SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
+FROM information_schema.TABLES 
+WHERE TABLE_SCHEMA = "lbook" AND TABLE_NAME = "log_book_message_'. $setup->getId() .'" 
+ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
+                $em = $this->getDoctrine()->getManager();
+                /** @var \Doctrine\DBAL\Statement $statment */
+                $statment = $em->getConnection()->prepare($sql);
+                $statment->execute();
+                $res = $statment->fetchAll();
+                $table_size = $res[0]['table_size'];
+                $table_name = $res[0]['table_name'];
+            } catch (\Throwable $ex) {
+//                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
+            }
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup' => $setup,
                 'size' => $totalPosts,
@@ -599,6 +617,8 @@ class LogBookSetupController extends AbstractController
                 'delete_form' => $deleteForm->createView(),
                 'show_build' => $show_build,
                 'show_user' => $show_user,
+                'table_size' => $table_size,
+                'table_name' => $table_name
             ));
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);

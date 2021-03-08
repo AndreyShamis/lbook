@@ -1,7 +1,6 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
 {% block content %}
-
     <div class="row">
         <div class="col-xs-9">
             <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
@@ -106,6 +105,8 @@
                     /<span class="label label-info arrowed-right arrowed-in" title="Retention Policy in days">
                         {{ setup.retentionPolicy }}
                     </span>
+
+                    {{ table_name }}({{ table_size }} MB)
                 </span>
             </td>
         </tr>

@@ -700,9 +700,10 @@ class LogBookTestController extends AbstractController
 //                ->orderBy('log_book_message.chain', 'ASC')
 //                ->setParameter('test', $test->getId());
             $dataTable = 'log_book_message';
+            $first_log = $test->getLogs()->first();
             //if ($test->getCycle())
 //            $res = $qb->getQuery()->execute();
-            if ($test->getLogs()->first() === false) {
+            if ($first_log === false) {
                 $em = $this->getDoctrine()->getManager();
                 /** @var ClassMetadataInfo $classMetaData */
                 $classMetaData = $em->getClassMetadata('App:LogBookMessage');
@@ -711,8 +712,8 @@ class LogBookTestController extends AbstractController
                 $dataTable = $test->getDbNameWithPrefix();
                 $qb2 = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
-                    ->setCacheable(true)
-                    ->setLifetime(120)
+//                    ->setCacheable(true)
+//                    ->setLifetime(120)
                     ->orderBy('log_book_message.chain', 'ASC')
                     ->setParameter('test', $test->getId());
                 $paginator = $pagePaginator->paginate($qb2, $page, $this->log_size);
@@ -720,8 +721,8 @@ class LogBookTestController extends AbstractController
             } else {
                 $qb = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
-                    ->setCacheable(true)
-                    ->setLifetime(120)
+//                    ->setCacheable(true)
+//                    ->setLifetime(120)
                     ->orderBy('log_book_message.chain', 'ASC')
                     ->setParameter('test', $test->getId());
                 $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
@@ -748,6 +749,7 @@ class LogBookTestController extends AbstractController
                 'iterator'      => $iterator,
                 'paginator'     => $paginator,
                 'data_table'   => $dataTable,
+                'first_log'   => $first_log,
 //                'delete_form'   => $deleteForm->createView(),
                 'file_exist'    => $this->isTestFileExist($test),
             ));

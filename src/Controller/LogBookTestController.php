@@ -708,8 +708,13 @@ class LogBookTestController extends AbstractController
                 /** @var ClassMetadataInfo $classMetaData */
                 $classMetaData = $em->getClassMetadata('App:LogBookMessage');
                 $classMetaData->setPrimaryTable(['name' => $test->getDbNameWithPrefix()]);
+                // Used in case there is no table created
                 $logRepo->createCustomTable($test->getDbPrefix());
                 $dataTable = $test->getDbNameWithPrefix();
+                $logRepo = $em->getRepository('App:LogBookMessage');
+                $logRepo->setCustomTable($test->getDbNameWithPrefix());
+                $em->refresh($test);
+
                 $qb2 = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
 //                    ->setCacheable(true)

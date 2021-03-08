@@ -40,6 +40,8 @@ class LogBookApiController extends AbstractController
     /**
      *
      * @Route("/send_emails", name="send_emails", methods={"GET", "POST"})
+     * @param LogBookEmailRepository $emailRepo
+     * @param \Swift_Mailer $mailer
      * @param LoggerInterface $logger
      * @return JsonResponse
      */
@@ -55,14 +57,13 @@ class LogBookApiController extends AbstractController
             }
             $this->em->flush();
         } catch (\Throwable $ex) {
-                $logger->critical('BOT:' . $ex->getMessage());
+            $logger->critical('BOT:' . $ex->getMessage());
         }
 
         try {
             $messages = $emailRepo->findBy(['status' => 0], null, 30);
             foreach ($messages as $message) {
                 $message->setStatus(1);
-
             }
             $this->em->flush();
             foreach ($messages as $message) {
@@ -146,8 +147,8 @@ class LogBookApiController extends AbstractController
     /**
      * @Route("/suite_uuid_info/{uuid}", name="api_suite_uuid_to_info", methods={"POST", "GET"})
      * @param string|null $uuid
-     * @param SuiteExecutionRepository $suites
-     * @return Response
+     * @param SuiteExecutionRepository|null $suites
+     * @return JsonResponse
      */
     public function getExecutionSuiteNameByUuid(string $uuid='', SuiteExecutionRepository $suites=null): JsonResponse
     {
@@ -169,8 +170,9 @@ class LogBookApiController extends AbstractController
 
     /**
      * @Route("/suite_eta_runtime", name="api_suite_eta_runtime", methods={"POST", "GET"})
-     * @param SuiteExecutionRepository $suites
-     * @return Response
+     * @param Request $request
+     * @param SuiteExecutionRepository|null $suites
+     * @return JsonResponse
      */
     public function getSuiteEtaRunTime(Request $request, SuiteExecutionRepository $suites=null): JsonResponse
     {
@@ -220,9 +222,8 @@ class LogBookApiController extends AbstractController
             $fin_res['state'] = $state;
             $fin_res['count'] = count($suites);
             return new JsonResponse($fin_res);
-
         } catch (\Throwable $ex) {
-            $logger->critical('ERROR :' . $ex->getMessage());
+            $logger->critical('ERROR [suitesNotPublishedCount]:' . $ex->getMessage());
             $response = $this->json([]);
             $arr[] = $ex->getMessage();
             $prev = $ex->getPrevious();
@@ -265,7 +266,7 @@ class LogBookApiController extends AbstractController
             return new JsonResponse($fin_res);
 
         } catch (\Throwable $ex) {
-            $logger->critical('ERROR :' . $ex->getMessage());
+            $logger->critical('ERROR[getOneByState]:' . $ex->getMessage());
             $response = $this->json([]);
             $arr[] = $ex->getMessage();
             $prev = $ex->getPrevious();
@@ -517,7 +518,6 @@ class LogBookApiController extends AbstractController
         foreach ($properties as $property) {
             $property->setAccessible(true);
             $value = $property->getValue($object);
-            /** @var string $pName */
             $pName = $property->getName();
             if (is_object($value)) {
                 if (strpos($pName, '__') !== false) {

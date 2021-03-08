@@ -221,6 +221,8 @@
                             <li>DUT uptime on end={{ test.dutUpTimeEnd }}</li>
                             <li>ForDelete={{ test.forDelete ? 'Yes' : 'No' }}</li>
                             <li>Disabled={{ test.disabled ? 'Yes' : 'No' }}</li>
+                            <li>data_table={{ data_table }}</li>
+                            <li>cycle_data_table={{ test.cycle.dbName | default('null') }}</li>
                         </ul>
                     </div>
                 </div>

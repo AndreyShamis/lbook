@@ -685,17 +685,21 @@ class LogBookTestController extends AbstractController
     public function showFull(PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo, LogBookTest $test = null, $page = 1): ?Response
     {
         set_time_limit(10);
+        $dataTable = '';
         try {
             if (!$test) {
                 throw new \RuntimeException('');
             }
             $totalPosts = 0;
+            $res = [];
             $qb = $logRepo->createQueryBuilder('log_book_message')
                 ->where('log_book_message.test = :test')
                 ->setCacheable(true)
                 ->setLifetime(120)
                 ->orderBy('log_book_message.chain', 'ASC')
                 ->setParameter('test', $test->getId());
+            $dataTable = 'log_book_message';
+            //if ($test->getCycle())
             $res = $qb->getQuery()->execute();
             if (count($res) === 0) {
                 $em = $this->getDoctrine()->getManager();
@@ -703,7 +707,7 @@ class LogBookTestController extends AbstractController
                 $classMetaData = $em->getClassMetadata('App:LogBookMessage');
                 $classMetaData->setPrimaryTable(['name' => $test->getDbNameWithPrefix()]);
                 $logRepo->createCustomTable($test->getDbPrefix());
-
+                $dataTable = $test->getDbNameWithPrefix();
 //                $qb = $logRepo->createQueryBuilder('log_book_message')
 //                    ->where('log_book_message.test = :test')
 //                    ->setCacheable(true)
@@ -729,7 +733,6 @@ class LogBookTestController extends AbstractController
             }
 
             $thisPage = $page;
-
             return $this->render('lbook/test/show.full.html.twig', array(
                 'test'          => $test,
                 'size'          => $totalPosts,
@@ -737,6 +740,7 @@ class LogBookTestController extends AbstractController
                 'thisPage'      => $thisPage,
                 'iterator'      => $iterator,
                 'paginator'     => $paginator,
+                'data_table'   => $dataTable,
 //                'delete_form'   => $deleteForm->createView(),
                 'file_exist'    => $this->isTestFileExist($test),
             ));

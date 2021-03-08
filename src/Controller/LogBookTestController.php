@@ -717,7 +717,7 @@ class LogBookTestController extends AbstractController
 
                 $qb2 = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
-//                    ->setCacheable(true)
+                    ->setCacheable(false)
 //                    ->setLifetime(120)
                     ->orderBy('log_book_message.chain', 'ASC')
                     ->setParameter('test', $test->getId());
@@ -727,15 +727,22 @@ class LogBookTestController extends AbstractController
                 $logRepo->setCustomTable('log_book_message');
                 $qb = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
-//                    ->setCacheable(true)
+                    ->setCacheable(false)
 //                    ->setLifetime(120)
                     ->orderBy('log_book_message.chain', 'ASC')
                     ->setParameter('test', $test->getId());
                 $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
                 $totalPosts = $paginator->count();
-            }
-            $iterator = $paginator->getIterator(); # ArrayIterator
 
+            }
+            if ($totalPosts === 0 && $first_log !== null) {
+                $iterator = $test->getLogs()->getIterator();
+                $totalPosts = $test->getLogs()->count();
+
+            } else {
+                $iterator = $paginator->getIterator();
+            }
+            
             $impossibleSize = $this->log_size * ($page-1) + 1;
             $maxPages = ceil($totalPosts / $this->log_size);
 

@@ -724,6 +724,7 @@ class LogBookTestController extends AbstractController
                 $paginator = $pagePaginator->paginate($qb2, $page, $this->log_size);
                 $totalPosts = $paginator->count();
             } else {
+                $logRepo->setCustomTable('log_book_message');
                 $qb = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
 //                    ->setCacheable(true)

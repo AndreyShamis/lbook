@@ -690,19 +690,10 @@ class LogBookTestController extends AbstractController
             if (!$test) {
                 throw new \RuntimeException('');
             }
-            $totalPosts = 0;
-            $res = [];
 
-//            $qb = $logRepo->createQueryBuilder('log_book_message')
-//                ->where('log_book_message.test = :test')
-//                ->setCacheable(false)
-////                ->setLifetime(120)
-//                ->orderBy('log_book_message.chain', 'ASC')
-//                ->setParameter('test', $test->getId());
             $dataTable = 'log_book_message';
             $first_log = $test->getLogs()->first();
-            //if ($test->getCycle())
-//            $res = $qb->getQuery()->execute();
+
             if ($first_log === false || $first_log === null) {
                 $em = $this->getDoctrine()->getManager();
                 /** @var ClassMetadataInfo $classMetaData */
@@ -728,21 +719,20 @@ class LogBookTestController extends AbstractController
                 $qb = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
                     ->setCacheable(false)
-//                    ->setLifetime(120)
                     ->orderBy('log_book_message.chain', 'ASC')
                     ->setParameter('test', $test->getId());
                 $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
                 $totalPosts = $paginator->count();
 
             }
-            if ($totalPosts === 0 && $first_log !== null) {
-                $iterator = $test->getLogs()->getIterator();
-                $totalPosts = $test->getLogs()->count();
+//            if ($totalPosts === 0 && $first_log !== null) {
+//                $iterator = $test->getLogs()->getIterator();
+//                $totalPosts = $test->getLogs()->count();
+//
+//            } else {
+            $iterator = $paginator->getIterator();
+//            }
 
-            } else {
-                $iterator = $paginator->getIterator();
-            }
-            
             $impossibleSize = $this->log_size * ($page-1) + 1;
             $maxPages = ceil($totalPosts / $this->log_size);
 

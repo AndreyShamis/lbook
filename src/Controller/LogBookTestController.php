@@ -692,31 +692,38 @@ class LogBookTestController extends AbstractController
             }
             $totalPosts = 0;
             $res = [];
-            $qb = $logRepo->createQueryBuilder('log_book_message')
-                ->where('log_book_message.test = :test')
-                ->setCacheable(true)
-                ->setLifetime(120)
-                ->orderBy('log_book_message.chain', 'ASC')
-                ->setParameter('test', $test->getId());
+
+//            $qb = $logRepo->createQueryBuilder('log_book_message')
+//                ->where('log_book_message.test = :test')
+//                ->setCacheable(false)
+////                ->setLifetime(120)
+//                ->orderBy('log_book_message.chain', 'ASC')
+//                ->setParameter('test', $test->getId());
             $dataTable = 'log_book_message';
             //if ($test->getCycle())
-            $res = $qb->getQuery()->execute();
-            if (count($res) === 0) {
+//            $res = $qb->getQuery()->execute();
+            if ($test->getLogs()->first() === false) {
                 $em = $this->getDoctrine()->getManager();
                 /** @var ClassMetadataInfo $classMetaData */
                 $classMetaData = $em->getClassMetadata('App:LogBookMessage');
                 $classMetaData->setPrimaryTable(['name' => $test->getDbNameWithPrefix()]);
                 $logRepo->createCustomTable($test->getDbPrefix());
                 $dataTable = $test->getDbNameWithPrefix();
-//                $qb = $logRepo->createQueryBuilder('log_book_message')
-//                    ->where('log_book_message.test = :test')
-//                    ->setCacheable(true)
-//                    ->setLifetime(120)
-//                    ->orderBy('log_book_message.chain', 'ASC')
-//                    ->setParameter('test', $test->getId());
-                $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
+                $qb2 = $logRepo->createQueryBuilder('log_book_message')
+                    ->where('log_book_message.test = :test')
+                    ->setCacheable(true)
+                    ->setLifetime(120)
+                    ->orderBy('log_book_message.chain', 'ASC')
+                    ->setParameter('test', $test->getId());
+                $paginator = $pagePaginator->paginate($qb2, $page, $this->log_size);
                 $totalPosts = $paginator->count();
             } else {
+                $qb = $logRepo->createQueryBuilder('log_book_message')
+                    ->where('log_book_message.test = :test')
+                    ->setCacheable(true)
+                    ->setLifetime(120)
+                    ->orderBy('log_book_message.chain', 'ASC')
+                    ->setParameter('test', $test->getId());
                 $paginator = $pagePaginator->paginate($qb, $page, $this->log_size);
                 $totalPosts = $paginator->count();
             }

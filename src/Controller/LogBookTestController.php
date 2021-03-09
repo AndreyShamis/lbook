@@ -690,12 +690,12 @@ class LogBookTestController extends AbstractController
             if (!$test) {
                 throw new \RuntimeException('');
             }
-
+            $bad_case = '';
             $dataTable = 'log_book_message';
             $first_log = $test->getLogs()->first();
-
+            $em = $this->getDoctrine()->getManager();
             if ($first_log === false || $first_log === null) {
-                $em = $this->getDoctrine()->getManager();
+
                 /** @var ClassMetadataInfo $classMetaData */
                 $classMetaData = $em->getClassMetadata('App:LogBookMessage');
                 $classMetaData->setPrimaryTable(['name' => $test->getDbNameWithPrefix()]);
@@ -715,7 +715,9 @@ class LogBookTestController extends AbstractController
                 $paginator = $pagePaginator->paginate($qb2, $page, $this->log_size);
                 $totalPosts = $paginator->count();
             } else {
-                $logRepo->setCustomTable('log_book_message');
+                $classMetaData = $em->getClassMetadata('App:LogBookMessage');
+                $classMetaData->setPrimaryTable(['name' => $dataTable]);
+                $logRepo->setCustomTable($dataTable);
                 $qb = $logRepo->createQueryBuilder('log_book_message')
                     ->where('log_book_message.test = :test')
                     ->setCacheable(false)
@@ -725,13 +727,14 @@ class LogBookTestController extends AbstractController
                 $totalPosts = $paginator->count();
 
             }
-//            if ($totalPosts === 0 && $first_log !== null) {
-//                $iterator = $test->getLogs()->getIterator();
-//                $totalPosts = $test->getLogs()->count();
-//
-//            } else {
-            $iterator = $paginator->getIterator();
-//            }
+            if ($totalPosts === 0 && $first_log !== null) {
+                $iterator = $test->getLogs()->getIterator();
+                $totalPosts = $test->getLogs()->count();
+                $bad_case = 'totalPosts === 0 && first_log !== null';
+
+            } else {
+                $iterator = $paginator->getIterator();
+            }
 
             $impossibleSize = $this->log_size * ($page-1) + 1;
             $maxPages = ceil($totalPosts / $this->log_size);
@@ -755,6 +758,7 @@ class LogBookTestController extends AbstractController
                 'first_log'   => $first_log,
 //                'delete_form'   => $deleteForm->createView(),
                 'file_exist'    => $this->isTestFileExist($test),
+                'bad_case'      =>  $bad_case
             ));
         } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);

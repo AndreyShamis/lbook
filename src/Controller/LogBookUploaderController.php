@@ -1431,7 +1431,7 @@ class LogBookUploaderController extends AbstractController
         } catch (Exception $e) {
         }
 
-        $skip_counter = 0;  // used for Not to skip first logs
+        $skip_counter = $warnings_count = 0;  // used for Not to skip first logs
         $countLines = count($newTempArr);
         $lineCounter = 0;
         /**
@@ -1497,6 +1497,12 @@ class LogBookUploaderController extends AbstractController
                 try {
                     /** @var string $preparedLevelName */
                     $preparedLevelName = $this->prepareDebugLevel($msgType_str);
+                    if ($preparedLevelName === 'WARNING') {
+                        if ($warnings_count > 20) {
+                            continue;
+                        }
+                        $warnings_count++;
+                    }
                     if (isset($this->blackListLevels[$preparedLevelName])) {
                         if ($lineCounter > ($countLines - 500) && ($countLines - 500) > 0 ) {
                             # we allow to add last 20 lines
@@ -1511,6 +1517,7 @@ class LogBookUploaderController extends AbstractController
                             if ($preparedLevelName === 'INFO' && $skip_counter > 80) {
                                 continue;
                             }
+
                             $skip_counter++;
                         }
                     }

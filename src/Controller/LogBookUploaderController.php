@@ -1285,6 +1285,10 @@ class LogBookUploaderController extends AbstractController
                 || $msg_len > $this->MAX_SINGLE_LOG_SIZE
                 || strpos($value, '##############################') !== false
                 || strpos($value, '*************************') !== false
+                || strpos($value, '------------------------------------------------------------') !== false
+                || strpos($value, '-------------------------------------------') !== false
+                || strpos($value, '---------') !== false
+                || (strpos($value, '=> frame') !== false && strpos($value, '), drops: 0') !== false)
                 || strpos($value, ' LOGBOOK ')  !== false
                 || strpos($value, 'EQACC:')  !== false
                 || strpos($value, 'Post login')  !== false

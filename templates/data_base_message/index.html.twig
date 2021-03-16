@@ -1,0 +1,20 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}DB messages{% endblock %}
+{% block content %}
+    Count {{  tables | length }}  tables<br/>
+    {% for table in tables | slice(0, 10000) %}
+        {{ table['TABLE_NAME'] }} <br/>
+
+    {% endfor %}
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            try {
+                ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
+                ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
+            } catch (e) {}
+
+        });
+    </script>
+{% endblock %}

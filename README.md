@@ -188,3 +188,14 @@ curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 
 # in .env
 DISABLE_TEST_UPLOAD=true
 ~~~
+
+### Tweak your Swap Settings
+https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
+~~~ bash
+cat /proc/sys/vm/swappiness
+~~~
+The swappiness parameter configures how often your system swaps data out of RAM to the swap space. This is a value between 0 and 100 that represents a percentage.
+
+With values close to zero, the kernel will not swap data to the disk unless absolutely necessary. Remember, interactions with the swap file are “expensive” in that they take a lot longer than interactions with RAM and they can cause a significant reduction in performance. Telling the system not to rely on the swap much will generally make your system faster.
+
+Values that are closer to 100 will try to put more data into swap in an effort to keep more RAM space free. Depending on your applications’ memory profile or what you are using your server for, this might be better in some cases.

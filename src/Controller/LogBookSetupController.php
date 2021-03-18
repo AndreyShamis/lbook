@@ -680,14 +680,16 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                     if ($cycle !== null) {
                         $build = $cycle->getBuild();
                         if ($build !== null) {
-                            $build_id = $build->getId();
-                            if ($prev_build_id === 0) {
-                                $prev_build_id = $build_id;
-                            }
-                            if ($prev_build_id !== $build_id) {
-                                $show_build = true;
-                                break;
-                            }
+                            $show_build = true;
+                            break;
+//                            $build_id = $build->getId();
+//                            if ($prev_build_id === 0) {
+//                                $prev_build_id = $build_id;
+//                            }
+//                            if ($prev_build_id !== $build_id) {
+//                                $show_build = true;
+//                                break;
+//                            }
                         }
                     }
                     $iterator->next();

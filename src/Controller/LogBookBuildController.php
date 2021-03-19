@@ -38,51 +38,49 @@ class LogBookBuildController extends AbstractController
         $updated = 0;
         $counterIncreased = 0;
         $removed = 0;
-        $builds_to_show = array();
+        $builds_to_show = [];
         try {
+            $size = count($builds);
             /** @var LogBookBuild $build */
             foreach ($builds as $build) {
                 if ($build !== null) {
                     $add_to_view = false;
                     $build_id = $build->getId();
-                    $prev_count = $build->getCycles();
                     $current_counter = $build->getDeleteCounter();
                     $cycles_found_in_build = $cycleRepo->count(array('build' => $build_id));
                     $build->setCycles($cycles_found_in_build);
-                    if ($cycles_found_in_build > 0) {
+                    if ($build->getCycles() > 0) {
                         $build->setDeleteCounter(0);
                         $em->persist($build);
                         $updated++;
-//                        if ($cycles_found_in_build === 0 || $prev_count === 0 ) {
-                            $add_to_view = true;
-//                        }
-                    }
-                    if ($current_counter > 10 && $build->getCycles() === 0) {
-                        $em->remove($build);
-                        $removed++;
-                    }
-                    else if ($build->getCycles() === 0 && $prev_count === 0) {
                         $add_to_view = true;
-                        $build->increaseDeleteCounter();
-                        $em->persist($build);
-                        $counterIncreased++;
+                    } else {
+                        if ($current_counter > 10 ) {
+                            $em->remove($build);
+                            $removed++;
+                        } else {
+                            $add_to_view = true;
+                            $build->increaseDeleteCounter();
+                            $em->persist($build);
+                            $counterIncreased++;
+                        }
                     }
                     if ($add_to_view) {
                         $builds_to_show[] = $build;
                     }
                 }
             }
+            $em->flush();
         } catch (\Throwable $ex) {
             $logger->critical('[/build/cleanNotUsed] ERROR::' . $ex->getMessage(). ':'. $ex->getLine() . ':' . $ex->getFile(), $ex->getTrace());
         }
-
-        $em->flush();
 
         return array(
             'removed'           => $removed,
             'iterator'          => $builds_to_show,
             'counterIncreased'  => $counterIncreased,
             'updated'           => $updated,
+            'size'              => $size,
         );
     }
 

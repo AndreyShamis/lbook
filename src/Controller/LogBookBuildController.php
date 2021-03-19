@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\PagePaginator;
+use Psr\Log\LoggerInterface;
 
 /**
  * @Route("/build")
@@ -27,9 +28,10 @@ class LogBookBuildController extends AbstractController
      * @Template(template="lbook/build/delete.html.twig")
      * @param LogBookCycleRepository $cycleRepo
      * @param LogBookBuildRepository $logBookBuildRepository
+     * @param LoggerInterface $logger
      * @return array
      */
-    public function cleanNotUsed(LogBookCycleRepository $cycleRepo, LogBookBuildRepository $logBookBuildRepository): array
+    public function cleanNotUsed(LogBookCycleRepository $cycleRepo, LogBookBuildRepository $logBookBuildRepository, LoggerInterface $logger): array
     {
         $builds = $logBookBuildRepository->findAll();
         $em = $this->getDoctrine()->getManager();
@@ -70,7 +72,9 @@ class LogBookBuildController extends AbstractController
                     }
                 }
             }
-        } catch (\Throwable $ex) { }
+        } catch (\Throwable $ex) {
+            $logger->critical('[/build/cleanNotUsed] ERROR::' . $ex->getMessage(). ':'. $ex->getLine() . ':' . $ex->getFile(), $ex->getTrace());
+        }
 
         $em->flush();
 

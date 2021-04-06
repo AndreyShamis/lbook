@@ -1,5 +1,5 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}TestEventCmu index{% endblock %}
+{% block title %}Test Events{% endblock %}
 {% block content %}
     <h4>See statistic</h4>
     <a href="{{ path('event_cmu_stats') }}">Stats</a>
@@ -61,7 +61,7 @@
                 {% set testType = ' test-recovery-cycle ' %}
             {% endif %}
             <tr class='{{ testType }}'>
-                <td>{{ test_event_cmu.id }}</td>
+                <td>{{ test_event_cmu.test.id }}</td>
                 <td>{{ test_event_cmu.test.testType }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test_event_cmu.test.id  }) }}">{{ test_event_cmu.test }}</a></td>
                 <td>{{ test_event_cmu.block }}</td>

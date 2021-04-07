@@ -33,13 +33,82 @@ class LogBookTestInfo
     private $path;
 
     /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $testCount = 0;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $lastMarkedAsSeenAt;
+
+    /**
      * @ORM\OneToMany(targetEntity=LogBookTest::class, mappedBy="testInfo", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"id" = "desc"})
      */
     private $logBookTests;
 
+    /**
+     * @ORM\Column(type="datetime", options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned"=true, "default"="0"})
+     */
+    private $lastUpdateDiff = 0;
+
     public static $MAX_NAME_LEN = 250;
     public static $MAX_PATH_LEN = 500;
+
+    public function __construct()
+    {
+        $this->setCreatedAt(new \DateTime());
+        $this->setLastMarkedAsSeenAt($this->getCreatedAt());
+        $this->logBookTests = new ArrayCollection();
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getLastMarkedAsSeenAt(): ?\DateTimeInterface
+    {
+        return $this->lastMarkedAsSeenAt;
+    }
+
+    public function setLastMarkedAsSeenAt(\DateTimeInterface $lastMarkedAsSeenAt): self
+    {
+        $this->lastMarkedAsSeenAt = $lastMarkedAsSeenAt;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastUpdateDiff(): int
+    {
+        return $this->lastUpdateDiff;
+    }
+
+    /**
+     * @param int $lastUpdateDiff
+     */
+    public function setLastUpdateDiff(int $lastUpdateDiff): self
+    {
+        $this->lastUpdateDiff = $lastUpdateDiff;
+
+        return $this;
+    }
 
     public static function validateName($newName): string
     {
@@ -61,11 +130,6 @@ class LogBookTestInfo
             $newPath = mb_substr($newPath, 0, self::$MAX_PATH_LEN);
         }
         return $newPath;
-    }
-
-    public function __construct()
-    {
-        $this->logBookTests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,6 +193,23 @@ class LogBookTestInfo
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTestCount(): int
+    {
+        return $this->testCount;
+    }
+
+    /**
+     * @param int $testCount
+     */
+    public function setTestCount(int $testCount): self
+    {
+        $this->testCount = $testCount;
         return $this;
     }
 

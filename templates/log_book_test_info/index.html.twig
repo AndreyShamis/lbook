@@ -1,13 +1,25 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}LogBook TestInfo index{% endblock %}
 {% block content %}
-    <h4>LogBook TestInfo index</h4>
-    <table class="table">
+    <h4> Tests </h4>
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="testInfoTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#eventsMcuTableToolBar"
+           data-show-refresh="true"
+           data-key-events="true"
+           data-show-footer="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="20" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Path</th>
+                <th data-sortable="true" data-switchable="false">ID</th>
+                <th data-sortable="true" data-switchable="true">Name</th>
+                <th data-sortable="true" data-switchable="true">Path</th>
+                <th data-sortable="true" data-switchable="true">Count</th>
             </tr>
         </thead>
         <tbody>
@@ -16,6 +28,7 @@
                 <td><a href="{{ path('log_book_test_info_show', {'id': log_book_test_info.id}) }}">{{ log_book_test_info.id }}</a></td>
                 <td>{{ log_book_test_info.name }}</td>
                 <td>{{ log_book_test_info.path }}</td>
+                <td>{{ log_book_test_info.testCount }}</td>
             </tr>
         {% else %}
             <tr><td colspan="4">no records found</td></tr>

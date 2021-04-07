@@ -62,7 +62,14 @@
         </a>
         <b class="arrow"></b>
     </li>
-
+    <li class="{% if route starts with 'log_book_test_info_' %}active{% endif %}">
+        <a href="{{ asset(path('log_book_test_info_index')) }}">
+            <i class="menu-icon fa fa-tag"></i>
+            <span class="menu-text">Tests
+        </span>
+        </a>
+        <b class="arrow"></b>
+    </li>
     <li class="{% if route starts with 'hosts_' or route starts with 'host_' %}active{% endif %}">
         <a href="{{asset(path('hosts_index'))}}" >
             <i class="menu-icon fa fa-laptop"></i>

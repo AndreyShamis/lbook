@@ -135,6 +135,7 @@ class LogBookTest
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\SuiteExecution", inversedBy="tests")
+     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
     private $suite_execution;
 

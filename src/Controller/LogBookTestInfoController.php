@@ -17,8 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class LogBookTestInfoController extends AbstractController
 {
     /**
-     * @Route("/{page}", name="log_book_test_info_index", methods={"GET"})
+     * @Route("/", name="log_book_test_info_index", methods={"GET"})
+     * @Route("/page/{page}", name="log_book_test_info_index_page", methods={"GET"})
+     * @param PagePaginator $pagePaginator
      * @param LogBookTestInfoRepository $logBookTestInfoRepository
+     * @param int $page
      * @return Response
      */
     public function index(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository, int $page = 1): Response
@@ -42,7 +45,7 @@ class LogBookTestInfoController extends AbstractController
      * @param LogBookTestInfoRepository $logBookTestInfoRepository
      * @return Response
      */
-    public function update(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository): Response
+    public function update(LogBookTestInfoRepository $logBookTestInfoRepository): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
 
@@ -54,7 +57,7 @@ class LogBookTestInfoController extends AbstractController
 
         }
         $entityManager->flush();
-        return $this->index($pagePaginator, $logBookTestInfoRepository);
+        return $this->redirectToRoute('log_book_test_info_index');
     }
 
     /**

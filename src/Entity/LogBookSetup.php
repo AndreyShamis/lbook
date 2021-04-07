@@ -138,10 +138,13 @@ class LogBookSetup
      */
     private $subscribers;
 
+    /**
+     * @ORM\Column(type="integer", name="logs_size", nullable=true, options={"unsigned"=true, "default"="0"})
+     */
+    private $logsSize = 0;
+
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
-
-
 
     /**
      * LogBookSetup constructor.
@@ -156,6 +159,24 @@ class LogBookSetup
         $this->favoritedByUsers = new ArrayCollection();
         $this->cyclesCount = 0;
         $this->subscribers = new ArrayCollection();
+    }
+
+    /**
+     * Get logs table size in MB
+     * @return int
+     */
+    public function getLogsSize(): int
+    {
+        return $this->logsSize;
+    }
+
+    /**
+     * Set logs table size in MB
+     * @param int $logsSize
+     */
+    public function setLogsSize(int $logsSize): void
+    {
+        $this->logsSize = $logsSize;
     }
 
     /**

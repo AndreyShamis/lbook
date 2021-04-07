@@ -109,6 +109,14 @@ class LogBookSetupRepository extends ServiceEntityRepository
     public function delete(LogBookSetup $setup): void
     {
         $setupId = $setup->getId();
+        try{
+            // First remove whole table with logs
+            $sql = 'DROP TABLE log_book_message_' . $setupId;
+            $this->_em->getConnection()->prepare($sql)->execute();
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[SETUP][DELETE]: Cannot drop table :' . $setupId );
+        }
+
         /** @var LogBookCycleRepository $cycleRepo */
         $cycleRepo = $this->getEntityManager()->getRepository('App:LogBookCycle');
         /** @var LogBookCycle $cycle */

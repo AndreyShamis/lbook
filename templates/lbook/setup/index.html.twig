@@ -64,6 +64,7 @@
 {#                <th data-sortable="true" title="Shows if the setup is disabled" data-visible="false">Disabled</th>#}
 {#                <th data-sortable="true" title="Is it marked as Private" data-visible="false">Private</th>#}
                 <th data-sortable="true" title="Retention Policy, new cycle will be deleted after (days)" data-visible="true">Ret Pol</th>
+                <th data-sortable="true" title="Logs Size in MB" data-visible="true">DB size</th>
                 <th class="setup_list_options_column">Options</th>
             </tr>
             </thead>
@@ -101,6 +102,7 @@
 {#                    <td>{{ setup.disabled ? 'Yes':'False' }}</td>#}
 {#                    <td>{{ setup.isPrivate ? 'Private':'Public' }}</td>#}
                     <td>{{ setup.retentionPolicy }}</td>
+                    <td>{{ setup.logsSize ? setup.logsSize : '0' }}</td>
                     <td>
                         <div class="hidden-sm hidden-xs action-buttons">
                             <a class="blue" href="{{ path('setup_show', { 'id': setup.id }) }}" title="Show">

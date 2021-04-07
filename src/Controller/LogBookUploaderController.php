@@ -832,6 +832,7 @@ class LogBookUploaderController extends AbstractController
                         'path' => $test_path
                     ]);
                     $test->setTestInfo($testInfo);
+                    $testInfo->setLastMarkedAsSeenAt(new DateTime());
                 } catch (Exception $ex) {
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }

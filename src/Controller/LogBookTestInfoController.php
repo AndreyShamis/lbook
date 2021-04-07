@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookTestInfo;
 use App\Form\LogBookTestInfoType;
 use App\Repository\LogBookTestInfoRepository;
+use App\Service\PagePaginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,13 +17,44 @@ use Symfony\Component\Routing\Annotation\Route;
 class LogBookTestInfoController extends AbstractController
 {
     /**
-     * @Route("/", name="log_book_test_info_index", methods={"GET"})
+     * @Route("/{page}", name="log_book_test_info_index", methods={"GET"})
+     * @param LogBookTestInfoRepository $logBookTestInfoRepository
+     * @return Response
      */
-    public function index(LogBookTestInfoRepository $logBookTestInfoRepository): Response
+    public function index(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository, int $page = 1): Response
     {
+        $size = 100000;
+        $paginator = $pagePaginator->paginate(
+            $logBookTestInfoRepository->createQueryBuilder('tt')
+            ->where('tt.path is NOT NULL')
+            ->orderBy('tt.lastMarkedAsSeenAt', 'DESC')
+            , $page, $size);
+        $totalPosts = $paginator->count();
         return $this->render('log_book_test_info/index.html.twig', [
-            'log_book_test_infos' => $logBookTestInfoRepository->findAll(),
+            'log_book_test_infos' => $paginator,
+            'thisPage' => $page,
+            'maxPages' => ceil($totalPosts / $size),
         ]);
+    }
+
+    /**
+     * @Route("/update", name="log_book_test_info_update", methods={"GET"})
+     * @param LogBookTestInfoRepository $logBookTestInfoRepository
+     * @return Response
+     */
+    public function update(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $da = $logBookTestInfoRepository->findAll();
+        foreach ($da as $d) {
+//            if ($d->getTestCount() > 2000) {
+            $d->setTestCount($d->getLogBookTests()->count());
+//            }
+
+        }
+        $entityManager->flush();
+        return $this->index($pagePaginator, $logBookTestInfoRepository);
     }
 
     /**

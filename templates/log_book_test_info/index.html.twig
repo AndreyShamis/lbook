@@ -2,6 +2,8 @@
 {% block title %}LogBook TestInfo index{% endblock %}
 {% block content %}
     <h4> Tests </h4>
+    <a href="{{ path('log_book_test_info_update') }}">Update</a>
+    {% include "lbook/paginator.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
            id="testInfoTable" data-pagination="true" data-search="true" data-toggle="table"
            data-toolbar="#eventsMcuTableToolBar"
@@ -18,8 +20,10 @@
             <tr>
                 <th data-sortable="true" data-switchable="false">ID</th>
                 <th data-sortable="true" data-switchable="true">Name</th>
-                <th data-sortable="true" data-switchable="true">Path</th>
                 <th data-sortable="true" data-switchable="true">Count</th>
+                <th data-sortable="true" data-switchable="true">Path</th>
+                <th data-sortable="true" data-switchable="true">Last Seen</th>
+                <th data-sortable="true" data-switchable="true">Created</th>
             </tr>
         </thead>
         <tbody>
@@ -27,8 +31,10 @@
             <tr>
                 <td><a href="{{ path('log_book_test_info_show', {'id': log_book_test_info.id}) }}">{{ log_book_test_info.id }}</a></td>
                 <td>{{ log_book_test_info.name }}</td>
-                <td>{{ log_book_test_info.path }}</td>
                 <td>{{ log_book_test_info.testCount }}</td>
+                <td>{{ log_book_test_info.path }}</td>
+                <td>{{ log_book_test_info.lastMarkedAsSeenAt ? log_book_test_info.lastMarkedAsSeenAt | date('Y-m-d H:i:s') : ''}}</td>
+                <td>{{ log_book_test_info.createdAt ? log_book_test_info.createdAt | date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         {% else %}
             <tr><td colspan="4">no records found</td></tr>

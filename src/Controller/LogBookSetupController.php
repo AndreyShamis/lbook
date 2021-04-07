@@ -571,26 +571,12 @@ class LogBookSetupController extends AbstractController
      */
     public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
+        $table_name = '';
+        $table_size = -1;
         try {
             if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
                 throw new \RuntimeException('');
             }
-            $qb = $cycleRepo->createQueryBuilder('t')
-                ->where('t.setup = :setup')
-                ->orderBy('t.timeEnd', 'DESC')
-                ->addOrderBy('t.updatedAt', 'DESC')
-                ->setParameter('setup', $setup->getId());
-            $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
-            $totalPosts = $paginator->count();
-            $iterator = $paginator->getIterator();
-
-            $maxPages = ceil($totalPosts / $this->show_cycle_size);
-            $thisPage = $page;
-            $deleteForm = $this->createDeleteForm($setup);
-            $show_build = $this->showBuild($paginator);
-            $show_user = $this->showUsers($paginator);
-            $table_name = '';
-            $table_size = -1;
             try{
                 $sql = '
 SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
@@ -613,6 +599,23 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             } catch (\Throwable $ex) {
 //                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
             }
+
+            $qb = $cycleRepo->createQueryBuilder('t')
+                ->where('t.setup = :setup')
+                ->orderBy('t.timeEnd', 'DESC')
+                ->addOrderBy('t.updatedAt', 'DESC')
+                ->setParameter('setup', $setup->getId());
+            $paginator = $pagePaginator->paginate($qb, $page, $this->show_cycle_size);
+            $totalPosts = $paginator->count();
+            $iterator = $paginator->getIterator();
+
+            $maxPages = ceil($totalPosts / $this->show_cycle_size);
+            $thisPage = $page;
+            $deleteForm = $this->createDeleteForm($setup);
+            $show_build = $this->showBuild($paginator);
+            $show_user = $this->showUsers($paginator);
+
+
             return $this->render('lbook/setup/show.full.html.twig', array(
                 'setup' => $setup,
                 'size' => $totalPosts,

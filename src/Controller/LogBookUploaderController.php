@@ -281,6 +281,44 @@ class LogBookUploaderController extends AbstractController
                 $data['hostname'] = $ip;
             }
             $suiteHost = $hosts->findOneOrCreate(['name' => $data['hostname'], 'ip' => $ip]);
+            try {
+                $diffHours = 0;
+                $nowDate = new DateTime();
+                if ($suiteHost->getLastSeenAt() !== null) {
+                    $diffSeconds =  $nowDate->getTimestamp() - $suiteHost->getLastSeenAt()->getTimestamp();
+                    $diffHours = round($diffSeconds/60/60, 0);
+                }
+
+                if ($suiteHost->getSuitesCount() === 0 || $diffHours >= 3 || $suiteHost->getLastSeenAt() === null) {
+                    $hostSuites = $suiteHost->getSuiteExecutions();
+                    $suites_count = $hostSuites->count();
+                    $suites_pass = $suites_fail = 0;
+                    $tests_count = $tests_executed = $tests_pass = $tests_fail = $tests_error = $tests_executed = 0;
+                    foreach ($hostSuites as $tmp_suite) {
+                        if ($tmp_suite->getPassRate() < 100) {
+                            $suites_fail += 1;
+                        } else {
+                            $suites_pass += 1;
+                        }
+                        $tests_count += $tmp_suite->getTestsCount();
+                        $tests_count += $tmp_suite->getTestsCount();
+                        $tests_pass += $tmp_suite->getPassCount();
+                        $tests_fail += $tmp_suite->getFailCount();
+                        $tests_error += $tmp_suite->getErrorCount();
+                        $tests_executed += $tmp_suite->getTotalExecutedTests();
+                    }
+                    $suiteHost->setSuitesCount($suites_count);
+                    $suiteHost->setTestsExecuted($tests_executed);
+                    $suiteHost->setSuitesPass($suites_pass);
+                    $suiteHost->setTestsCount($tests_count);
+                    $suiteHost->setTestsError($tests_error);
+                    $suiteHost->setTestsFailed($tests_fail);
+
+                }
+            }catch (\Throwable $ex) {
+                $logger->critical('SUITE_CREATE_FAIL in host UPDATE:[' . $data['hostname'] . ':' . $ip . ']', $ex->getTrace());
+            }
+
             unset($data['hostname']);
             $data['host'] = $suiteHost;
         } catch (\Throwable $ex) {
@@ -419,8 +457,6 @@ class LogBookUploaderController extends AbstractController
                     }
 
                     $suiteHost->setLastSuite($suiteExecution);
-
-
 
                     $tarLab = '';
                     try {
@@ -832,7 +868,15 @@ class LogBookUploaderController extends AbstractController
                         'path' => $test_path
                     ]);
                     $test->setTestInfo($testInfo);
-                    $testInfo->setLastMarkedAsSeenAt(new DateTime());
+                    $diffHours = 0;
+                    $nowDate = new DateTime();
+                    if ($testInfo->getLastMarkedAsSeenAt() !== null) {
+                        $diffSeconds =  $nowDate->getTimestamp() - $testInfo->getLastMarkedAsSeenAt()->getTimestamp();
+                        $diffHours = round($diffSeconds/60/60, 0);
+                    }
+                    if ($testInfo->getTestCount() === 0 || $diffHours >= 3 || $testInfo->getLastMarkedAsSeenAt() === null) {
+                        $testInfo->setLastMarkedAsSeenAt(new DateTime());
+                    }
                 } catch (Exception $ex) {
                     $logger->alert('[CONTROL_FILE_SHOW_OPT] Found Exception:' . $ex->getMessage(), $ex->getTrace());
                 }

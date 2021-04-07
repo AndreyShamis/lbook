@@ -604,6 +604,12 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                 $res = $statment->fetchAll();
                 $table_size = $res[0]['table_size'];
                 $table_name = $res[0]['table_name'];
+                try{
+                    $setup->setLogsSize($table_size);
+                    $em->flush();
+                } catch (\Throwable $ex) {
+//                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
+                }
             } catch (\Throwable $ex) {
 //                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
             }

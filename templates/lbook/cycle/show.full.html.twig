@@ -198,26 +198,37 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     <div id="suites" class="tab-pane">
                         {#<div class="container" style="width: 100%;height: 100%;min-height: 700px;">#}
                         {% if suitesCount > 0 %}
-                            <table class="records_list table table-striped table-condensed font9">
+                            <table class="records_list table table-striped table-condensed table-hover font10" data-classes="table table-no-bordered"
+                                   data-pagination="false" data-toggle="table" data-sort-order="desc"
+                                   id="suitesInCycle" data-search="true"
+                                   data-toolbar="#suitesInCycleToolbar"
+                                   data-show-refresh="true"
+                                    {#data-show-toggle="true"#}
+                                   data-show-footer="true"
+                                   data-show-export="true"
+                                   data-show-columns="true"
+                                   data-advanced-search="true"
+                                   data-id-table="advancedTable">
                                 <thead>
+
                                 <tr>
-                                    <th>ID</th>
-                                    <th title="Name/UUID">Name</th>
-                                    <th>Summary</th>
-                                    <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]">Tests</th>
-                                    <th title="Pass">Pass</th>
-                                    <th title="Pass Rate">Pass Rate</th>
-                                    <th title="Testing Level">TL</th>
-                                    <th>Duration</th>
-                                    <th>Chip</th>
-                                    <th>Platform</th>
-                                    <th title="Build Flavor">BF</th>
-                                    <th>Component</th>
-                                    <th title="Test Environments">ENV</th>
-                                    <th title="Suite Host Name">Host</th>
-                                    <th title="Owners">Owners</th>
-                                    <th title="Closed : X= Closed; O= Open">X</th>
-                                    <th title="JIRA KEY/Publish">JIRA</th>
+                                    <th data-field="id" title="Show Suite Tests" data-switchable="true" data-sortable="true">ID</th>
+                                    <th title="Name/UUID" data-switchable="true" data-sortable="true">Name</th>
+                                    <th data-sorter="htmlSorter" data-switchable="true" data-sortable="true">Summary</th>
+                                    <th title="Enabled Tests/Total Tests only executed [In title total tests count in suite include disabled, and total disabled]" data-switchable="true" data-sortable="true">Tests</th>
+                                    <th title="Pass" data-switchable="true" data-sortable="true">Pass</th>
+                                    <th data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-sortable="true">Pass Rate</th>
+                                    <th title="Testing Level" data-switchable="true" data-sortable="true">TL</th>
+                                    <th data-sorter="dataTitleIntSorter" data-sortable="true">Duration</th>
+                                    <th data-switchable="true" data-sortable="true">Chip</th>
+                                    <th data-switchable="true" data-sortable="true">Platform</th>
+                                    <th title="Build Flavor" data-switchable="true" data-sortable="true">BF</th>
+                                    <th data-switchable="true" data-sortable="true">Component</th>
+{#                                    <th title="Test Environments">ENV</th>#}
+                                    <th data-sorter="htmlSorter" title="Suite Host Name" data-switchable="true" data-sortable="true">Host</th>
+                                    <th title="Owners" data-switchable="true" data-sortable="true" data-visible="false">Owners</th>
+                                    <th title="Closed : X= Closed; O= Open" data-switchable="true" data-sortable="true" data-visible="false">X</th>
+                                    <th data-sorter="htmlSorter" title="JIRA KEY/Publish" data-switchable="true" data-sortable="true" data-visible="false">JIRA</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -255,12 +266,12 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passCount }}">{{ suite.passCount }}</span></td>
                                     <td><span class="{{ passRateToColor(suite.passRate) }}" data-percent="{{ suite.passRate }}">{{ suite.passRate }}%</span></td>
                                     <td>{{ suite.testingLevel }}</td>
-                                    <td>{{ suite.runTime | executionTimeGenericShort }}</td>
+                                    <td><span data-title="{{ suite.runTime }}">{{ suite.runTime | executionTimeGenericShort }}</span></td>
                                     <td>{{ suite.chip }}</td>
                                     <td>{{ suite.platform }}</td>
                                     <td>{{ suite.buildType }}</td>
                                     <td>{{ suite.components |join(', ')}}</td>
-                                    <td>{{ suite.testEnvironments |join(', ')}}</td>
+{#                                    <td>{{ suite.testEnvironments |join(', ')}}</td>#}
                                     <td>
                                         {% if suite.host and suite.host.ip is defined %}
                                         <span title="{{ suite.host.ip }}"><a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a></span>
@@ -272,33 +283,33 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                                 </tr>
                             {% endfor %}
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <th title="Total suites count"><strong>{{ suitesCount }}</strong></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>
-                                    <th>{{ tests_pass }}</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>Host</th>
-                                    <th></th>
-                                    <th title="Suites Done/WIP">{{ suite_done }}/
-                                        {% if suite_progress > 0 %}
-                                            <strong>{{ suite_progress }}</strong>
-                                        {% else %}
-                                            {{ suite_progress }}
-                                        {% endif %}
-                                    </th>
-                                    <th></th>
-                                </tr>
-                                </tfoot>
+{#                                <tfoot>#}
+{#                                <tr>#}
+{#                                    <th title="Total suites count"><strong>{{ suitesCount }}</strong></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th title="Tests only : Enabled/Executed/Disabled">{{ tests_enabled }}/{{ tests_executed }}/{{ tests_disabled }}</th>#}
+{#                                    <th>{{ tests_pass }}</th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th></th>#}
+{#                                    <th>Host</th>#}
+{#                                    <th></th>#}
+{#                                    <th title="Suites Done/WIP">{{ suite_done }}/#}
+{#                                        {% if suite_progress > 0 %}#}
+{#                                            <strong>{{ suite_progress }}</strong>#}
+{#                                        {% else %}#}
+{#                                            {{ suite_progress }}#}
+{#                                        {% endif %}#}
+{#                                    </th>#}
+{#                                    <th></th>#}
+{#                                </tr>#}
+{#                                </tfoot>#}
                             </table>
                         {% endif %}
                         {#

@@ -18,18 +18,19 @@ class TestFilterApply
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=TestFilter::class, inversedBy="testFilterApplies")
+     * @ORM\ManyToOne(targetEntity="App\Entity\TestFilter", inversedBy="testFilterApplies")
+     * @ORM\JoinColumn(name="filter", fieldName="id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $testFilter;
 
     /**
-     * @ORM\ManyToOne(targetEntity=suiteExecution::class, cascade={"persist"})
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
+     * @ORM\ManyToOne(targetEntity="App\Entity\SuiteExecution")
+     * @ORM\JoinColumn(nullable=true, referencedColumnName="id", onDelete="SET NULL")
      */
     private $suiteExecution;
 
     /**
-     * @ORM\ManyToOne(targetEntity=LogBookTestInfo::class)
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookTestInfo")
      * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
     private $testInfo;
@@ -99,5 +100,10 @@ class TestFilterApply
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getId() . '-' . $this->getTestFilter()->getId() . '-' . $this->getTestInfo()->getName();
     }
 }

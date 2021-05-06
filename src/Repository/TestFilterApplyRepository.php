@@ -14,6 +14,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class TestFilterApplyRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TestFilterApply::class);

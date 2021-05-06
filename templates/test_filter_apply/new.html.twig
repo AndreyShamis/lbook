@@ -1,0 +1,9 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}Test Filter Apply New{% endblock %}
+{% block content %}
+    <h1>Create new TestFilterApply</h1>
+
+    {{ include('test_filter_apply/_form.html.twig') }}
+
+    <a href="{{ path('test_filter_apply_index') }}">back to list</a>
+{% endblock %}

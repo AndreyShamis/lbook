@@ -83,6 +83,7 @@ security:
         - { path: ^/suites/cycle/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/filters/(.*), role: ROLE_FILTER_CREATOR }
         - { path: ^/filters, role: ROLE_FILTER_CREATOR }
+        - { path: ^/filters_apply/new_cli(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/eventcmu(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/migration(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/reports/auto/create(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }

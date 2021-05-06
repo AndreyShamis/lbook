@@ -127,6 +127,11 @@ class TestFilter
      */
     private $exclusions = [];
 
+    /**
+     * @ORM\OneToMany(targetEntity=TestFilterApply::class, mappedBy="testFilter")
+     */
+    private $testFilterApplies;
+
 
     public function __construct()
     {
@@ -135,6 +140,7 @@ class TestFilter
         $this->setUpdatedAt(new \DateTime());
         $this->filterEditHistories = new ArrayCollection();
         $this->exclusions = [];
+        $this->testFilterApplies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -483,5 +489,46 @@ class TestFilter
     public function addExclusions(array $exclusions): void
     {
         $this->exclusions = array_merge($this->exclusions, $exclusions);
+    }
+
+    /**
+     * @return Collection|TestFilterApply[]
+     */
+    public function getTestFilterApplies(): Collection
+    {
+        return $this->testFilterApplies;
+    }
+
+    public function addTestFilterApply(TestFilterApply $testFilterApply): self
+    {
+        if (!$this->testFilterApplies->contains($testFilterApply)) {
+            $this->testFilterApplies[] = $testFilterApply;
+            $testFilterApply->setTestFilter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTestFilterApply(TestFilterApply $testFilterApply): self
+    {
+        if ($this->testFilterApplies->contains($testFilterApply)) {
+            $this->testFilterApplies->removeElement($testFilterApply);
+            // set the owning side to null (unless already changed)
+            if ($testFilterApply->getTestFilter() === $this) {
+                $testFilterApply->setTestFilter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString() : string
+    {
+        try {
+            return $this->getId()  . '-' . $this->getName();
+        } catch (\Throwable $ex) {
+            return 'New';
+        }
+
     }
 }

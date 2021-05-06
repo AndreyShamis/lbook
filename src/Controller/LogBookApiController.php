@@ -188,6 +188,7 @@ class LogBookApiController extends AbstractController
             ->addSelect('s.uuid')
             ->from('App:SuiteExecution','s')
             ->where('s.uuid IN (:uuid_list)')
+            ->andWhere('s.passRate > 50')
             ->setMaxResults(100)
             ->orderBy('s.id', 'DESC')
             ->groupBy('s.suiteInfo')

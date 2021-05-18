@@ -521,4 +521,14 @@ class TestFilter
 
         return $this;
     }
+
+    public function __toString() : string
+    {
+        try {
+            return $this->getId()  . '-' . $this->getName();
+        } catch (\Throwable $ex) {
+            return 'New';
+        }
+
+    }
 }

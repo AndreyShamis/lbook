@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\SuiteExecution;
 use App\Entity\TestFilterApply;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -14,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class TestFilterApplyRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TestFilterApply::class);

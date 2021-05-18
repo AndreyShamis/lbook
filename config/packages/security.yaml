@@ -82,11 +82,11 @@ security:
         - { path: ^/suites/calculate/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/suites/cycle/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/filters/(.*), role: ROLE_FILTER_CREATOR }
-        - { path: ^/filters, role: ROLE_FILTER_CREATOR }
-        - { path: ^/filters_apply/new_cli(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/filters/, role: ROLE_FILTER_CREATOR }
         - { path: ^/eventcmu(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/migration(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/reports/auto/create(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/filters_apply/new_cli(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
 #        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }

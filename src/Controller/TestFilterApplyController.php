@@ -51,6 +51,13 @@ class TestFilterApplyController extends AbstractController
                 "name" => $name,
                 "path" => $path
             ]);
+            if ( $ti === null ) {
+                $ti = $testInfoRepo->findOneBy([
+                    "name" => $name,
+                    "path" => 'server/'.$path
+                ]);
+            }
+            $ret = [];
             if ( $ti !== null ) {
                 $tf = $filters->findOneBy(['id' => $filterId]);
                 if ( $tf !== null ) {
@@ -60,10 +67,9 @@ class TestFilterApplyController extends AbstractController
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($testFilterApply);
                     $em->flush();
+                    $ret[] = 'Filter added to history id:' . $testFilterApply->getId();
                 }
-
             }
-            $ret = $data;
             $response =  new JsonResponse($ret);
             $response->setEncodingOptions(JSON_PRETTY_PRINT);
             return $response;
@@ -71,11 +77,7 @@ class TestFilterApplyController extends AbstractController
         } catch (\Throwable $ex) {
             $logger->critical('ERROR [test_filter_apply_new_cli]:' . $ex->getMessage());
             $response = $this->json([]);
-            $arr[] = $ex->getMessage();
-            $prev = $ex->getPrevious();
-            if ($prev !== null) {
-                $arr[] = $prev->getMessage();
-            }
+            $arr['ERROR'] = $ex->getMessage();
             $js = json_encode($arr);
             $response->setJson($js);
             $response->setEncodingOptions(JSON_PRETTY_PRINT);

@@ -7,6 +7,7 @@ use App\Entity\TestFilter;
 use App\Entity\TestFilterApply;
 use App\Form\TestFilterApplyType;
 use App\Repository\LogBookTestInfoRepository;
+use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterApplyRepository;
 use App\Repository\TestFilterRepository;
 use Psr\Log\LoggerInterface;
@@ -39,12 +40,13 @@ class TestFilterApplyController extends AbstractController
      * @param LoggerInterface $logger
      * @return JsonResponse
      */
-    public function create(Request $request, TestFilterRepository $filters, LogBookTestInfoRepository $testInfoRepo, LoggerInterface $logger): JsonResponse
+    public function create(Request $request, TestFilterRepository $filters, LogBookTestInfoRepository $testInfoRepo, SuiteExecutionRepository $suites, LoggerInterface $logger): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
             $name = $data['name'];
             $path = $data['path'];
+            $suite_execution_id = $data['suite_execution_id'];
             $filterId = $data['filter_id'];
             $testFilterApply = new TestFilterApply();
             $ti = $testInfoRepo->findOneBy([
@@ -57,13 +59,14 @@ class TestFilterApplyController extends AbstractController
                     "path" => 'server/'.$path
                 ]);
             }
+            $suiteExecution = $suites->findOneBy(['id' => $suite_execution_id]);
             $ret = [];
             if ( $ti !== null ) {
                 $tf = $filters->findOneBy(['id' => $filterId]);
                 if ( $tf !== null ) {
                     $testFilterApply->setTestFilter($tf);
                     $testFilterApply->setTestInfo($ti);
-
+                    $testFilterApply->setSuiteExecution($suiteExecution);
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($testFilterApply);
                     $em->flush();

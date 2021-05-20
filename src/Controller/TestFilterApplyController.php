@@ -10,6 +10,7 @@ use App\Repository\LogBookTestInfoRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterApplyRepository;
 use App\Repository\TestFilterRepository;
+use App\Service\PagePaginator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,13 +24,33 @@ use Symfony\Component\Routing\Annotation\Route;
 class TestFilterApplyController extends AbstractController
 {
     /**
+     * @Route("/page/{page}", name="test_filter_apply_index_page", methods={"GET"}, requirements={"page"="\d*"})
      * @Route("/", name="test_filter_apply_index", methods={"GET"})
      */
-    public function index(TestFilterApplyRepository $testFilterApplyRepository): Response
+    public function index(PagePaginator $pagePaginator, TestFilterApplyRepository $testFilterApplyRepository, int $page = 1): Response
     {
+        $index_size = 5000;
+
+        $query = $testFilterApplyRepository->createQueryBuilder('filters')
+                ->orderBy('filters.createdAt', 'DESC');
+
+
+        $paginator = $pagePaginator->paginate($query, $page, $index_size);
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+
+        $maxPages = ceil($totalPosts / $index_size);
+        $thisPage = $page;
+
         return $this->render('test_filter_apply/index.html.twig', [
-            'test_filter_applies' => $testFilterApplyRepository->findAll(),
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator
         ]);
+
+
     }
 
     /**

@@ -3,23 +3,54 @@
 {% block content %}
     <h5>TestFilterApply index</h5>
 
-    <table class="table">
+    {% set pagePath = "test_filter_apply_index" %}
+    {% include "lbook/paginator.html.twig" %}
+    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
+           id="testFilterApply" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#eventsMcuTableToolBar"
+           data-show-refresh="true"
+           data-key-events="true"
+           data-show-footer="true"
+            {#data-show-toggle="true"#}
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+            {#data-id-table="advancedTable"#}
+           data-page-size="20" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>CreatedAt</th>
-                <th>actions</th>
+                <th data-sortable="true" data-switchable="false">Id</th>
+                <th data-sortable="true" data-switchable="true">Test</th>
+                <th data-sortable="true" data-switchable="true">Path</th>
+                <th data-sortable="true" data-switchable="true">Filter</th>
+                <th data-sortable="true" data-switchable="true">Suite ID</th>
+                <th data-sortable="true" data-switchable="true">Suite</th>
+                <th data-sortable="true" data-switchable="true">Branch</th>
+                <th data-sortable="true" data-switchable="true" data-visible="false">Owners</th>
+                <th data-sortable="true" data-switchable="true">CreatedAt</th>
+{#                <th>actions</th>#}
             </tr>
         </thead>
         <tbody>
-        {% for test_filter_apply in test_filter_applies %}
+        {% for filter in iterator| slice(0, 100000) %}
             <tr>
-                <td>{{ test_filter_apply.id }}</td>
-                <td>{{ test_filter_apply.createdAt ? test_filter_apply.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ filter.id }}</td>
+                <td>{{ filter.testInfo.name | default('') }}</td>
+                <td>{{ filter.testInfo.path | default('')}}</td>
+                <td>{{ filter.testFilter.id }}</td>
+                <td>{{ filter.suiteExecution.id | default('None') }}</td>
                 <td>
-                    <a href="{{ path('test_filter_apply_show', {'id': test_filter_apply.id}) }}">show</a>
-                    <a href="{{ path('test_filter_apply_edit', {'id': test_filter_apply.id}) }}">edit</a>
+                    {%  if filter.suiteExecution is not null and filter.suiteExecution.id is defined %}
+                    <span><a href="{{ path('suite_show', {'id': filter.suiteExecution.id}) }}" target="_blank" title="[{{ filter.suiteExecution.uuid }}] : PLATFORM::{{ filter.suiteExecution.platform }}/{{ filter.suiteExecution.chip }}">{{ filter.suiteExecution.name }}</a></span>
+                    {% endif %}
                 </td>
+                <td>{{ filter.suiteExecution.branchName| default('') }}</td>
+                <td>{{ filter.suiteExecution.owners| default([]) | join(', ') }}</td>
+                <td>{{ filter.createdAt ? filter.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+{#                <td>#}
+{#                    <a href="{{ path('test_filter_apply_show', {'id': test_filter_apply.id}) }}">show</a>#}
+{#                    <a href="{{ path('test_filter_apply_edit', {'id': test_filter_apply.id}) }}">edit</a>#}
+{#                </td>#}
             </tr>
         {% else %}
             <tr>
@@ -29,5 +60,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('test_filter_apply_new') }}">Create new</a>
+{#    <a href="{{ path('test_filter_apply_new') }}">Create new</a>#}
 {% endblock %}

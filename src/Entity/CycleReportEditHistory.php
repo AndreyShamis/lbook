@@ -24,7 +24,7 @@ class CycleReportEditHistory
 
     /**
      * @ORM\ManyToOne(targetEntity=LogBookCycleReport::class, inversedBy="history")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $report;
 

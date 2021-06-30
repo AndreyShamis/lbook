@@ -113,8 +113,8 @@ class LogBookSetupRepository extends ServiceEntityRepository
             // First remove whole table with logs
             $sql = 'DROP TABLE log_book_message_' . $setupId;
             $this->_em->getConnection()->prepare($sql)->execute();
-            $sql = 'CREATE TABLE log_book_message_' . $setupId;
-            $this->_em->getConnection()->prepare($sql)->execute();
+//            $sql = 'CREATE TABLE log_book_message_' . $setupId;
+//            $this->_em->getConnection()->prepare($sql)->execute();
         } catch (\Throwable $ex) {
             $this->logger->critical('[SETUP][DELETE]: Cannot drop table :' . $setupId , $ex->getTrace());
         }

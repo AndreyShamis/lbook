@@ -40,6 +40,27 @@ class TestFilterApply
      */
     private $createdAt;
 
+    /**
+     * @ORM\Column(type="boolean", name="emailed", options={"default"="0"})
+     */
+    private $emailed = false;
+
+    /**
+     * @return bool
+     */
+    public function isEmailed(): bool
+    {
+        return $this->emailed;
+    }
+
+    /**
+     * @param bool $emailed
+     */
+    public function setEmailed(bool $emailed): void
+    {
+        $this->emailed = $emailed;
+    }
+
 
     public function __construct()
     {

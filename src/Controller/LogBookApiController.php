@@ -6,6 +6,8 @@ use App\Entity\LogBookCycle;
 use App\Entity\SuiteExecution;
 use App\Repository\LogBookEmailRepository;
 use App\Repository\SuiteExecutionRepository;
+use App\Repository\TestFilterApplyRepository;
+use App\Repository\TestFilterRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -34,6 +36,34 @@ class LogBookApiController extends AbstractController
         $this->container = $container;
         $this->em = $this->getDoctrine()->getManager();
 
+    }
+
+    /**
+     *
+     * @Route("/make_filter_emails", name="make_filter_emails", methods={"GET", "POST"})
+     * @param LogBookEmailRepository $emailRepo
+     * @param TestFilterRepository $filters
+     * @param TestFilterApplyRepository $applies
+     * @param \Swift_Mailer $mailer
+     * @param LoggerInterface $logger
+     * @return JsonResponse
+     */
+    public function make_filter_emails(LogBookEmailRepository $emailRepo, TestFilterRepository $filters, TestFilterApplyRepository $applies, \Swift_Mailer $mailer, LoggerInterface $logger): ?JsonResponse
+    {
+        $fin_res = [];
+
+        try {
+
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            $logger->critical('BOT SEND_EMAIL:' . $ex->getMessage());
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
     }
 
 

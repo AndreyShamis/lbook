@@ -152,4 +152,18 @@ class LogBookMessage
     {
         return $this->getMessage();
     }
+
+    public function toJson()
+    {
+        $ret = [
+            'id' => $this->getId(),
+            'message' => $this->getMessage(),
+            'msgType' => $this->getMsgType()->getName(),
+            'chain' => $this->getChain(),
+            'logtime' => $this->getLogTime()->getTimestamp(),
+        ];
+        return $ret;
+    }
 }
+
+

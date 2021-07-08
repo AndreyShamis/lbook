@@ -878,5 +878,28 @@ class LogBookTest
         return $this;
     }
 
+    public function toJson()
+    {
+        $ret = [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+
+            'time_start' => $this->getTimeStart()->getTimestamp(),
+            'time_end' => $this->getTimeEnd()->getTimestamp(),
+            'rime_run' => $this->getTimeRun(),
+            'verdict' => $this->getVerdictString(),
+            'execution_order' => $this->getExecutionOrder(),
+            'log_file_size' => $this->getLogFileSize(),
+            'suite_id' => $this->getSuiteExecution() ? $this->getSuiteExecution()->getId() : 0,
+            'test_key' => $this->getTestKey(),
+            'fail_desc' => $this->getFailDesc(),
+            'control_path' => $this->getTestInfo()->getPath(),
+            'test_type' => $this->getTestType()->getName(),
+            'metadata'=> $this->getNewMetaData() ? $this->getNewMetaData()->getValue(): ''
+
+        ];
+
+        return $ret;
+    }
 
 }

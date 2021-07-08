@@ -1354,4 +1354,39 @@ class LogBookCycle
 
         return $this;
     }
+
+    public function toJson()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'build' => $this->getBuild()? $this->getBuild()->getName(): '',
+            'build_id' => $this->getBuild()? $this->getBuild()->getId(): '',
+            'user' => $this->getUser()->getFullName(),
+            'pass_rate' => $this->getPassRate(),
+            'fail_rate' => $this->getFailRate(),
+            'error_rate' => $this->getErrorRate(),
+            'warning_rate' => $this->getWarningRate(),
+            'na_rate' => $this->getNaRate(),
+            'unknown_rate' => $this->getUnknownRate(),
+            'created_at' => $this->getCreatedAt()->getTimestamp(),
+            'updated_at' => $this->getUpdatedAt()->getTimestamp(),
+            'time_start' => $this->getTimeStart()->getTimestamp(),
+            'time_end' => $this->getTimeEnd()->getTimestamp(),
+            'period' => $this->getPeriod(),
+            'tests_time_sum' => $this->getTestsTimeSum(),
+            'uploader' => $this->getTargetUploader()? $this->getTargetUploader()->getName() : '',
+            'controller' => $this->getController()? $this->getController()->getName() : '',
+            'dut' => $this->getDut()? $this->getDut()->getName() : '',
+            'tests_count' => $this->getTestsCount(),
+            'tests_pass' => $this->getTestsPass(),
+            'tests_fail' => $this->getTestsFail(),
+            'tests_error' => $this->getTestsError(),
+            'tests_warning' => $this->getTestsWarning(),
+            'tests_na' => $this->getTestsNa(),
+            'tests_unknown' => $this->getTestsUnknown(),
+            'disabled' => $this->isDisabled(),
+            'suites_count' => $this->getSuiteExecution()->count()
+        ];
+    }
 }

@@ -522,4 +522,25 @@ class LogBookSetup
 
         return $this;
     }
+
+    public function toJson()
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'show_name' => $this->getNameShown(),
+            'disabled' => $this->isDisabled(),
+            'os' => $this->getOsStr(),
+            'check_uptime' => $this->isCheckUpTime(),
+            'owner' => (string)$this->getOwner(),
+            'created_at' => $this->getCreatedAt()->getTimestamp(),
+            'updated_at' => $this->getUpdatedAt()->getTimestamp(),
+            'retention_policy' => $this->getRetentionPolicy(),
+            'cycles_count' => $this->getCyclesCount(),
+
+            'extDefectsJql' => $this->getExtDefectsJql(),
+            'auto_cycle_report' => $this->getAutoCycleReport(),
+            'logs_size' => $this->getLogsSize()
+        ];
+    }
 }

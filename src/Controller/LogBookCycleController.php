@@ -14,6 +14,7 @@ use App\Form\CycleSearchType;
 use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\SuiteExecutionRepository;
+use App\Repository\TestFilterApplyRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Psr\Log\LoggerInterface;
@@ -971,7 +972,9 @@ class LogBookCycleController extends AbstractController
      * @param int $maxSize
      * @return Response
      */
-    public function showSuiteFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
+    public function showSuiteFirstPage(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
+                                       LogBookTestRepository $testRepo, LogBookCycle $cycle = null,
+                                       SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
     {
         if ($cycle === null && $suite !== null) {
             $cycle = $suite->getCycle();
@@ -984,7 +987,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($pagePaginator, $testRepo, $cycle, $suite, $page, false, $maxSize);
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, $suite, $page, false, $maxSize);
     }
 
     /**
@@ -997,7 +1000,9 @@ class LogBookCycleController extends AbstractController
      * @param int $maxSize
      * @return Response
      */
-    public function showFirstPage(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $maxSize = null): ?Response
+    public function showFirstPage(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
+                                  LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null,
+                                  $maxSize = null): ?Response
     {
         if ($page === null) {
             $page = 1;
@@ -1007,7 +1012,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
     }
 
 //    /**
@@ -1045,7 +1050,9 @@ class LogBookCycleController extends AbstractController
      * @param null $maxSize
      * @return Response
      */
-    public function show(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null, $page = null, $forJson=false, $maxSize=null): ?Response
+    public function show(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
+                         LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null,
+                         $page = null, $forJson=false, $maxSize=null): ?Response
     {
         $suiteMode = false;
         if ($page === null) {
@@ -1195,7 +1202,11 @@ class LogBookCycleController extends AbstractController
             if ($forJson) {
                 $iterator = null;
             }
-
+            $qb_f = $app_filters->createQueryBuilder('f')
+                ->where('f.suiteExecution IN (:suites)')
+                ->setParameter('suites', $suites);
+            $q = $qb_f->getQuery();
+            $filters = $q->execute();
             $ret_arr = array(
                 'cycle'                 => $cycle,
                 'size'                  => $totalPosts,
@@ -1217,6 +1228,7 @@ class LogBookCycleController extends AbstractController
                 'suites_tests_aborted' => $suites_tests_aborted,
                 'suites_tests_total' => $suites_tests_total,
                 'suites_tests_wip' => $suites_tests_wip,
+                'applied_filters' => $filters
 
 //                'errors'                => $errors,
             );

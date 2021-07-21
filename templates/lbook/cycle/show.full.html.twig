@@ -62,7 +62,9 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     {% if suitesCount > 0 %}
                         <li class=""><a data-toggle="tab" href="#suites">Suites ({{ suitesCount }})</a></li>
                     {% endif %}
-
+                    {% if applied_filters | length %}
+                        <li class=""><a data-toggle="tab" href="#filters">Filters ({{ applied_filters | length }})</a></li>
+                    {% endif %}
                     <li class=""><a data-toggle="tab" href="#view" id="view_graph">View</a></li>
                     {% if cycle.metaData %}
                         <li class=""><a data-toggle="tab" href="#metadata">Metadata ({{ cycle.metaData | length }})</a></li>
@@ -315,7 +317,33 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                         {#
                         </div>#}
                     </div>
+                    <div id="filters" class="tab-pane">
+                        <table class="records_list table table-striped table-condensed">
+                            <tr>
+                                <th>Filter ID</th>
+                                <td>Suite</td>
+                                <td>Suite ID</td>
+                                <td>Test Name</td>
+                                <td>Control</td>
+                                <td>Owners</td>
+                            </tr>
+                            {% for filter in applied_filters | slice(0, 500) %}
+                                <tr>
+                                    <th><a href="{{ path('test_filter_show', {'id': filter.testFilter.id}) }}">{{ filter.testFilter.id }}</a></th>
+                                    <td>
+                                        {%  if filter.suiteExecution is not null and filter.suiteExecution.id is defined %}
+                                            <span><a href="{{ path('suite_show', {'id': filter.suiteExecution.id}) }}" target="_blank" title="[{{ filter.suiteExecution.uuid }}] : PLATFORM::{{ filter.suiteExecution.platform }}/{{ filter.suiteExecution.chip }}">{{ filter.suiteExecution.name }}</a></span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ filter.suiteExecution.id }}</td>
+                                    <td><a href="{{ path('log_book_test_info_show', {'id': filter.testInfo.id }) }}">{{ filter.testInfo.name }}</a></td>
+                                    <td>{{ filter.testInfo.path }}</td>
+                                    <td>{{ filter.suiteExecution.owners| default([]) | join(', ') }}</td>
 
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
                     {% if errors_found%}
                         <div id="failures" class="tab-pane">
                             {#<h6>Found {{ errors | length }} issues with description</h6>#}

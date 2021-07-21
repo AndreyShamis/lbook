@@ -263,7 +263,7 @@ class SuiteExecution
     protected $rate = 0;
 
     /**
-     * @ORM\ManyToOne(targetEntity=LogBookSuiteInfo::class, inversedBy="suiteExecutions")
+     * @ORM\ManyToOne(targetEntity="App\Entity\LogBookSuiteInfo", inversedBy="suiteExecutions")
      */
     private $suiteInfo;
 

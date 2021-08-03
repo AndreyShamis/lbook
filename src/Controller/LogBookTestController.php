@@ -626,6 +626,7 @@ class LogBookTestController extends AbstractController
                 $tmp = '%d-%d-%d__%s_-_%s_-_%s.%s';
                 $retFileName = sprintf($tmp, $setup->getId(), $cycle->getId(), $test->getId(), $setup->getName(), $cycle->getName(), $test->getName(), 'txt');
             }
+            $retFileName = preg_replace( '/[^a-z0-9]+/', '-', strtolower( $retFileName ));
             return $this->file($path, $retFileName);
         } catch (\Throwable $ex) {
             return $this->testNotFound($test, $ex);

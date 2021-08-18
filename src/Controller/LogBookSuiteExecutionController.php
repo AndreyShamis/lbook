@@ -564,10 +564,11 @@ class LogBookSuiteExecutionController extends AbstractController
                     continue;
                 }
                 $newEmail = new LogBookEmail();
+                $b = $suite->getBranch();
                 if ($suite->getPassRate() < 100) {
-                    $newEmail->setSubject('['. $newSuiteInfo->getName() . '] failed. PR:' . $suite->getPassRate() . '%');
+                    $newEmail->setSubject('['. $newSuiteInfo->getName() . ']['. $b . '] failed. PR:' . $suite->getPassRate() . '%');
                 } else{
-                    $newEmail->setSubject('['. $newSuiteInfo->getName() . '] finished');
+                    $newEmail->setSubject('['. $newSuiteInfo->getName() . ']['. $b . '] finished');
 
                 }
                 try {

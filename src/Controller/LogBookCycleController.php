@@ -50,6 +50,7 @@ class LogBookCycleController extends AbstractController
      * @Route("/search", name="cycle_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
+     * @param SuiteExecutionRepository $suitesRepo
      * @return Response
      */
     public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): Response
@@ -169,12 +170,6 @@ class LogBookCycleController extends AbstractController
                     ->setParameter('setups', $setups);
                 $enableSearch = True;
             }
-
-
-
-
-            $enableSearch = True;
-
             $enableSearch = True;
             if ($addOrder) {
                 $qb->orderBy('t.id', 'DESC');
@@ -402,6 +397,7 @@ class LogBookCycleController extends AbstractController
             $ex->getTraceAsString()
         ]);
     }
+
     /**
      * Tests exporter to JSON file
      *
@@ -409,8 +405,8 @@ class LogBookCycleController extends AbstractController
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
      * @param LogBookTestRepository $testRepo
+     * @param LoggerInterface $logger
      * @return Response
-     * @throws \Exception
      */
     public function multiExport(Request $request, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, LoggerInterface $logger): Response
     {
@@ -469,36 +465,6 @@ class LogBookCycleController extends AbstractController
                     }
                 }
             }
-
-
-//            $qb = $testRepo->createQueryBuilder('t')
-//                ->where('t.cycle IN (:cycles)')
-//                //            ->andWhere('t.disabled = :disabled')
-//                //            ->orderBy('t.executionOrder', 'ASC')
-//                ->setMaxResults(40000)
-//                ->setCacheable(true)
-//                ->setLifetime(3000)
-//                ->setParameters(['cycles'=> $cycles]); //, 'disabled' => 0]
-//
-//            $q = $qb->getQuery();
-//            $tests = $q->execute(); //null, Query::HYDRATE);
-//            //if ($totalPosts > 0) {
-//            $time_end = microtime(true);
-//            $query_time = ($time_end - $time_start);
-//            $time_start = microtime(true);
-//
-//            foreach ($tests as $test)  {
-//                /** @var LogBookTest $test */
-//                try {
-//                    if ($test !== null) {
-//                        $fin_res[] = $this->buildExportTestArray($test);
-//                        $em->detach($test);
-//                    }
-//                } catch (\Throwable $ex) {
-//                    $logger->critical('MULTI_EXPORT_LOOP:' . $ex->getMessage(), [$ex->getLine(), $ex->getTraceAsString()]);
-//                }
-//
-//            }
         } catch (\Throwable $ex) {
             $this->keep_critical_log('MULTI_EXPORT', $logger, $ex);
         }
@@ -677,20 +643,15 @@ class LogBookCycleController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return array
+     * @throws \Exception
      */
     public function index(PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo, $page = 1): array
     {
-//        $em = $this->getDoctrine()->getManager();
-//        $cycleRepo = $em->getRepository('App:LogBookCycle');
         $query = $cycleRepo->createQueryBuilder('t')
             ->orderBy('t.id', 'DESC');
         $paginator = $pagePaginator->paginate($query, $page, $this->index_size);
-        //$posts = $this->getAllPosts($page); // Returns 5 posts out of 20
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        //$totalPostsReturned = $paginator->getIterator()->count(); # Total fetched (ie: `5` posts)
-        $totalPosts = $paginator->count(); # Count of ALL posts (ie: `20` posts)
-        $iterator = $paginator->getIterator(); # ArrayIterator
-
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = $page;
         return array(
@@ -717,6 +678,7 @@ class LogBookCycleController extends AbstractController
      *
      * @Route("/{id}/suite/{suite}/download", name="cycle_suite_download", methods={"GET"})
      * @param LogBookCycle|null $cycle
+     * @param SuiteExecution|null $suite
      * @return Response
      */
     public function downloadArchiveForSuite(LogBookCycle $cycle = null, SuiteExecution $suite = null): Response
@@ -790,6 +752,7 @@ class LogBookCycleController extends AbstractController
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return array
+     * @throws \Exception
      */
     public function indexFirst(PagePaginator $pagePaginator, LogBookCycleRepository $cycleRepo): array
     {
@@ -1015,37 +978,16 @@ class LogBookCycleController extends AbstractController
         return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
     }
 
-//    /**
-//     * @Route("/{id}/{maxSize<\d+>?1}/{page<\d+>?1}", name="cycle_show_page", methods={"GET"}, defaults={"page"="", "maxSize"=2000})
-//     * @Route("/{id}/{maxSize<\d+>?1}", name="cycle_show_page_2", methods={"GET"}, defaults={"page"="", "maxSize"=""})
-//     * @param PagePaginator $pagePaginator
-//     * @param LogBookTestRepository $testRepo
-//     * @param LogBookCycle $cycle
-//     * @param int $page
-//     * @return \Symfony\Component\HttpFoundation\Response
-//     */
-//    public function show_page(PagePaginator $pagePaginator, LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null, $maxSize = null) : ?Response
-//    {
-//        if ($page === null) {
-//            $page = 1;
-//        }
-//        if ($maxSize === null) {
-//            $maxSize = $this->show_tests_size;
-//        }
-//        return $this->show($pagePaginator, $testRepo, $cycle, $page, false, $maxSize);
-//    }
-
-
-
     /**
      * Finds and displays a cycle entity with paginator.
      *
      * @Route("/{id}/{maxSize<\d+>?1}/{page<\d+>?1}/use_json/{forJson}", name="cycle_show", methods={"GET"})
+     * @param TestFilterApplyRepository $app_filters
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
-     * @param LogBookCycle $cycle
+     * @param LogBookCycle|null $cycle
      * @param SuiteExecution|null $suite
-     * @param int $page
+     * @param null $page
      * @param bool $forJson if True the JSON table for tests will be used
      * @param null $maxSize
      * @return Response

@@ -310,11 +310,24 @@ class LogBookCycle
      */
     private $dbName;
 
+    /**
+     * @ORM\Column(name="is_closed", type="boolean", options={"default"="0"})
+     */
+    private $isClosed = false;
+
     //-----------------------------------------------------------
     protected $calculateStatistic = true;
 
     protected $rate = 0;
 
+
+    public function close()
+    {
+        if ($this->getStatus() !== 12) {
+            $this->setStatus(12);
+        }
+        $this->setIsClosed(true);
+    }
     /**
      * @param float $r
      */
@@ -1350,6 +1363,9 @@ class LogBookCycle
 
     public function setStatus(int $status): self
     {
+        if ($status === 12) {
+            $this->close();
+        }
         $this->status = $status;
 
         return $this;
@@ -1388,5 +1404,17 @@ class LogBookCycle
             'disabled' => $this->isDisabled(),
             'suites_count' => $this->getSuiteExecution()->count()
         ];
+    }
+
+    public function getIsClosed(): ?bool
+    {
+        return $this->isClosed;
+    }
+
+    public function setIsClosed(bool $isClosed): self
+    {
+        $this->isClosed = $isClosed;
+
+        return $this;
     }
 }

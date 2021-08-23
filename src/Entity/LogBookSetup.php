@@ -72,6 +72,7 @@ class LogBookSetup
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\LogBookUser", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="lbook_setup_moderators")
      */
     protected $moderators;
 

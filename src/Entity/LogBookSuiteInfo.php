@@ -45,6 +45,7 @@ class LogBookSuiteInfo
 
     /**
      * @ORM\ManyToMany(targetEntity=LogBookUser::class)
+     * @ORM\JoinTable(name="log_book_suite_log_book_user_subscribers")
      */
     private $subscribers;
 

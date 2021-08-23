@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SuiteExecutionRepository")
- * @ORM\Table(name="suite_execution", uniqueConstraints={@ORM\UniqueConstraint(
+ * @ORM\Table(name="lbook_suite_execution", uniqueConstraints={@ORM\UniqueConstraint(
  *          name="uniq_suite_execution",
  *          columns={"datetime","testing_level","product_version"}
  *      )

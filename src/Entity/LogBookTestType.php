@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookTestTypeRepository::class)
+ * @ORM\Table(name="lbook_test_type")
  */
 class LogBookTestType
 {

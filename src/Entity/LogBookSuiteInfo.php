@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookSuiteInfoRepository::class)
+ * @ORM\Table(name="lbook_suite_info")
  */
 class LogBookSuiteInfo
 {

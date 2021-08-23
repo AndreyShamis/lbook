@@ -134,7 +134,7 @@ class LogBookSetup
 
     /**
      * @ORM\ManyToMany(targetEntity=LogBookUser::class, inversedBy="subscribedSetups")
-     * @ORM\JoinTable(name="log_book_setup_log_book_user_subscribers")
+     * @ORM\JoinTable(name="lbook_setup_lbook_user_subscribers")
      */
     private $subscribers;
 

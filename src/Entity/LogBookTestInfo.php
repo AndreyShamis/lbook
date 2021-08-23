@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass=LogBookTestInfoRepository::class)
- * @ORM\Table(name="log_book_test_info", indexes={
+ * @ORM\Table(name="lbook_test_info", indexes={
  *     @Index(name="fulltext_name_path", columns={"name", "path"}, flags={"fulltext"})})
  */
 class LogBookTestInfo

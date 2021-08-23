@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TestEventCmuRepository::class)
- * @ORM\Table(name="test_event_cmu", uniqueConstraints={@ORM\UniqueConstraint(name="unique_event", columns={"block", "fault", "test_id", "a_time", "b_time"})})
+ * @ORM\Table(name="lbook_test_event_cmu", uniqueConstraints={@ORM\UniqueConstraint(name="unique_event", columns={"block", "fault", "test_id", "a_time", "b_time"})})
  */
 class TestEventCmu
 {

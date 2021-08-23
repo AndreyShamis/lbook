@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TestFilterRepository")
+ * @ORM\Table(name="lbook_test_filter")
  */
 class TestFilter
 {

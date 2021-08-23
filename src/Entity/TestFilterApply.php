@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TestFilterApplyRepository::class)
+ * @ORM\Table(name="lbook_test_filter_apply")
  */
 class TestFilterApply
 {

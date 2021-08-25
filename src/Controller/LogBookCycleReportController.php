@@ -352,11 +352,13 @@ class LogBookCycleReportController extends AbstractController
 
                                 foreach ($cycle->getSetup()->getModerators() as $tmp_user) {
                                     try {
-                                        $newEmail = new LogBookEmail();
-                                        $newEmail->setRecipient($tmp_user);
-                                        $newEmail->setBody($body);
-                                        $newEmail->setSubject($subject);
-                                        $entityManager->persist($newEmail);
+                                        if($tmp_user !== null) {
+                                            $newEmail = new LogBookEmail();
+                                            $newEmail->setRecipient($tmp_user);
+                                            $newEmail->setBody($body);
+                                            $newEmail->setSubject($subject);
+                                            $entityManager->persist($newEmail);
+                                        }
                                     } catch (\Throwable $ex) {
                                         $logger->critical($ex->getMessage());
                                     }
@@ -364,22 +366,26 @@ class LogBookCycleReportController extends AbstractController
 
                                 foreach ($cycle->getSetup()->getSubscribers() as $tmp_user) {
                                     try {
-                                        $newEmail = new LogBookEmail();
-                                        $newEmail->setRecipient($tmp_user);
-                                        $newEmail->setBody($body);
-                                        $newEmail->setSubject($subject);
-                                        $entityManager->persist($newEmail);
+                                        if($tmp_user !== null) {
+                                            $newEmail = new LogBookEmail();
+                                            $newEmail->setRecipient($tmp_user);
+                                            $newEmail->setBody($body);
+                                            $newEmail->setSubject($subject);
+                                            $entityManager->persist($newEmail);
+                                        }
                                     } catch (\Throwable $ex) {
                                         $logger->critical($ex->getMessage());
                                     }
                                 }
 
                                 try {
-                                    $newEmail = new LogBookEmail();
-                                    $newEmail->setSubject($subject);
-                                    $newEmail->setRecipient($cycle->getSetup()->getOwner());
-                                    $newEmail->setBody($body);
-                                    $entityManager->persist($newEmail);
+                                    if($cycle->getSetup()->getOwner() !== null) {
+                                        $newEmail = new LogBookEmail();
+                                        $newEmail->setSubject($subject);
+                                        $newEmail->setRecipient($cycle->getSetup()->getOwner());
+                                        $newEmail->setBody($body);
+                                        $entityManager->persist($newEmail);
+                                    }
                                 } catch (\Throwable $ex) {
                                     $logger->critical($ex->getMessage());
                                 }

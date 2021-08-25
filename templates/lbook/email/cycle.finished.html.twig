@@ -8,7 +8,7 @@
 {% apply spaceless %}
     <table style="width: 100%;padding-left: 100px;">
         <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
-        <tr><th style="text-align: left">Cycle Name</th><td style=";font-size: 30px;">{{ cycle.name }}</td></tr>
+        <tr><th style="text-align: left">Cycle Name</th><th style="font-size: 30px;">{{ cycle.name }}</th></tr>
         <tr><th style="text-align: left">Suites</th><td><strong style="font-size: 22px;">{{ cycle.suiteExecution | length }}</strong></td></tr>
         <tr><th style="text-align: left">Runtime</th><td><strong style="font-size: 22px;">{{ cycle.testsTimeSum | executionTimeGenericShort }}</strong></td></tr>
         <tr><th style="text-align: left">Period</th><td><strong style="font-size: 22px;">{{ cycle.period | executionTimeGenericShort }}</strong></td></tr>
@@ -24,14 +24,14 @@
         <table style="width: 70%;text-align: center;">
             <tr>
                 <td rowspan="3">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Total</strong></th>
-                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Pass</strong></th>
-                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Fail</strong></th>
-                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Error</strong></th>
-                {% if cycle.testsWarning > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Warning</strong></th>{% endif %}
-                {% if cycle.testsNa > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">NA</strong></th>{% endif %}
-                {% if cycle.testsUnknown > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Unknown</strong></th>{% endif %}
-                {% if cycle.testsDisabled > 0 %}<th style="background-color: #736CD2FF;"><strong style="font-size: 24px;">Disabled</strong></th>{% endif %}
+                <th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Total</strong></th>
+                <th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Pass</strong></th>
+                <th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Fail</strong></th>
+                <th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Error</strong></th>
+                {% if cycle.testsWarning > 0 %}<th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Warning</strong></th>{% endif %}
+                {% if cycle.testsNa > 0 %}<th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">NA</strong></th>{% endif %}
+                {% if cycle.testsUnknown > 0 %}<th style="background-color: #7c69af;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Unknown</strong></th>{% endif %}
+                {% if cycle.testsDisabled > 0 %}<th style="background-color: #7c69af;"><strong style="font-size: 24px;">Disabled</strong></th>{% endif %}
 {#                {% if aborted > 0 %}<th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Aborted</strong></th>{% endif %}#}
             </tr>
             <tr>
@@ -72,7 +72,7 @@
                 </tr>
                 {% for suite in cycle.suiteExecution %}
                     <tr>
-                        <td>{{ suite.name }}</td>
+                        <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
                         <td><span {% if suite.passRate < 100 %} style="color: red;" {% endif %}{% if suite.passRate == 100 %} style="color: green;" {% endif %}>{{ suite.passRate }}%</span></td>
                     </tr>
                 {% endfor %}

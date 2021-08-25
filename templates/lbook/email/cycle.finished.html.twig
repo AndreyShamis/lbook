@@ -1,0 +1,108 @@
+{% set url = app.request.scheme ~'://' ~  app.request.httpHost %}
+<style>
+    span{font-weight: bolder;}
+    a{font-weight: bolder;font-size: 16px;}
+    th{font-size: 24px;}
+</style>
+
+{% apply spaceless %}
+    <table style="width: 100%;padding-left: 100px;">
+        <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
+        <tr><th style="text-align: left">Cycle Name</th><td style=";font-size: 30px;">{{ cycle.name }}</td></tr>
+        <tr><th style="text-align: left">Suites</th><td><strong style="font-size: 22px;">{{ cycle.suiteExecution | length }}</strong></td></tr>
+        <tr><th style="text-align: left">Runtime</th><td><strong style="font-size: 22px;">{{ cycle.testsTimeSum | executionTimeGenericShort }}</strong></td></tr>
+        <tr><th style="text-align: left">Period</th><td><strong style="font-size: 22px;">{{ cycle.period | executionTimeGenericShort }}</strong></td></tr>
+    </table>
+
+    <div>
+        {% if cycle.passRate == 100 %}
+            <div style="font-size: 32px;color: #69aa46;padding-left: 100px;">Cycle finished successfully</div>
+{#        {% else %}#}
+{#            <div style="font-size: 32px;color: red;padding-left: 100px;">Cycle Pass Rate {{ cycle.passRate }}%</div>#}
+        {% endif %}
+{#        {% set aborted = cycle.testsCount - cycle.totalExecutedTests %}#}
+        <table style="width: 70%;text-align: center;">
+            <tr>
+                <td rowspan="3">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Total</strong></th>
+                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Pass</strong></th>
+                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Fail</strong></th>
+                <th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Error</strong></th>
+                {% if cycle.testsWarning > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Warning</strong></th>{% endif %}
+                {% if cycle.testsNa > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">NA</strong></th>{% endif %}
+                {% if cycle.testsUnknown > 0 %}<th style="background-color: #736CD2FF;border: 1px solid #23e6ff;"><strong style="font-size: 28px;">Unknown</strong></th>{% endif %}
+                {% if cycle.testsDisabled > 0 %}<th style="background-color: #736CD2FF;"><strong style="font-size: 24px;">Disabled</strong></th>{% endif %}
+{#                {% if aborted > 0 %}<th style="background-color: #9fffeb;"><strong style="font-size: 24px;">Aborted</strong></th>{% endif %}#}
+            </tr>
+            <tr>
+                <td style="text-align: center;font-size: 40px;border: 1px solid #23e6ff;">{{ cycle.testsCount}}</td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #00CC00;font-size: 36px;font-weight: bolder;">{{ cycle.testsPass }}</span></td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #d90e0e;font-size: 36px;font-weight: bolder;">{{ cycle.testsFail }}</span></td>
+                <td style="border: 1px solid #23e6ff;"><span style="color: #ffbc00;font-size: 36px;font-weight: bolder;">{{ cycle.testsError }}</span></td>
+                {% if cycle.testsWarning > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: #a535ff;font-size: 36px;font-weight: bolder;">{{ cycle.testsWarning }}</span></td>{% endif %}
+                {% if cycle.testsNa > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: #a535ff;font-size: 36px;font-weight: bolder;">{{ cycle.testsNa }}</span></td>{% endif %}
+                {% if cycle.testsUnknown > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: #a535ff;font-size: 36px;font-weight: bolder;">{{ cycle.testsUnknown }}</span></td>{% endif %}
+                {% if cycle.testsDisabled> 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: grey;font-size: 36px;">{{ cycle.testsDisabled }}</span></td>{% endif %}
+{#                {% if aborted > 0 %}<td style="border: 1px solid #23e6ff;"><span style="color: grey;font-size: 36px;">{{ aborted }}</span></td>{% endif %}#}
+            </tr>
+        </table>
+    </div>
+<br/>
+<table style="width: 100%;padding-left: 100px;">
+    <tr><th style="width: 20%"></th><td style="width: 80%"></td></tr>
+    <tr><th style="text-align: left">Build</th><td><strong style="font-size: 22px;">{{ cycle.build }}</strong></td></tr>
+    <tr><th style="text-align: left">Controller</th><td style="font-size: 22px;">{{ cycle.controller }}</td></tr>
+    <tr><th style="text-align: left">Time Start</th><td style="font-size: 18px;color: #1b6aaa;">{{ cycle.timeStart |date('Y-m-d H:i') }}</td></tr>
+    <tr><th style="text-align: left">Time End</th><td style="font-size: 18px;color: #1b6aaa;">{{ cycle.timeEnd |date('Y-m-d H:i') }}</td></tr>
+    <tr><th style="text-align: left"></th><td></td></tr>
+    <tr><th style="vertical-align: top;">Links</th><td>
+            <table style="width: 100%">
+                <tr><th style="text-align: left;">LogBook Cycle</th><td><a href="{{ url }}{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.name }}</a></td></tr>
+                <tr><th style="text-align: left;">LogBook Setup</th><td><a href="{{ url }}{{ path('setup_show_first', { 'id': setup.id }) }}">{{ setup.name }}</a></td></tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <th>
+
+            <table class="records_list table table-striped table-condensed">
+                <tr>
+                    <th>Suites ({{ cycle.suiteExecution | length }})</th>
+                    <th>PassRate</th>
+                </tr>
+                {% for suite in cycle.suiteExecution %}
+                    <tr>
+                        <td>{{ suite.name }}</td>
+                        <td><span {% if suite.passRate < 100 %} style="color: red;" {% endif %}{% if suite.passRate == 100 %} style="color: green;" {% endif %}>{{ suite.passRate }}%</span></td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+
+        </th>
+        <td>
+
+        </td>
+    </tr>
+
+</table>
+
+{#    <h3>Failed tests</h3>#}
+{#    <table class="records_list table table-striped table-condensed">#}
+{#    <tr>#}
+{#        <th style="width: 10%;">ExecutionOrder-Name</th>#}
+{#        <td style="width: 90%;">Description</td>#}
+{#    </tr>#}
+{#    {% for test in cycle.getFailedTests  %}#}
+{#        <tr>#}
+{#            <th>{{ test.name }}</th>#}
+{#            <td style="width: 90%;">{{ test.failDescription }}</td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#    </table>#}
+
+<br/><br/><br/><br/>
+    <table style="width: 100%">
+        <tr><td style="width: 100%;text-align: center;"><a style="font-size: 26px;" href="{{ url }}{{ path('setup_unsubscribe', { 'id': setup.id }) }}">Unsubscribe</a></td></tr></table>
+    <br/><br/>
+{% endapply %}

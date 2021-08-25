@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CycleSearch;
 use App\Entity\Host;
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookEmail;
 use App\Entity\LogBookTest;
 use App\Entity\LogBookTestInfo;
 use App\Entity\LogBookTestType;
@@ -45,6 +46,27 @@ class LogBookCycleController extends AbstractController
 {
     protected $index_size = 3000;
     protected $show_tests_size = 5000;
+//
+//    /**
+//     *
+//     * @Route("/close_test/{cycle}", name="close_cycle_test", methods={"GET"})
+//     * @return JsonResponse
+//     */
+//    public function close_test(LogBookCycle $cycle, LoggerInterface $logger): ?Response
+//    {
+//        $fin_res = [];
+//        try {
+//            $setup = $cycle->getSetup();
+//
+//
+//        } catch (\Throwable $ex) {
+//            $logger->critical($ex->getMessage());
+//        }
+//        return $this->render('lbook/email/cycle.finished.html.twig', [
+//            'cycle' => $cycle,
+//            'setup' => $setup
+//        ]);
+//    }
 
     /**
      * @Route("/search", name="cycle_search", methods={"GET|POST"})
@@ -1372,4 +1394,106 @@ class LogBookCycleController extends AbstractController
             ->getForm()
             ;
     }
+
+    /**
+     *
+     * @Route("/close/{cycle}", name="close_cycle", methods={"GET"})
+     * @return JsonResponse
+     */
+    public function close(LogBookCycle $cycle, LoggerInterface $logger): ?JsonResponse
+    {
+        $fin_res = [];
+        try {
+            $em = $this->getDoctrine()->getManager();
+            try{
+                if (!$cycle->getIsClosed() && $cycle->isAllSuitesFinished()) {
+                    $cycle->close();
+                    $em->flush();
+
+
+                    $setup = $cycle->getSetup();
+                    try {
+                        $subscribers = $setup->getSubscribers();
+                        // $fail_subscribers = $setup->getFailureSubscribers();
+                        foreach ($subscribers as $subscriber) {
+                            if ( $subscriber->getEmail() === null) {
+                                continue;
+                            }
+                            $newEmail = new LogBookEmail();
+                            $b = $cycle->getBuild();
+                            if ($cycle->getPassRate() < 100) {
+                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] failed. PR:' . $cycle->getPassRate() . '%');
+                            } else{
+                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] finished');
+                            }
+//                    try {
+//                        if ( $fail_subscribers->contains($subscriber) ) {
+//                            # For those who subscribed to failure (only)
+//                            continue;
+//                        }
+//                    } catch (\Throwable $ex) {}
+
+                            try {
+                                $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
+                                    'cycle' => $cycle,
+                                    'setup' => $setup
+                                ]);
+                                $newEmail->setBody($body);
+                            } catch (\Throwable $ex) {
+                                $logger->critical($ex->getMessage());
+                            }
+
+                            $newEmail->setRecipient($subscriber);
+                            $em->persist($newEmail);
+                        }
+
+//                foreach ($fail_subscribers as $subscriber) {
+//                    if ( $subscriber->getEmail() === null) {
+//                        continue;
+//                    }
+//                    $newEmail = new LogBookEmail();
+//                    if ($cycle->getPassRate() < 100) {
+//                        $newEmail->setSubject('['. $cycle->getName() . '] failed. PR:' . $cycle->getPassRate() . '%');
+//                    } else{
+//                        continue;
+//                    }
+//                    try {
+//                        $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
+//                            'cycle' => $cycle,
+//                            'setup' => $setup
+//                        ]);
+//                        $newEmail->setBody($body);
+//                    } catch (\Throwable $ex) {
+//                        $logger->critical($ex->getMessage());
+//                    }
+//
+//                    $newEmail->setRecipient($subscriber);
+//                    $em->persist($newEmail);
+//                }
+                    } catch (\Throwable $ex) {
+                        $logger->critical($ex->getMessage());
+                    }
+
+                }
+
+            } catch (\Throwable $ex) {}
+
+            $em->flush();
+            $logger->notice('CLOSE_CYCLE:',
+                array(
+                    'name' => $cycle->getName()
+                ));
+
+            return new JsonResponse($fin_res);
+
+        } catch (\Throwable $ex) {
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+
 }

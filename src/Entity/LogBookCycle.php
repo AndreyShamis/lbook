@@ -321,13 +321,33 @@ class LogBookCycle
     protected $rate = 0;
 
 
-    public function close()
+    /**
+     * @return LogBookTest[]
+     */
+    public function getFailedTests(): ?array
     {
-        if ($this->getStatus() !== 12) {
-            $this->setStatus(12);
+        $failedTests = [];
+        /** @var LogBookTest $test */
+        foreach ($this->getTests() as $test) {
+            if ($test !== null && $test->getVerdict() !== null && $test->getVerdict()->getName() !== 'PASS') {
+                $failedTests[] = $test;
+            }
         }
-        $this->setIsClosed(true);
+        return $failedTests;
     }
+
+    public function close(): bool
+    {
+        if ($this->isAllSuitesFinished())
+        {
+            if ($this->getStatus() !== 12) {
+                $this->setStatus(12);
+            }
+            $this->setIsClosed(true);
+        }
+
+    }
+
     /**
      * @param float $r
      */

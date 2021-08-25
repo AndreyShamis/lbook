@@ -320,6 +320,25 @@ class LogBookCycle
 
     protected $rate = 0;
 
+    /**
+     * LogBookCycle constructor.
+     * @throws \Exception
+     */
+    public function __construct()
+    {
+        $this->setUpdatedAt();
+        $this->setCreatedAt();
+        $this->setTokenExpiration(new \DateTime('+2 hours'));
+        $this->setDeleteAt(new \DateTime('+100 days'));
+        $this->setUploadToken(RandomString::generateRandomString(50));
+        $this->meta_data = [];
+        $this->setKeepForever(false);
+
+        /**  Other stuff */
+        $this->tests = new ArrayCollection();
+        $this->suiteExecution = new ArrayCollection();
+        $this->logBookCycleReports = new ArrayCollection();
+    }
 
     /**
      * @return LogBookTest[]
@@ -345,7 +364,7 @@ class LogBookCycle
             }
             $this->setIsClosed(true);
         }
-
+        return $this->getIsClosed();
     }
 
     /**
@@ -357,28 +376,6 @@ class LogBookCycle
 
     public function getRate(): float{
         return $this->rate;
-    }
-    /**
-     * LogBookCycle constructor.
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        /**
-         * For new creation usage
-         */
-        $this->setUpdatedAt();
-        $this->setCreatedAt();
-        $this->setTokenExpiration(new \DateTime('+2 hours'));
-        $this->setDeleteAt(new \DateTime('+100 days'));
-        $this->setUploadToken(RandomString::generateRandomString(50));
-        $this->meta_data = [];
-        $this->setKeepForever(false);
-
-        /**  Other stuff */
-        $this->tests = new ArrayCollection();
-        $this->suiteExecution = new ArrayCollection();
-        $this->logBookCycleReports = new ArrayCollection();
     }
 
     /**
@@ -1383,9 +1380,6 @@ class LogBookCycle
 
     public function setStatus(int $status): self
     {
-        if ($status === 12) {
-            $this->close();
-        }
         $this->status = $status;
 
         return $this;

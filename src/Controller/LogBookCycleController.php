@@ -69,6 +69,108 @@ class LogBookCycleController extends AbstractController
 //    }
 
     /**
+     *
+     * @Route("/close/{cycle}", name="close_cycle", methods={"GET"})
+     * @return JsonResponse
+     */
+    public function close_cycle(LogBookCycle $cycle, LoggerInterface $logger): ?JsonResponse
+    {
+        $fin_res = [];
+        try {
+            $em = $this->getDoctrine()->getManager();
+            try{
+                if (!$cycle->getIsClosed() && $cycle->isAllSuitesFinished()) {
+                    $cycle->close();
+                    $setup = $cycle->getSetup();
+                    try {
+                        $subscribers = $setup->getSubscribers();
+                        // $fail_subscribers = $setup->getFailureSubscribers();
+                        foreach ($subscribers as $subscriber) {
+                            if ( $subscriber->getEmail() === null) {
+                                continue;
+                            }
+                            $newEmail = new LogBookEmail();
+                            $b = $cycle->getBuild();
+                            if ($cycle->getPassRate() < 100) {
+                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] failed. PR:' . $cycle->getPassRate() . '%');
+                            } else{
+                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] finished');
+                            }
+//                    try {
+//                        if ( $fail_subscribers->contains($subscriber) ) {
+//                            # For those who subscribed to failure (only)
+//                            continue;
+//                        }
+//                    } catch (\Throwable $ex) {}
+
+                            try {
+                                $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
+                                    'cycle' => $cycle,
+                                    'setup' => $setup
+                                ]);
+                                $newEmail->setBody($body);
+                            } catch (\Throwable $ex) {
+                                $logger->critical($ex->getMessage());
+                            }
+
+                            $newEmail->setRecipient($subscriber);
+                            $em->persist($newEmail);
+                        }
+
+//                foreach ($fail_subscribers as $subscriber) {
+//                    if ( $subscriber->getEmail() === null) {
+//                        continue;
+//                    }
+//                    $newEmail = new LogBookEmail();
+//                    if ($cycle->getPassRate() < 100) {
+//                        $newEmail->setSubject('['. $cycle->getName() . '] failed. PR:' . $cycle->getPassRate() . '%');
+//                    } else{
+//                        continue;
+//                    }
+//                    try {
+//                        $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
+//                            'cycle' => $cycle,
+//                            'setup' => $setup
+//                        ]);
+//                        $newEmail->setBody($body);
+//                    } catch (\Throwable $ex) {
+//                        $logger->critical($ex->getMessage());
+//                    }
+//
+//                    $newEmail->setRecipient($subscriber);
+//                    $em->persist($newEmail);
+//                }
+                    } catch (\Throwable $ex) {
+                        $logger->critical($ex->getMessage());
+                    }
+
+                }
+                $em->flush();
+            } catch (\Throwable $ex) {
+                $fin_res['ERROR_LINE'] = $ex->getLine();
+                $fin_res['ERROR_FILE'] = $ex->getFile();
+                $fin_res['ERROR_MESSAGE'] = $ex->getMessage();
+            }
+
+
+            $logger->notice('CLOSE_CYCLE:',
+                array(
+                    'name' => $cycle->getName()
+                ));
+            $response = new JsonResponse($fin_res);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+
+        } catch (\Throwable $ex) {
+            $response = $this->json([]);
+            $js = json_encode('["'. $ex->getMessage() .'"]');
+            $response->setJson($js);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+    }
+
+    /**
      * @Route("/search", name="cycle_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
@@ -1394,106 +1496,5 @@ class LogBookCycleController extends AbstractController
             ->getForm()
             ;
     }
-
-    /**
-     *
-     * @Route("/close/{cycle}", name="close_cycle", methods={"GET"})
-     * @return JsonResponse
-     */
-    public function close(LogBookCycle $cycle, LoggerInterface $logger): ?JsonResponse
-    {
-        $fin_res = [];
-        try {
-            $em = $this->getDoctrine()->getManager();
-            try{
-                if (!$cycle->getIsClosed() && $cycle->isAllSuitesFinished()) {
-                    $cycle->close();
-                    $em->flush();
-
-
-                    $setup = $cycle->getSetup();
-                    try {
-                        $subscribers = $setup->getSubscribers();
-                        // $fail_subscribers = $setup->getFailureSubscribers();
-                        foreach ($subscribers as $subscriber) {
-                            if ( $subscriber->getEmail() === null) {
-                                continue;
-                            }
-                            $newEmail = new LogBookEmail();
-                            $b = $cycle->getBuild();
-                            if ($cycle->getPassRate() < 100) {
-                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] failed. PR:' . $cycle->getPassRate() . '%');
-                            } else{
-                                $newEmail->setSubject('['. $cycle->getName() . ']['. $b . '] finished');
-                            }
-//                    try {
-//                        if ( $fail_subscribers->contains($subscriber) ) {
-//                            # For those who subscribed to failure (only)
-//                            continue;
-//                        }
-//                    } catch (\Throwable $ex) {}
-
-                            try {
-                                $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
-                                    'cycle' => $cycle,
-                                    'setup' => $setup
-                                ]);
-                                $newEmail->setBody($body);
-                            } catch (\Throwable $ex) {
-                                $logger->critical($ex->getMessage());
-                            }
-
-                            $newEmail->setRecipient($subscriber);
-                            $em->persist($newEmail);
-                        }
-
-//                foreach ($fail_subscribers as $subscriber) {
-//                    if ( $subscriber->getEmail() === null) {
-//                        continue;
-//                    }
-//                    $newEmail = new LogBookEmail();
-//                    if ($cycle->getPassRate() < 100) {
-//                        $newEmail->setSubject('['. $cycle->getName() . '] failed. PR:' . $cycle->getPassRate() . '%');
-//                    } else{
-//                        continue;
-//                    }
-//                    try {
-//                        $body = $this->get('twig')->render('lbook/email/cycle.finished.html.twig', [
-//                            'cycle' => $cycle,
-//                            'setup' => $setup
-//                        ]);
-//                        $newEmail->setBody($body);
-//                    } catch (\Throwable $ex) {
-//                        $logger->critical($ex->getMessage());
-//                    }
-//
-//                    $newEmail->setRecipient($subscriber);
-//                    $em->persist($newEmail);
-//                }
-                    } catch (\Throwable $ex) {
-                        $logger->critical($ex->getMessage());
-                    }
-
-                }
-
-            } catch (\Throwable $ex) {}
-
-            $em->flush();
-            $logger->notice('CLOSE_CYCLE:',
-                array(
-                    'name' => $cycle->getName()
-                ));
-
-            return new JsonResponse($fin_res);
-
-        } catch (\Throwable $ex) {
-            $response = $this->json([]);
-            $js = json_encode('["'. $ex->getMessage() .'"]');
-            $response->setJson($js);
-            $response->setEncodingOptions(JSON_PRETTY_PRINT);
-            return $response;
-        }
-    }
-
 
 }

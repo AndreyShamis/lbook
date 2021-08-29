@@ -3,26 +3,89 @@
 namespace App\Controller;
 
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookCycleReport;
+use App\Entity\LogBookEmail;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
+use App\Entity\SuiteExecution;
 use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
 /**
  * Class LogBookApiCycleController
  * @package App\Controller
- * @Route("cycle/api/")
+ * @Route("api/cycle/")
  */
 class LogBookApiCycleController extends AbstractController
 {
+
+    /**
+     * @Route("auto/cycle_close", name="log_book_cycle_auto_close", methods={"GET","POST"})
+     * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookTestRepository $testRepo
+     * @param SuiteExecutionRepository $suitesRepo
+     * @param LogBookDefectRepository $defectsRepo
+     * @param LoggerInterface $logger
+     * @return Response
+     */
+    public function auto_cycle_close(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LoggerInterface $logger): Response
+    {
+        $time_limiter1 = new \DateTime('-90 minutes');
+        $time_limiter2 = new \DateTime('-40 hours');
+        $qb = $cycleRepo->createQueryBuilder('c')
+            ->where('c.timeEnd <= :time_limiter1')
+            ->andWhere('c.timeEnd > :time_limiter2')
+            ->andWhere('c.isClosed = :closed')
+            ->innerJoin('c.setup', 's') //->andWhere('s.autoCycleReport = 1')
+            ->setParameter('time_limiter1', $time_limiter1)
+            ->setParameter('time_limiter2', $time_limiter2)
+            ->setParameter('closed', false)
+//            ->setMaxResults(10)
+        ;
+
+        $cycles = $qb->getQuery()->execute();
+        $cycles_ret = [];
+        $entityManager = $this->getDoctrine()->getManager();
+        $i = 0;
+        /** @var LogBookCycle $cycle */
+        foreach ($cycles as $cycle) {
+            if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {
+                $l = $cycle->getTestingLevels();
+                if (count($l) == 1 && in_array($l[0], [ 'integration', 'nightly', 'weekly'])) {
+
+                    if ($i < 500) {
+                        $i += 1;
+                        $cycles_ret[] = $cycle;
+
+                    }
+
+
+                }
+            }
+            $cycle->setCalculateStatistic(false);
+        }
+
+        $entityManager->flush();
+
+        return $this->render('lbook/cycle/index.html.twig', [
+            'size'      => count($cycles_ret),
+            'maxPages'  => 1,
+            'thisPage'  => 1,
+            'iterator'  => $cycles_ret
+        ]);
+    }
     /**
      * @Route("{cycle}", name="api_cycle_index")
      */

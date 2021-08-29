@@ -44,13 +44,16 @@ class LogBookApiCycleController extends AbstractController
     {
         $time_limiter1 = new \DateTime('-90 minutes');
         $time_limiter2 = new \DateTime('-40 hours');
+        $time_limiter3 = new \DateTime('-30 minutes');
         $qb = $cycleRepo->createQueryBuilder('c')
             ->where('c.timeEnd <= :time_limiter1')
             ->andWhere('c.timeEnd > :time_limiter2')
+            ->andWhere('c.updatedAt < :time_limiter3')
             ->andWhere('c.isClosed = :closed')
             ->innerJoin('c.setup', 's') //->andWhere('s.autoCycleReport = 1')
             ->setParameter('time_limiter1', $time_limiter1)
             ->setParameter('time_limiter2', $time_limiter2)
+            ->setParameter('time_limiter3', $time_limiter3)
             ->setParameter('closed', false)
 //            ->setMaxResults(10)
         ;

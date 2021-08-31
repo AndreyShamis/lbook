@@ -12,6 +12,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookDefectRepository;
 use App\Repository\LogBookSetupRepository;
 use App\Repository\LogBookTestRepository;
+use App\Repository\LogBookUserRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -36,15 +37,15 @@ class LogBookApiCycleController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @param LogBookTestRepository $testRepo
      * @param SuiteExecutionRepository $suitesRepo
-     * @param LogBookDefectRepository $defectsRepo
      * @param LoggerInterface $logger
+     * @param LogBookUserRepository $users
      * @return Response
      */
-    public function auto_cycle_close(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LoggerInterface $logger): Response
+    public function auto_cycle_close(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LoggerInterface $logger, LogBookUserRepository $users): Response
     {
-        $time_limiter1 = new \DateTime('-90 minutes');
+        $time_limiter1 = new \DateTime('-60 minutes');
         $time_limiter2 = new \DateTime('-40 hours');
-        $time_limiter3 = new \DateTime('-30 minutes');
+        $time_limiter3 = new \DateTime('-20 minutes');
         $qb = $cycleRepo->createQueryBuilder('c')
             ->where('c.timeEnd <= :time_limiter1')
             ->andWhere('c.timeEnd > :time_limiter2')
@@ -55,14 +56,14 @@ class LogBookApiCycleController extends AbstractController
             ->setParameter('time_limiter2', $time_limiter2)
             ->setParameter('time_limiter3', $time_limiter3)
             ->setParameter('closed', false)
-//            ->setMaxResults(10)
+            ->setMaxResults(500)
         ;
 
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
         $i = 0;
         $em = $this->getDoctrine()->getManager();
-
+        //$subscribers = $users->findBy(['id' => 3]);
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
             if ($cycle->isAllSuitesFinished() && count($cycle->getLogBookCycleReports()) <= 0) {

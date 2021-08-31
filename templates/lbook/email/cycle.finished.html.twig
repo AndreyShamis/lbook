@@ -62,30 +62,31 @@
             </table>
         </td>
     </tr>
-    <tr>
-        <th>
-
-            <table class="records_list table table-striped table-condensed">
-                <tr>
-                    <th>Suites ({{ cycle.suiteExecution | length }})</th>
-                    <th>PassRate</th>
-                </tr>
-                {% for suite in cycle.suiteExecution %}
-                    <tr>
-                        <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
-                        <td><span {% if suite.passRate < 100 %} style="color: red;" {% endif %}{% if suite.passRate == 100 %} style="color: green;" {% endif %}>{{ suite.passRate }}%</span></td>
-                    </tr>
-                {% endfor %}
-            </table>
-
-
-        </th>
-        <td>
-
-        </td>
-    </tr>
-
 </table>
+    <table class="records_list table table-striped table-condensed" style="width: 100%">
+        <tr>
+            <th>Suites ({{ cycle.suiteExecution | length }})</th>
+            <th>Pass Rate</th>
+            <th>Tests Total</th>
+            <th>Pass</th>
+            <th>Fail</th>
+            <th>Error</th>
+            <th>Other</th>
+            <th>Tests Disabled</th>
+        </tr>
+        {% for suite in cycle.suiteExecution %}
+            <tr>
+                <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
+                <td><span {% if suite.passRate < 50 %} style="color: red;" {% endif %}{% if suite.passRate == 100 %} style="color: green;" {% endif %}>{{ suite.passRate }}%</span></td>
+                <td>{{ suite.testsCount }}</td>
+                <td>{{ suite.passCount }}</td>
+                <td>{{ suite.failCount }}</td>
+                <td>{{ suite.errorCount }}</td>
+                <td>{{ suite.otherCount }}</td>
+                <td>{{ suite.testsCountDisabled }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {#    <h3>Failed tests</h3>#}
 {#    <table class="records_list table table-striped table-condensed">#}

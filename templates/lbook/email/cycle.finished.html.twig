@@ -76,7 +76,7 @@
         </tr>
         {% for suite in cycle.suiteExecution %}
             <tr>
-                <td><a href="{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
+                <td><a href="{{ url }}{{ path('cycle_suite_show_first', {'cycle': cycle.id, 'suite': suite.id}) }}">{{ suite.name }}</a></td>
                 <td><span {% if suite.passRate < 50 %} style="color: red;" {% endif %}{% if suite.passRate == 100 %} style="color: green;" {% endif %}>{{ suite.passRate }}%</span></td>
                 <td>{{ suite.testsCount }}</td>
                 <td>{{ suite.passCount }}</td>

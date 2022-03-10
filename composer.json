@@ -6,15 +6,20 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-zip": "^1.15",
+        "doctrine/annotations": "^1.0",
+        "doctrine/common": "^2",
+        "doctrine/doctrine-bundle": "^2",
         "doctrine/doctrine-migrations-bundle": "2.1.2",
+        "doctrine/orm": "^2",
         "erusev/parsedown": "^1.7",
         "knplabs/knp-time-bundle": "^1.9",
         "lesstif/php-jira-rest-client": "^2.4",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.2",
         "phpunit/php-invoker": "^2.0",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/asset": "^4.4",
         "symfony/console": "^4.4",
-        "symfony/debug-pack": "*",
         "symfony/expression-language": "^4.4",
         "symfony/flex": "^1.0",
         "symfony/form": "^4.4",
@@ -22,17 +27,18 @@
         "symfony/ldap": "^4.4",
         "symfony/lock": "^4.4",
         "symfony/monolog-bundle": "^3.1",
-        "symfony/orm-pack": "^1.0",
         "symfony/process": "^4.4",
+        "symfony/property-access": "4.4.*",
+        "symfony/property-info": "4.4.*",
         "symfony/routing": "^4.4",
         "symfony/security-bundle": "^4.4",
-        "symfony/serializer-pack": "*",
+        "symfony/serializer": "4.4.*",
         "symfony/swiftmailer-bundle": "^3.2",
         "symfony/translation": "^4.4",
         "symfony/twig-bundle": "^4.4",
         "symfony/validator": "^4.4",
         "symfony/web-link": "^4.4",
-        "symfony/webpack-encore-pack": "*",
+        "symfony/webpack-encore-bundle": "*",
         "symfony/yaml": "4.4.*",
         "twig/extensions": "^1.5",
         "twig/extra-bundle": "^3.0",
@@ -42,17 +48,22 @@
         "phpunit/phpunit": "^7",
         "symfony/browser-kit": "^4.4",
         "symfony/css-selector": "^4.4",
+        "symfony/debug-bundle": "4.4.*",
         "symfony/dotenv": "^4.4",
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^4.4",
-        "symfony/profiler-pack": "*",
+        "symfony/stopwatch": "4.4.*",
+        "symfony/web-profiler-bundle": "4.4.*",
         "symfony/web-server-bundle": "^4.4"
     },
     "config": {
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/flex": true
+        }
     },
     "autoload": {
         "psr-4": {

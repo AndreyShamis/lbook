@@ -247,6 +247,74 @@ class LogBookUploaderController extends AbstractController
         return $setup;
     }
 
+    
+    /**
+     * @Route("/cycle_token_keep_alive", name="upload_cycle_token_keep_alive", methods={"GET|POST"})
+     * @param Request $request
+     * @param LoggerInterface $logger
+     * @param HostRepository $hosts
+     * @param TestFilterRepository $filtersRepo
+     * @return JsonResponse
+     */
+    public function cycleTokenKeepAlive(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
+    {
+        $token = null;
+        $setupName = $cycleName = null;
+        $ip = $request->getClientIp();
+        $fin_res['DEBUG'] = array();
+        $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            $data = array();
+        }
+        if (array_key_exists('token', $data)) {
+            $token = $data['token'];
+        }
+        if (array_key_exists('setup_name', $data)) {
+            $setupName = $data['setup_name'];
+        }
+
+        try {
+
+            try {
+                if ( $token !== null && $setupName !== null && $setupName !== '' ) {
+                    $setup = $this->setupRepo->findByName($setupName);
+                    $cycle = $this->cycleRepo->findByToken($token, $setup);
+                    if ($cycle !== null) {
+                        $cycle->setTokenExpiration(new \DateTime('+1 hours'));
+                    }
+
+                }
+            }catch (\Throwable $ex) {
+                $logger->critical('Failed to set cycleTokenKeepAlive:[' . $token . ']', $ex->getTrace());
+            }
+
+        } catch (\Throwable $e) {
+            $method = $request->getMethod();
+            $data['ip'] = $ip;
+            $data['method'] = $method;
+            $data['request'] = $request->request->all();
+            $data['query'] = $request->query->all();
+            $data['trace'] = $e->getTraceAsString();
+            $data['DEBUG'][] = $e->getMessage();
+            $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
+            $response =  new JsonResponse($data);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+
+        try {
+
+            $this->em->flush();
+        } catch (\Throwable $ex) {
+            $fin_res['DEBUG'][] = $ex->getMessage();
+            $logger->critical($ex->getMessage());
+
+        }
+        $response =  new JsonResponse($fin_res);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+    }
+
     /**
      * @Route("/create_suite_execution", name="add_new_suite_execution_json", methods={"GET|POST"})
      * @param Request $request
@@ -575,6 +643,7 @@ class LogBookUploaderController extends AbstractController
         $response->setEncodingOptions(JSON_PRETTY_PRINT);
         return $response;
     }
+
     /**
      * Creates a new Upload entity.
      *

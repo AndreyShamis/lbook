@@ -32,6 +32,7 @@
         "symfony/twig-bundle": "^4.4",
         "symfony/validator": "^4.4",
         "symfony/web-link": "^4.4",
+        "symfony/webpack-encore-bundle": "^1.14",
         "symfony/webpack-encore-pack": "*",
         "symfony/yaml": "4.4.*",
         "twig/extensions": "^1.5",
@@ -52,7 +53,10 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/flex": true
+        }
     },
     "autoload": {
         "psr-4": {

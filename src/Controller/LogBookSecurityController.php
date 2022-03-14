@@ -86,8 +86,12 @@ class LogBookSecurityController extends AbstractController
                 $ret_arr['firstName'] = $entry->getAttribute($LDAP_FIRSTNAME_STR)[0];
                 $ret_arr['fullName'] = $entry->getAttribute($LDAP_FULLNAME_STR)[0];
                 $ret_arr['anotherId'] = $entry->getAttribute($LDAP_ID_STR)[0];
-                $ret_arr['sitecode'] = $entry->getAttribute($LDAP_SITECODE_STR)[0];
-                $ret_arr['mobile'] = $entry->getAttribute($LDAP_MOBILE_STR)[0];
+                try {
+                    $ret_arr['sitecode'] = $entry->getAttribute($LDAP_SITECODE_STR)[0];
+                } catch (\Throwable $ex) { $ret_arr['sitecode'] = ''; }
+                try {
+                    $ret_arr['mobile'] = $entry->getAttribute($LDAP_MOBILE_STR)[0];
+                } catch (\Throwable $ex) { $ret_arr['sitecode'] = ''; }
                 $ret_arr['dummyPassword'] = $passwordEncoder->encodePassword(new LogBookUser(), 'dummyPassword');
                 $ret_arr['ldapUser'] = true;
             }

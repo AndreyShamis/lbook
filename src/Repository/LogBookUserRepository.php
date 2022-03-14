@@ -64,7 +64,12 @@ class LogBookUserRepository extends ServiceEntityRepository implements UserLoade
             $entity->setLastName($criteria['lastName']);
             $entity->setFirstName($criteria['firstName']);
             $entity->setAnotherId($criteria['anotherId']);
-            $entity->setMobile($criteria['mobile']);
+            if (!\in_array('mobile', $criteria, true)) {
+                $entity->setMobile('');
+            } else {
+                $entity->setMobile($criteria['mobile']);
+            }
+            
             $entity->setIsLdapUser($criteria['ldapUser']);
             $entity->setPassword($criteria['dummyPassword']);
             $this->_em->persist($entity);

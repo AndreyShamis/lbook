@@ -272,9 +272,6 @@
             "ref": "71d29aaf710fd59cd3abff2b1ade907ed73103c6"
         }
     },
-    "symfony/debug-pack": {
-        "version": "v1.0.4"
-    },
     "symfony/dependency-injection": {
         "version": "v4.0.4"
     },
@@ -374,9 +371,6 @@
     "symfony/options-resolver": {
         "version": "v4.0.4"
     },
-    "symfony/orm-pack": {
-        "version": "v1.0.5"
-    },
     "symfony/phpunit-bridge": {
         "version": "3.3",
         "recipe": {
@@ -409,9 +403,6 @@
     },
     "symfony/process": {
         "version": "v4.0.4"
-    },
-    "symfony/profiler-pack": {
-        "version": "v1.0.3"
     },
     "symfony/property-access": {
         "version": "v4.0.4"
@@ -454,9 +445,6 @@
     },
     "symfony/serializer": {
         "version": "v4.0.4"
-    },
-    "symfony/serializer-pack": {
-        "version": "v1.0.1"
     },
     "symfony/service-contracts": {
         "version": "v1.1.2"
@@ -525,15 +513,6 @@
             "branch": "master",
             "version": "3.3",
             "ref": "c72d107d077f1654428edaed69415d0228c1aefe"
-        }
-    },
-    "symfony/webpack-encore-pack": {
-        "version": "1.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.0",
-            "ref": "a2f276eff6e95ca94be135d2d3e5c1247c6f8807"
         }
     },
     "symfony/yaml": {

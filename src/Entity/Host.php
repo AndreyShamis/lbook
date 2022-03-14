@@ -20,12 +20,12 @@ use Doctrine\ORM\Mapping\Index;
  *     @Index(name="h_ip_index", columns={"ip"}),
  *     @Index(name="h_updated_at_index", columns={"updated_at"}),
  *     @Index(name="h_last_seen_at_index", columns={"last_seen_at"}),
- *     @Index(name="system_index", columns={"system"}),
+ *     @Index(name="system_index", columns={"system_str"}),
  *     @Index(name="uptime_index", columns={"uptime"}),
  *     @Index(name="user_name_index", columns={"user_name"}),
  *     @Index(name="memory_total_index", columns={"memory_total"}),
  *     @Index(name="fulltext_custom", columns={"name", "ip"}, flags={"fulltext"}),
- *     @Index(name="fulltext_versions", columns={"system", "system_release", "system_version"}, flags={"fulltext"}),
+ *     @Index(name="fulltext_versions", columns={"system_str", "system_release", "system_version"}, flags={"fulltext"}),
  *  }
  * )
  */
@@ -140,7 +140,7 @@ class Host
     protected $memoryFree = 0;
 
     /**
-     * @ORM\Column(name="system", type="string", length=50, options={"default"=""})
+     * @ORM\Column(name="system_str", type="string", length=50, options={"default"=""})
      */
     protected $system = '';
 

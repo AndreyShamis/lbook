@@ -42,6 +42,7 @@ class LogBookTestFailDesc
 
     /**
      * @ORM\OneToMany(targetEntity=LogBookTest::class, mappedBy="failDesc", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"time_end" = "DESC"})
      */
     private $tests;
 

@@ -447,6 +447,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
            data-show-columns="true"
            data-advanced-search="true"
            data-id-table="advancedTable"
+           data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="cycleShowFull"
             {% if tests_in_json == true %}
                 data-url="http://127.0.0.1:8080/cycle/json/{{ objId }}"
                 data-side-pagination="server"

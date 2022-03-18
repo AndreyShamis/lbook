@@ -1,2 +1,2 @@
 parameters:
-    http_protocol: https
+    http_protocol: http

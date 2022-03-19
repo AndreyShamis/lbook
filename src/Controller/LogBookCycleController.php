@@ -337,9 +337,22 @@ class LogBookCycleController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
         $cycle_name = $data['cycle_name'];
-        $fromDate = $data['fromDate'];
-        $toDate = $data['toDate'];
-        $setups_in = $data['setups'];
+        if (array_key_exists('fromDate', $data)) {
+            $fromDate = $data['fromDate'];
+        } else {
+            $fromDate = '';
+        }
+        if (array_key_exists('toDate', $data)) {
+            $toDate = $data['toDate'];
+        } else {
+            $toDate = '';
+        }
+        if (array_key_exists('setups', $data)) {
+            $setups_in = $data['setups'];
+        } else {
+            $setups_in = array();
+        }
+
         $limit = 200;
         set_time_limit(30);
         $tests = $new_tests = $cycles_res = array();
@@ -354,15 +367,12 @@ class LogBookCycleController extends AbstractController
         $post = $request->request->get('cycle_search');
         if ($post !== null) {
             $enableSearch = false;
-            if (array_key_exists('setup', $setups_in)) {
-                $setups = $setups_in;
-            }
+            $setups = $setups_in;
             if (array_key_exists('limit', $data)) {
                 $limit = (int)$data['limit'];
                 if ($limit > 10000) {
                     $limit = 500;
                 }
-                
             }
             $cycles->setLimit($limit);
             $qb = $cycleRepo->createQueryBuilder('t')

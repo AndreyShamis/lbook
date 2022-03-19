@@ -342,7 +342,7 @@ class LogBookCycleController extends AbstractController
         $setups_in = $data['setups'];
         $limit = 200;
         set_time_limit(30);
-        $tests = $new_tests = array();
+        $tests = $new_tests = $cycles_res = array();
         $setups = null;
         $sql = '';
         $leftDate = $rightDate = false;

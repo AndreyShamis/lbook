@@ -27,7 +27,7 @@ class LogBookTestFailDescController extends AbstractController
      */
     public function index(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
     {
-        $paginator_size = 2000;
+        $paginator_size = 5000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC')

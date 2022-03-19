@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}LogBook Test Fail Descriptions index{% endblock %}
+{% block title %}LogBook Test Fail Descriptions{% endblock %}
 {% block content %}
-    <h4>LogBook Test Fail Descriptions index</h4>
+    <h4>List of avaliable test failures</h4>
     {% set pagePath = "fail_desc_index_page" %}
     <div class="row">
         <div class="col-sm-12 text-center">{% include "lbook/paginator.html.twig" %}</div>
@@ -30,7 +30,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for log_book_test_fail_desc in iterator %}
+        {% for log_book_test_fail_desc in iterator | slice(0, 10000)  %}
             <tr>
                 <td><a data-title="{{ log_book_test_fail_desc.id }}" href="{{ path('fail_desc_show', {'id': log_book_test_fail_desc.id}) }}">{{ log_book_test_fail_desc.id }}</a></td>
                 <td>{{ log_book_test_fail_desc.description }}</td>

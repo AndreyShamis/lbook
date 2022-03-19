@@ -90,6 +90,7 @@ security:
         - { path: ^/filters_apply/new_cli(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/setup/api/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/cycle/api/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cycle/searchjson(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/cycle/multiexport(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/cycle/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/api/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }

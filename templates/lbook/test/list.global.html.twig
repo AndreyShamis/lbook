@@ -16,6 +16,7 @@
         {#data-detail-formatter="detailFormatter"#}
         {#data-show-refresh="true" data-show-toggle="true" data-show-fullscreen="true"#}
            data-toolbar="#testsList"
+           data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="testListGlobal"
            data-page-size="50" data-page-list="[5, 10, 20, 25, 30, 40, 50, 100, 500, 1000, 2000, 5000 , 10000, 20000, 50000, 'ALL'" data-sort-order="desc">
         <thead>
         <tr>
@@ -31,6 +32,7 @@
             {#<th data-sortable="true" data-visible="false">Uptime</th>#}
             {#<th data-sortable="true" data-visible="false">Uptime</th>#}
             <th data-sortable="true">Verdict</th>
+            <th data-sortable="true" data-visible="false">Host</th>
 {#            <th data-sortable="false" data-visible="false">Actions</th>#}
         </tr>
         </thead>
@@ -54,6 +56,7 @@
 {#                    <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
 {#                    {% endif %}#}
 {#                </td>#}
+                <td>{% if test.suiteExecution.id is defined and test.suiteExecution.host is defined and test.suiteExecution.host.name is defined %}{{ test.suiteExecution.host.name }}{% endif %}</td></td>
             </tr>
         {% endfor %}
         </tbody>

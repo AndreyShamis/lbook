@@ -325,6 +325,161 @@ class LogBookCycleController extends AbstractController
         ));
     }
 
+        /**
+     * @Route("/searchjson", name="cycle_search_json", methods={"GET|POST"})
+     * @param Request $request
+     * @param LogBookCycleRepository $cycleRepo
+     * @param SuiteExecutionRepository $suitesRepo
+     * @return Response
+     */
+    public function search_json(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): JsonResponse
+    {
+
+        $data = json_decode($request->getContent(), true);
+        $cycle_name = $data['cycle_name'];
+        $fromDate = $data['fromDate'];
+        $toDate = $data['toDate'];
+        $setups_in = $data['setups'];
+        $limit = 200;
+        set_time_limit(30);
+        $tests = $new_tests = array();
+        $setups = null;
+        $sql = '';
+        $leftDate = $rightDate = false;
+        $startDate = $endDate = null;
+        $DATE_TIME_TYPE = \Doctrine\DBAL\Types\Type::DATETIME;
+        $cycles = new CycleSearch();
+
+        $addOrder = true;
+        $post = $request->request->get('cycle_search');
+        if ($post !== null) {
+            $enableSearch = false;
+            if (array_key_exists('setup', $setups_in)) {
+                $setups = $setups_in;
+            }
+            if (array_key_exists('limit', $data)) {
+                $limit = (int)$data['limit'];
+                if ($limit > 10000) {
+                    $limit = 500;
+                }
+                
+            }
+            $cycles->setLimit($limit);
+            $qb = $cycleRepo->createQueryBuilder('t')
+                ->where('t.disabled = 0')
+                ->setMaxResults($cycles->getLimit());
+            if ($fromDate !== null && mb_strlen($fromDate) > 7) {
+                $startDate = \DateTime::createFromFormat('m/d/Y H:i', $fromDate . '00:00');
+                if ($startDate !== false) {
+                    $leftDate = true;
+                }
+            }
+            if ($toDate !== null && mb_strlen($toDate) > 7) {
+                $endDate = \DateTime::createFromFormat('m/d/Y H:i', $toDate . '23:59');
+                if ($endDate !== false) {
+                    $rightDate = true;
+                }
+            }
+
+            if ($cycle_name !== null && \mb_strlen($cycle_name) >= 2) {
+
+                $qb->andWhere('MATCH_AGAINST(t.name, t.meta_data, :search_str) > 1 OR t.name LIKE :cycle_name OR t.id = :cycle_id OR t.uploadToken LIKE :cycle_name');
+                $qb->addSelect('MATCH_AGAINST(t.name, t.meta_data, :search_str) as rate');
+                $qb->orderBy('rate', 'DESC');
+                $qb->addOrderBy('t.id', 'DESC');
+                $addOrder = false;
+//                }
+                $cycle_name = trim($cycle_name);
+                $cycle_name_match = str_replace('%', ' ', $cycle_name);
+                $cycle_name_match = str_replace('?', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace('  ', ' ', $cycle_name_match);
+                $cycle_name_match = str_replace(' ', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' ++', ' +', $cycle_name_match);
+                $cycle_name_match = str_replace(' +-', ' -', $cycle_name_match);
+
+                $qb->leftJoin('t.targetUploader', 'targetUploader')->orWhere($qb->expr()->like('targetUploader.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.controller', 'controller')->orWhere($qb->expr()->like('controller.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.dut', 'dut')->orWhere($qb->expr()->like('dut.name', $qb->expr()->literal($cycle_name)));
+                $qb->leftJoin('t.user', 'userExecutor')
+                    ->orWhere($qb->expr()->like('userExecutor.username', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('userExecutor.email', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('userExecutor.fullName', $qb->expr()->literal('%' . $cycle_name . '%')));
+
+                $qb->leftJoin('t.suiteExecution', 'suite')
+                    ->orWhere($qb->expr()->like('suite.summary', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.description', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.productVersion', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.jobName', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.buildTag', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.testingLevel', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.platform', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.chip', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.name', $qb->expr()->literal('%' . $cycle_name . '%')))
+                    ->orWhere($qb->expr()->like('suite.uuid', $qb->expr()->literal('%' . $cycle_name . '%')));
+
+                $qb->setParameter('search_str', $cycle_name_match);
+                $cycle_name_search = $cycle_name;
+                $str_len = mb_strlen($cycle_name_search);
+                if ($str_len >= 3) {
+                    $cycle_name_search = '%' . $cycle_name_search . '%';
+                } elseif ($str_len < 3) {
+                    $cycle_name_search .= '%';
+                }
+
+                $qb->setParameter('cycle_name', $cycle_name_search);
+                $qb->setParameter('cycle_id', (int)$cycle_name);
+            }
+            if ($leftDate === true && $rightDate === true) {
+                $qb->andWhere('t.timeStart BETWEEN :fromDate AND :toDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE)
+                    ->setParameter( 'toDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($leftDate === true) {
+                $qb->andWhere('t.timeStart >= :fromDate')
+                    ->setParameter('fromDate', $startDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            } else if ($rightDate === true) {
+                $qb->andWhere('t.timeEnd <= :endDate')
+                    ->setParameter('endDate', $endDate, $DATE_TIME_TYPE);
+                $enableSearch = True;
+            }
+            if ($setups !== null && \count($setups) > 0) {
+                $qb->andWhere('t.setup IN (:setups)')
+                    ->setParameter('setups', $setups);
+                $enableSearch = True;
+            }
+            $enableSearch = True;
+            if ($addOrder) {
+                $qb->orderBy('t.id', 'DESC');
+            }
+
+            if ($enableSearch) {
+                $query = $qb->getQuery();
+                $sql = $query->getSQL();
+                $tests = $query->execute();
+                if (!$addOrder){
+                    foreach($tests as $tmp_test) {
+                        /** @var LogBookCycle $t_t */
+                        $t_t = $tmp_test[0];
+                        $t_t->setRate($tmp_test['rate']);
+                        $new_tests[] = $t_t;
+                    }
+                } else {
+                    $new_tests = $tests;
+                }
+            }
+        }
+        foreach($tests as $tmp_test) {
+            /** @var LogBookCycle $t_t */
+            $t_t = $tmp_test[0];
+            $cycles_res[] = $t_t->toJson();
+        }
+        $fin_resp['count'] =  \count($new_tests);
+        $fin_resp['cycles'] =  $cycles_res;
+        $response =  new JsonResponse($fin_resp);
+        return $response;
+    }
+
     /**
      * Tests exporter to JSON file
      *

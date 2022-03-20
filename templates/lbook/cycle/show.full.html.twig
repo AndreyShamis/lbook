@@ -530,7 +530,7 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             <tr class='{{ test_disabled }}{{ testType }}'>
                 {#{% if is_granted('edit', cycle.setup) %}#}
                     {% if test.suiteExecution is defined and test.suiteExecution.name is defined  %}
-                        {%  set column =  test.suiteExecution.name ~ '[' ~  shortString(test.suiteExecution.buildType, 3, '')  ~ ']' ~ '[' ~  test.suiteExecution.id ~ ']'%}
+                        {%  set column =  test.suiteExecution.name | default('') ~ '[' ~  shortString(test.suiteExecution.buildType| default(''), 3, '')  ~ ']' ~ '[' ~  test.suiteExecution.id | default('') ~ ']'%}
                     {% else %}
                         {%  set column =  test.verdict %}
                     {% endif %}

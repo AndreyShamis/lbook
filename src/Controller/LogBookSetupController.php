@@ -549,20 +549,22 @@ class LogBookSetupController extends AbstractController
      * Finds and displays a setup entity.
      *
      * @Route("/{id}", name="setup_show_first", methods={"GET"})
+     * @param LoggerInterface $logger
      * @param LogBookSetup $setup
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFullFirst(LoggerInterface $logger, LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
-        return $this->showFull($setup, 1, $pagePaginator, $cycleRepo);
+        return $this->showFull($logger, $setup, 1, $pagePaginator, $cycleRepo);
     }
 
     /**
      * Finds and displays a setup entity.
      *
      * @Route("/{id}/page/{page}", name="setup_show", methods={"GET"})
+     * @param LoggerInterface $logger
      * @param LogBookSetup $setup
      * @param int $page
      * @param PagePaginator $pagePaginator

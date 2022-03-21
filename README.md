@@ -189,6 +189,16 @@ curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 
 DISABLE_TEST_UPLOAD=true
 ~~~
 
+### session storage In mysql
+~~~ bash
+CREATE TABLE `lbk_customer_session` (
+    `guid` VARBINARY(128) NOT NULL PRIMARY KEY,
+    `sess_data` BLOB NOT NULL,
+    `sess_lifetime` INTEGER UNSIGNED NOT NULL,
+    `sess_time` INTEGER UNSIGNED NOT NULL,
+    INDEX `sessions_sess_lifetime_idx` (`sess_lifetime`)
+) COLLATE utf8mb4_bin, ENGINE = InnoDB;
+~~~
 ### crontab
 Run crontab -e
 Add next lines:

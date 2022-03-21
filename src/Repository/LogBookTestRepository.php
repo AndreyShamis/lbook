@@ -99,18 +99,27 @@ class LogBookTestRepository extends ServiceEntityRepository
             $classMetaData->setPrimaryTable(['name' => $cycle->getDbName()]);
             $logsRepo = $this->getEntityManager()->getRepository('App:LogBookMessage');
             foreach ($cycle->getTests() as $test) {
-                $logsRepo->createQueryBuilder('m')
+                try {
+                    $logsRepo->createQueryBuilder('m')
                     ->delete()
                     ->where('m.test = :test_id')
                     ->setParameter('test_id', $test->getId());
+                } catch (\Throwable $ex) {
+                    $this->logger->critical('deleteByCycle: Throwable 1 for', $ex->getMessage(), $ex]);
+                }
             }
         }
-        $qd = $this->createQueryBuilder('t')
+        try {
+            $qd = $this->createQueryBuilder('t')
             ->delete()
             ->where('t.cycle = :cycle')
             ->setParameter('cycle', $cycle->getId());
-        $query = $qd->getQuery();
-        $query->execute();
+            $query = $qd->getQuery();
+            $query->execute();
+        } catch (\Throwable $ex) {
+            $this->logger->critical('deleteByCycle: Throwable 2 for', $ex->getMessage(), $ex]);
+        }
+
     }
 
     /**

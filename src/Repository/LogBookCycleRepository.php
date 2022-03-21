@@ -38,6 +38,7 @@ class LogBookCycleRepository extends ServiceEntityRepository
                 ->andWhere('c.keepForever = 0')
                 ->setMaxResults($max_results)
                 ->setParameter('now', new \DateTime('now'));
+            $qb->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
         } catch (\Exception $e) {
         }
         return $qb->getQuery()->execute();

@@ -5,13 +5,13 @@ namespace App\Repository;
 use App\Entity\LogBookUser;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class LogBookUserRepository extends ServiceEntityRepository implements UserLoaderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, LogBookUser::class);
     }

@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookTestFailDesc;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
@@ -16,7 +16,7 @@ use Doctrine\ORM\ORMException;
  */
 class LogBookTestFailDescRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, LogBookTestFailDesc::class);
     }

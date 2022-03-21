@@ -6,7 +6,7 @@ use App\Entity\LogBookSetup;
 use App\Entity\LogBookCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Log\LoggerInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use App\Model\OsType;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -21,10 +21,10 @@ class LogBookSetupRepository extends ServiceEntityRepository
 
     /**
      * LogBookSetupRepository constructor.
-     * @param ManagerRegistry $registry
+     * @param Registry $registry
      * @param LoggerInterface $logger
      */
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
+    public function __construct(Registry $registry, LoggerInterface $logger)
     {
         parent::__construct($registry, LogBookSetup::class);
         $this->logger = $logger;

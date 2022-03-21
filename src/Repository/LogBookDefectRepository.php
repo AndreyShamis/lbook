@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookDefect;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * @method LogBookDefect|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,7 +14,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class LogBookDefectRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, LogBookDefect::class);
     }

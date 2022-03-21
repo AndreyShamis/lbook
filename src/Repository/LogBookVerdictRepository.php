@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookVerdict;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 class LogBookVerdictRepository extends ServiceEntityRepository
 {
@@ -13,7 +13,7 @@ class LogBookVerdictRepository extends ServiceEntityRepository
      */
     protected static $hashedData = array();
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, LogBookVerdict::class);
     }

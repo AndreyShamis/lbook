@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookBuild;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 class LogBookBuildRepository extends ServiceEntityRepository
 {
@@ -12,7 +12,7 @@ class LogBookBuildRepository extends ServiceEntityRepository
      * LogBookBuildRepository constructor.
      * @param ManagerRegistry $registry
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, LogBookBuild::class);
     }

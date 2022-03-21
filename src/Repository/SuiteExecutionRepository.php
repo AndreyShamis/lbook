@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\AbstractQuery;
 
 /**
@@ -16,7 +16,7 @@ use Doctrine\ORM\AbstractQuery;
  */
 class SuiteExecutionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, SuiteExecution::class);
     }

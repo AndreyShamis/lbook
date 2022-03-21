@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\TestFilterApply;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * @method TestFilterApply|null find($id, $lockMode = null, $lockVersion = null)
@@ -15,7 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 class TestFilterApplyRepository extends ServiceEntityRepository
 {
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Registry $registry)
     {
         parent::__construct($registry, TestFilterApply::class);
     }

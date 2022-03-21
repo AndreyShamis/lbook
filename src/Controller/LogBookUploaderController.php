@@ -36,6 +36,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -112,11 +113,11 @@ class LogBookUploaderController extends AbstractController
      * @param Container $container
      * @throws \LogicException
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, ManagerRegistry $doctrine)
     {
         self::$UPLOAD_PATH = self::getUploadPath();
         $this->container = $container;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
         $this->testsRepo = $this->em->getRepository('App:LogBookTest');
         $this->cycleRepo = $this->em->getRepository('App:LogBookCycle');
         $this->verdictRepo = $this->em->getRepository('App:LogBookVerdict');
@@ -1150,7 +1151,7 @@ class LogBookUploaderController extends AbstractController
      * @param string $remote_ip
      * @return File
      */
-    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger, string $remote_ip): File
+    protected function fileHandler(UploadedFile $file, LogBookSetup $setup, LogBookCycle $cycle, LogBookUpload $obj, LoggerInterface $logger, string $remote_ip): ?File
     {
         /** @var UploadedFile $new_file */
         $new_file = null;

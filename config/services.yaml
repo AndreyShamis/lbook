@@ -36,11 +36,11 @@ services:
                 options:
                     protocol_version: 3
                     referrals: false
-    twig.extension.date:
-       class: Twig_Extensions_Extension_Date
-       arguments: ["@translator"]
-       tags:
-            - { name: twig.extension }
+#    twig.extension.date:
+#        class: Twig_Extensions_Extension_Date
+#        arguments: ["@translator"]
+#        tags:
+#              - { name: twig.extension }
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:
             - '%env(DATABASE_URL)%'

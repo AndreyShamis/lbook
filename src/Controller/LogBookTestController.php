@@ -20,6 +20,7 @@ use App\Utils\LogBookCommon;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerInterface as Container;
@@ -49,10 +50,10 @@ class LogBookTestController extends AbstractController
      * @param Container $container
      * @throws \LogicException
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, ManagerRegistry $doctrine)
     {
         $this->container = $container;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
 
     }
 
@@ -480,7 +481,7 @@ class LogBookTestController extends AbstractController
                 //$qb->setParameter('test_name', $test_name_search);
 
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             /** @var Query $queryObj */
             $queryObj = $em->createQuery("SELECT t FROM App\LogBookTest t");
             $queryObj->setDQL($qb->getDQL());
@@ -562,7 +563,7 @@ class LogBookTestController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             $em->persist($test);
             $em->flush();
 
@@ -694,7 +695,7 @@ class LogBookTestController extends AbstractController
             $bad_case = '';
             $dataTable = 'log_book_message';
             $first_log = $test->getLogs()->first();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->em;
             if ($first_log === false || $first_log === null) {
 
                 /** @var ClassMetadataInfo $classMetaData */
@@ -827,7 +828,7 @@ class LogBookTestController extends AbstractController
                 /** @var LogBookCycle $cycle */
                 $cycle = $test->getCycle();
                 $cycle->setDirty(true);
-                $this->getDoctrine()->getManager()->flush();
+                $this->em->flush();
                 return $this->redirectToRoute('test_edit', array('id' => $test->getId()));
             }
 
@@ -864,7 +865,7 @@ class LogBookTestController extends AbstractController
                 /** @var LogBookCycle $cycle */
                 $cycle = $test->getCycle();
                 $cycle->setDirty(true);
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->em;
                 $em->remove($test);
                 $em->flush();
             }

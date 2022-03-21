@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\StorageString;
 use App\Form\StorageStringType;
 use App\Repository\StorageStringRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,14 +29,14 @@ class StorageStringController extends AbstractController
     /**
      * @Route("/new", name="storage_string_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $storageString = new StorageString();
         $form = $this->createForm(StorageStringType::class, $storageString);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($storageString);
             $entityManager->flush();
 
@@ -61,13 +62,13 @@ class StorageStringController extends AbstractController
     /**
      * @Route("/{id}/edit", name="storage_string_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, StorageString $storageString): Response
+    public function edit(Request $request, StorageString $storageString, ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(StorageStringType::class, $storageString);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('storage_string_index');
         }
@@ -81,10 +82,10 @@ class StorageStringController extends AbstractController
     /**
      * @Route("/{id}", name="storage_string_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, StorageString $storageString): Response
+    public function delete(Request $request, StorageString $storageString, ManagerRegistry $doctrine): Response
     {
         if ($this->isCsrfTokenValid('delete'.$storageString->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->remove($storageString);
             $entityManager->flush();
         }

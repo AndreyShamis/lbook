@@ -7,6 +7,7 @@ use App\Form\LogBookBuildType;
 use App\Repository\LogBookBuildRepository;
 use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookCycleRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,10 +33,10 @@ class LogBookBuildController extends AbstractController
      * @param LoggerInterface $logger
      * @return array
      */
-    public function cleanNotUsed(LogBookCycleReportRepository $reports, LogBookCycleRepository $cycleRepo, LogBookBuildRepository $logBookBuildRepository, LoggerInterface $logger): array
+    public function cleanNotUsed(LogBookCycleReportRepository $reports, LogBookCycleRepository $cycleRepo, LogBookBuildRepository $logBookBuildRepository, LoggerInterface $logger, ManagerRegistry $doctrine): array
     {
         $builds = $logBookBuildRepository->findAll();
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $updated = 0;
         $counterIncreased = 0;
         $removed = 0;
@@ -140,14 +141,14 @@ class LogBookBuildController extends AbstractController
      * @return Response
      * @throws \LogicException
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $logBookBuild = new LogBookBuild();
         $form = $this->createForm(LogBookBuildType::class, $logBookBuild);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($logBookBuild);
             $em->flush();
 
@@ -220,7 +221,7 @@ class LogBookBuildController extends AbstractController
      * @return Response
      * @throws \LogicException
      */
-    public function edit(Request $request, LogBookBuild $logBookBuild): Response
+    public function edit(Request $request, LogBookBuild $logBookBuild, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('edit', $logBookBuild);
 
@@ -228,7 +229,7 @@ class LogBookBuildController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('log_book_build_edit', ['id' => $logBookBuild->getId()]);
         }
@@ -246,11 +247,11 @@ class LogBookBuildController extends AbstractController
      * @return Response
      * @throws \LogicException
      */
-    public function delete(Request $request, LogBookBuild $logBookBuild): Response
+    public function delete(Request $request, LogBookBuild $logBookBuild, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('delete', $logBookBuild);
         if ($this->isCsrfTokenValid('delete'.$logBookBuild->getId(), $request->request->get('_token'))) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($logBookBuild);
             $em->flush();
         }

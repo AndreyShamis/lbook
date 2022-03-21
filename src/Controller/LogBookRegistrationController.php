@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,7 @@ class LogBookRegistrationController extends AbstractController
      * @throws \Symfony\Component\Form\Exception\LogicException
      * @throws \LogicException
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, ManagerRegistry $doctrine)
     {
         // 1) build the form
         $user = new LogBookUser();
@@ -35,7 +36,7 @@ class LogBookRegistrationController extends AbstractController
             $user->setPassword($password);
 
             // 4) save the User!
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
 

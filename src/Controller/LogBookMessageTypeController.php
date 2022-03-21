@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookMessageType;
 use App\Form\LogBookMessageTypeType;
 use App\Repository\LogBookMessageTypeRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,14 +37,14 @@ class LogBookMessageTypeController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, ManagerRegistry $doctrine)
     {
         $obj = new LogBookMessageType();
         $form = $this->createForm(LogBookMessageTypeType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($obj);
             $em->flush();
 
@@ -83,7 +84,7 @@ class LogBookMessageTypeController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function editAction(Request $request, LogBookMessageType $obj)
+    public function editAction(Request $request, LogBookMessageType $obj, ManagerRegistry $doctrine)
     {
         $this->denyAccessUnlessGranted('edit', $obj);
         $deleteForm = $this->createDeleteForm($obj);
@@ -91,7 +92,7 @@ class LogBookMessageTypeController extends AbstractController
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('msg_type_edit', array('id' => $obj->getId()));
         }
@@ -112,14 +113,14 @@ class LogBookMessageTypeController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @throws \LogicException
      */
-    public function deleteAction(Request $request, LogBookMessageType $obj): RedirectResponse
+    public function deleteAction(Request $request, LogBookMessageType $obj, ManagerRegistry $doctrine): RedirectResponse
     {
         $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($obj);
             $em->flush();
         }

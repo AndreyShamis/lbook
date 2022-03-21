@@ -11,6 +11,7 @@ use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterApplyRepository;
 use App\Repository\TestFilterRepository;
 use App\Service\PagePaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -61,7 +62,7 @@ class TestFilterApplyController extends AbstractController
      * @param LoggerInterface $logger
      * @return JsonResponse
      */
-    public function create(Request $request, TestFilterRepository $filters, LogBookTestInfoRepository $testInfoRepo, SuiteExecutionRepository $suites, LoggerInterface $logger): JsonResponse
+    public function create(Request $request, TestFilterRepository $filters, LogBookTestInfoRepository $testInfoRepo, SuiteExecutionRepository $suites, LoggerInterface $logger, ManagerRegistry $doctrine): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -88,7 +89,7 @@ class TestFilterApplyController extends AbstractController
                     $testFilterApply->setTestFilter($tf);
                     $testFilterApply->setTestInfo($ti);
                     $testFilterApply->setSuiteExecution($suiteExecution);
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $doctrine->getManager();
                     $em->persist($testFilterApply);
                     $em->flush();
                     $ret[] = 'Filter added to history id:' . $testFilterApply->getId();
@@ -113,14 +114,14 @@ class TestFilterApplyController extends AbstractController
     /**
      * @Route("/new", name="test_filter_apply_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $testFilterApply = new TestFilterApply();
         $form = $this->createForm(TestFilterApplyType::class, $testFilterApply);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($testFilterApply);
             $em->flush();
 
@@ -146,13 +147,13 @@ class TestFilterApplyController extends AbstractController
     /**
      * @Route("/{id}/edit", name="test_filter_apply_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, TestFilterApply $testFilterApply): Response
+    public function edit(Request $request, TestFilterApply $testFilterApply, ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(TestFilterApplyType::class, $testFilterApply);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('test_filter_apply_index');
         }
@@ -166,10 +167,10 @@ class TestFilterApplyController extends AbstractController
     /**
      * @Route("/{id}", name="test_filter_apply_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, TestFilterApply $testFilterApply): Response
+    public function delete(Request $request, TestFilterApply $testFilterApply, ManagerRegistry $doctrine): Response
     {
         if ($this->isCsrfTokenValid('delete'.$testFilterApply->getId(), $request->request->get('_token'))) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($testFilterApply);
             $em->flush();
         }

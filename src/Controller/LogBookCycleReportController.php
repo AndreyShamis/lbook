@@ -11,6 +11,7 @@ use App\Form\LogBookCycleReportType;
 use App\Entity\LogBookCycleReport;
 use App\Service\PagePaginator;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use JiraRestApi\Issue\Issue;
 use Psr\Log\LoggerInterface;
@@ -71,7 +72,7 @@ class LogBookCycleReportController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function new(Request $request, LogBookCycle $cycle=null, LoggerInterface $logger): Response
+    public function new(Request $request, LogBookCycle $cycle=null, LoggerInterface $logger, ManagerRegistry $doctrine): Response
     {
         /** @var LogBookCycleReport $logBookCycleReport */
         $logBookCycleReport = new LogBookCycleReport();
@@ -110,7 +111,7 @@ class LogBookCycleReportController extends AbstractController
             $logBookCycleReport->setTestsNotes($request->request->get('testsNotes'));
             $logBookCycleReport->setBugsNotes($request->request->get('bugsNotes'));
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($logBookCycleReport);
             $entityManager->flush();
 
@@ -175,7 +176,7 @@ class LogBookCycleReportController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function edit(Request $request, LogBookCycleReport $logBookCycleReport, CycleReportEditHistoryRepository $historyRepo, LoggerInterface $logger): Response
+    public function edit(Request $request, LogBookCycleReport $logBookCycleReport, CycleReportEditHistoryRepository $historyRepo, LoggerInterface $logger, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('edit', $logBookCycleReport);
         $form = $this->createForm(LogBookCycleReportType::class, $logBookCycleReport);
@@ -189,7 +190,7 @@ class LogBookCycleReportController extends AbstractController
             $logBookCycleReport->setBugsNotes($request->request->get('bugsNotes'));
             try{
                 /** @var UnitOfWork $uow */
-                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                $uow = $doctrine->getManager()->getUnitOfWork();
                 $uow->computeChangeSets(); // do not compute changes if inside a listener
                 $diff_arr = $uow->getEntityChangeSet($logBookCycleReport);
                 $user = $this->get('security.token_storage')->getToken()->getUser();
@@ -209,7 +210,7 @@ class LogBookCycleReportController extends AbstractController
             } catch (\Throwable $ex) {
                 $logger->critical('REPORT_DIFF:' .$ex->getMessage());
             }
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('log_book_cycle_report_calculate', ['id' => $logBookCycleReport->getId()]);
         }
@@ -226,11 +227,11 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookCycleReport $report
      * @return Response
      */
-    public function lock(Request $request, LogBookCycleReport $report): Response
+    public function lock(Request $request, LogBookCycleReport $report, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('edit', $report);
         $report->setIsLocked(true);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
@@ -240,22 +241,22 @@ class LogBookCycleReportController extends AbstractController
      * @param LogBookCycleReport $report
      * @return Response
      */
-    public function unlock(Request $request, LogBookCycleReport $report): Response
+    public function unlock(Request $request, LogBookCycleReport $report, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('edit', $report);
         $report->setIsLocked(false);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
     /**
      * @Route("/{id}", name="log_book_cycle_report_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, LogBookCycleReport $logBookCycleReport): Response
+    public function delete(Request $request, LogBookCycleReport $logBookCycleReport, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('delete', $logBookCycleReport);
         if ($this->isCsrfTokenValid('delete'.$logBookCycleReport->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->remove($logBookCycleReport);
             $entityManager->flush();
         }
@@ -273,7 +274,7 @@ class LogBookCycleReportController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function auto_create(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
+    public function auto_create(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger, ManagerRegistry $doctrine): Response
     {
         $time_limiter1 = new \DateTime('-90 minutes');
         $time_limiter2 = new \DateTime('-40 hours');
@@ -287,7 +288,7 @@ class LogBookCycleReportController extends AbstractController
 
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $doctrine->getManager();
         $i = 0;
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
@@ -443,14 +444,14 @@ class LogBookCycleReportController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger): Response
+    public function calculate(LogBookCycleReport $report, LogBookTestRepository $testRepo, LogBookVerdictRepository $verdicts, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger, ManagerRegistry $doctrine): Response
     {
 
-        $this->calculateReport($report, $testRepo, $suitesRepo, $defectsRepo, $logger);
+        $this->calculateReport($report, $testRepo, $suitesRepo, $defectsRepo, $logger, $doctrine);
         return $this->redirectToRoute('log_book_cycle_report_show', ['id' => $report->getId()]);
     }
 
-    private function calculateReport(LogBookCycleReport $report, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger)
+    private function calculateReport(LogBookCycleReport $report, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LogBookDefectRepository $defectsRepo, LoggerInterface $logger, ManagerRegistry $doctrine)
     {
         if (!$report->isLocked()) {
             $testsTotalEnabledInSuites = 0;
@@ -534,7 +535,7 @@ class LogBookCycleReportController extends AbstractController
             } catch (\Throwable $ex) {
                 $logger->critical($ex->getMessage());
             }
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
         }
     }
 

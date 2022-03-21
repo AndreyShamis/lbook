@@ -6,6 +6,7 @@ use App\Entity\LogBookUser;
 use App\Entity\LogBookUserSettings;
 use App\Form\LogBookUserSettingsType;
 use App\Repository\LogBookUserSettingsRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,11 +31,11 @@ class LogBookUserSettingsController extends AbstractController
      * @param LogBookUser $logBookUser
      * @return LogBookUserSettings
      */
-    protected function validateAndCreateSettings(LogBookUser $logBookUser): LogBookUserSettings
+    protected function validateAndCreateSettings(LogBookUser $logBookUser, ManagerRegistry $doctrine): LogBookUserSettings
     {
         $settings = $logBookUser->getSettings();
         if ($settings === null || $settings->getId() === null) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $userSettings = new LogBookUserSettings();
             $em->persist($userSettings);
             $logBookUser->setSettings($userSettings);
@@ -66,7 +67,7 @@ class LogBookUserSettingsController extends AbstractController
      * @param LogBookUser $logBookUser
      * @return Response
      */
-    public function edit(Request $request, LogBookUser $logBookUser): Response
+    public function edit(Request $request, LogBookUser $logBookUser, ManagerRegistry $doctrine): Response
     {
         $settings = $this->validateAndCreateSettings($logBookUser);
 
@@ -74,7 +75,7 @@ class LogBookUserSettingsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('user_settings_edit', ['id' => $logBookUser->getId()]);
         }

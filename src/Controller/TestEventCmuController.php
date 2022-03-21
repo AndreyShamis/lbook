@@ -7,6 +7,7 @@ use App\Form\TestEventCmuType;
 use App\Repository\TestEventCmuRepository;
 use App\Service\PagePaginator;
 use DateInterval;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,14 +108,14 @@ class TestEventCmuController extends AbstractController
     /**
      * @Route("/new", name="test_event_cmu_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $testEventCmu = new TestEventCmu();
         $form = $this->createForm(TestEventCmuType::class, $testEventCmu);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($testEventCmu);
             $entityManager->flush();
 
@@ -140,13 +141,13 @@ class TestEventCmuController extends AbstractController
     /**
      * @Route("/{id}/edit", name="test_event_cmu_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, TestEventCmu $testEventCmu): Response
+    public function edit(Request $request, TestEventCmu $testEventCmu, ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(TestEventCmuType::class, $testEventCmu);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('test_event_cmu_index');
         }
@@ -160,10 +161,10 @@ class TestEventCmuController extends AbstractController
     /**
      * @Route("/{id}", name="test_event_cmu_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, TestEventCmu $testEventCmu): Response
+    public function delete(Request $request, TestEventCmu $testEventCmu, ManagerRegistry $doctrine): Response
     {
         if ($this->isCsrfTokenValid('delete'.$testEventCmu->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->remove($testEventCmu);
             $entityManager->flush();
         }

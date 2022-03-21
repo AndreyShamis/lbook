@@ -13,6 +13,7 @@ use App\Repository\LogBookSetupRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,10 +40,10 @@ class LogBookBotController extends AbstractController
      * @param Container $container
      * @param LoggerInterface $logger
      */
-    public function __construct(Container $container, LoggerInterface $logger)
+    public function __construct(Container $container, LoggerInterface $logger, ManagerRegistry $doctrine)
     {
         $this->container = $container;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
         $this->logger = $logger;
     }
 
@@ -415,11 +416,11 @@ class LogBookBotController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function deleteCycleRetention(LogBookCycleRepository $cycleRepo, LogBookSetupRepository $setupRepo): Response
+    public function deleteCycleRetention(LogBookCycleRepository $cycleRepo, LogBookSetupRepository $setupRepo, ManagerRegistry $doctrine): Response
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('deleteCycleRetention');
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('target_date', 'target_date');
         $rsm->addScalarResult('late_minutes', 'late_minutes');

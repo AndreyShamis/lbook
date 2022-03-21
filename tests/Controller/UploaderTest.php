@@ -13,6 +13,7 @@ use App\Entity\LogBookMessage;
 use App\Entity\LogBookSetup;
 use App\Entity\LogBookTest;
 use App\Utils\RandomString;
+use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,7 +38,7 @@ class UploaderTest extends LogBookApplicationTestCase
 
     /**
      * Check that Upload CLI works without token
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws MappingException
      */
     public function testUploadCliEmptyRequest():void
     {
@@ -85,7 +86,6 @@ class UploaderTest extends LogBookApplicationTestCase
         $test = $testRepo->find($testId);
         /** @var LogBookCycle $cycle */
         $cycle = $test->getCycle();
-        /** @var LogBookSetup $setup */
         $setup = $cycle->getSetup();
         $logsRepo->setCustomTable($cycle->getDbName());
 

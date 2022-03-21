@@ -9,6 +9,7 @@ use App\Repository\FilterEditHistoryRepository;
 use App\Repository\TestFilterRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ class TestFilterController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $testFilter = new TestFilter();
         $user = $this->get('security.token_storage')->getToken()->getUser();
@@ -47,7 +48,7 @@ class TestFilterController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($testFilter);
             $em->flush();
 
@@ -75,9 +76,9 @@ class TestFilterController extends AbstractController
      * @param TestFilter $testFilter
      * @return Response
      */
-    public function showTest(TestFilter $testFilter): Response
+    public function showTest(TestFilter $testFilter, ManagerRegistry $doctrine): Response
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $testFilter->setName('AAAAAA');
         /** @var UnitOfWork $uow */
         $uow = $em->getUnitOfWork();
@@ -97,7 +98,7 @@ class TestFilterController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function edit(Request $request, TestFilter $testFilter, FilterEditHistoryRepository $historyRepo): Response
+    public function edit(Request $request, TestFilter $testFilter, FilterEditHistoryRepository $historyRepo, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('edit', $testFilter);
         $form = $this->createForm(TestFilterType::class, $testFilter);
@@ -108,7 +109,7 @@ class TestFilterController extends AbstractController
             $testFilter->setUpdatedAt(new \DateTime());
             try{
                 /** @var UnitOfWork $uow */
-                $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
+                $uow = $doctrine->getManager()->getUnitOfWork();
                 $uow->computeChangeSets(); // do not compute changes if inside a listener
                 $diff_arr = $uow->getEntityChangeSet($testFilter);
                 $user = $this->get('security.token_storage')->getToken()->getUser();
@@ -126,7 +127,7 @@ class TestFilterController extends AbstractController
                 $history = $historyRepo->findOneOrCreate($f);
                 $testFilter->addFilterEditHistory($history);
             } catch (\Throwable $ex) {}
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
             return $this->redirectToRoute('test_filter_edit', ['id' => $testFilter->getId()]);
         }
 
@@ -142,11 +143,11 @@ class TestFilterController extends AbstractController
      * @param TestFilter $testFilter
      * @return Response
      */
-    public function delete(Request $request, TestFilter $testFilter): Response
+    public function delete(Request $request, TestFilter $testFilter, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('delete', $testFilter);
         if ($this->isCsrfTokenValid('delete'.$testFilter->getId(), $request->request->get('_token'))) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             //$em->remove($testFilter);
             $testFilter->setEnabled(false);
             $em->persist($em);

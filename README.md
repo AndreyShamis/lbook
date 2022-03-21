@@ -189,6 +189,28 @@ curl --noproxy "127.0.0.1" --max-time 120 --form SETUP_NAME=DELL-KUBUNTU --form 
 DISABLE_TEST_UPLOAD=true
 ~~~
 
+### crontab
+Run crontab -e
+Add next lines:
+~~~ bash
+*/10 * * * *    wget --no-proxy -O- http://logbook.com/bot/delete_cycles >> /tmp/bot_cycle_delete.log
+*/2  * * * *    wget --no-proxy -O- http://logbook.com/bot/find_cycles_for_delete >> /tmp/bot_find_cycles_for_delete.>
+*/3  * * * *    wget --no-proxy -O- http://logbook.com/bot/cycle_event_delete >> /tmp/bot_cycle_event_delete.log
+*/40 * * * *    wget --no-proxy -O- http://logbook.com/bot/setups/clean > /dev/null
+*/3 * * * *     wget --no-proxy -O- http://logbook.com/bot/setups/count_cycles > /dev/null
+*/13 * * * *    wget --no-proxy -O- http://logbook.com/reports/auto/create > /dev/null
+*/1 * * * *     wget --no-proxy -O- http://logbook.com/api/send_emails > /dev/null
+*/3 * * * *     sleep 15; wget --no-proxy -O- http://logbook.com/api/cycle/auto/cycle_close   > /dev/null 2>&1
+*/2  * * * *    sleep 15; wget --no-proxy -O- http://logbook.com/bot/cycle_event_delete >> /tmp/bot_cycle_event_delet>
+* */12 * * *    sleep 15; wget --no-proxy -O- http://logbook.com/build/clean_not_used   > /dev/null 2>&1
+* */6 * * *     sleep 15; wget --no-proxy -O- http://logbook.com/bot/setups/clean  >> /tmp/logbook.setup.clean_not_us>
+3 */12 * * *    sleep 15; wget --no-proxy -O- http://logbook.com/suites/calculate/3  > /dev/null 2>&1
+2 */6 * * *     sleep 15; wget --no-proxy -O- http://logbook.com/suites/calculate/2  > /dev/null 2>&1
+1 */2 * * *     sleep 15; wget --no-proxy -O- http://logbook.com/suites/calculate/1  > /dev/null 2>&1
+* */20 * * *    sleep 15; wget --no-proxy -O- http://logbook.com/suites/close_unclosed/5  > /dev/null 2>&1
+4 */3 * * *     sleep 15; wget --no-proxy -O- http://logbook.com/suites/close_unclosed/3  > /dev/null 2>&1
+~~~
+
 ### Tweak your Swap Settings
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
 ~~~ bash

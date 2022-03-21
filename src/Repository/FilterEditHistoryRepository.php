@@ -5,8 +5,7 @@ namespace App\Repository;
 use App\Entity\FilterEditHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\ORMException;
-use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Doctrine\Persistence\ManagerRegistry;
 /**
  * @method FilterEditHistory|null find($id, $lockMode = null, $lockVersion = null)
  * @method FilterEditHistory|null findOneBy(array $criteria, array $orderBy = null)

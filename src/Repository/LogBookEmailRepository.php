@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\LogBookEmail;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method LogBookEmail|null find($id, $lockMode = null, $lockVersion = null)

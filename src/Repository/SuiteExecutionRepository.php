@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 
 /**

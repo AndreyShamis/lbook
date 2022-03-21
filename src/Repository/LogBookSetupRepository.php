@@ -6,7 +6,7 @@ use App\Entity\LogBookSetup;
 use App\Entity\LogBookCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Log\LoggerInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Model\OsType;
 use Symfony\Component\Filesystem\Filesystem;
 

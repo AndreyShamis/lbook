@@ -105,7 +105,7 @@ class LogBookTestRepository extends ServiceEntityRepository
                     ->where('m.test = :test_id')
                     ->setParameter('test_id', $test->getId());
                 } catch (\Throwable $ex) {
-                    $this->logger->critical('deleteByCycle: Throwable 1 for', $ex->getMessage(), $ex]);
+                    $this->logger->critical('deleteByCycle: Throwable 1 for', [$ex->getMessage(), $ex]);
                 }
             }
         }
@@ -117,7 +117,7 @@ class LogBookTestRepository extends ServiceEntityRepository
             $query = $qd->getQuery();
             $query->execute();
         } catch (\Throwable $ex) {
-            $this->logger->critical('deleteByCycle: Throwable 2 for', $ex->getMessage(), $ex]);
+            $this->logger->critical('deleteByCycle: Throwable 2 for', [$ex->getMessage(), $ex]);
         }
 
     }

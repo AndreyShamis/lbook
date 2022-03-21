@@ -146,15 +146,26 @@ class LogBookCycleRepository extends ServiceEntityRepository
 
         } catch (\Throwable $ex) {
             $this->logger->critical('[CYCLE][DELETE]: Throwable CYCLE ID:' . $cycle->getId(),
-                array(
+                [
                     $ex->getMessage(),
                     $ex,
                     $logs,
-                    $setup_path));
+                    $setup_path]);
         }
         $this->logger->notice('[CYCLE][DELETE]: Removing CYCLE '. $cycle->getId());
-        $this->_em->remove($cycle);
-        $this->_em->flush($cycle);
+        try {
+            $this->_em->remove($cycle);
+            $this->_em->flush($cycle);
+
+        } catch (\Throwable $ex) {
+            $this->logger->critical('[CYCLE][DELETE]: Throwable ',
+                [
+                    $ex->getMessage(),
+                    $ex,
+                    $logs,
+                    $setup_path]);
+        }
+
     }
 
 

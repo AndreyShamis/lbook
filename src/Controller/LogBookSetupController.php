@@ -569,35 +569,43 @@ class LogBookSetupController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFull(LoggerInterface $logger, LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
         $table_name = '';
-        $table_size = -1;
+        $table_size = 0;
         try {
             if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
                 throw new \RuntimeException('');
             }
             try{
+                $em = $this->getDoctrine()->getManager();
+                $databaseName = $em->getConnection()->getDatabase();
                 $sql = '
 SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
 FROM information_schema.TABLES 
-WHERE TABLE_SCHEMA = "lbook" AND TABLE_NAME = "log_book_message_'. $setup->getId() .'" 
+WHERE TABLE_SCHEMA = "'. $databaseName. '" AND TABLE_NAME = "log_book_message_'. $setup->getId() .'" 
 ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
-                $em = $this->getDoctrine()->getManager();
+
                 /** @var \Doctrine\DBAL\Statement $statment */
                 $statment = $em->getConnection()->prepare($sql);
                 $statment->execute();
                 $res = $statment->fetchAll();
-                $table_size = $res[0]['table_size'];
-                $table_name = $res[0]['table_name'];
-                try{
+                try {
+                    $table_size = $res[0]['table_size'];
+                    $table_name = $res[0]['table_name'];
+                } catch (\Throwable $ex) {
+                    $table_size = -1;
+                    $this->logger->critical('showFull:Cannot get tabl size : SQL: ' . $sql );
+                }
+                try {
                     $setup->setLogsSize($table_size);
                     $em->flush();
                 } catch (\Throwable $ex) {
+                    $this->logger->critical('showFull:Cannot update table size for : ' . $table_name );
 //                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
                 }
             } catch (\Throwable $ex) {
-//                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
+                $this->logger->critical('showFull:Update table size due: ' . $ex->getMessage() );
             }
 
             $qb = $cycleRepo->createQueryBuilder('t')
@@ -616,7 +624,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             $show_user = $this->showUsers($paginator);
 
 
-            return $this->render('lbook/setup/show.full.html.twig', array(
+            return $this->render('lbook/setup/show.full.html.twig', [
                 'setup' => $setup,
                 'size' => $totalPosts,
                 'maxPages' => $maxPages,
@@ -628,7 +636,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                 'show_user' => $show_user,
                 'table_size' => $table_size,
                 'table_name' => $table_name
-            ));
+            ]);
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);
         }

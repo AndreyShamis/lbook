@@ -41,3 +41,7 @@ services:
        arguments: ["@translator"]
        tags:
             - { name: twig.extension }
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - '%env(DATABASE_URL)%'
+            - { db_table: 'lbk_customer_session', db_id_col: 'guid' }

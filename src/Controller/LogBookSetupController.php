@@ -596,7 +596,6 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                     $table_size = $res[0]['table_size'];
                     $table_name = $res[0]['table_name'];
                 } catch (\Throwable $ex) {
-                    $table_size = -1;
                     $logger->critical('showFull:Cannot get tabl size : SQL: ' . $sql );
                 }
                 try {

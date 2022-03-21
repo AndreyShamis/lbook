@@ -597,17 +597,16 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                     $table_name = $res[0]['table_name'];
                 } catch (\Throwable $ex) {
                     $table_size = -1;
-                    $this->logger->critical('showFull:Cannot get tabl size : SQL: ' . $sql );
+                    $logger->critical('showFull:Cannot get tabl size : SQL: ' . $sql );
                 }
                 try {
                     $setup->setLogsSize($table_size);
                     $em->flush();
                 } catch (\Throwable $ex) {
-                    $this->logger->critical('showFull:Cannot update table size for : ' . $table_name );
-//                $this->logger->critical(': Cannot execute size :' . $setup->getId() );
+                    $logger->critical('showFull:Cannot update table size for : ' . $table_name . ' : SQL: ' . $sql );
                 }
             } catch (\Throwable $ex) {
-                $this->logger->critical('showFull:Update table size due: ' . $ex->getMessage() );
+                $logger->critical('showFull:Update table size due: ' . $ex->getMessage() );
             }
 
             $qb = $cycleRepo->createQueryBuilder('t')

@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\CycleReportEditHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\ORMException;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method CycleReportEditHistory|null find($id, $lockMode = null, $lockVersion = null)

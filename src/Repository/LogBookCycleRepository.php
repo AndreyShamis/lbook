@@ -8,7 +8,7 @@ use App\Entity\SuiteExecution;
 use App\Utils\RandomString;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Psr\Log\LoggerInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LogBookCycleRepository extends ServiceEntityRepository

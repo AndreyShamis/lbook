@@ -7,6 +7,7 @@ use App\Repository\LogBookMessageRepository;
 use App\Repository\LogBookTestRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,7 +33,7 @@ class LogBookApiTestController extends AbstractController
     /**
      * @Route("list/{test}", name="api_test_list")
      */
-    public function show(LogBookTest $test = null, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo = null): ?JsonResponse
+    public function show(LogBookTest $test = null, PagePaginator $pagePaginator, LogBookMessageRepository $logRepo, LogBookTestRepository $testRepo = null, ManagerRegistry $doctrine): ?JsonResponse
     {
         $res = [];
         $dataTable = '';
@@ -44,7 +45,7 @@ class LogBookApiTestController extends AbstractController
             $bad_case = '';
             $dataTable = 'log_book_message';
             $first_log = $test->getLogs()->first();
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             if ($first_log === false || $first_log === null) {
 
                 /** @var ClassMetadataInfo $classMetaData */

@@ -12,6 +12,7 @@ use App\Repository\LogBookSuiteInfoRepository;
 use App\Service\PagePaginator;
 use App\Repository\SuiteExecutionRepository;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -256,7 +257,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @return array
      * @throws Exception
      */
-    public function calculate_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
+    public function calculate_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days, ManagerRegistry $doctrine): array
     {
         if ($days > 30) {
             $days = 1;
@@ -275,7 +276,7 @@ class LogBookSuiteExecutionController extends AbstractController
         $iterator = $paginator->getIterator();
 
         $iterator->rewind();
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $output = [];
         $start = microtime(true);
         $persisted = 0;
@@ -327,7 +328,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @return array
      * @throws Exception
      */
-    public function close_unclosed_suites_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days): array
+    public function close_unclosed_suites_api(PagePaginator $pagePaginator, SuiteExecutionRepository $suites, int $days, ManagerRegistry $doctrine): array
     {
         if ($days > 100) {
             $days = 100;
@@ -350,7 +351,7 @@ class LogBookSuiteExecutionController extends AbstractController
         $iterator = $paginator->getIterator();
 
         $iterator->rewind();
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $output = [];
         $start = microtime(true);
         $closed = 0;
@@ -391,7 +392,7 @@ class LogBookSuiteExecutionController extends AbstractController
      * @return Response
      * @throws Exception
      */
-    public function show(SuiteExecution $suite, PagePaginator $pagePaginator, SuiteExecutionRepository $suites): Response
+    public function show(SuiteExecution $suite, PagePaginator $pagePaginator, SuiteExecutionRepository $suites, ManagerRegistry $doctrine): Response
     {
 //        $this->denyAccessUnlessGranted('view', $suite);
         $query = $suites->createQueryBuilder('suite_execution')
@@ -411,7 +412,7 @@ class LogBookSuiteExecutionController extends AbstractController
 
         $maxPages = ceil($totalPosts / $this->index_size);
         $thisPage = 1;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
         /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
         $suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
         //$suite->calculateStatistic();
@@ -449,11 +450,11 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param LogBookSuiteInfo|null $suite
      * @return Response
      */
-    public function subscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    public function subscribe(Request $request, LogBookSuiteInfo $suite = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $suite->addSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
 
         $referer = $request->headers->get('referer');
         if ($referer === null) {
@@ -469,11 +470,11 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param LogBookSuiteInfo|null $suite
      * @return Response
      */
-    public function failSubscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    public function failSubscribe(Request $request, LogBookSuiteInfo $suite = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $suite->addFailureSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
 
         $referer = $request->headers->get('referer');
         if ($referer === null) {
@@ -489,11 +490,11 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param LogBookSuiteInfo|null $suite
      * @return Response
      */
-    public function unsubscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    public function unsubscribe(Request $request, LogBookSuiteInfo $suite = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $suite->removeSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         $referer = $request->headers->get('referer');
         if ($referer === null) {
             try {
@@ -515,11 +516,11 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param LogBookSuiteInfo|null $suite
      * @return Response
      */
-    public function failUnsubscribe(Request $request, LogBookSuiteInfo $suite = null): Response
+    public function failUnsubscribe(Request $request, LogBookSuiteInfo $suite = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $suite->removeFailureSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         $referer = $request->headers->get('referer');
         if ($referer === null) {
             try {
@@ -541,13 +542,13 @@ class LogBookSuiteExecutionController extends AbstractController
      * @param LogBookSuiteInfoRepository $suiteInfoRepo
      * @return Response
      */
-    public function close(SuiteExecution $suite, LoggerInterface $logger, LogBookSuiteInfoRepository $suiteInfoRepo): Response
+    public function close(SuiteExecution $suite, LoggerInterface $logger, LogBookSuiteInfoRepository $suiteInfoRepo, ManagerRegistry $doctrine): Response
     {
 //        $this->denyAccessUnlessGranted('view', $suite);
         $suite->calculateStatistic();
         $suite->setClosed(true);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->persist($suite);
 
         try {
@@ -641,13 +642,10 @@ class LogBookSuiteExecutionController extends AbstractController
     public function close_aaa(SuiteExecution $suite, LoggerInterface $logger, LogBookSuiteInfoRepository $suiteInfoRepo): Response
     {
 
-        $em = $this->getDoctrine()->getManager();
-
-            $newSuiteInfo = $suiteInfoRepo->findOneOrCreate([
-                'name' => $suite->getName(),
-                'uuid' => $suite->getUuid(),
-            ]);
-
+        $newSuiteInfo = $suiteInfoRepo->findOneOrCreate([
+            'name' => $suite->getName(),
+            'uuid' => $suite->getUuid(),
+        ]);
 
         return $this->render('lbook/email/suite_finished.html.twig',
             [

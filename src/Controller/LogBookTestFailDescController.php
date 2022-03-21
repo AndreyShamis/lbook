@@ -6,6 +6,7 @@ use App\Entity\LogBookTestFailDesc;
 use App\Form\LogBookTestFailDescType;
 use App\Repository\LogBookTestFailDescRepository;
 use App\Service\PagePaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,35 +74,35 @@ class LogBookTestFailDescController extends AbstractController
     /**
      * @Route("/{id}/edit", name="fail_desc_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, LogBookTestFailDesc $logBookTestFailDesc): Response
+    public function edit(Request $request, LogBookTestFailDesc $logBookTestFailDesc, ManagerRegistry $doctrine): Response
     {
         return $this->redirectToRoute('fail_desc_index');
-        $form = $this->createForm(LogBookTestFailDescType::class, $logBookTestFailDesc);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('fail_desc_index');
-        }
-
-        return $this->render('log_book_test_fail_desc/edit.html.twig', [
-            'log_book_test_fail_desc' => $logBookTestFailDesc,
-            'form' => $form->createView(),
-        ]);
+//        $form = $this->createForm(LogBookTestFailDescType::class, $logBookTestFailDesc);
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            $doctrine->getManager()->flush();
+//
+//            return $this->redirectToRoute('fail_desc_index');
+//        }
+//
+//        return $this->render('log_book_test_fail_desc/edit.html.twig', [
+//            'log_book_test_fail_desc' => $logBookTestFailDesc,
+//            'form' => $form->createView(),
+//        ]);
     }
 
     /**
      * @Route("/{id}", name="log_book_test_fail_desc_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, LogBookTestFailDesc $logBookTestFailDesc): Response
+    public function delete(Request $request, LogBookTestFailDesc $logBookTestFailDesc, ManagerRegistry $doctrine): Response
     {
         return $this->redirectToRoute('fail_desc_index');
-        if ($this->isCsrfTokenValid('delete'.$logBookTestFailDesc->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($logBookTestFailDesc);
-            $entityManager->flush();
-        }
+//        if ($this->isCsrfTokenValid('delete'.$logBookTestFailDesc->getId(), $request->request->get('_token'))) {
+//            $entityManager = $doctrine->getManager();
+//            $entityManager->remove($logBookTestFailDesc);
+//            $entityManager->flush();
+//        }
 
         return $this->redirectToRoute('fail_desc_index');
     }

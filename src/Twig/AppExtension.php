@@ -3,6 +3,8 @@
 namespace App\Twig;
 
 use App\Entity\LogBookMessageType;
+use DateTime;
+use DateTimeInterface;
 use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -38,6 +40,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('arrayToString', array($this, 'arrayToString')),
             new TwigFilter('time_ago', function ($time) { return $this->ExecutionTimeInHours(time() - $time);}),
             new TwigFilter('filter_name', [$this, 'doSomething'], ['is_safe' => ['html']]),
+            new TwigFilter('time_diff', array($this, 'time_diff')),
         );
     }
 
@@ -68,8 +71,74 @@ class AppExtension extends AbstractExtension
             new TwigFunction('jiraKeyToUrl', array($this, 'jiraKeyToUrl')),
             new TwigFunction('jiraLabelToUrl', array($this, 'jiraLabelToUrl')),
             new TwigFunction('testFilterTestToBr', array($this, 'testFilterTestToBr')),
+            new TwigFunction('time_diff', array($this, 'time_diff')),
 
         ];
+    }
+    public function time_diff($since = null, $to = null)
+    {
+        $from = $this->getDatetimeObject($since);
+        $to = $this->getDatetimeObject($to);
+        return $this->formatDiff($from, $to);
+
+    }
+
+    /**
+     * Returns a formatted diff for the given from and to datetimes
+     *
+     * @param  DateTimeInterface $from
+     * @param  DateTimeInterface $to
+     *
+     * @return string
+     */
+    public function formatDiff(DateTimeInterface $from, DateTimeInterface $to)
+    {
+        static $units = array(
+            'y' => 'year',
+            'm' => 'month',
+            'd' => 'day',
+            'h' => 'hour',
+            'i' => 'minute',
+            's' => 'second'
+        );
+
+        $diff = $to->diff($from);
+
+        foreach ($units as $attribute => $unit) {
+            $count = $diff->$attribute;
+            if (0 !== $count) {
+                return $this->doGetDiffMessage($count, $diff->invert, $unit);
+            }
+        }
+
+        return '';
+    }
+
+    protected function  doGetDiffMessage($count, $invert, $unit)
+    {
+        $id = sprintf('diff.%s.%s', $invert ? 'ago' : 'in', $unit);
+
+        return $id;
+    }
+
+    /**
+     * Returns a DateTime instance for the given datetime
+     *
+     * @param  mixed $datetime
+     *
+     * @return DateTimeInterface
+     */
+    public function getDatetimeObject($datetime = null)
+    {
+        if ($datetime instanceof DateTimeInterface) {
+            return $datetime;
+        }
+
+        if (is_integer($datetime)) {
+            $datetime = date('Y-m-d H:i:s', $datetime);
+        }
+
+        return new DateTime($datetime);
     }
 
     public function jiraLabelToUrl($label)
@@ -79,6 +148,7 @@ class AppExtension extends AbstractExtension
         } catch (\Throwable $ex) {}
         return '';
     }
+
     public function jiraKeyToUrl($key)
     {
         try {

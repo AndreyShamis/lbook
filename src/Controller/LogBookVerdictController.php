@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookVerdict;
 use App\Form\LogBookVerdictType;
 use App\Repository\LogBookVerdictRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,14 +39,14 @@ class LogBookVerdictController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, ManagerRegistry $doctrine)
     {
         $obj = new LogBookVerdict();
         $form = $this->createForm(LogBookVerdictType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($obj);
             $em->flush();
 
@@ -85,7 +86,7 @@ class LogBookVerdictController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
-    public function editAction(Request $request, LogBookVerdict $obj)
+    public function editAction(Request $request, LogBookVerdict $obj, ManagerRegistry $doctrine)
     {
         $this->denyAccessUnlessGranted('edit', $obj);
         $deleteForm = $this->createDeleteForm($obj);
@@ -93,7 +94,7 @@ class LogBookVerdictController extends AbstractController
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('verdict_edit', array('id' => $obj->getId()));
         }
@@ -114,14 +115,14 @@ class LogBookVerdictController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @throws \Symfony\Component\Form\Exception\LogicException|\LogicException
      */
-    public function deleteAction(Request $request, LogBookVerdict $obj): RedirectResponse
+    public function deleteAction(Request $request, LogBookVerdict $obj, ManagerRegistry $doctrine): RedirectResponse
     {
         $this->denyAccessUnlessGranted('delete', $obj);
         $form = $this->createDeleteForm($obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($obj);
             $em->flush();
         }

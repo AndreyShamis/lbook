@@ -170,6 +170,11 @@ class LogBookUser implements UserInterface, \Serializable
         return $this->username;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
     /**
      * @return string
      */

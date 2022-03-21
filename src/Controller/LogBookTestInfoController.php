@@ -6,6 +6,7 @@ use App\Entity\LogBookTestInfo;
 use App\Form\LogBookTestInfoType;
 use App\Repository\LogBookTestInfoRepository;
 use App\Service\PagePaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,9 +46,9 @@ class LogBookTestInfoController extends AbstractController
      * @param LogBookTestInfoRepository $logBookTestInfoRepository
      * @return Response
      */
-    public function update(LogBookTestInfoRepository $logBookTestInfoRepository): Response
+    public function update(LogBookTestInfoRepository $logBookTestInfoRepository, ManagerRegistry $doctrine): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $doctrine->getManager();
 
         $da = $logBookTestInfoRepository->findAll();
         foreach ($da as $d) {

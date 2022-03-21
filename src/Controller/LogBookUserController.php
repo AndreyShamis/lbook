@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookUser;
 use App\Form\LogBookUserType;
 use App\Repository\LogBookUserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,7 +59,7 @@ class LogBookUserController extends AbstractController
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \LogicException
      */
-    public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder)
+    public function editAction(Request $request, LogBookUser $obj, UserPasswordEncoderInterface $passwordEncoder, ManagerRegistry $doctrine)
     {
         // check for "edit" access: calls all voters
         $this->denyAccessUnlessGranted('edit', $obj);
@@ -78,7 +79,7 @@ class LogBookUserController extends AbstractController
                 $password = $passwordEncoder->encodePassword($edited_user, $edited_user->getPlainPassword());
                 $edited_user->setPassword($password);
             }
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('user_edit', array('id' => $obj->getId()));
         }

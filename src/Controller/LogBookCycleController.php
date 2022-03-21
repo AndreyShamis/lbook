@@ -18,6 +18,7 @@ use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterApplyRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -73,11 +74,11 @@ class LogBookCycleController extends AbstractController
      * @Route("/close/{cycle}", name="close_cycle", methods={"GET"})
      * @return JsonResponse
      */
-    public function close_cycle(LogBookCycle $cycle, LoggerInterface $logger): ?JsonResponse
+    public function close_cycle(LogBookCycle $cycle, LoggerInterface $logger, ManagerRegistry $doctrine): ?JsonResponse
     {
         $fin_res = [];
         try {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             try{
                 if (!$cycle->getIsClosed() && $cycle->isAllSuitesFinished()) {
                     $cycle->close();
@@ -698,7 +699,7 @@ class LogBookCycleController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function multiExport(Request $request, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, LoggerInterface $logger): Response
+    public function multiExport(Request $request, LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, LoggerInterface $logger, ManagerRegistry $doctrine): Response
     {
         $time_start = microtime(true);
         $cycles = [];
@@ -712,7 +713,7 @@ class LogBookCycleController extends AbstractController
         $query_time = 0;
         try {
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             if (count($data['query']) > 0) {
                 // WORK with GET method
                 $work_arr = $data['query'];
@@ -813,7 +814,7 @@ class LogBookCycleController extends AbstractController
      * @throws AccessDeniedException
      * @throws \LogicException
      */
-    public function edit(Request $request, LogBookCycle $obj = null)
+    public function edit(Request $request, LogBookCycle $obj = null, ManagerRegistry $doctrine)
     {
         try {
             if (!$obj) {
@@ -825,7 +826,7 @@ class LogBookCycleController extends AbstractController
             $editForm->handleRequest($request);
 
             if ($editForm->isSubmitted() && $editForm->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
                 return $this->redirectToRoute('cycle_edit', array('id' => $obj->getId()));
             }
 
@@ -971,9 +972,9 @@ class LogBookCycleController extends AbstractController
      * @param SuiteExecution|null $suite
      * @return Response
      */
-    public function downloadArchiveForSuite(LogBookCycle $cycle = null, SuiteExecution $suite = null): Response
+    public function downloadArchiveForSuite(LogBookCycle $cycle = null, SuiteExecution $suite = null, ManagerRegistry $doctrine): Response
     {
-        return $this->downloadArchive($cycle, $suite);
+        return $this->downloadArchive($cycle, $suite, $doctrine);
     }
 
     /**
@@ -984,7 +985,7 @@ class LogBookCycleController extends AbstractController
      * @param SuiteExecution|null $suite
      * @return Response
      */
-    public function downloadArchive(LogBookCycle $cycle = null, SuiteExecution $suite = null): Response
+    public function downloadArchive(LogBookCycle $cycle = null, SuiteExecution $suite = null, ManagerRegistry $doctrine): Response
     {
         try {
             if (!$cycle) {
@@ -1021,7 +1022,7 @@ class LogBookCycleController extends AbstractController
             $response->headers->set('Content-Disposition', 'attachment;filename="' . $zipName . '"');
             $response->headers->set('Content-length', filesize($zipName));
             try {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $cycle->increaseDownloads();
                 $em->persist($cycle);
                 $em->flush();
@@ -1058,14 +1059,14 @@ class LogBookCycleController extends AbstractController
      * @throws \LogicException
      * @throws \Exception
      */
-    public function new(Request $request)
+    public function new(Request $request, ManagerRegistry $doctrine)
     {
         $obj = new LogBookCycle();
         $form = $this->createForm(LogBookCycleType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($obj);
             $em->flush();
 
@@ -1184,7 +1185,7 @@ class LogBookCycleController extends AbstractController
      * @param int $weeks
      * @return RedirectResponse|Response
      */
-    public function keepCycle(LogBookCycle $cycle = null, int $weeks=12)
+    public function keepCycle(ManagerRegistry $doctrine, LogBookCycle $cycle = null, int $weeks=12)
     {
         try {
             if (!$cycle) {
@@ -1199,7 +1200,7 @@ class LogBookCycleController extends AbstractController
             if ($cycle->getDeleteAt() > new \DateTime('+' . $weeks . ' weeks')) {
 
             } else {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $cycle->setDeleteAt(new \DateTime('+' . $weeks . ' weeks'));
                 $em->persist($cycle);
                 $em->flush();
@@ -1227,7 +1228,7 @@ class LogBookCycleController extends AbstractController
      */
     public function showSuiteFirstPage(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
                                        LogBookTestRepository $testRepo, LogBookCycle $cycle = null,
-                                       SuiteExecution $suite = null, $page = null, $maxSize = null): ?Response
+                                       SuiteExecution $suite = null, $page = null, $maxSize = null, ManagerRegistry $doctrine): ?Response
     {
         if ($cycle === null && $suite !== null) {
             $cycle = $suite->getCycle();
@@ -1240,7 +1241,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, $suite, $page, false, $maxSize);
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, $suite, $page, false, $maxSize, $doctrine);
     }
 
     /**
@@ -1255,7 +1256,7 @@ class LogBookCycleController extends AbstractController
      */
     public function showFirstPage(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
                                   LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null,
-                                  $maxSize = null): ?Response
+                                  $maxSize = null, ManagerRegistry $doctrine): ?Response
     {
         if ($page === null) {
             $page = 1;
@@ -1265,7 +1266,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize, $doctrine);
     }
 
     /**
@@ -1284,7 +1285,7 @@ class LogBookCycleController extends AbstractController
      */
     public function show(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
                          LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null,
-                         $page = null, $forJson=false, $maxSize=null): ?Response
+                         $page = null, $forJson=false, $maxSize=null, ManagerRegistry $doctrine): ?Response
     {
         $suiteMode = false;
         if ($page === null) {
@@ -1316,7 +1317,7 @@ class LogBookCycleController extends AbstractController
                 $suiteMode = true;
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             /** @var Query $query */
             $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
             $query->setDQL($qb->getDQL());
@@ -1623,7 +1624,7 @@ class LogBookCycleController extends AbstractController
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    public function delete(Request $request, LogBookCycle $obj = null)
+    public function delete(ManagerRegistry $doctrine, Request $request, LogBookCycle $obj = null)
     {
         try {
             if (!$obj) {
@@ -1634,7 +1635,7 @@ class LogBookCycleController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
 
                 /** @var LogBookCycleRepository $cycleRepo */
                 $cycleRepo = $em->getRepository('App:LogBookCycle');

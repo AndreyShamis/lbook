@@ -36,11 +36,16 @@ services:
                 options:
                     protocol_version: 3
                     referrals: false
-    twig.extension.date:
-       class: Twig_Extensions_Extension_Date
-       arguments: ["@translator"]
-       tags:
-            - { name: twig.extension }
+#    twig.extension.date:
+#        class: Twig_Extensions_Extension_Date
+#        arguments: ["@translator"]
+#        tags:
+#              - { name: twig.extension }
+    security.user_password_hasher:
+        class: Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
+        public: true
+        arguments:
+          [ '@security.password_hasher_factory' ]
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:
             - '%env(DATABASE_URL)%'

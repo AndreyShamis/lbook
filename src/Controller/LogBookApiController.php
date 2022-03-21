@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Class LogBookApiController
@@ -31,10 +32,10 @@ class LogBookApiController extends AbstractController
      * @param Container $container
      * @throws \LogicException
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, ManagerRegistry $doctrine)
     {
         $this->container = $container;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
 
     }
 

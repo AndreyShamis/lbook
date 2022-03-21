@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\LogBookUser;
 use App\Repository\LogBookUserRepository;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\User;
 
 class LogBookSecurityController extends AbstractController
 {
@@ -32,11 +33,11 @@ class LogBookSecurityController extends AbstractController
     /**
      * @param $user
      * @param $password
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UserPasswordHasher $passwordEncoder
      * @param int $serverIndex
      * @return array
      */
-    protected function ldapLogin($user, $password, UserPasswordEncoderInterface $passwordEncoder, $serverIndex = 0): array
+    protected function ldapLogin($user, $password, UserPasswordHasher $passwordEncoder, $serverIndex = 0): array
     {
         $user_src = $user;
         $pass_src = $password;
@@ -92,7 +93,8 @@ class LogBookSecurityController extends AbstractController
                 try {
                     $ret_arr['mobile'] = $entry->getAttribute($LDAP_MOBILE_STR)[0];
                 } catch (\Throwable $ex) { $ret_arr['sitecode'] = ''; }
-                $ret_arr['dummyPassword'] = $passwordEncoder->encodePassword(new LogBookUser(), 'dummyPassword');
+
+                $ret_arr['dummyPassword'] = $passwordEncoder->hashPassword(new LogBookUser(), 'dummyPassword');
                 $ret_arr['ldapUser'] = true;
             }
         } catch (ConnectionException $ex) {

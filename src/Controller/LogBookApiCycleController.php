@@ -17,6 +17,7 @@ use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,7 +42,7 @@ class LogBookApiCycleController extends AbstractController
      * @param LogBookUserRepository $users
      * @return Response
      */
-    public function auto_cycle_close(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LoggerInterface $logger, LogBookUserRepository $users): Response
+    public function auto_cycle_close(LogBookCycleRepository $cycleRepo, LogBookTestRepository $testRepo, SuiteExecutionRepository $suitesRepo, LoggerInterface $logger, LogBookUserRepository $users, ManagerRegistry $doctrine): Response
     {
         $time_limiter1 = new \DateTime('-60 minutes');
         $time_limiter2 = new \DateTime('-40 hours');
@@ -62,7 +63,7 @@ class LogBookApiCycleController extends AbstractController
         $cycles = $qb->getQuery()->execute();
         $cycles_ret = [];
         $i = 0;
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         //$subscribers = $users->findBy(['id' => 3]);
         /** @var LogBookCycle $cycle */
         foreach ($cycles as $cycle) {
@@ -168,7 +169,7 @@ class LogBookApiCycleController extends AbstractController
     /**
      * @Route("list/{cycle}", name="api_cycle_list")
      */
-    public function show(LogBookCycle $cycle = null, PagePaginator $pagePaginator, LogBookTestRepository $testRepo = null): ?JsonResponse
+    public function show(LogBookCycle $cycle = null, PagePaginator $pagePaginator, LogBookTestRepository $testRepo = null, ManagerRegistry $doctrine): ?JsonResponse
     {
         $page = 1;
         $paginator_size = 20000;
@@ -181,7 +182,7 @@ class LogBookApiCycleController extends AbstractController
 
         $qb = $qb->setParameters(['cycle'=> $cycle->getId(), 'disabled' => 0]);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         /** @var Query $query */
         $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
         $query->setDQL($qb->getDQL());

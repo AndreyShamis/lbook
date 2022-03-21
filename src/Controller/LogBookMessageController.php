@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\LogBookMessageType;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\LogBookMessage;
 use App\Repository\LogBookMessageRepository;
@@ -53,14 +54,14 @@ class LogBookMessageController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, ManagerRegistry $doctrine)
     {
         $obj = new LogBookMessage();
         $form = $this->createForm(LogBookMessageType::class, $obj);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($obj);
             $em->flush();
 
@@ -106,7 +107,7 @@ class LogBookMessageController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \LogicException
      */
-    public function edit(Request $request, LogBookMessage $obj = null)
+    public function edit(Request $request, LogBookMessage $obj = null, ManagerRegistry $doctrine)
     {
         try {
             if (!$obj) {
@@ -117,7 +118,7 @@ class LogBookMessageController extends AbstractController
             $editForm->handleRequest($request);
 
             if ($editForm->isSubmitted() && $editForm->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
 
                 return $this->redirectToRoute('log_edit', array('id' => $obj->getId()));
             }
@@ -141,7 +142,7 @@ class LogBookMessageController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @throws \LogicException
      */
-    public function delete(Request $request, LogBookMessage $obj = null): RedirectResponse
+    public function delete(Request $request, LogBookMessage $obj = null, ManagerRegistry $doctrine): RedirectResponse
     {
         try {
             if (!$obj) {
@@ -151,7 +152,7 @@ class LogBookMessageController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->remove($obj);
                 $em->flush();
             }

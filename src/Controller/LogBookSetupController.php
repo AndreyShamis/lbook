@@ -14,6 +14,7 @@ use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Exception\LogicException;
@@ -64,7 +65,7 @@ class LogBookSetupController extends AbstractController
                               LogBookCycle $compareCycle = null,
                               LogBookCycleRepository $cycleRepo = null,
                               LogBookTestRepository $testRepo = null,
-                              SuiteExecutionRepository $suiteRepo = null): ?Response
+                              SuiteExecutionRepository $suiteRepo = null, ManagerRegistry $doctrine): ?Response
     {
         try {
             if ($size > 100) {
@@ -157,7 +158,7 @@ class LogBookSetupController extends AbstractController
                 }
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
 
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
@@ -461,7 +462,7 @@ class LogBookSetupController extends AbstractController
      * @param LogBookSetup|null $setup
      * @return Response
      */
-    public function addUserToFavorite(Request $request, ?LogBookSetup $setup)
+    public function addUserToFavorite(Request $request, ?LogBookSetup $setup, ManagerRegistry $doctrine)
     {
         /** @var LogBookUser $user */
         $user = $this->get('security.token_storage')->getToken()->getUser();
@@ -470,7 +471,7 @@ class LogBookSetupController extends AbstractController
         } else {
             $setup->addFavoritedByUser($user);
         }
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->persist($setup);
         $em->flush();
         /** @var  $referer */
@@ -522,7 +523,7 @@ class LogBookSetupController extends AbstractController
      * @return RedirectResponse|Response
      * @throws LogicException|\LogicException|InvalidOptionsException
      */
-    public function new(Request $request)
+    public function new(Request $request, ManagerRegistry $doctrine)
     {
         $obj = new LogBookSetup();
         $form = $this->get('form.factory')->create(LogBookSetupType::class, $obj, array(
@@ -532,7 +533,7 @@ class LogBookSetupController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($obj);
             $em->flush();
 
@@ -555,9 +556,9 @@ class LogBookSetupController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFullFirst(LoggerInterface $logger, LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFullFirst(LoggerInterface $logger, LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null, ManagerRegistry $doctrine): ?Response
     {
-        return $this->showFull($logger, $setup, 1, $pagePaginator, $cycleRepo);
+        return $this->showFull($logger, $setup, 1, $pagePaginator, $cycleRepo, $doctrine);
     }
 
     /**
@@ -571,7 +572,7 @@ class LogBookSetupController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFull(LoggerInterface $logger, LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFull(LoggerInterface $logger, LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null, ManagerRegistry $doctrine): ?Response
     {
         $table_name = '';
         $table_size = 0;
@@ -580,7 +581,7 @@ class LogBookSetupController extends AbstractController
                 throw new \RuntimeException('');
             }
             try{
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $databaseName = $em->getConnection()->getDatabase();
                 $sql = '
 SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
@@ -766,7 +767,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
      * @throws InvalidOptionsException
      * @throws \LogicException|AccessDeniedException
      */
-    public function edit(Request $request, LogBookSetup $obj = null)
+    public function edit(Request $request, LogBookSetup $obj = null, ManagerRegistry $doctrine)
     {
         try {
             if (!$obj) {
@@ -792,7 +793,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
 
             if ($editForm->isSubmitted() && $editForm->isValid()) {
                 $obj->setUpdatedAt();
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
                 return $this->redirectToRoute('setup_edit', array('id' => $obj->getId()));
             }
 
@@ -813,11 +814,11 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
      * @param LogBookSetup|null $setup
      * @return Response
      */
-    public function subscribe(LogBookSetup $setup = null): Response
+    public function subscribe(LogBookSetup $setup = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->addSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
@@ -827,11 +828,11 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
      * @param LogBookSetup|null $setup
      * @return Response
      */
-    public function unsubscribe(LogBookSetup $setup = null): Response
+    public function unsubscribe(LogBookSetup $setup = null, ManagerRegistry $doctrine): Response
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->removeSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $doctrine->getManager()->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
@@ -844,7 +845,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
      * @return RedirectResponse|Response
      * @throws AccessDeniedException|\LogicException
      */
-    public function delete(Request $request, LogBookSetup $obj = null)
+    public function delete(Request $request, LogBookSetup $obj = null, ManagerRegistry $doctrine)
     {
         try {
             if (!$obj) {
@@ -860,7 +861,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             $form->handleRequest($request);
 
             if ($env === 'test' || ($form->isSubmitted() && $form->isValid())) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 /** @var LogBookSetupRepository $setupRepo */
                 $setupRepo = $em->getRepository('App:LogBookSetup');
                 $setupRepo->delete($obj);

@@ -7,6 +7,7 @@ use App\Form\LogBookSuiteInfoType;
 use App\Repository\LogBookSuiteInfoRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Service\PagePaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,7 @@ class LogBookSuiteInfoController extends AbstractController
      * @return Response
      * @throws \Doctrine\ORM\ORMException
      */
-    public function show(LogBookSuiteInfo $suite, PagePaginator $pagePaginator,  SuiteExecutionRepository $suites, int $size = 2000 ): Response
+    public function show(ManagerRegistry $doctrine, LogBookSuiteInfo $suite, PagePaginator $pagePaginator,  SuiteExecutionRepository $suites, int $size = 2000): Response
     {
 
         //        $this->denyAccessUnlessGranted('view', $suite);
@@ -48,7 +49,7 @@ class LogBookSuiteInfoController extends AbstractController
 
         $maxPages = ceil($totalPosts / $size);
         $thisPage = 1;
-        $this->em = $this->getDoctrine()->getManager();
+        $this->em = $doctrine->getManager();
         /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
         $suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
         //$suite->calculateStatistic();

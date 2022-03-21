@@ -6,6 +6,7 @@ use App\Entity\LogBookDefect;
 use App\Entity\LogBookUser;
 use App\Form\LogBookDefectType;
 use App\Repository\LogBookDefectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ class LogBookDefectController extends AbstractController
     /**
      * @Route("/new", name="log_book_defect_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ManagerRegistry $doctrine): Response
     {
         $logBookDefect = new LogBookDefect();
         $form = $this->createForm(LogBookDefectType::class, $logBookDefect);
@@ -42,7 +43,7 @@ class LogBookDefectController extends AbstractController
             $user = $this->get('security.token_storage')->getToken()->getUser();
             $logBookDefect->setReporter($user);
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->persist($logBookDefect);
             $entityManager->flush();
 
@@ -73,13 +74,13 @@ class LogBookDefectController extends AbstractController
      * @param LogBookDefect $logBookDefect
      * @return Response
      */
-    public function edit(Request $request, LogBookDefect $logBookDefect): Response
+    public function edit(Request $request, LogBookDefect $logBookDefect, ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(LogBookDefectType::class, $logBookDefect);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $doctrine->getManager()->flush();
 
             return $this->redirectToRoute('log_book_defect_index');
         }
@@ -96,10 +97,10 @@ class LogBookDefectController extends AbstractController
      * @param LogBookDefect $logBookDefect
      * @return Response
      */
-    public function delete(Request $request, LogBookDefect $logBookDefect): Response
+    public function delete(Request $request, LogBookDefect $logBookDefect, ManagerRegistry $doctrine): Response
     {
         if ($this->isCsrfTokenValid('delete'.$logBookDefect->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $doctrine->getManager();
             $entityManager->remove($logBookDefect);
             $entityManager->flush();
         }

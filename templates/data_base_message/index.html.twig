@@ -1,11 +1,40 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}DB messages{% endblock %}
 {% block content %}
-    Count {{  tables | length }}  tables<br/>
-    {% for table in tables | slice(0, 10000) %}
-        {{ table['TABLE_NAME'] }} <br/>
-
-    {% endfor %}
+    Count {{  tables | length }}  tables in DB name={{ databaseName }}<br/>
+        <table class="records_list table table-striped table-condensed table-hover"
+           id="logsTableIndexTable" data-pagination="true" data-search="true" data-toggle="table"
+           data-toolbar="#logsTableIndexTableToolbar"
+           data-show-refresh="true"
+           data-key-events="true"
+           data-show-export="true"
+           data-show-columns="true"
+           data-advanced-search="true"
+           data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="logsTableIndex"
+           data-page-size="30" data-page-list="[5, 10, 20, 25, 30, 40, 50, 100, 500, 1000, 2000, 5000 , 10000]" data-sort-order="desc">
+        <thead>
+            <tr>
+                <th data-sorter="dataTitleIntSorter" data-sortable="true">ID</th>
+                <th data-sortable="true">Name</th>
+                <th data-sortable="true" title="Size" data-switchable="true">Size</th>
+                <th data-sortable="true">Options</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tables in tables | slice(0, 10000)  %}
+            <tr>
+                <td></td>
+                <td>{{ table['table_name'] }}</td>
+                <td>{{ table['table_size'] }}</td>
+                <td></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     <script type="text/javascript">
 
         $(document).ready(function() {

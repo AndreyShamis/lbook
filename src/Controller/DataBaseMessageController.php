@@ -25,6 +25,7 @@ class DataBaseMessageController extends AbstractController
         $res = $statment->fetchAll();
         return $this->render('data_base_message/index.html.twig', [
             'tables' => $res,
+            'databaseName' => $databaseName,
         ]);
     }
 }

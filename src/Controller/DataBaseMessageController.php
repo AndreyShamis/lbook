@@ -17,7 +17,7 @@ class DataBaseMessageController extends AbstractController
         $em = $doctrine->getManager();
         $connection = $em->getConnection();
         $databaseName = $connection->getDatabase();
-        $sql = "SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` FROM information_schema.TABLES WHERE TABLE_SCHEMA LIKE '".$databaseName."' AND TABLE_NAME LIKE 'log_book_message%' AND TABLE_NAME != 'log_book_message'"
+        $sql = "SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` FROM information_schema.TABLES WHERE TABLE_SCHEMA LIKE '".$databaseName."' AND TABLE_NAME LIKE 'log_book_message%' AND TABLE_NAME != 'log_book_message'";
         //"SELECT DISTINCT(TABLE_NAME) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA LIKE '".$databaseName."' AND TABLE_NAME LIKE 'log_book_message%'";
         /** @var \Doctrine\DBAL\Statement $statment */
         $statment = $connection->prepare($sql);

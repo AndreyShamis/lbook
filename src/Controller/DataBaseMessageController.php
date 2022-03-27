@@ -36,10 +36,15 @@ class DataBaseMessageController extends AbstractController
                 $setupId = (int)str_replace('log_book_message_' , '', $table_name);
                 if ($setupId > 0) {
                     $setup = $setupRepo->findById($setupId);
-                    $setup->setLogsSize($table_size);
+                    if ($setup !== null) {
+                        $setup->setLogsSize($table_size);
+                    } else {
+                        $r['found'] = '0';
+                    }
+                    
                     $r['found'] = '1';
                 } else {
-                    $r['found'] = '0';
+                    $r['found'] = '-1';
                 }
                 
             } catch (\Throwable $ex) {

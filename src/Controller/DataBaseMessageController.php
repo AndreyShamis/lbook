@@ -43,7 +43,7 @@ class DataBaseMessageController extends AbstractController
                 }
                 
             } catch (\Throwable $ex) {
-                $logger->critical('DataBaseMessageController:Cannot update table size for : ' . $table_name . ' : SQL: ' . $sql );
+                $logger->critical('DataBaseMessageController:Cannot update table size for : ' . $table_name . ' : ' . $ex->getMessage());
             }
         }
         $em->flush();

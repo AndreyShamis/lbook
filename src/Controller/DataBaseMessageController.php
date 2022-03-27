@@ -27,8 +27,8 @@ class DataBaseMessageController extends AbstractController
         $res = $statment->fetchAll();
         foreach ($res as $r) {
             try {
-                $table_size = $r[0]['table_size'];
-                $table_name = $r[0]['table_name'];
+                $table_size = $r['table_size'];
+                $table_name = $r['table_name'];
             } catch (\Throwable $ex) {
                 $logger->critical('DataBaseMessageController:Cannot get tabl size : SQL: ' . $sql );
             }
@@ -37,9 +37,9 @@ class DataBaseMessageController extends AbstractController
                 if ($setupId > 0) {
                     $setup = $setupRepo->findById($setupId);
                     $setup->setLogsSize($table_size);
-                    $r[0]['found'] = '1';
+                    $r['found'] = '1';
                 } else {
-                    $r[0]['found'] = '0';
+                    $r['found'] = '0';
                 }
                 
             } catch (\Throwable $ex) {

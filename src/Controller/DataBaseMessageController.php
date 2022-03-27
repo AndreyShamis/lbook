@@ -35,7 +35,7 @@ class DataBaseMessageController extends AbstractController
                 $logger->critical('DataBaseMessageController:Cannot get tabl size : SQL: ' . $sql );
             }
             try {
-                $setupId = (int)str_replace('log_book_message_' , '', $table_name)
+                $setupId = (int)str_replace('log_book_message_' , '', $table_name);
                 if ($setupId > 0) {
                     $setup = $setupRepo->findById($setupId);
                     $setup->setLogsSize($table_size);

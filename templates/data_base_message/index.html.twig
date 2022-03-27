@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for tables in tables | slice(0, 10000)  %}
+        {% for table in tables | slice(0, 10000)  %}
             <tr>
                 <td></td>
                 <td>{{ table['table_name'] }}</td>

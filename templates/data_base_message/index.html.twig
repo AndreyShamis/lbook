@@ -17,6 +17,7 @@
                 <th data-sorter="dataTitleIntSorter" data-sortable="true">ID</th>
                 <th data-sortable="true">Name</th>
                 <th data-sortable="true" title="Size" data-switchable="true">Size</th>
+                <th data-sortable="true" title="Size" data-switchable="true">Found</th>
                 <th data-sortable="true">Options</th>
             </tr>
         </thead>
@@ -26,6 +27,7 @@
                 <td></td>
                 <td>{{ table['table_name'] }}</td>
                 <td>{{ table['table_size'] }}</td>
+                <td>{{ table['found'] }}</td>
                 <td></td>
             </tr>
         {% else %}

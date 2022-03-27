@@ -25,8 +25,6 @@ class DataBaseMessageController extends AbstractController
         $statment = $connection->prepare($sql);
         $statment->execute();
         $res = $statment->fetchAll();
-
-        $res = $statment->fetchAll();
         foreach ($res as $r) {
             try {
                 $table_size = $r[0]['table_size'];

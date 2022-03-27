@@ -43,15 +43,13 @@ class DataBaseMessageController extends AbstractController
                     $setup = $setupRepo->findById($setupId);
                     if ($setup !== null) {
                         $setup->setLogsSize($table_size);
+                        $ret['found'] = 'Exist';
                     } else {
                         $ret['found'] = 'Setup NOT EXIST';
                     }
-                    
-                    $ret['found'] = 'Exist';
                 } else {
                     $ret['found'] = 'Setup id not parsed';
                 }
-                
             } catch (\Throwable $ex) {
                 $logger->critical('DataBaseMessageController:Cannot update table size for : ' . $table_name . ' : ' . $ex->getMessage());
             }

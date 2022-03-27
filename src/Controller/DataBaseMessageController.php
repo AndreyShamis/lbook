@@ -25,10 +25,14 @@ class DataBaseMessageController extends AbstractController
         $statment = $connection->prepare($sql);
         $statment->execute();
         $res = $statment->fetchAll();
+        $ret = [];
         foreach ($res as $r) {
             try {
                 $table_size = $r['table_size'];
                 $table_name = $r['table_name'];
+                $ret['table_size'] = $table_size;
+                $ret['table_name'] = $table_name;
+                $ret['found'] = 'WIP';
             } catch (\Throwable $ex) {
                 $logger->critical('DataBaseMessageController:Cannot get tabl size : SQL: ' . $sql );
             }
@@ -39,12 +43,12 @@ class DataBaseMessageController extends AbstractController
                     if ($setup !== null) {
                         $setup->setLogsSize($table_size);
                     } else {
-                        $r['found'] = '0';
+                        $ret['found'] = 'Setup NOT EXIST';
                     }
                     
-                    $r['found'] = '1';
+                    $ret['found'] = 'Exist';
                 } else {
-                    $r['found'] = '-1';
+                    $ret['found'] = 'Setup id not parsed';
                 }
                 
             } catch (\Throwable $ex) {
@@ -54,7 +58,7 @@ class DataBaseMessageController extends AbstractController
         $em->flush();
 
         return $this->render('data_base_message/index.html.twig', [
-            'tables' => $res,
+            'tables' => $ret,
             'databaseName' => $databaseName,
         ]);
     }

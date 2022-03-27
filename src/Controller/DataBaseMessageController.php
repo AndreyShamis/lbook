@@ -25,8 +25,9 @@ class DataBaseMessageController extends AbstractController
         $statment = $connection->prepare($sql);
         $statment->execute();
         $res = $statment->fetchAll();
-        $ret = [];
+        $ret2 = [];
         foreach ($res as $r) {
+            $ret = [];
             try {
                 $table_size = $r['table_size'];
                 $table_name = $r['table_name'];
@@ -54,11 +55,12 @@ class DataBaseMessageController extends AbstractController
             } catch (\Throwable $ex) {
                 $logger->critical('DataBaseMessageController:Cannot update table size for : ' . $table_name . ' : ' . $ex->getMessage());
             }
+            $ret2[] = $ret;
         }
         $em->flush();
 
         return $this->render('data_base_message/index.html.twig', [
-            'tables' => $ret,
+            'tables' => $ret2,
             'databaseName' => $databaseName,
         ]);
     }

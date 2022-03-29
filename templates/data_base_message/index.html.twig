@@ -1,7 +1,7 @@
 {% extends 'lbook/default/index.html.twig' %}
 {% block title %}DB messages{% endblock %}
 {% block content %}
-    Count {{  tables | length }}  tables in DB name={{ databaseName }}<br/>
+    Count {{  tables | length }}  tables in DB name={{ databaseName }}, setups not exist = {{setup_not_exist}}<br/>
         <table class="records_list table table-striped table-condensed table-hover"
            id="logsTableIndexTable" data-pagination="true" data-search="true" data-toggle="table"
            data-toolbar="#logsTableIndexTableToolbar"

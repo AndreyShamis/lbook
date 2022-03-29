@@ -26,6 +26,7 @@ class DataBaseMessageController extends AbstractController
         $statment->execute();
         $res = $statment->fetchAll();
         $ret2 = [];
+        $setup_not_exist = 0;
         foreach ($res as $r) {
             $ret = [];
             try {
@@ -46,6 +47,7 @@ class DataBaseMessageController extends AbstractController
                         $ret['found'] = 'Exist';
                     } else {
                         $ret['found'] = 'Setup NOT EXIST';
+                        $setup_not_exist++;
                     }
                 } else {
                     $ret['found'] = 'Setup id not parsed';
@@ -60,6 +62,7 @@ class DataBaseMessageController extends AbstractController
         return $this->render('data_base_message/index.html.twig', [
             'tables' => $ret2,
             'databaseName' => $databaseName,
+            'setup_not_exist' => $setup_not_exist,
         ]);
     }
 }

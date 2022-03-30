@@ -48,6 +48,12 @@ class DataBaseMessageController extends AbstractController
                     } else {
                         $ret['found'] = 'Setup NOT EXIST';
                         $setup_not_exist++;
+                        try{
+                            $sql = 'DROP TABLE log_book_message_' . $setupId;
+                            $connection->prepare($sql)->execute();
+                        } catch (\Throwable $ex) {
+                            $this->logger->critical('/database/messages: Cannot drop table :' . $setupId , $ex->getTrace());
+                        }
                     }
                 } else {
                     $ret['found'] = 'Setup id not parsed';

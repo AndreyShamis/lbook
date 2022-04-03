@@ -27,6 +27,7 @@ class DataBaseMessageController extends AbstractController
         $res = $statment->fetchAll();
         $ret2 = [];
         $setup_not_exist = 0;
+        $deletedTables = 0;
         foreach ($res as $r) {
             $ret = [];
             try {
@@ -48,11 +49,14 @@ class DataBaseMessageController extends AbstractController
                     } else {
                         $ret['found'] = 'Setup NOT EXIST';
                         $setup_not_exist++;
-                        try{
-                            $sql = 'DROP TABLE log_book_message_' . $setupId;
-                            $connection->prepare($sql)->execute();
-                        } catch (\Throwable $ex) {
-                            $this->logger->critical('/database/messages: Cannot drop table :' . $setupId , $ex->getTrace());
+                        if ($deletedTables < 10) {
+                            try{
+                                $sql = 'DROP TABLE log_book_message_' . $setupId;
+                                $connection->prepare($sql)->execute();
+                                $deletedTables++;
+                            } catch (\Throwable $ex) {
+                                $this->logger->critical('/database/messages: Cannot drop table :' . $setupId , $ex->getTrace());
+                            }
                         }
                     }
                 } else {

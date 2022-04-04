@@ -643,6 +643,9 @@ class LogBookCycleController extends AbstractController
             } else {
                 $ret_test['verdict'] = 'WIP';
             }
+            if ($test->getFailDesc() !== null) {
+                $ret_test['fail_desc'] = $test->getFailDesc()->getDescription();
+            }
             $ret_test['order'] = $test->getExecutionOrder();
             $ret_test['chip'] = $test->getSuiteExecution()->getChip();
             $ret_test['platform'] = $test->getSuiteExecution()->getPlatform();
@@ -671,6 +674,14 @@ class LogBookCycleController extends AbstractController
                 $ret_test['suite_id'] = $suite->getId();
                 $ret_test['suite_name'] = $suite->getName();
                 $ret_test['suite_uuid'] = $suite->getUuid();
+                if ($suite->getCiUrl() !== null && $suite->getCiUrl() !== '') {
+                    $ret_test['suite_ci_url'] = $suite->getCiUrl();
+                }
+                
+                if ($suite->getHost() !== null) {
+                    $ret_test['suite_host'] = $suite->getHost()->getName();
+                }
+                
             }
             $ret_test['cycle_id'] = $cycle_id;
 

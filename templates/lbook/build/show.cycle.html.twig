@@ -10,7 +10,11 @@
     <div>Count : {{ size }}</div>
     {% include "lbook/search.html.twig" %}
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           data-pagination="true" data-toggle="table"
+           data-pagination="true" data-search="true" data-toggle="table"
+           data-show-export="true"
+           data-toolbar="#buildCycleShowToolbar"
+           data-show-columns="true"
+           data-advanced-search="true"
            data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="buildCycleShow"
            data-page-size="2000" data-page-list="[20, 50, 100, 500, 1000, 2000 'ALL']" data-sort-order="desc">
         <thead>
@@ -20,11 +24,11 @@
             <th data-sorter="htmlSorter" data-sortable="true">Setup</th>
             <th data-sorter="htmlSorter" data-sortable="true">Name</th>
             <th data-sortable="true">Tests</th>
-            <th data-sortable="true">Build</th>
+            <th data-sortable="true" data-visible="false">Build</th>
             <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
-            <th data-sortable="true">Controller</th>
+            <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true">DUT</th>
-            <th data-sortable="true">Uploader</th>
+            <th data-sortable="true" data-visible="false">Uploader</th>
             <th data-sortable="true">Period</th>
             <th data-sortable="true">Test time</th>
             <th data-sorter="htmlSorter" data-sortable="true">Updated</th>
@@ -41,7 +45,7 @@
                 </td>
                 <td><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ cycle.id }}</a></td>
                 <td title="{{ cycle.setup.name }}"><a href="{{ path('setup_show_first', { 'id': cycle.setup.id }) }}">{{ shortString(cycle.setup.name, 35, "...") }}</a></td>
-                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 35, "...") }}</a></td>
+                <td title="{{ cycle.name }}"><a href="{{ path('cycle_show_first', { 'id': cycle.id }) }}">{{ shortString(cycle.name, 80, "...") }}</a></td>
                 <td>{{ cycle.testsCount }}</td>
                 <td title="{{ cycle.build }}">{{ shortString(cycle.build, 30) }}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>

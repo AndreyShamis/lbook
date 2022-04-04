@@ -26,8 +26,8 @@
             <th data-sortable="true">Tests</th>
             <th data-sortable="true" data-visible="false">Build</th>
             <th data-sorter="htmlSorter" data-sortable="true">Pass Rate</th>
-            <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true">DUT</th>
+            <th data-sortable="true" data-visible="false">Controller</th>
             <th data-sortable="true" data-visible="false">Uploader</th>
             <th data-sortable="true">Period</th>
             <th data-sortable="true">Test time</th>
@@ -49,8 +49,8 @@
                 <td>{{ cycle.testsCount }}</td>
                 <td title="{{ cycle.build }}">{{ shortString(cycle.build, 30) }}</td>
                 <td><span class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.passRate }}%</span></td>
+                <td>{{ cycle.suiteDut.name | default('') }}</td>
                 <td>{{ cycle.controller }}</td>
-                <td>{{ cycle.dut }}</td>
                 <td>{{ cycle.targetUploader }}</td>
                 <td>{{ cycle.period |  ExecutionTimeGeneric}}</td>
                 <td>{{ cycle.testsTimeSum |  ExecutionTimeGeneric}}</td>

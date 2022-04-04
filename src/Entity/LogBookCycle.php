@@ -916,6 +916,31 @@ class LogBookCycle
     }
 
     /**
+     * @return Host[]
+     */
+    public function getSuitesDuts(): array
+    {
+        $ret = [];
+        /** @var SuiteExecution $suiteExecution */
+        foreach ($this->getSuiteExecution() as $suiteExecution) {
+            $h = $suiteExecution->getHost();
+            if (!in_array($h, $ret)) {
+                $ret[] = $h;
+            }
+        }
+        return $ret;
+    }
+
+    public function getSuiteDut(): ?Host
+    {
+        $ret = $this->getSuitesDuts();
+        if (count($ret) >= 1) {
+            return $ret[0];
+        }
+        return null;
+    }
+
+    /**
      * @param LogBookTarget $dut
      */
     public function setDut(LogBookTarget $dut = null): void

@@ -611,6 +611,7 @@ class LogBookCycleController extends AbstractController
             $arr['name'] = $cycle->getName();
             $arr['build_project'] = $cycle->getBuild()->getName();
             $arr['setup'] = $cycle->getSetup()->getName();
+            $arr['setup_id'] = $cycle->getSetup()->getId();
             $arr['time_start'] = $cycle->getTimeStart()->getTimestamp();
             $arr['time_end'] = $cycle->getTimeEnd()->getTimestamp();
             $arr['period'] = $cycle->getPeriod();

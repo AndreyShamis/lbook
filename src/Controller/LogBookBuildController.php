@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class LogBookBuildController extends AbstractController
 {
-    protected $index_size = 500;
+    protected $index_size = 2000;
     protected $show_cycle_size = 1000;
 
 

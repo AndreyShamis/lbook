@@ -1415,6 +1415,8 @@ class LogBookCycle
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
+            'setup' => $this->getSetup()->getName(),
+            'setup_id' => $this->getSetup()->getId(),
             'build' => $this->getBuild()? $this->getBuild()->getName(): '',
             'build_id' => $this->getBuild()? $this->getBuild()->getId(): '',
             'user' => $this->getUser()->getFullName(),

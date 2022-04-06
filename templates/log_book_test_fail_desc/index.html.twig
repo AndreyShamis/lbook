@@ -24,8 +24,9 @@
 {#                <th>Md5</th>#}
                 <th data-sortable="true" title="Tests Count" data-switchable="false">Tests Count</th>
                 <th data-sortable="true">Last Seen</th>
-                <th data-sortable="true">CreatedAt</th>
+                <th data-sortable="true" data-visible="false">CreatedAt</th>
                 <th data-sortable="true">Update Diff</th>
+                <th data-sortable="true" data-visible="false">Note</th>
 {#                <th>actions</th>#}
             </tr>
         </thead>
@@ -39,13 +40,18 @@
                 <td>{{ log_book_test_fail_desc.lastMarkedAsSeenAt ? log_book_test_fail_desc.lastMarkedAsSeenAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ log_book_test_fail_desc.createdAt ? log_book_test_fail_desc.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ log_book_test_fail_desc.lastUpdateDiff }}</td>
+                <td>
+                {% if log_book_test_fail_desc.tests | lenght != log_book_test_fail_desc.testsCount %}
+                    {{log_book_test_fail_desc.tests | lenght}} != {{log_book_test_fail_desc.testsCount}}
+                {% endif %}
+                </td>
 {#                <td>#}
 {#                    <a href="{{ path('log_book_test_fail_desc_edit', {'id': fail_desc.id}) }}">edit</a>#}
 {#                </td>#}
             </tr>
         {% else %}
             <tr>
-                <td colspan="8">no records found</td>
+                <td colspan="7">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

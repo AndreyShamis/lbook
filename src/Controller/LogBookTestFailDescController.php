@@ -27,7 +27,40 @@ class LogBookTestFailDescController extends AbstractController
      */
     public function index(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
     {
-        $paginator_size = 5000;
+        $paginator_size = 10000;
+        $query = $logBookTestFailDescRepository->createQueryBuilder('f')
+            ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
+            ->addOrderBy('f.testsCount', 'DESC')
+
+        ;
+        $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
+        $totalPosts = $paginator->count();
+        $iterator = $paginator->getIterator();
+
+        $maxPages = ceil($totalPosts / $paginator_size);
+        $thisPage = $page;
+
+
+        return $this->render('log_book_test_fail_desc/index.html.twig', [
+            'size'      => $totalPosts,
+            'maxPages'  => $maxPages,
+            'thisPage'  => $thisPage,
+            'iterator'  => $iterator,
+            'paginator' => $paginator,
+        ]);
+    }
+
+        /**
+     * @Route("/maintain", name="fail_desc_maintain", methods={"GET"})
+     * @param LogBookTestFailDescRepository $logBookTestFailDescRepository
+     * @param PagePaginator $pagePaginator
+     * @param int $page
+     * @return Response
+     * @throws \Exception
+     */
+    public function maintain(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
+    {
+        $paginator_size = 10000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC')

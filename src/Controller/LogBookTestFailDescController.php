@@ -6,6 +6,7 @@ use App\Entity\LogBookTestFailDesc;
 use App\Form\LogBookTestFailDescType;
 use App\Repository\LogBookTestFailDescRepository;
 use App\Service\PagePaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,17 +59,38 @@ class LogBookTestFailDescController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function maintain(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
+    public function maintain(ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
     {
-        $paginator_size = 10000;
+        $paginator_size = 100000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
-            ->addOrderBy('f.testsCount', 'DESC')
-
-        ;
+            ->addOrderBy('f.testsCount', 'DESC');
         $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();
+
+        $iterator->rewind();
+        $em = $doctrine->getManager();
+        try {
+            if ($totalPosts > 0) {
+                for ($x = 0; $x < $totalPosts; $x++) {
+                    /** @var LogBookTestFailDesc $failDesc */
+                    $failDesc = $iterator->current();
+                    if ($failDesc !== null) {
+                        $realTestsNumber = $failDesc->getTests()->count();
+                        if ($failDesc->getTestsCount() !== $realTestsNumber) {
+                            $failDesc->setTestsCount($realTestsNumber);
+                        }
+                    }
+                    $iterator->next();
+                }
+            }
+            
+            $em->flush();
+
+        } catch (\Throwable $ex) {
+            
+        }
 
         $maxPages = ceil($totalPosts / $paginator_size);
         $thisPage = $page;

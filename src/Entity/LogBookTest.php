@@ -911,6 +911,9 @@ class LogBookTest
         if ($this->getTestInfo() !== null) {
             $ret_test['test_info_id'] = $this->getTestInfo()->getId();
         }
+        if ($this->getCycle() !== null) {
+            $ret_test['cycle_id'] = $this->getCycle()->getId();
+        }
         $ret_test['time_start'] = $this->getTimeStart()->getTimestamp();
         $ret_test['time_end'] = $this->getTimeEnd()->getTimestamp();
         $ret_test['duration'] = $this->getTimeRun();

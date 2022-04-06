@@ -586,22 +586,9 @@ class LogBookCycleController extends AbstractController
             $arr['tests_total'] = $cycle->getTestsCount();
             $arr['metadata'] = $cycle->getMetaData();
         } catch (\Throwable $ex) {
-            $this->keep_critical_log('MULTI_EXPORT[buildExportCycleArray]', $logger, $ex);
+            $this->keep_critical_log('[buildExportCycleArray]', $logger, $ex);
         }
         return $arr;
-    }
-
-    private function buildExportTestArray(LogBookTest $test, int $cycle_id, LoggerInterface $logger): array
-    {
-        $ret_test = [];
-        try {
-            $ret_test = $test->toJsonExport();
-            $ret_test['cycle_id'] = $cycle_id;
-
-        } catch (\Throwable $ex) {
-            $this->keep_critical_log('MULTI_EXPORT[buildExportTestArray]', $logger, $ex);
-        }
-        return $ret_test;
     }
 
     private function keep_critical_log($msg, LoggerInterface $logger, \Throwable $ex): void
@@ -661,7 +648,7 @@ class LogBookCycleController extends AbstractController
                                             foreach ($tests as $test) {
                                                 try {
                                                     /** @var LogBookTest $test */
-                                                    $fin_res[] = $this->buildExportTestArray($test, $cycle_id, $logger);
+                                                    $fin_res[] = $test->toJsonExport();
                                                 } catch (\Throwable $ex) {
                                                     $this->keep_critical_log('MULTI_EXPORT[IN_LOOP]', $logger, $ex);
                                                 }

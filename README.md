@@ -210,6 +210,7 @@ Add next lines:
 */3 * * * *     wget --no-proxy -O- http://logbook.com/bot/setups/count_cycles > /dev/null
 */13 * * * *    wget --no-proxy -O- http://logbook.com/reports/auto/create > /dev/null
 */1 * * * *     wget --no-proxy -O- http://logbook.com/api/send_emails > /dev/null
+* */6 * * *     wget --no-proxy -O- http://logbook.com//failure/maintain > /dev/null
 */3 * * * *     sleep 15; wget --no-proxy -O- http://logbook.com/api/cycle/auto/cycle_close   > /dev/null 2>&1
 */2  * * * *    sleep 15; wget --no-proxy -O- http://logbook.com/bot/cycle_event_delete >> /tmp/bot_cycle_event_delet>
 * */12 * * *    sleep 15; wget --no-proxy -O- http://logbook.com/build/clean_not_used   > /dev/null 2>&1

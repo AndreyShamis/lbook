@@ -902,4 +902,50 @@ class LogBookTest
         return $ret;
     }
 
+    public function toJsonExport()
+    {
+
+        $ret_test = array();
+        $ret_test['id'] = $this->getId();
+        $ret_test['name'] = $this->getName();
+        $ret_test['time_start'] = $this->getTimeStart()->getTimestamp();
+        $ret_test['time_end'] = $this->getTimeEnd()->getTimestamp();
+        $ret_test['duration'] = $this->getTimeRun();
+        if ($this->getVerdict() !== null) {
+            $ret_test['verdict'] = $this->getVerdict()->getName();
+        } else {
+            $ret_test['verdict'] = 'WIP';
+        }
+        $ret_test['order'] = $this->getExecutionOrder();
+        $ret_test['chip'] = $this->getSuiteExecution()->getChip();
+        $ret_test['platform'] = $this->getSuiteExecution()->getPlatform();
+        $ret_test['test_type'] = $this->getTestType()->getName();
+        $ret_test['metadata'] = $this->getMetaData(); //array();
+        try {
+            unset($ret_test['metadata']['TEST_FILENAME']);
+            unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
+            unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
+            unset($ret_test['metadata']['SUITE_SHOW']);
+            unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
+            unset($ret_test['metadata']['CHIP']);
+            unset($ret_test['metadata']['PLATFORM']);
+            unset($ret_test['metadata']['TIMEOUT']);
+
+            if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
+                $ret_test['metadata']['CONTROL'] = $this->getTestInfo()->getPath();
+            } else {
+                $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                $ret_test['metadata']['CONTROL'] = $control_path;
+            }
+        } catch (\Throwable $ex) {}
+        $suite = $this->getSuiteExecution();
+        if ($suite !== null) {
+            $ret_test['suite_id'] = $suite->getId();
+            $ret_test['suite_name'] = $suite->getName();
+            $ret_test['suite_uuid'] = $suite->getUuid();
+        }
+        return $ret_test;
+    }
+
 }

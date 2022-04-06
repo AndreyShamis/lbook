@@ -57,6 +57,34 @@ class LogBookTestController extends AbstractController
     }
 
     /**
+     * Test exporter to JSON file
+     *
+     * @Route("/export/{test}", name="test_exporter", methods={"GET", "POST"})
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookTest $test
+     * @return JsonResponse
+     */
+    public function export(LoggerInterface $logger, LogBookTestRepository $testRepo, LogBookTest $test = null): JsonResponse
+    {
+        $fin_resp = [];
+        try{
+            if ($test !== null) {
+                $fin_resp[] = $test->toJsonExport();
+            }
+            $response =  new JsonResponse($fin_resp);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        } catch (\Throwable $ex) {
+            $logger->critical('test:export:test_exporter: Issue found :' . $ex->getMessage());
+            $fin_resp['ERROR'] = $ex->getMessage();
+        }
+        $response = new JsonResponse($fin_resp);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+        
+    }
+
+    /**
      * Lists all Tests entities.
      *
      * @Route("/page/{page}", name="test_index", methods={"GET"})

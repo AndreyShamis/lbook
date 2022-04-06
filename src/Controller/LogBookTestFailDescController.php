@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 /**
  * @Route("/failure")
@@ -28,12 +29,14 @@ class LogBookTestFailDescController extends AbstractController
      */
     public function index(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
     {
-        $paginator_size = 10000;
+        $paginator_size = 20000;
+
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC')
-
+            ->where('f.testsCount > 0')
         ;
+
         $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();
@@ -59,50 +62,35 @@ class LogBookTestFailDescController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function maintain(ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
+    public function maintain(LoggerInterface $logger, ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator): Response
     {
-        $paginator_size = 100000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC');
-        $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
-        $totalPosts = $paginator->count();
-        $iterator = $paginator->getIterator();
-
-        $iterator->rewind();
+        $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
+        $failDescs = $query->getQuery()->execute();
         $em = $doctrine->getManager();
         try {
-            if ($totalPosts > 0) {
-                for ($x = 0; $x < $totalPosts; $x++) {
+            foreach ($failDescs as $failDesc) {
+                try {
                     /** @var LogBookTestFailDesc $failDesc */
-                    $failDesc = $iterator->current();
                     if ($failDesc !== null) {
                         $realTestsNumber = $failDesc->getTests()->count();
                         if ($failDesc->getTestsCount() !== $realTestsNumber) {
                             $failDesc->setTestsCount($realTestsNumber);
+                            $em->persist($failDesc);
                         }
                     }
-                    $iterator->next();
+                } catch (\Throwable $ex) {
+                    $logger->critical('fail_desc_maintain:maintain: Issue found in loop:' . $ex->getMessage());
                 }
             }
-            
             $em->flush();
-
         } catch (\Throwable $ex) {
-            
+            $logger->critical('fail_desc_maintain:maintain: Issue found:' . $ex->getMessage());
         }
 
-        $maxPages = ceil($totalPosts / $paginator_size);
-        $thisPage = $page;
-
-
-        return $this->render('log_book_test_fail_desc/index.html.twig', [
-            'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
-            'paginator' => $paginator,
-        ]);
+        return $this->redirectToRoute('fail_desc_index');
     }
 
     /**

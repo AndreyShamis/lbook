@@ -41,8 +41,8 @@
                 <td>{{ log_book_test_fail_desc.createdAt ? log_book_test_fail_desc.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ log_book_test_fail_desc.lastUpdateDiff }}</td>
                 <td>
-                {% if log_book_test_fail_desc.tests | lenght != log_book_test_fail_desc.testsCount %}
-                    {{log_book_test_fail_desc.tests | lenght}} != {{log_book_test_fail_desc.testsCount}}
+                {% if log_book_test_fail_desc.tests | length != log_book_test_fail_desc.testsCount %}
+                    {{log_book_test_fail_desc.tests | length}} != {{log_book_test_fail_desc.testsCount}}
                 {% endif %}
                 </td>
 {#                <td>#}

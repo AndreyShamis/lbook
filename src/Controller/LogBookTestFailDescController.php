@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 /**
  * @Route("/failure")
@@ -28,12 +29,14 @@ class LogBookTestFailDescController extends AbstractController
      */
     public function index(LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
     {
-        $paginator_size = 10000;
+        $paginator_size = 20000;
+
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC')
-
+            ->where('f.testsCount > 0')
         ;
+
         $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();
@@ -59,13 +62,13 @@ class LogBookTestFailDescController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function maintain(ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator, int $page = 1): Response
+    public function maintain(LoggerInterface $logger, ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator): Response
     {
-        $paginator_size = 100000;
+        $paginator_size = 50000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC');
-        $paginator = $pagePaginator->paginate($query, $page, $paginator_size);
+        $paginator = $pagePaginator->paginate($query, 1, $paginator_size);
         $totalPosts = $paginator->count();
         $iterator = $paginator->getIterator();
 
@@ -85,15 +88,14 @@ class LogBookTestFailDescController extends AbstractController
                     $iterator->next();
                 }
             }
-            
             $em->flush();
 
         } catch (\Throwable $ex) {
-            
+            $logger->critical('fail_desc_maintain:maintain: Issue found:' . $ex->getMessage());
         }
 
         $maxPages = ceil($totalPosts / $paginator_size);
-        $thisPage = $page;
+        $thisPage = 1;
 
 
         return $this->render('log_book_test_fail_desc/index.html.twig', [

@@ -78,7 +78,11 @@ class LogBookTestFailDescController extends AbstractController
                         $realTestsNumber = $failDesc->getTests()->count();
                         if ($failDesc->getTestsCount() !== $realTestsNumber) {
                             $failDesc->setTestsCount($realTestsNumber);
-                            $em->persist($failDesc);
+                            if ($realTestsNumber === 0 && $failDesc->getTestsCount() === 0) {
+                                $em->remove($failDesc);
+                            } else {
+                                $em->persist($failDesc);
+                            }
                         }
                     }
                 } catch (\Throwable $ex) {

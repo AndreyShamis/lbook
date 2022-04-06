@@ -595,56 +595,7 @@ class LogBookCycleController extends AbstractController
     {
         $ret_test = [];
         try {
-            $ret_test['id'] = $test->getId();
-            $ret_test['name'] = $test->getName();
-            $ret_test['time_start'] = $test->getTimeStart()->getTimestamp();
-            $ret_test['time_end'] = $test->getTimeEnd()->getTimestamp();
-            $ret_test['duration'] = $test->getTimeRun();
-            if ($test->getVerdict() !== null) {
-                $ret_test['verdict'] = $test->getVerdict()->getName();
-            } else {
-                $ret_test['verdict'] = 'WIP';
-            }
-            if ($test->getFailDesc() !== null) {
-                $ret_test['fail_desc'] = $test->getFailDesc()->getDescription();
-            }
-            $ret_test['order'] = $test->getExecutionOrder();
-            $ret_test['chip'] = $test->getSuiteExecution()->getChip();
-            $ret_test['platform'] = $test->getSuiteExecution()->getPlatform();
-            $ret_test['test_type'] = $test->getTestType()->getName();
-            $ret_test['metadata'] = $test->getMetaData(); //array();
-            try {
-                unset($ret_test['metadata']['TEST_FILENAME']);
-                unset($ret_test['metadata']['TEST_VERSION_SHOW_OPT']);
-                unset($ret_test['metadata']['CONTROL_VERSION_SHOW_OPT']);
-                unset($ret_test['metadata']['SUITE_SHOW']);
-                unset($ret_test['metadata']['TEST_TYPE_SHOW_OPT']);
-                unset($ret_test['metadata']['CHIP']);
-                unset($ret_test['metadata']['PLATFORM']);
-                unset($ret_test['metadata']['TIMEOUT']);
-
-                if ($test->getTestInfo() !== null && $test->getTestInfo()->getPath() !== null) {
-                    $ret_test['metadata']['CONTROL'] = $test->getTestInfo()->getPath();
-                } else {
-                    $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                    unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                    $ret_test['metadata']['CONTROL'] = $control_path;
-                }
-            } catch (\Throwable $ex) {}
-            $suite = $test->getSuiteExecution();
-            if ($suite !== null) {
-                $ret_test['suite_id'] = $suite->getId();
-                $ret_test['suite_name'] = $suite->getName();
-                $ret_test['suite_uuid'] = $suite->getUuid();
-                if ($suite->getCiUrl() !== null && $suite->getCiUrl() !== '') {
-                    $ret_test['suite_ci_url'] = $suite->getCiUrl();
-                }
-                
-                if ($suite->getHost() !== null) {
-                    $ret_test['suite_host'] = $suite->getHost()->getName();
-                }
-                
-            }
+            $ret_test = $test->toJsonExport();
             $ret_test['cycle_id'] = $cycle_id;
 
         } catch (\Throwable $ex) {

@@ -908,6 +908,9 @@ class LogBookTest
         $ret_test = array();
         $ret_test['id'] = $this->getId();
         $ret_test['name'] = $this->getName();
+        if ($this->getTestInfo() !== null) {
+            $ret_test['test_info_id'] = $this->getTestInfo()->getId();
+        }
         $ret_test['time_start'] = $this->getTimeStart()->getTimestamp();
         $ret_test['time_end'] = $this->getTimeEnd()->getTimestamp();
         $ret_test['duration'] = $this->getTimeRun();
@@ -915,6 +918,10 @@ class LogBookTest
             $ret_test['verdict'] = $this->getVerdict()->getName();
         } else {
             $ret_test['verdict'] = 'WIP';
+        }
+        if ($this->getFailDesc() !== null) {
+            $ret_test['fail_desc'] = $this->getFailDesc()->getDescription();
+            $ret_test['fail_desc_id'] = $this->getFailDesc()->getId();
         }
         $ret_test['order'] = $this->getExecutionOrder();
         $ret_test['chip'] = $this->getSuiteExecution()->getChip();
@@ -939,12 +946,22 @@ class LogBookTest
                 $ret_test['metadata']['CONTROL'] = $control_path;
             }
         } catch (\Throwable $ex) {}
-        $suite = $this->getSuiteExecution();
-        if ($suite !== null) {
-            $ret_test['suite_id'] = $suite->getId();
-            $ret_test['suite_name'] = $suite->getName();
-            $ret_test['suite_uuid'] = $suite->getUuid();
-        }
+        try {
+            $suite = $this->getSuiteExecution();
+            if ($suite !== null) {
+                $ret_test['suite_id'] = $suite->getId();
+                $ret_test['suite_name'] = $suite->getName();
+                $ret_test['suite_uuid'] = $suite->getUuid();
+                if ($suite->getCiUrl() !== null && $suite->getCiUrl() !== '') {
+                    $ret_test['suite_ci_url'] = $suite->getCiUrl();
+                }
+                
+                if ($suite->getHost() !== null) {
+                    $ret_test['suite_host'] = $suite->getHost()->getName();
+                }
+                
+            }
+        } catch (\Throwable $ex) {}
         return $ret_test;
     }
 

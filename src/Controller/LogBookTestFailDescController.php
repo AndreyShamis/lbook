@@ -64,47 +64,33 @@ class LogBookTestFailDescController extends AbstractController
      */
     public function maintain(LoggerInterface $logger, ManagerRegistry $doctrine, LogBookTestFailDescRepository $logBookTestFailDescRepository, PagePaginator $pagePaginator): Response
     {
-        $paginator_size = 50000;
         $query = $logBookTestFailDescRepository->createQueryBuilder('f')
             ->orderBy('f.lastMarkedAsSeenAt', 'DESC')
             ->addOrderBy('f.testsCount', 'DESC');
-        $paginator = $pagePaginator->paginate($query, 1, $paginator_size);
-        $totalPosts = $paginator->count();
-        $iterator = $paginator->getIterator();
-
-        $iterator->rewind();
+        $query->addSelect('RAND() as HIDDEN rand')->orderBy('rand()');
+        $failDescs = $query->getQuery()->execute();
         $em = $doctrine->getManager();
         try {
-            if ($totalPosts > 0) {
-                for ($x = 0; $x < $totalPosts; $x++) {
+            foreach ($failDescs as $failDesc) {
+                try {
                     /** @var LogBookTestFailDesc $failDesc */
-                    $failDesc = $iterator->current();
                     if ($failDesc !== null) {
                         $realTestsNumber = $failDesc->getTests()->count();
                         if ($failDesc->getTestsCount() !== $realTestsNumber) {
                             $failDesc->setTestsCount($realTestsNumber);
+                            $em->persist($failDesc);
                         }
                     }
-                    $iterator->next();
+                } catch (\Throwable $ex) {
+                    $logger->critical('fail_desc_maintain:maintain: Issue found in loop:' . $ex->getMessage());
                 }
             }
             $em->flush();
-
         } catch (\Throwable $ex) {
             $logger->critical('fail_desc_maintain:maintain: Issue found:' . $ex->getMessage());
         }
 
-        $maxPages = ceil($totalPosts / $paginator_size);
-        $thisPage = 1;
-
-
-        return $this->render('log_book_test_fail_desc/index.html.twig', [
-            'size'      => $totalPosts,
-            'maxPages'  => $maxPages,
-            'thisPage'  => $thisPage,
-            'iterator'  => $iterator,
-            'paginator' => $paginator,
-        ]);
+        return $this->redirectToRoute('fail_desc_index');
     }
 
     /**

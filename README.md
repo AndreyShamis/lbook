@@ -221,6 +221,33 @@ Add next lines:
 * */20 * * *    sleep 15; wget --no-proxy -O- http://logbook.com/suites/close_unclosed/5  > /dev/null 2>&1
 4 */3 * * *     sleep 15; wget --no-proxy -O- http://logbook.com/suites/close_unclosed/3  > /dev/null 2>&1
 ~~~
+### API
+Use API to search cycles
+~~~ BASH
+curl --header "Content-Type: application/json" --request POST --data '{"cycle_name":"pass", "fromDate": "03/12/2013"}'  http://logbook.com/cycle/searchjson
+curl --header "Content-Type: application/json" --request POST --data '{"cycle_name":"pass", "fromDate": "03/12/2013", "limit": "2000", "setups": [1958, 1957] }'  http://logbook.com/cycle/searchjson
+~~~
+Available parameter
+
+cycle_name
+fromDate
+toDate
+limit
+setups
+
+Multi Export
+~~~ BASH
+http://logbook.com/cycle/multiexport?cycles=624144;625572;625541
+~~~
+Export Single test metadata
+~~~ BASH
+http://logbook.com/test/export/105443579
+~~~
+Search setups
+~~~ BASH
+curl --header "Content-Type: application/json" --request POST --data '{"setup_name":"app"}' http://logbook.com/setup/searchjson
+
+~~~
 
 ### Tweak your Swap Settings
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04

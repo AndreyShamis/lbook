@@ -97,6 +97,7 @@ security:
         - { path: ^/test/(.*)/showlog, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/(.*)/downloadlog, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/test/export/(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/setup/searchjson(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/failure/maintain(.*), role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
 #        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }

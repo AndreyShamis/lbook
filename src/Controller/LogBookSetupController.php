@@ -406,6 +406,54 @@ class LogBookSetupController extends AbstractController
 
     }
 
+    /**
+     * @Route("/searchjson", name="setup_search_json", methods={"GET", "POST"})
+     * @param Request $request
+     * @param LogBookSetupRepository $setupRepo
+     * @param SuiteExecutionRepository $suitesRepo
+     * @return JsonResponse
+     */
+    public function setup_json_search(Request $request, LogBookSetupRepository $setupRepo, SuiteExecutionRepository $suitesRepo): JsonResponse
+    {
+
+        $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            $data = [];
+        }
+        $setup_name = '';
+        $limit = 100;
+        if (array_key_exists('setup_name', $data)) {
+            $setup_name = $data['setup_name'];
+        }
+        if (array_key_exists('limit', $data)) {
+            $limit = min((int)$data['limit'], $limit);
+        }
+
+        $qb = $setupRepo->createQueryBuilder('t')
+            ->where('t.disabled = 0')
+            ->setMaxResults($limit);
+        $qb->andWhere('MATCH_AGAINST(t.name, t.nameShown, :search_str) > 1 OR t.name LIKE :search_str');
+        $qb->addSelect('MATCH_AGAINST(t.name, t.nameShown, :search_str) as rate');
+        $qb->orderBy('rate', 'DESC');
+        $qb->setParameter('search_str', $setup_name);
+        $query = $qb->getQuery();
+        $sql = $query->getSQL();
+        $setups = $query->execute();
+        $fin_resp = [];
+        $new_setups = [];
+        foreach($setups as $tmpSetup) {
+            /** @var LogBookSetup $t_t */
+            $t_t = $tmpSetup[0];
+            $t_t->setRate($tmpSetup['rate']);
+            $new_setups[] = $t_t->toJson();
+        }
+        $fin_resp['setups'] = $new_setups;
+        $fin_resp['SQL'] = $sql;
+        $fin_resp['LIMIT'] = $limit;
+        $response = new JsonResponse($fin_resp);
+        return $response;
+
+    }
 
     /**
      * Lists all setup entities.

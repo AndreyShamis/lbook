@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use App\Controller\LogBookUploaderController;
 use App\Model\OsType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PreFlush;
 use Doctrine\ORM\Mapping\PrePersist;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -15,7 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LogBookSetupRepository")
- * @ORM\Table(name="lbook_setups")
+ * @ORM\Table(name="lbook_setups", indexes={
+ *     @Index(name="full_text", columns={"name", "name_shown"}, flags={"fulltext"})}))
  * @UniqueEntity("name", message="Setup with this name already exist")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -146,6 +148,18 @@ class LogBookSetup
 
     public static $MIN_NAME_LEN = 2;
     public static $MAX_NAME_LEN = 250;
+
+    protected $rate = 0;
+    /**
+     * @param float $r
+     */
+    public function setRate(float $r) {
+        $this->rate = round($r, 2);
+    }
+
+    public function getRate(): float{
+        return $this->rate;
+    }
 
     /**
      * LogBookSetup constructor.
@@ -538,7 +552,6 @@ class LogBookSetup
             'updated_at' => $this->getUpdatedAt()->getTimestamp(),
             'retention_policy' => $this->getRetentionPolicy(),
             'cycles_count' => $this->getCyclesCount(),
-
             'extDefectsJql' => $this->getExtDefectsJql(),
             'auto_cycle_report' => $this->getAutoCycleReport(),
             'logs_size' => $this->getLogsSize()

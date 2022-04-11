@@ -42,13 +42,11 @@
                data-toolbar="#setupTableToolbar"
                data-show-refresh="true"
                data-key-events="true"
-                {#data-show-toggle="true"#}
                data-show-export="true"
                data-show-columns="true"
                data-advanced-search="true"
-               {#data-id-table="advancedTable"#}
                data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="setupIndexList"
-               data-page-size="100" data-page-list="[5, 10, 20, 50, 100, 500]" data-sort-order="desc">
+               data-page-size="100" data-page-list="[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000]" data-sort-order="desc">
             <thead>
             <tr>
                 <th data-sortable="true" title="Favorite" class="time_diff_icon" data-switchable="false">&nbsp;</th>
@@ -66,7 +64,7 @@
 {#                <th data-sortable="true" title="Is it marked as Private" data-visible="false">Private</th>#}
                 <th data-sortable="true" title="Retention Policy, new cycle will be deleted after (days)" data-visible="true">Ret Pol</th>
                 <th data-sortable="true" title="Logs Size in MB" data-visible="true">DB size</th>
-                <th class="setup_list_options_column">Options</th>
+                <th class="setup_list_options_column" data-visible="false">Options</th>
             </tr>
             </thead>
             <tbody class="searchable">

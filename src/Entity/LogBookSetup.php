@@ -538,9 +538,13 @@ class LogBookSetup
         return $this;
     }
 
-    public function toJson()
+    /**
+     * @param bool $addRate
+     * @return array
+     */
+    public function toJson(bool $addRate=false): array
     {
-        return [
+        $ret = [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'show_name' => $this->getNameShown(),
@@ -554,7 +558,11 @@ class LogBookSetup
             'cycles_count' => $this->getCyclesCount(),
             'extDefectsJql' => $this->getExtDefectsJql(),
             'auto_cycle_report' => $this->getAutoCycleReport(),
-            'logs_size' => $this->getLogsSize()
+            'logs_size' => $this->getLogsSize(),
         ];
+        if ($addRate) {
+            $ret['rate'] = $this->getRate();
+        }
+        return $ret;
     }
 }

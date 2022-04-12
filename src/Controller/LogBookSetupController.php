@@ -415,44 +415,76 @@ class LogBookSetupController extends AbstractController
      */
     public function setup_json_search(Request $request, LogBookSetupRepository $setupRepo, SuiteExecutionRepository $suitesRepo): JsonResponse
     {
-
-        $data = json_decode($request->getContent(), true);
-        if ($data === null) {
-            $data = [];
-        }
-        $setup_name = '';
-        $limit = 100;
-        if (array_key_exists('setup_name', $data)) {
-            $setup_name = $data['setup_name'];
-        }
-        if (array_key_exists('limit', $data)) {
-            $limit = min((int)$data['limit'], $limit);
-        }
-
-        $qb = $setupRepo->createQueryBuilder('t')
-            ->where('t.disabled = 0')
-            ->setMaxResults($limit);
-        $qb->andWhere('MATCH_AGAINST(t.name, t.nameShown, :search_str) > 1 OR t.name LIKE :search_str');
-        $qb->addSelect('MATCH_AGAINST(t.name, t.nameShown, :search_str) as rate');
-        $qb->orderBy('rate', 'DESC');
-        $qb->setParameter('search_str', $setup_name);
-        $query = $qb->getQuery();
-        $sql = $query->getSQL();
-        $setups = $query->execute();
         $fin_resp = [];
-        $new_setups = [];
-        foreach($setups as $tmpSetup) {
-            /** @var LogBookSetup $t_t */
-            $t_t = $tmpSetup[0];
-            $t_t->setRate($tmpSetup['rate']);
-            $new_setups[] = $t_t->toJson();
+        $setup_name = '';
+        $beautify = 0;
+        $method = $request->getRealMethod();
+        if ($method === 'GET') {
+            $data = $request->query->all();
+        } else {
+            $data = json_decode($request->getContent(), true);
         }
+        try {
+            if ($data === null) {
+                $data = [];
+            }
+            $limit = 1000;
+            if (array_key_exists('beautify', $data) && (int)$data['beautify'] === 1) {
+                $beautify = (int)$data['beautify'];
+            }
+            if (array_key_exists('setup_name', $data)) {
+                $setup_name = $data['setup_name'];
+            } else {
+                $fin_resp['HELP'] = [
+                    "setup_name" => "To search setups by name",
+                    "limit" => "To set limit (MAX 10000)",
+                    "beautify" => "Set 1 to beautify JSON",
+                    "Note" => 'Methods allowed: POST/GET'
+                ];
+                $response = new JsonResponse($fin_resp);
+                $response->setEncodingOptions(JSON_PRETTY_PRINT);
+                return $response;
+            }
+            if (array_key_exists('limit', $data)) {
+                if ((int)$data['limit'] > 0 && (int)$data['limit'] <= 10000) {
+                    $limit = min((int)$data['limit'], 10000);
+                } else {
+                    $limit = 10;
+                }
+            }
+
+            $qb = $setupRepo->createQueryBuilder('t')
+                ->where('t.disabled = 0')
+                ->setMaxResults($limit);
+            $qb->andWhere('MATCH_AGAINST(t.name, t.nameShown, :search_str) > 1 OR t.name LIKE :search_str');
+            $qb->addSelect('MATCH_AGAINST(t.name, t.nameShown, :search_str) as rate');
+            $qb->orderBy('rate', 'DESC');
+            $qb->setParameter('search_str', '%' .$setup_name . '%');
+            $query = $qb->getQuery();
+            $sql = $query->getSQL();
+            $setups = $query->execute();
+
+            $new_setups = [];
+            foreach($setups as $tmpSetup) {
+                /** @var LogBookSetup $t_t */
+                $t_t = $tmpSetup[0];
+                $t_t->setRate($tmpSetup['rate']);
+                $new_setups[] = $t_t->toJson(true);
+            }
+        } catch (\Throwable $ex){
+            $fin_resp['ERROR'] = $ex->getMessage();
+        }
+        $fin_resp['COUNT'] = count($setups);
         $fin_resp['setups'] = $new_setups;
         $fin_resp['SQL'] = $sql;
         $fin_resp['LIMIT'] = $limit;
+        $fin_resp['SEARCH_DATA'] = $data;
+        $fin_resp['METHOD'] = $method;
         $response = new JsonResponse($fin_resp);
+        if ($beautify) {
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        }
         return $response;
-
     }
 
     /**

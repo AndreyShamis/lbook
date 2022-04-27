@@ -926,6 +926,23 @@ class LogBookUploaderController extends AbstractController
                 $this->testMetaDataHandler($test_metadata, $test, $obj);
 
                 if ( strlen($fail_reason) > 2 && $test->getVerdict()->getName() !== 'PASS') {
+                    try {
+                        $t_fr_arr = explode(' details: ', $fail_reason);
+                        if ($t_fr_arr !== null && count($t_fr_arr) >= 2) {
+                            $fail_reason = $t_fr_arr[0];
+                        }
+                        $t_fr_arr = explode(' Traceback (', $fail_reason);
+                        if ($t_fr_arr !== null && count($t_fr_arr) >= 2) {
+                            $fail_reason = $t_fr_arr[0];
+                        }
+                        if(strpos($fail_reason, "can't open file") != false && strpos($fail_reason, "[Errno 2]")) {
+                            $t_fr_arr = explode(" can't open file ", $fail_reason);
+                            $t_fr_arr2 = explode(" [Errno 2] ", $fail_reason);
+                            $fail_reason = $t_fr_arr[0] . " can't open file" . ". [Errno 2] " . $t_fr_arr2[1];
+                        }
+                    } catch (\Throwable $ex) {
+                        $logger->alert('Failed to clean fail_reason :' . $ex->getMessage(), $ex->getTrace());
+                    }
                     $test->setFailDescription($fail_reason);
                 }
 

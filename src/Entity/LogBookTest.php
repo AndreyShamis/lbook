@@ -317,7 +317,7 @@ class LogBookTest
                 }
             
             }
-            $newValue = trim($newValue);
+            $newValue = trim($fail_reason);
             // Replace Long string strats with / by [PATH]
             $newValue = trim(preg_replace('~\/\S{60,}~', '[PATH]', $newValue));
             // Replace Long string ALL

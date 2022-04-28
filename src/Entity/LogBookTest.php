@@ -318,6 +318,11 @@ class LogBookTest
             
             }
             $newValue = trim($newValue);
+            // Replace Long string strats with / by [PATH]
+            $newValue = trim(preg_replace('~\/\S{60,}~', '[PATH]', $newValue));
+            // Replace Long string ALL
+            $newValue = trim(preg_replace('~\S{60,}~', '', $newValue));
+
         } catch (\Throwable $ex) {}
         $this->failDescription = trim(LogBookTest::validateFailDescription($newValue));
     }

@@ -1431,7 +1431,7 @@ class LogBookCycle
             'time_start' => $this->getTimeStart()->getTimestamp(),
             'time_end' => $this->getTimeEnd()->getTimestamp(),
             'period' => $this->getPeriod(),
-            'tests_time_sum' => $this->getTestsTimeSum(),
+            'run_time' => $this->getTestsTimeSum(),
             'uploader' => $this->getTargetUploader()? $this->getTargetUploader()->getName() : '',
             'controller' => $this->getController()? $this->getController()->getName() : '',
             'dut' => $this->getDut()? $this->getDut()->getName() : '',
@@ -1443,7 +1443,8 @@ class LogBookCycle
             'tests_na' => $this->getTestsNa(),
             'tests_unknown' => $this->getTestsUnknown(),
             'disabled' => $this->isDisabled(),
-            'suites_count' => $this->getSuiteExecution()->count()
+            'suites_count' => $this->getSuiteExecution()->count(),
+            'metadata' => $this->getMetaData()
         ];
     }
 

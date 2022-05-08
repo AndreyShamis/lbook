@@ -481,7 +481,7 @@ class LogBookCycleController extends AbstractController
         foreach($tests as $tmp_test) {
             /** @var LogBookCycle $t_t */
             $t_t = $tmp_test[0];
-            $cycles_res[] = $t_t->toJson();
+            $cycles_res[$t_t->getId()] = $t_t->toJson();
         }
         $fin_resp['count'] =  \count($new_tests);
         $fin_resp['cycles'] =  $cycles_res;
@@ -642,7 +642,8 @@ class LogBookCycleController extends AbstractController
                                     $cycle_ids[] = $cycle_id;
 
                                     if (!array_key_exists($cycle_id, $ret_cycle_arr)) {
-                                        $ret_cycle_arr[$cycle->getId()] = $this->buildExportCycleArray($cycle, $logger);
+                                        $ret_cycle_arr[$cycle->getId()] = $cycle->toJson();
+                                        // $ret_cycle_arr[$cycle->getId()] = $this->buildExportCycleArray($cycle, $logger);
                                         $tests = $cycle->getTests();
                                         try {
                                             foreach ($tests as $test) {

@@ -334,8 +334,12 @@ class LogBookCycleController extends AbstractController
      */
     public function search_json(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): JsonResponse
     {
-
-        $data = json_decode($request->getContent(), true);
+        $method = $request->getRealMethod();
+        if ($method === 'GET') {
+            $data = $request->query->all();
+        } else {
+            $data = json_decode($request->getContent(), true);
+        }
         $cycle_name = $data['cycle_name'];
         if (array_key_exists('fromDate', $data)) {
             $fromDate = $data['fromDate'];

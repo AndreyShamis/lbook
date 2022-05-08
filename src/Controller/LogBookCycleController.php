@@ -326,7 +326,7 @@ class LogBookCycleController extends AbstractController
     }
 
         /**
-     * @Route("/searchjson", name="cycle_search_json", methods={"GET|POST"})
+     * @Route("/searchjson", name="cycle_search_json", methods={"GET", "POST"})
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
      * @param SuiteExecutionRepository $suitesRepo

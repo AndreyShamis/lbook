@@ -200,6 +200,7 @@ class LogBookBotController extends AbstractController
         /** @var LogBookCycle $cycle */
         $now = new \DateTime('now');
         $counter = $skip = $skipped_due_report = 0;
+        $write_skipped = false;
         foreach ($list as $cycle) {
             $cycleReports = $cycle->getLogBookCycleReports();
             if ($cycleReports === null) {
@@ -245,11 +246,14 @@ class LogBookBotController extends AbstractController
                 }
             } else {
                 $skipped_due_report++;
-                $logger->notice('[BOT][findCyclesForDelete] Skip cycle for delete due report existence', [
-                    'ID' => $cycle->getId(),
-                    'NAME' => $cycle->getName(),
-                    'REPORTS_COUNT' => count($cycleReports),
-                ]);
+                if ($write_skipped === true) {
+                    $logger->notice('[BOT][findCyclesForDelete] Skip cycle for delete due report existence', [
+                        'ID' => $cycle->getId(),
+                        'NAME' => $cycle->getName(),
+                        'REPORTS_COUNT' => count($cycleReports),
+                    ]);
+                }
+
             }
 
         }

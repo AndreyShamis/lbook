@@ -25,6 +25,8 @@
             <th data-sortable="true" data-switchable="true">Suite</th>
             <th data-sortable="true" data-switchable="true">Cycle</th>
             <th data-sortable="true" data-visible="false" title="Test order in cycle">Order</th>
+            <th data-sortable="true" data-visible="true" title="Platform">Platform</th>
+            <th data-sortable="true" data-visible="true" title="Platform">Chip</th>
             <th data-sortable="true" data-switchable="true" data-visible="false">Setup Name</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true">Time start</th>
             <th data-sorter="dataTitleDateSorter" data-sortable="true">Time end</th>
@@ -38,12 +40,20 @@
         </thead>
         <tbody class="searchable">
         {% for test in iterator | slice(0, 10000) %}
+            {% set suite = '' %}
+            {% if test.suiteExecution %}
+                {% set suite = test.suiteExecution %}
+            {% endif %}
             <tr class="{% if test.isDisabled == 1 %}test-disabled{% endif %}">
                 <td>{{ test.id }}</td>
                 <td><a href="{{ path('test_show_first', { 'id': test.id  }) }}">{{ test.name }}</a></td>
                 <td>{% if test.suiteExecution is defined and test.suiteExecution.id is defined %}<a href="{{ path('suite_cycle_show', { 'id': test.suiteExecution.id }) }}">{{ test.suiteExecution.name }}</a>{% endif %}</td>
                 <td><a href="{{ path('cycle_show_first', { 'id': test.cycle.id }) }}">{{ test.cycle.name }}</a></td>
                 <td>{{ test.executionOrder }}</td>
+                {% if suite %}
+                <td><span class="label label-info label-white middle" style="color: {{ stringToColor(suite.platform| default('')) }} !important;">{{ suite.platform | default('') }}</span></td>
+                <td><span class="label label-info label-white middle" style="color: {{ stringToColor(suite.chip| default('')) }} !important;">{{ suite.chip | default('') }}</span></td>
+                {% endif %}
                 <td><a href="{{ path('setup_show_first', { 'id': test.cycle.setup.id }) }}">{{ test.cycle.setup.name }}</a></td>
                 <td>{% if test.timeStart %}<span data-title="{{ test.timeStart|date('ymdHis') }}">{{ test.timeStart|date('m.d H:i:s') }}</span>{% endif %}</td>
                 <td>{% if test.timeEnd %}<span data-title="{{ test.timeEnd|date('ymdHis') }}">{{ test.timeEnd|date('H:i:s') }}</span>{% endif %}</td>
@@ -56,7 +66,7 @@
 {#                    <a href="{{ path('test_edit', { 'id': test.id }) }}">edit</a>#}
 {#                    {% endif %}#}
 {#                </td>#}
-                <td>{% if test.suiteExecution.id is defined and test.suiteExecution.host is defined and test.suiteExecution.host.name is defined %}{{ test.suiteExecution.host.name }}{% endif %}</td>
+                <td>{% if suite.id is defined and suite.host is defined and suite.host.name is defined %} <a href="{{ path('host_show', {'id': suite.host.id}) }}" target="_blank">{{ suite.host.name }}</a>{{ suite.host.name }} {% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -1,5 +1,7 @@
 {
     "type": "project",
+    "name": "andreyshamis/lbook",
+    "description": "LogBook",
     "license": "proprietary",
     "require": {
         "php": "^7.2",
@@ -10,7 +12,7 @@
         "doctrine/annotations": "^1.0",
         "doctrine/common": "^2",
         "doctrine/doctrine-bundle": "^2",
-        "doctrine/doctrine-migrations-bundle": "2.1.2",
+        "doctrine/doctrine-migrations-bundle": "2.*",
         "doctrine/orm": "^2",
         "erusev/parsedown": "^1.7",
         "knplabs/knp-time-bundle": "^1.9",

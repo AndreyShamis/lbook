@@ -22,6 +22,7 @@ class LogBookHostController extends AbstractController
 
     /**
  * @Route("/", name="hosts_index")
+ * @Route("/page/{page}", name="hosts_index_page", methods={"GET"})
  * @param HostRepository $hosts
  * @param PagePaginator $pagePaginator
  * @param int $page

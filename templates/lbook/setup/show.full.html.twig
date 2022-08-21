@@ -1,13 +1,17 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}Setup [{{ setup.id }}:{{ setup.name }}] {% endblock %}
+{% block title %}Setup [{{ setup.id | default('') }}:{{ setup.name| default('')  }}] {% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-xs-9">
-            <h3 style="margin-top: 0 !important;">Setup [{{ setup.id }}] : {{ setup.name }}</h3>
+        {% if decoded_url is defined %}
+            <h3 style="margin-top: 0 !important;">Cycles with CI_URL={{decoded_url}}</h3>
+        {% else %}
+            <h3 style="margin-top: 0 !important;">Setup [{{ setup.id| default('')  }}] : {{ setup.name| default('')  }}</h3>
+        {% endif %}
         </div>
         <div class="col-xs-3">
             <span style="float: right;">
-                {% if app.user is not null and setup.subscribers.contains(app.user) %}
+                {% if app.user is not null and setup.id is defined and  setup.subscribers.contains(app.user)  %}
                                 <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
                     <i class="ace-icon fa fa-flag bigger-110 blue"></i>
                     Unsubscribe
@@ -18,7 +22,7 @@
                     Subscribe
                 </button>
                 {% endif %}
-                {% if app.user is not null and setup.favoritedByUsers.contains(app.user) %}
+                {% if app.user is not null and setup.id is defined and setup.favoritedByUsers.contains(app.user) %}
                     <button class="btn btn-white btn-info btn-bold" id="unfavorite">
                     <i class="ace-icon fa fa-bookmark bigger-110 blue"></i>
                     Unfavorite
@@ -35,16 +39,19 @@
     </div>
 
     {% apply spaceless %}
+    {% if setup.id is defined %}
     <table class="records_list table table-striped table-condensed">
         <tbody>
         <tr>
             <th>Short Name / OS</th>
             <td>
                 <i class="ace-icon fa fa-bookmark"></i>
-                {{ setup.nameShown }}
+                {{ setup.nameShown | default('') }}
                 /
-                <span class="label label-lg label-yellow">{{ setup.osStr }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="label label-lg label-yellow">{{ setup.osStr | default('')}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {% if setup.id is defined %}
                 <a href="{{ path('setup_indicator', { 'id': setup.id }) }}"><span class="label label-lg label-important">Indicators</span></a>
+                {% endif %}
             </td>
             <th>
                 <span style="float: right;">Created / Updated</span>
@@ -52,18 +59,20 @@
             <td>
                 <span style="float: right;">
                     <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ setup.createdAt|date('d/m/Y H:i:s') }}</span>
+                    <span class="blue">{% if setup.id is defined %}{{ setup.createdAt|date('d/m/Y H:i:s') }}{% endif %}</span>
                     /
                     <i class="ace-icon fa fa-calendar"></i>
-                    <span class="blue">{{ setup.updatedAt|date('d/m/Y H:i:s') }}</span>
+                    <span class="blue">{% if setup.id is defined %}{{ setup.updatedAt|date('d/m/Y H:i:s') }}{% endif %}</span>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <i class="ace-icon fa fa-info-circle" title="Show time diff when the setup was updated"></i>
-                    {%  if date(setup.updatedAt) > date('-20minutes') %}
-                        {% set updatedClass="red" %}
-                    {% else %}
-                        {% set updatedClass="blue" %}
+                    {% if setup.id is defined %}
+                        {%  if date(setup.updatedAt) > date('-20minutes') %}
+                            {% set updatedClass="red" %}
+                        {% else %}
+                            {% set updatedClass="blue" %}
+                        {% endif %}
                     {% endif %}
-                    <span class="{{ updatedClass }}">{{ setup.updatedAt|time_diff}}</span>
+                    <span class="{{ updatedClass }}">{% if setup.id is defined %}{{ setup.updatedAt|time_diff}}{% endif %}</span>
                 </span>
             </td>
         </tr>
@@ -72,7 +81,7 @@
             <td>
                 <span>
                     <i class="ace-icon fa fa-key" title="Owner"></i>
-                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner}}</span>
+                    <span class="label label-sm label-success label-white arrowed arrowed-right">{{ setup.owner | default('')}}</span>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <i class="ace-icon fa fa-users" title="Moderators"></i>
                     {% for moderator in setup.moderators %}
@@ -122,13 +131,17 @@
 {#        {% endfor %}#}
         </tbody>
     </table>
+    {% endif %}
+
     {% endapply %}
     {% set pagePath = "setup_show" %}
-    {% set objId = setup.id %}
+    {% set objId = setup.id | default(0) %}
     {% include "lbook/double.paginator.html.twig" %}
-    {%  set cycles = setup.cycles %}
+    {%  set cycles = setup.cycles | default('') %}
     <div>Count : {{ size }}</div>
+    {% if decoded_url is not defined %}
     {% include "lbook/search.html.twig" %}
+    {%endif%}
     <div id="toolbarSetupsList">
     </div>
     {% apply spaceless %}
@@ -249,6 +262,7 @@
     </table>
     {% endapply %}
     {% apply spaceless %}
+    {% if setup.id is defined %}
     <ul>
         <li>
             <a href="{{ path('setup_index') }}">Back to setup list</a>
@@ -268,6 +282,7 @@
         {#</li>#}
         {#{% endif %}#}
     </ul>
+    {% endif %}
     <script>
         function detailFormatter(index, row) {
             var html = [];
@@ -288,8 +303,7 @@
                 ace.settings.sidebar_collapsed(document.getElementById('sidebar'), true, true);
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
-
-
+        {% if setup.id is defined %}
             $( "#unsubscribe" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_unsubscribe', { 'id': setup.id }) }}";
             });
@@ -302,6 +316,7 @@
             $( "#favorite" ).bind( "click", function() {
                 window.location.href = "{{ path('add_remove_setup_to_favorite', { 'setup': setup.id }) }}";
             });
+            {% endif %}
         });
     </script>
     {% endapply %}

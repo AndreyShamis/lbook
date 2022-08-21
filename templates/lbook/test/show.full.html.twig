@@ -179,7 +179,7 @@
                                 <tr>
                                     <th>CI Url</th>
                                     <td><a target="_blank" href="{{ suite.ciUrl }}">{{ shortString(suite.ciUrl, 120) }}</a></td>
-                                    <th></th>
+                                    <th><a href="{{ path('show_all_cycles_by_suite_job_url', {'url': suite.ciUrl | default('') | url_encode } ) }}">Others</th>
                                     <td></td>
                                     <th>Suite ID</th>
                                     <td><span title="{{ suite.id }}">{{ suite.id}}</span></td>

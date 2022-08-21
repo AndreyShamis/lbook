@@ -723,6 +723,60 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
     }
 
     /**
+     * show_all_cycles_by_suite_job_url
+     *
+     * @Route("suite_url/{url}", name="show_all_cycles_by_suite_job_url", methods={"GET"})
+     * @param LoggerInterface $logger
+     * @param string $url
+     * @param PagePaginator $pagePaginator
+     * @param LogBookCycleRepository $cycleRepo
+     * @return Response
+     */
+    public function show_all_cycles_by_suite_job_url(LoggerInterface $logger, string $url, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null, SuiteExecutionRepository $suitesRepo): ?Response
+    {
+        $table_name = '';
+        $table_size = 0;
+        $decoded_url = urldecode($url);
+        try {
+            if ($url === null || $cycleRepo === null || $pagePaginator === null) {
+                throw new \RuntimeException('');
+            }
+            $qb = $cycleRepo->createQueryBuilder('t')
+            ->orderBy('t.timeEnd', 'DESC')
+            ->addOrderBy('t.updatedAt', 'DESC');
+
+            $qb->leftJoin('t.suiteExecution', 'suite')
+            ->orWhere($qb->expr()->like('suite.ciUrl', $qb->expr()->literal($decoded_url)));
+
+            $paginator = $pagePaginator->paginate($qb, 1, $this->show_cycle_size);
+            $totalPosts = $paginator->count();
+            $iterator = $paginator->getIterator();
+
+            $maxPages = ceil($totalPosts / $this->show_cycle_size);
+            $thisPage = 1;
+            $query = $qb->getQuery();
+            $sql = $query->getSQL();
+
+            return $this->render('lbook/setup/show.full.html.twig', [
+                'setup' => null,
+                'sql' => $sql,
+                'decoded_url' => $decoded_url,
+                'size' => $totalPosts,
+                'maxPages' => $maxPages,
+                'thisPage' => $thisPage,
+                'iterator' => $iterator,
+                'paginator' => $paginator,
+                'show_build' => false,
+                'show_user' => false,
+                'table_size' => $table_size,
+                'table_name' => $table_name
+            ]);
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($ex, null);
+        }
+    }
+
+    /**
      * @param Paginator $paginator
      * @return bool
      */

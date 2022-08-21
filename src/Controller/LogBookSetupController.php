@@ -746,7 +746,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             ->addOrderBy('t.updatedAt', 'DESC');
 
             $qb->leftJoin('t.suiteExecution', 'suite')
-            ->orWhere($qb->expr()->like('suite.ciUrl', $qb->expr()->literal($decoded_url)));
+            ->orWhere($qb->expr()->like('suite.ciUrl', $qb->expr()->literal('%' . $decoded_url)));
 
             $paginator = $pagePaginator->paginate($qb, 1, $this->show_cycle_size);
             $totalPosts = $paginator->count();

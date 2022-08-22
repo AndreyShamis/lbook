@@ -248,7 +248,7 @@ class LogBookUploaderController extends AbstractController
     }
     
     /**
-     * @Route("/cycle_token_keep_alive", name="upload_cycle_token_keep_alive", methods={"GET|POST"})
+     * @Route("/cycle_token_keep_alive", name="upload_cycle_token_keep_alive", methods={"GET", "POST"})
      * @param Request $request
      * @param LoggerInterface $logger
      * @param HostRepository $hosts

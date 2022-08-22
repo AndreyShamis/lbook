@@ -260,7 +260,7 @@ class LogBookUploaderController extends AbstractController
         $token = null;
         $setupName = $cycleName = null;
         $ip = $request->getClientIp();
-        $fin_res['DEBUG'] = array();
+        $fin_res['DEBUG'] = [];
         $data = json_decode($request->getContent(), true);
         if ($data === null) {
             $data = array();
@@ -271,20 +271,26 @@ class LogBookUploaderController extends AbstractController
         if (array_key_exists('setup_name', $data)) {
             $setupName = $data['setup_name'];
         }
-
+        $fin_res['DEBUG']['STARTED'] = 'yes';
+        $fin_res['DEBUG']['token'] = $token;
+        $fin_res['DEBUG']['setup'] = $setupName;
         try {
-
             try {
                 if ( $token !== null && $setupName !== null && $setupName !== '' ) {
                     $setup = $this->setupRepo->findByName($setupName);
                     $cycle = $this->cycleRepo->findByToken($token, $setup);
                     if ($cycle !== null) {
                         $cycle->setTokenExpiration(new \DateTime('+1 hours'));
+                        $fin_res['DEBUG']['CYCLE_ID'] = $cycle->getId();
+                        $fin_res['DEBUG']['SETUP_ID'] = $setup->getId();
+                        $fin_res['DEBUG']['SUCCESS'] = 'yes';
+                        $fin_res['DEBUG']['NEW_VALUE'] = $cycle->getTokenExpiration()->format('d/m/Y H:i:s');
                     }
-
                 }
-            }catch (\Throwable $ex) {
+            } catch (\Throwable $ex) {
                 $logger->critical('Failed to set cycleTokenKeepAlive:[' . $token . ']', $ex->getTrace());
+                $fin_res['DEBUG']['token'] = $token;
+                $fin_res['DEBUG']['ERROR'] = $ex->getMessage();
             }
 
         } catch (\Throwable $e) {

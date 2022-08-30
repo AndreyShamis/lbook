@@ -36,6 +36,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 
 /**
  * Cycle controller.
@@ -46,7 +47,10 @@ class LogBookCycleController extends AbstractController
 {
     protected $index_size = 3000;
     protected $show_tests_size = 5000;
-//
+    /** @var LogBookSetupRepository $setupRepo */
+    protected $setupRepo;
+    /** @var LogBookCycleRepository $cycleRepo */
+    protected $cycleRepo;
 //    /**
 //     *
 //     * @Route("/close_test/{cycle}", name="close_cycle_test", methods={"GET"})
@@ -67,6 +71,19 @@ class LogBookCycleController extends AbstractController
 //            'setup' => $setup
 //        ]);
 //    }
+    /**
+     * LogBookUploaderController constructor.
+     * @param Container $container
+     * @throws \LogicException
+     */
+    public function __construct(Container $container)
+    {
+
+        $this->container = $container;
+        $this->em = $this->getDoctrine()->getManager();
+        $this->cycleRepo = $this->em->getRepository('App:LogBookCycle');
+        $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
+    }
 
 
     /**

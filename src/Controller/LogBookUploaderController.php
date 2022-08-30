@@ -251,11 +251,9 @@ class LogBookUploaderController extends AbstractController
      * @Route("/cycle_token_keep_alive", name="upload_cycle_token_keep_alive", methods={"GET", "POST"})
      * @param Request $request
      * @param LoggerInterface $logger
-     * @param HostRepository $hosts
-     * @param TestFilterRepository $filtersRepo
      * @return JsonResponse
      */
-    public function cycleTokenKeepAlive(Request $request, LoggerInterface $logger, HostRepository $hosts, TestFilterRepository $filtersRepo): JsonResponse
+    public function cycleTokenKeepAlive(Request $request, LoggerInterface $logger): JsonResponse
     {
         $token = null;
         $setupName = $cycleName = null;

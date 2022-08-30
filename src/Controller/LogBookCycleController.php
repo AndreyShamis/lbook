@@ -68,6 +68,78 @@ class LogBookCycleController extends AbstractController
 //        ]);
 //    }
 
+
+    /**
+     * @Route("/api/token/keep_alive", name="cycle_token_keep_alive", methods={"GET", "POST"})
+     * @param Request $request
+     * @param LoggerInterface $logger
+     * @return JsonResponse
+     */
+    public function cycleTokenKeepAlive(Request $request, LoggerInterface $logger): JsonResponse
+    {
+        $token = null;
+        $setupName = $cycleName = null;
+        $ip = $request->getClientIp();
+        $fin_res['DEBUG'] = [];
+        $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            $data = array();
+        }
+        if (array_key_exists('token', $data)) {
+            $token = $data['token'];
+        }
+        if (array_key_exists('setup_name', $data)) {
+            $setupName = $data['setup_name'];
+        }
+        $fin_res['DEBUG']['STARTED'] = 'yes';
+        $fin_res['DEBUG']['token'] = $token;
+        $fin_res['DEBUG']['setup'] = $setupName;
+        try {
+            try {
+                if ( $token !== null && $setupName !== null && $setupName !== '' ) {
+                    $setup = $this->setupRepo->findByName($setupName);
+                    $cycle = $this->cycleRepo->findByToken($token, $setup);
+                    if ($cycle !== null) {
+                        $cycle->setTokenExpiration(new \DateTime('+1 hours'));
+                        $fin_res['DEBUG']['CYCLE_ID'] = $cycle->getId();
+                        $fin_res['DEBUG']['SETUP_ID'] = $setup->getId();
+                        $fin_res['DEBUG']['SUCCESS'] = 'yes';
+                        $fin_res['DEBUG']['NEW_VALUE'] = $cycle->getTokenExpiration()->format('d/m/Y H:i:s');
+                    }
+                }
+            } catch (\Throwable $ex) {
+                $logger->critical('Failed to set cycleTokenKeepAlive:[' . $token . ']', $ex->getTrace());
+                $fin_res['DEBUG']['token'] = $token;
+                $fin_res['DEBUG']['ERROR'] = $ex->getMessage();
+            }
+
+        } catch (\Throwable $e) {
+            $method = $request->getMethod();
+            $data['ip'] = $ip;
+            $data['method'] = $method;
+            $data['request'] = $request->request->all();
+            $data['query'] = $request->query->all();
+            $data['trace'] = $e->getTraceAsString();
+            $data['DEBUG'][] = $e->getMessage();
+            $logger->critical($method . '::' . $ip . '::ERROR :' . $e->getMessage(), $data);
+            $response =  new JsonResponse($data);
+            $response->setEncodingOptions(JSON_PRETTY_PRINT);
+            return $response;
+        }
+
+        try {
+
+            $this->em->flush();
+        } catch (\Throwable $ex) {
+            $fin_res['DEBUG'][] = $ex->getMessage();
+            $logger->critical($ex->getMessage());
+
+        }
+        $response =  new JsonResponse($fin_res);
+        $response->setEncodingOptions(JSON_PRETTY_PRINT);
+        return $response;
+    }
+
     /**
      *
      * @Route("/close/{cycle}", name="close_cycle", methods={"GET"})

@@ -177,9 +177,17 @@
                                     <td><span class="label label-danger label-white middle">{{ suite.platform }}</span></td>
                                 </tr>
                                 <tr>
-                                    <th>CI Url</th>
-                                    <td><a target="_blank" href="{{ suite.ciUrl }}">{{ shortString(suite.ciUrl, 120) }}</a></td>
-                                    <th><a href="{{ path('show_all_cycles_by_suite_job_url', {'url': suite.ciUrl | default('') | url_encode } ) }}">Others</th>
+                                    <th>{% if suite.ciUrl is defined and  suite.ciUrl| length > 3%}CI Url{% endif %}</th>
+                                    <td>
+                                    {% if suite.ciUrl is defined and  suite.ciUrl| length > 3%}
+                                    <a target="_blank" href="{{ suite.ciUrl }}">{{ shortString(suite.ciUrl, 120) }}</a>
+                                    {% endif %}
+                                    </td>
+                                    <th>
+                                    {% if suite.ciUrl is defined and  suite.ciUrl| length > 3%}
+                                    <a href="{{ path('show_all_cycles_by_suite_job_url', {'url': suite.ciUrl | default('') | url_encode } ) }}">Others</a>
+                                    {% endif %}
+                                    </th>
                                     <td></td>
                                     <th>Suite ID</th>
                                     <td><span title="{{ suite.id }}">{{ suite.id}}</span></td>

@@ -278,7 +278,7 @@ class LogBookUploaderController extends AbstractController
                     $setup = $this->setupRepo->findByName($setupName);
                     $cycle = $this->cycleRepo->findByToken($token, $setup);
                     if ($cycle !== null) {
-                        $cycle->setTokenExpiration(new \DateTime('+1 hours'));
+                        $cycle->setTokenExpiration(new \DateTime('+4 hours'));
                         $fin_res['DEBUG']['CYCLE_ID'] = $cycle->getId();
                         $fin_res['DEBUG']['SETUP_ID'] = $setup->getId();
                         $fin_res['DEBUG']['SUCCESS'] = 'yes';

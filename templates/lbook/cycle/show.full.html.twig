@@ -45,6 +45,18 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     <i class="ace-icon fa fa-briefcase bigger-120 blue"></i>
                     Indicator
                 </button>
+                {% set current_path = app.request.get('_route') %}
+                {% if  current_path != 'cycle_show_first_tests_only' %}
+                <button class="btn btn-white btn-info btn-bold" id="showOnlyTests">
+                    <i class="ace-icon fa fa-eye bigger-120 blue"></i>
+                    Tests Only
+                </button>
+                {%else %}
+                <button class="btn btn-white btn-info btn-bold" id="showAllFlows">
+                    <i class="ace-icon fa fa-eye bigger-120 blue"></i>
+                    All Flows
+                </button>
+                {% endif %}
                 <button class="btn btn-white btn-info btn-bold" id="saveCycleAsArchive">
                     <i class="ace-icon fa fa-floppy-o bigger-120 blue"></i>
                     Download{% if cycle.downloads > 0 %}({{ cycle.downloads }}){% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
@@ -699,6 +711,12 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
             {% endif %}
             $( "#showIndicators" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_indicator_with_main_cycle', { 'id': cycle.setup.id, 'mainCycle': cycle.id }) }}";
+            });
+            $( "#showOnlyTests" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_show_first_tests_only', {'id': cycle.id }) }}";
+            });
+            $( "#showAllFlows" ).bind( "click", function() {
+                window.location.href = "{{ path('cycle_show_first', {'id': cycle.id }) }}";
             });
             $( "#go_to_cycle" ).bind( "click", function() {
                 window.location.href = "{{ path('cycle_show_first', { 'id': cycle.id}) }}";

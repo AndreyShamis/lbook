@@ -85,7 +85,31 @@ class LogBookCycleController extends AbstractController
         $this->setupRepo = $this->em->getRepository('App:LogBookSetup');
     }
 
-
+        /**
+     * @Route("/tests/{id}", name="cycle_show_first_tests_only", methods={"GET"})
+     * @Route("/tests/{id}/{maxSize}", name="cycle_show_size_tests_only", methods={"GET"}, defaults={"maxSize"=""})
+     * @Route("/tests/{id}/{maxSize}/{page}", name="cycle_show_page_tests_only", methods={"GET"}, defaults={"page"=1, "maxSize"=5000})
+     * @param PagePaginator $pagePaginator
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookCycle $cycle
+     * @param int $maxSize
+     * @return Response
+     */
+    public function showFirstPageTestsOnly(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
+                                  LogBookTestRepository $testRepo, LogBookCycle $cycle = null, $page = null,
+                                  $maxSize = null): ?Response
+    {
+        if ($page === null) {
+            $page = 1;
+        }
+        if ($maxSize === null || $maxSize == "" || $maxSize == "1") {
+            $maxSize = $this->show_tests_size;
+        }
+        $page = (int)$page;
+        $maxSize = (int)$maxSize;
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize, true);
+    }
+    
     /**
      * @Route("/api/token/keep_alive", name="cycle_token_keep_alive", methods={"GET", "POST"})
      * @param Request $request
@@ -1289,7 +1313,7 @@ class LogBookCycleController extends AbstractController
      */
     public function show(TestFilterApplyRepository $app_filters, PagePaginator $pagePaginator,
                          LogBookTestRepository $testRepo, LogBookCycle $cycle = null, SuiteExecution $suite = null,
-                         $page = null, $forJson=false, $maxSize=null): ?Response
+                         $page = null, $forJson=false, $maxSize=null, $showOnlyTests=false): ?Response
     {
         $suiteMode = false;
         if ($page === null) {
@@ -1322,8 +1346,11 @@ class LogBookCycleController extends AbstractController
             }
 
             $em = $this->getDoctrine()->getManager();
+            $types = ['PRE_CYCLE', 'PRE_TEST_FLOW', 'POST_CYCLE', 'POST_TEST_FLOW', 'HEALTH_CHECK', 'RECOVERY'];
             /** @var Query $query */
-            $query = $em->createQuery("SELECT t FROM App\LogBookTest t");
+            $query = $em->createQuery("SELECT t FROM App\LogBookTest t");// WHERE t.testType NOT IN ('PRE_CYCLE', 'PRE_TEST_FLOW', 'POST_CYCLE', 'POST_TEST_FLOW', 'HEALTH_CHECK', 'RECOVERY')");
+            // ->where('t.testType IN (:types)')
+            // ->setParameter('types', $types);
             $query->setDQL($qb->getDQL());
             $query->setFetchMode(LogBookTest::class, "testInfo", ClassMetadataInfo::FETCH_EAGER);
             $query->setFetchMode(LogBookTest::class, "verdict", ClassMetadataInfo::FETCH_EAGER);
@@ -1367,7 +1394,6 @@ class LogBookCycleController extends AbstractController
                     $suites_pass_rate = round($pr_sum/$suite_count, 1);
                 }
             }
-
             $ret_tests = [];
             $errors_found = false;
             if ($totalPosts > 0) {
@@ -1375,12 +1401,17 @@ class LogBookCycleController extends AbstractController
                     /** @var LogBookTest $test */
                     $obj = $iterator->current();
                     $test = $obj;
+
 //                    $test = $obj[0];
 //                    $testName = $obj['name'];
 //                    $testPath = $obj['testPath'];
                     //$testFailDescription = $obj['testFailDesc'];
                     if ($test instanceof \App\Entity\LogBookTest) {
-
+                        if ($showOnlyTests === true && in_array($test->getTestType()->getName(), $types)) {
+                            $iterator->next();
+                            continue;
+                             
+                        }
 //                        if ($testName !== null) {
 //                            $test->setName($testName);
 //                        }

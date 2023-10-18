@@ -5,8 +5,8 @@
             <i class="ace-icon fa fa-flask"></i>
         </div>
         <div class="infobox-data" title="Also there is {{ cycle.testsDisabled }}({{ getPercentage (cycle.testsDisabled, allTestsCount, 2) }}%) disabled tests.">
-            <span class="infobox-data-number">{{ testsCount }}</span>
-            <div class="infobox-content">Total {{ allTestsCount}}
+            <span class="infobox-data-number">{{testsVerdiscts['COUNT']}}</span>
+            <div class="infobox-content">Total {{ allTestsCount}} 
                 <i class="ace-icon fa fa-exclamation-circle" title="All Tests count - Disabled tests also included"></i></div>
         </div>
     </div>
@@ -45,10 +45,11 @@
     {% endif %}
     {% endif %}
 
+    {# {% if cycle.testsPass > 0 %}
     <div class="infobox infobox-green">
         <div class="infobox-progress">
             <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ cycle.passRate }}" data-color="#82af6f">
-                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 1) }}%</span>
+                <span class="percent">{{ cycle.testsPass | getPercentage (testsCount, 1) }}% </span>
             </div>
         </div>
         <div class="infobox-data" title="Pass Rate - {{ cycle.passRate }}%">
@@ -58,8 +59,24 @@
             </div>
         </div>
     </div>
+    {% endif %} #}
+    {% if testsVerdiscts['PASS'] > 0 %}
+    <div class="infobox infobox-green">
+        <div class="infobox-progress">
+            <div class="easy-pie-chart percentage" id="passRate" data-size="50" data-percent="{{ getPercentage (testsVerdiscts['COUNT'], 1) }}" data-color="#82af6f">
+                <span class="percent">{{ testsVerdiscts['PASS'] | getPercentage (testsVerdiscts['COUNT'], 1) }}% </span>
+            </div>
+        </div>
+        <div class="infobox-data" title="Pass Rate - {{ getPercentage (testsVerdiscts['COUNT'], 1) }}%">
+            <span class="infobox-text" style="color: #82af6f">Pass</span>
+            <div class="infobox-content">
+                <span class="bigger-110">{{ testsVerdiscts['PASS'] }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-    {% if cycle.testsWarning > 0 %}
+    {# {% if cycle.testsWarning > 0 %}
         <div class="infobox infobox-black">
             <div class="infobox-progress">
                 <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycle.warningRate }}" data-color="#6FB3E0">
@@ -73,9 +90,24 @@
                 </div>
             </div>
         </div>
+    {% endif %} #}
+    {% if testsVerdiscts['WARNING'] > 0 %}
+    {% set cycleWarningRate = getPercentage (testsVerdiscts['COUNT'], 1) %}
+        <div class="infobox infobox-black">
+            <div class="infobox-progress">
+                <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycleWarningRate }}" data-color="#6FB3E0">
+                    <span class="percent">{{ testsVerdiscts['WARNING'] |  getPercentage (testsCount, 1) }}%</span>
+                </div>
+            </div>
+            <div class="infobox-data" title="Warning Rate - {{ cycleWarningRate }}%">
+                <span class="infobox-text" style="color: #6FB3E0">Warning</span>
+                <div class="infobox-content">
+                    <span class="bigger-110">{{ testsVerdiscts['WARNING'] }}</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
-
-    {% if cycle.testsFail > 0 %}
+    {# {% if cycle.testsFail > 0 %}
         <div class="infobox infobox-red">
             <div class="infobox-progress">
                 <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycle.failRate }}" data-color="#d15b47">
@@ -89,9 +121,26 @@
                 </div>
             </div>
         </div>
+    {% endif %} #}
+
+    {% if testsVerdiscts['FAIL'] > 0 %}
+    {% set cycleFailRate = getPercentage (testsVerdiscts['COUNT'], 1) %}
+        <div class="infobox infobox-red">
+            <div class="infobox-progress">
+                <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycleFailRate }}" data-color="#d15b47">
+                    <span class="percent">{{ testsVerdiscts['FAIL'] |  getPercentage (testsCount, 1) }}%</span>
+                </div>
+            </div>
+            <div class="infobox-data" title="Fail Rate - {{ cycleFailRate }}%">
+                <span class="infobox-text" style="color: #d15b47">Fail</span>
+                <div class="infobox-content">
+                    <span class="bigger-115">{{ testsVerdiscts['FAIL'] }}</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    {% if cycle.testsError > 0 %}
+    {# {% if cycle.testsError > 0 %}
         <div class="infobox infobox-orange">
             <div class="infobox-progress">
                 <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycle.errorRate }}" data-color="#f89406">
@@ -105,9 +154,25 @@
                 </div>
             </div>
         </div>
+    {% endif %} #}
+    {% if testsVerdiscts['ERROR'] > 0 %}
+    {% set cycleErrorRate = getPercentage (testsVerdiscts['COUNT'], 1) %}
+        <div class="infobox infobox-orange">
+            <div class="infobox-progress">
+                <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycleErrorRate}}" data-color="#f89406">
+                    <span class="percent">{{ testsVerdiscts['ERROR'] |   getPercentage (testsCount, 1) }}%</span>
+                </div>
+            </div>
+            <div class="infobox-data" title="Error Rate - {{ cycleErrorRate }}%">
+                <span class="infobox-text" style="color: #f89406">Error</span>
+                <div class="infobox-content">
+                    <span class="bigger-115">{{ testsVerdiscts['ERROR'] }}</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    {% if cycle.testsNa > 0 %}
+    {# {% if cycle.testsNa > 0 %}
         <div class="infobox infobox-blue">
             <div class="infobox-progress">
                 <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycle.naRate }}" data-color="#1da8f8">
@@ -121,9 +186,25 @@
                 </div>
             </div>
         </div>
+    {% endif %} #}
+    {% if testsVerdiscts['TEST_NA'] > 0 %}
+    {% set cycleTEST_NARate = getPercentage (testsVerdiscts['COUNT'], 1) %}
+        <div class="infobox infobox-blue">
+            <div class="infobox-progress">
+                <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycleTEST_NARate}}" data-color="#1da8f8">
+                    <span class="percent">{{ testsVerdiscts['TEST_NA'] |  getPercentage (testsCount, 1) }}%</span>
+                </div>
+            </div>
+            <div class="infobox-data" title="Not available Rate - {{ cycleTEST_NARate }}%">
+                <span class="infobox-text" style="color: #1da8f8">NA</span>
+                <div class="infobox-content">
+                    <span class="bigger-110">{{ testsVerdiscts['TEST_NA'] }}</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    {% if cycle.testsUnknown > 0 %}
+    {# {% if cycle.testsUnknown > 0 %}
         <div class="infobox infobox-grey">
             <div class="infobox-progress">
                 <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycle.unknownRate }}" data-color="#abbac3">
@@ -137,7 +218,24 @@
                 </div>
             </div>
         </div>
+    {% endif %} #}
+    {% if testsVerdiscts['UNKNOWN'] > 0 %}
+    {% set cycleUNKNOWNRate = getPercentage (testsVerdiscts['COUNT'], 1) %}
+        <div class="infobox infobox-grey">
+            <div class="infobox-progress">
+                <div class="easy-pie-chart percentage" data-size="45" data-percent="{{ cycleUNKNOWNRate }}" data-color="#abbac3">
+                    <span class="percent">{{ testsVerdiscts['UNKNOWN']  |  getPercentage (testsCount, 1) }}%</span>
+                </div>
+            </div>
+            <div class="infobox-data" title="Unknown Rate - {{ cycleUNKNOWNRate }}%">
+                <span class="infobox-text" style="color: #abbac3">Unknown</span>
+                <div class="infobox-content">
+                    <span class="bigger-110">{{ testsVerdiscts['UNKNOWN'] }}</span>
+                </div>
+            </div>
+        </div>
     {% endif %}
+
     <div class="infobox infobox-black" style="width: 160px !important;">
         <div class="infobox-data" title="Run Time">
             <span class="infobox-text">{{ cycle.testsTimeSum |  ExecutionTimeGeneric }}</span>

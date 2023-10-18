@@ -1396,6 +1396,15 @@ class LogBookCycleController extends AbstractController
             }
             $ret_tests = [];
             $errors_found = false;
+            $testsVerdiscts['COUNT'] = 0;
+            $testsVerdiscts['PASS'] = 0;
+            $testsVerdiscts['FAIL'] = 0;
+            $testsVerdiscts['ERROR'] = 0;
+
+            $testsVerdiscts['UNKNOWN'] = 0;
+            $testsVerdiscts['WARNING'] = 0;
+            $testsVerdiscts['TEST_NA'] = 0;
+            $testsVerdiscts['ABORT'] = 0;
             if ($totalPosts > 0) {
                 for ($x = 0; $x < $totalPosts; $x++) {
                     /** @var LogBookTest $test */
@@ -1411,6 +1420,28 @@ class LogBookCycleController extends AbstractController
                             $iterator->next();
                             continue;
                              
+                        } else {
+                            $testsVerdiscts['COUNT']++;
+                            $verdictName = $test->getVerdict()->getName();
+
+                            if (!isset($testsVerdiscts[$verdictName])) {
+                                $testsVerdiscts[$verdictName] = 0;
+                            }
+                            
+                            switch ($verdictName) {
+                                case 'PASS':
+                                case 'FAIL':
+                                case 'ERROR':
+                                case 'UNKNOWN':
+                                case 'WARNING':
+                                case 'TEST_NA':
+                                case 'ABORT':
+                                    $testsVerdiscts[$verdictName]++;
+                                    break;
+                                default:
+                                    // Handle unexpected cases here, if necessary
+                                    break;
+                            }
                         }
 //                        if ($testName !== null) {
 //                            $test->setName($testName);
@@ -1496,7 +1527,8 @@ class LogBookCycleController extends AbstractController
                 'suites_tests_aborted' => $suites_tests_aborted,
                 'suites_tests_total' => $suites_tests_total,
                 'suites_tests_wip' => $suites_tests_wip,
-                'applied_filters' => $filters
+                'applied_filters' => $filters,
+                'testsVerdiscts' => $testsVerdiscts,
 
 //                'errors'                => $errors,
             );

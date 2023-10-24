@@ -1294,7 +1294,7 @@ class LogBookCycleController extends AbstractController
         }
         $page = (int)$page;
         $maxSize = (int)$maxSize;
-        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize);
+        return $this->show($app_filters, $pagePaginator, $testRepo, $cycle, null, $page, false, $maxSize, false);
     }
 
     /**

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class LogBookHostController extends AbstractController
 {
-    protected $index_size = 500;
+    protected $index_size = 1000;
     protected $show_suites_size = 2000;
 
     /**

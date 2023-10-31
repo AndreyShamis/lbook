@@ -38,6 +38,7 @@
                     <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Node Uptiime" data-switchable="true" data-visible="false">Uptime</th>
                     <th data-sortable="true" title="Python Version usage" data-switchable="true"  data-visible="false">Python</th>
                     <th data-sorter="htmlSorter" data-field="Last Suite" data-sortable="true" title="Last Suitee">Last Suite</th>
+                    <th data-sorter="htmlSorter" data-field="Last Cycle" data-sortable="true" title="Last Cycle">Last Cycle</th>
                     <th data-sortable="true" title="Last Platform::Chip" data-switchable="true">Platform/Chp</th>
                     <th data-sorter="dataTitleIntSorter" data-sortable="true" title="Labels" data-switchable="true">Labels</th>
 {#                    <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="false">Tests</th>#}
@@ -84,6 +85,11 @@
                         <td>
                             {%  if host.lastSuite and host.lastSuite.id is defined %}
                                 <a href="{{ path('suite_cycle_show', { 'id': host.lastSuite.id }) }}">{{ host.lastSuite.id }}:{{ host.lastSuite }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {%  if host.lastSuite and host.lastSuite.id is defined and host.lastSuite.cycle and host.lastSuite.cycle.id is defined  %}
+                                <a href="{{ path('cycle_show_first', { 'id': host.lastSuite.cycle.id }) }}">{{ host.lastSuite.cycle.id }}:{{ host.lastSuite.cycle.name }}</a>
                             {% endif %}
                         </td>
                         <td>{{ host.targetLabel }}</td>

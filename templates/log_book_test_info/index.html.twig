@@ -1,22 +1,40 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}LogBook TestInfo index{% endblock %}
+
+{% block title %}LogBook TestInfo Index{% endblock %}
+
 {% block content %}
-    <h4> Tests </h4>
+    <h4>Tests</h4>
     <a href="{{ path('log_book_test_info_update') }}">Update</a>
-    {% include "lbook/paginator.html.twig" %}
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           id="testInfoTable" data-pagination="true" data-search="true" data-toggle="table"
-           data-toolbar="#eventsMcuTableToolBar"
-           data-show-refresh="true"
-           data-key-events="true"
-           data-show-footer="true"
-            {#data-show-toggle="true"#}
-           data-show-export="true"
-           data-show-columns="true"
-           data-advanced-search="true"
-           data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="testInfoShow"
-            {#data-id-table="advancedTable"#}
-           data-page-size="20" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+
+    {% block paginator %}
+        {% include "lbook/paginator.html.twig" %}
+    {% endblock %}
+
+    {% set table_data_attributes = {
+        'classes': 'table table-no-bordered',
+        'pagination': 'true',
+        'search': 'true',
+        'toggle': 'table',
+        'toolbar': '#eventsMcuTableToolBar',
+        'show-refresh': 'true',
+        'key-events': 'true',
+        'show-footer': 'true',
+        'show-export': 'true',
+        'show-columns': 'true',
+        'advanced-search': 'true',
+        'cookie': 'true',
+        'cookie-cookies-enabled': "['bs.table.columns']",
+        'cookie-id-table': 'testInfoShow',
+        'page-size': '20',
+        'page-list': "[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]",
+        'sort-order': 'desc'
+    } %}
+
+    <table class="records_list table table-striped table-condensed table-hover"
+           id="testInfoTable"
+           {% for attr, value in table_data_attributes %}
+               data-{{ attr }}="{{ value }}"
+           {% endfor %}>
         <thead>
             <tr>
                 <th data-sortable="true" data-switchable="false">ID</th>
@@ -30,17 +48,24 @@
         <tbody>
         {% for log_book_test_info in log_book_test_infos %}
             <tr>
-                <td><a href="{{ path('log_book_test_info_show', {'id': log_book_test_info.id}) }}">{{ log_book_test_info.id }}</a></td>
+                <td>
+                    <a href="{{ path('log_book_test_info_show', {'id': log_book_test_info.id}) }}">
+                        {{ log_book_test_info.id }}
+                    </a>
+                </td>
                 <td>{{ log_book_test_info.name }}</td>
                 <td>{{ log_book_test_info.testCount }}</td>
                 <td>{{ log_book_test_info.path }}</td>
-                <td>{{ log_book_test_info.lastMarkedAsSeenAt ? log_book_test_info.lastMarkedAsSeenAt | date('Y-m-d H:i:s') : ''}}</td>
+                <td>{{ log_book_test_info.lastMarkedAsSeenAt ? log_book_test_info.lastMarkedAsSeenAt | date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ log_book_test_info.createdAt ? log_book_test_info.createdAt | date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         {% else %}
-            <tr><td colspan="4">no records found</td></tr>
+            <tr>
+                <td colspan="6">No records found</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
-{#    <a href="{{ path('log_book_test_info_new') }}">Create new</a>#}
 {% endblock %}
+
+{#    <a href="{{ path('log_book_test_info_new') }}">Create new</a>#}

@@ -1,75 +1,210 @@
 {% extends 'lbook/default/index.html.twig' %}
+
 {% block title %}LogBook TestInfo{% endblock %}
+
 {% block content %}
-    <h5>LogBookTestInfo</h5>
+<div id="testsPivotTableOutput"></div>
+
+
+    <input type="button" id="btnSuiteVerdict" value="(Suite, Verdict)" />
+    <input type="button" id="btnHostsVerdict" value="(Host, Verdict)" />
+    <h5>LogBook TestInfo</h5>
 
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ log_book_test_info.id }}</td>
-            </tr>
-            <tr>
                 <th>Name</th>
-                <td>{{ log_book_test_info.name }}</td>
+                <td><strong>{{ log_book_test_info.name }}</strong></td>
+                <th></th>
+                <td></td>
             </tr>
             <tr>
                 <th>Path</th>
                 <td>{{ log_book_test_info.path }}</td>
+                <th>Count</th>
+                <td>{{ log_book_test_info.logBookTests | length }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('log_book_test_info_index') }}">back to list</a>
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           id="testsTable" data-pagination="true" data-search="true" data-toggle="table"
-           data-toolbar="#testsTableToolbar"
-           data-show-refresh="true"
-           data-key-events="true"
-            {#data-show-toggle="true"#}
-           data-show-export="true"
-           data-show-columns="true"
-           data-advanced-search="true"
-           data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="testInfoTestList"
-           data-page-size="20" data-page-list="[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000]" data-sort-order="desc">
-    <thead>
-    <tr>
-        <th data-sortable="true">ID</th>
-        <th data-sortable="true">Suite</th>
-        <th data-sortable="true">Cycle</th>
-        <th data-sortable="true">Branch</th>
-        <th data-sortable="true">Setup</th>
-        <th data-sortable="true">Host</th>
-        <th data-sortable="true" data-visible="false">Order</th>
-        <th data-sortable="true">Runtime</th>
-        <th data-sortable="true">Start</th>
-        <th data-sortable="true" data-visible="false">End</th>
-        <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
-        <th data-sortable="true">Verdict</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for log_book_test in log_book_test_info.logBookTests | slice(0, 5000) %}
-        <tr>
-            <td><a title="{{ log_book_test.testType | default('TEST') }} - {{ log_book_test.testInfo.path | default('') }}" href="{{ path('test_show_first', {'id': log_book_test.id}) }}">{{ log_book_test.id }}</a></td>
-            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.name : '' }}</td>
-            <td><a href="{{ path('cycle_show_first', { 'id': log_book_test.cycle.id }) }}">{{ log_book_test.cycle.name }}</a></td>
-            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.branchName : '' }}</td>
-            <td>{{ log_book_test.setup.name }}</td>
-            <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.host.name : '' }}</td>
-            <td>{{ log_book_test.executionOrder }}</td>
-            <td><span data-title="{{ log_book_test.timeRun }}">{{ log_book_test.timeRun | ExecutionTimeGeneric}}</span></td>
-            <td>{% if log_book_test.timeStart %}<span data-title="{{ log_book_test.timeStart|date('ymdHis') }}">{{ log_book_test.timeStart|date('m-d H:i:s') }}</span>{% endif %}</td>
-            <td>{% if log_book_test.timeEnd %}<span data-title="{{ log_book_test.timeEnd|date('ymdHis') }}">{{ log_book_test.timeEnd|date('H:i:s') }}</span>{% endif %}</td>
-            <td><span data-title="{{ log_book_test.timeRun }}"></span>{{ getPercentage(log_book_test.timeRun, log_book_test.cycle.testsTimeSum) }}%</td>
-            <td><span class="badge {{ verdictToBadge(log_book_test.verdict)}}">{{ log_book_test.verdict }}</span></td>
-        </tr>
-    {% else %}
-        <tr><td colspan="4">no records found</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <a href="{{ path('log_book_test_info_index') }}">Back to list</a>
+
+    {% set table_data_attributes = {
+        'classes': 'table table-no-bordered',
+        'pagination': 'true',
+        'search': 'true',
+        'toggle': 'table',
+        'toolbar': '#testsTableToolbar',
+        'show-refresh': 'true',
+        'key-events': 'true',
+        'show-export': 'true',
+        'show-columns': 'true',
+        'advanced-search': 'true',
+        'cookie': 'true',
+        'cookie-cookies-enabled': "['bs.table.columns']",
+        'cookie-id-table': 'testInfoTestList',
+        'page-size': '20',
+        'page-list': "[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000]",
+        'sort-order': 'desc'
+    } %}
+    {% apply spaceless %}
+    <table class="records_list table table-striped table-condensed table-hover"
+           id="testsTable"
+           {% for attr, value in table_data_attributes %}
+               data-{{ attr }}="{{ value }}"
+           {% endfor %}>
+        <thead>
+            <tr>
+                <th data-sortable="true">ID</th>
+                <th data-sortable="true">Suite</th>
+                <th data-sortable="true">Cycle</th>
+                <th data-sortable="true">Branch</th>
+                <th data-sortable="true">Setup</th>
+                <th data-sortable="true">Host</th>
+                <th data-sortable="true" data-visible="false">Order</th>
+                <th data-sortable="true">Runtime</th>
+                <th data-sortable="true">Start</th>
+                <th data-sortable="true" data-visible="false">End</th>
+                <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
+                <th data-sortable="true">Verdict</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log_book_test in log_book_test_info.logBookTests | slice(0, 10000) %}
+                <tr>
+                    <td>
+                        <a title="{{ log_book_test.testType | default('TEST') }} - {{ log_book_test.testInfo.path | default('') }}" 
+                           href="{{ path('test_show_first', {'id': log_book_test.id}) }}">
+                            {{ log_book_test.id }}
+                        </a>
+                    </td>
+                    <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.name : '' }}</td>
+                    <td>
+                        <a href="{{ path('cycle_show_first', { 'id': log_book_test.cycle.id }) }}">
+                            {{ shortString(log_book_test.cycle.name, 80)}}
+                        </a>
+                    </td>
+                    <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.branchName : '' }}</td>
+                    <td>{{ log_book_test.setup.name }}</td>
+                    <td>{{ log_book_test.suiteExecution ? log_book_test.suiteExecution.host.name : '' }}</td>
+                    <td>{{ log_book_test.executionOrder }}</td>
+                    <td>
+                        <span data-title="{{ log_book_test.timeRun }}">
+                            {{ log_book_test.timeRun | ExecutionTimeGeneric }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log_book_test.timeStart %}
+                            <span data-title="{{ log_book_test.timeStart | date('ymdHis') }}">
+                                {{ log_book_test.timeStart | date('m-d H:i:s') }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log_book_test.timeEnd %}
+                            <span data-title="{{ log_book_test.timeEnd | date('ymdHis') }}">
+                                {{ log_book_test.timeEnd | date('H:i:s') }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span data-title="{{ log_book_test.timeRun }}"></span>
+                        {{ getPercentage(log_book_test.timeRun, log_book_test.cycle.testsTimeSum) }}%
+                    </td>
+                    <td>
+                        <span class="badge {{ verdictToBadge(log_book_test.verdict) }}">
+                            {{ log_book_test.verdict }}
+                        </span>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="12">No records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endapply %}
+        <script type="text/javascript">
+        $(function(){
+            function buildPivotTable() {
+                $(function(){
+                    // var tpl = $.pivotUtilities.aggregatorTemplates;
+                    $("#testsPivotTableOutput").pivotUI($("#testsTable"),
+                        {
+                            renderers: $.extend(
+                                $.pivotUtilities.renderers,
+                                // $.pivotUtilities.c3_renderers,
+                                // $.pivotUtilities.d3_renderers,
+                                $.pivotUtilities.plotly_renderers,
+                                $.pivotUtilities.export_renderers,
+                                $.pivotUtilities.gchart_renderers,
+                                // $.pivotUtilities.derivers
+                            ),
+
+                            cols: ["Verdict"],
+                            rows: ["Suite"],
+                            vals: ["PassRate"],
+                            aggregatorName: ["Count"],
+                            // aggregators: {
+                            //     "PassRate": function() { return tpl.average()(["PassRate"])}
+                            // },
+                        });
+                });
+                //window.scrollTo(0,document.body.scrollHeight);
+                //window.scrollTo(0, 0);
+                document.getElementById("testsPivotTableOutput").scrollIntoView();
+            }
+                        
+            function buildPivotTableHosts() {
+                $(function(){
+                    $("#testsPivotTableOutput").pivotUI($("#testsTable"),{
+                            renderers: $.extend(
+                                $.pivotUtilities.renderers, $.pivotUtilities.plotly_renderers, $.pivotUtilities.export_renderers, $.pivotUtilities.gchart_renderers,
+                            ),
+                            cols: ["Verdict"],
+                            rows: ["Host"],
+                            vals: ["PassRate"],
+                            aggregatorName: ["Count"],
+                        });
+                });
+                document.getElementById("testsPivotTableOutput").scrollIntoView();
+            }
+            $( "#btnSuiteVerdict" ).bind( "click", buildPivotTable);
+            $( "#btnHostsVerdict" ).bind( "click", buildPivotTableHosts);
+            $( "#btnCurrentSuitesToPivotDown" ).bind( "click", buildPivotTable);
+            // var testTable = $('#suiteTable');
+            // testTable.bootstrapTable({
+            //     classes: "table-no-bordered",
+            //     pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
+            // });
+            // This example loads data from the HTML table below.
+
+
+            // var derivers = $.pivotUtilities.derivers;
+
+            // $.getJSON("mps.json", function(mps) {
+            //     $("#output").pivotUI(mps, {
+            //         derivedAttributes: {
+            //             "Age Bin": derivers.bin("Age", 10),
+            //             "Gender Imbalance": function(mp) {
+            //                 return mp["Gender"] == "Male" ? 1 : -1;
+            //             }
+            //         },
+            //         rows: ["Province"],
+            //         cols: ["Party"],
+            //         aggregatorName: "Integer Sum",
+            //         vals: ["Age"],
+            //         rendererName: "Heatmap"
+            //     });
+            // });
+        });
+
+</script>
+{% endblock %}
+
+
+
 {#    <a href="{{ path('log_book_test_info_edit', {'id': log_book_test_info.id}) }}">edit</a>#}
 
 {#    {{ include('log_book_test_info/_delete_form.html.twig') }}#}
-{% endblock %}

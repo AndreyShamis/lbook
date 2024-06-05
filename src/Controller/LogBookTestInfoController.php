@@ -67,10 +67,27 @@ class LogBookTestInfoController extends AbstractController
      */
     public function show(LogBookTestInfo $logBookTestInfo): Response
     {
-
+        $uniqueKeys = $this->getUniqueKeys($logBookTestInfo->getLogBookTests());
         return $this->render('log_book_test_info/show.html.twig', [
             'log_book_test_info' => $logBookTestInfo,
+            'uniqueKeys' => array_keys($uniqueKeys),
         ]);
+    }
+
+    private function getUniqueKeys($tests): array
+    {
+        $uniqueKeys = [];
+
+        foreach ($tests as $test) {
+            $metaData = $test->getNewMetaData();
+            if ($metaData) {
+                foreach ($metaData->getValue() as $key => $value) {
+                    $uniqueKeys[$key] = true;
+                }
+            }
+        }
+
+        return $uniqueKeys;
     }
 
 //    /**

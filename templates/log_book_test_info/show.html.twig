@@ -67,6 +67,9 @@
                 <th data-sortable="true" data-visible="false">End</th>
                 <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
                 <th data-sortable="true">Verdict</th>
+                {% for key in uniqueKeys %}
+                    <th data-sortable="true">{{ key }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
@@ -116,6 +119,11 @@
                             {{ log_book_test.verdict }}
                         </span>
                     </td>
+                    {% for key in uniqueKeys %}
+                        {% set metaData = log_book_test.newMetaData %}
+                        {% set value = metaData ? metaData.value[key] ?? '-' : '-' %}
+                        <td title="{{key}}">{{ value }}</td>
+                    {% endfor %}
                 </tr>
             {% else %}
                 <tr>

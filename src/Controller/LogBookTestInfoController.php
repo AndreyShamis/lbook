@@ -29,8 +29,9 @@ class LogBookTestInfoController extends AbstractController
         $size = 100000;
         $paginator = $pagePaginator->paginate(
             $logBookTestInfoRepository->createQueryBuilder('tt')
-            ->where('tt.path is NOT NULL')
+            // ->where('tt.path is NOT NULL')
             ->orderBy('tt.lastMarkedAsSeenAt', 'DESC')
+            ->orderBy('tt.path', 'ASC')
             , $page, $size);
         $totalPosts = $paginator->count();
         return $this->render('log_book_test_info/index.html.twig', [
@@ -64,14 +65,77 @@ class LogBookTestInfoController extends AbstractController
      * @Route("/{id}", name="log_book_test_info_show", methods={"GET"})
      * @param LogBookTestInfo $logBookTestInfo
      * @return Response
+     * @throws \Throwable
      */
     public function show(LogBookTestInfo $logBookTestInfo): Response
     {
+        // $textFilename = 'text_file.txt';
+        // $fileContent = $this->readFileContent($textFilename);
+        $fileContent = "2024/06/04 13:40:06 INFO | Badakti URL https://badakti.mobileye.com/workflow/graph/QxVvyxtIF25/nodes/rwzdAVlbsKk/Execution\n2024/06/04 13:52:06 INFO | Badakti URL (Alpha) https://badakti-sandbox.mobileye.com/node/rwzdAVlbsKk/graph/QxVvyxtIF25\n";
+        $urls = $this->parseURLs($fileContent);
+        $filenames = [sys_get_temp_dir() . '/content1.html', sys_get_temp_dir() . '/content2.html'];
+        print_r('URLS FOUND ' . count($urls));
+        $htmlContents = [];
+        foreach ($urls as $index => $url) {
+            // Получаем начальный HTML-контент страницы
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $initialHtml = curl_exec($ch);
+            curl_close($ch);
+    
+            // Находим AJAX-запрос в HTML-коде
+            preg_match('/\/\/.*\/intervention\.js/', $initialHtml, $matches);
+            if (!empty($matches)) {
+                $ajaxUrl = substr($matches[0], 2); // Удаляем начальные "//"
+    
+                // Выполняем AJAX-запрос и получаем обновленный HTML-контент
+                $ch = curl_init($ajaxUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $ajaxContent = curl_exec($ch);
+                curl_close($ch);
+    
+                $htmlContents[] = $initialHtml . $ajaxContent;
+                printf("HERE<br/>");
+            } else {
+                $htmlContents[] = $initialHtml;
+                printf("HERE2 <br/>");
+            }
+        }
+    
+
+        $stderrContents = array_map([$this, 'getStderrContent'], $htmlContents);
+
+        foreach ($stderrContents as $index => $stderrContent) {
+            if ($stderrContent !== null) {
+                echo "Содержимое stderr для файла {$filenames[$index]}:\n";
+                echo $stderrContent . "\n\n";
+            }
+        }
+    
+        print(count($stderrContents));
+        print_r($urls);
+        print_r($htmlContents);
         $uniqueKeys = $this->getUniqueKeys($logBookTestInfo->getLogBookTests());
         return $this->render('log_book_test_info/show.html.twig', [
             'log_book_test_info' => $logBookTestInfo,
             'uniqueKeys' => array_keys($uniqueKeys),
         ]);
+        // $htmlContents = $this->downloadContent($urls, $filenames);
+        
+        // $stderrContents = array_map([$this, 'getStderrContent'], $htmlContents);
+
+        // foreach ($stderrContents as $index => $stderrContent) {
+        //     if ($stderrContent !== null) {
+        //         print("Содержимое stderr для файла {$filenames[$index]}:\n");
+        //         echo $stderrContent . "\n\n";
+        //     }
+        // }
+
+        // $uniqueKeys = $this->getUniqueKeys($logBookTestInfo->getLogBookTests());
+        // return $this->render('log_book_test_info/show.html.twig', [
+        //     'log_book_test_info' => $logBookTestInfo,
+        //     'uniqueKeys' => array_keys($uniqueKeys),
+        // ]);
     }
 
     private function getUniqueKeys($tests): array
@@ -89,6 +153,53 @@ class LogBookTestInfoController extends AbstractController
 
         return $uniqueKeys;
     }
+
+    // Function to read file content
+    function readFileContent($filename) {
+        return file_get_contents($filename);
+    }
+
+    function parseUrls($text) {
+        // Регулярное выражение для поиска URL
+        $urlPattern = '/https:\/\/badakti(?:-sandbox)?\.[^\s]+/';
+    
+        // Найти все URL в тексте
+        preg_match_all($urlPattern, $text, $matches);
+    
+        // Вернуть массив найденных URL
+        return $matches[0];
+    }
+    function downloadContent($urls, $filenames) {
+        $contents = [];
+    
+        for ($i = 0; $i < count($urls); $i++) {
+            $url = $urls[$i];
+            $filename = $filenames[$i];
+    
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $content = curl_exec($ch);
+            curl_close($ch);
+    
+            file_put_contents($filename, $content);
+            $contents[] = $content;
+        }
+    
+        return $contents;
+    }
+    
+    function getStderrContent($htmlContent) {
+        $pattern = '/<div\s+(?:class="w3-container w3-left-align w3-small w3-margin-top w3-margin-bottom w3-monospace file-content"|style="min-height: 42vh; max-height: 42vh; overflow: initial; width: auto; max-width: initial; position: relative;")\s*>(.*?)<\/div>/s';
+        preg_match($pattern, $htmlContent, $matches);
+    
+        if (isset($matches[1])) {
+            $stderrContent = trim(strip_tags($matches[1]));
+            return json_encode(['stderr' => $stderrContent]);
+        }
+    
+        return null;
+    }
+    
 
 //    /**
 //     * @Route("/{id}/edit", name="log_book_test_info_edit", methods={"GET","POST"})

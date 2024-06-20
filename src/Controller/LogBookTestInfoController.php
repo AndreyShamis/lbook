@@ -21,22 +21,29 @@ class LogBookTestInfoController extends AbstractController
      * @Route("/page/{page}", name="log_book_test_info_index_page", methods={"GET"})
      * @param PagePaginator $pagePaginator
      * @param LogBookTestInfoRepository $logBookTestInfoRepository
+     * @param Request $request
      * @param int $page
      * @return Response
      */
-    public function index(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository, int $page = 1): Response
+    public function index(PagePaginator $pagePaginator, LogBookTestInfoRepository $logBookTestInfoRepository, Request $request, int $page = 1): Response
     {
-        $size = 100000;
-        $paginator = $pagePaginator->paginate(
-            $logBookTestInfoRepository->createQueryBuilder('tt')
-            ->where('tt.path is NOT NULL')
-            ->orderBy('tt.lastMarkedAsSeenAt', 'DESC')
-            , $page, $size);
+        $filter = $request->query->get('filter', 'with_path');
+        $size = 30000;
+        $queryBuilder = $logBookTestInfoRepository->createQueryBuilder('tt')
+        ->orderBy('tt.lastMarkedAsSeenAt', 'DESC');
+        if ($filter === 'path_null') {
+            $queryBuilder->where('tt.path IS NULL');
+        } else {
+            $queryBuilder->where('tt.path IS NOT NULL');
+        }
+        $queryBuilder->andHaving('tt.testCount > 0');
+        $paginator = $pagePaginator->paginate($queryBuilder, $page, $size);
         $totalPosts = $paginator->count();
         return $this->render('log_book_test_info/index.html.twig', [
             'log_book_test_infos' => $paginator,
             'thisPage' => $page,
             'maxPages' => ceil($totalPosts / $size),
+            'filter' => $filter,
         ]);
     }
 

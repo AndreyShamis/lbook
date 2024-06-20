@@ -4,8 +4,12 @@
 
 {% block content %}
     <h4>Tests</h4>
-    <a href="{{ path('log_book_test_info_update') }}">Update</a>
-
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{{ path('log_book_test_info_index', {'filter': 'with_path'}) }}" class="btn btn-secondary">TestMe</a>
+        <a href="{{ path('log_book_test_info_index', {'filter': 'path_null'}) }}" class="btn btn-secondary">SYS_VAL</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{{ path('log_book_test_info_update') }}" class="btn btn-primary">Update</a>
+    </div>
     {% block paginator %}
         {% include "lbook/paginator.html.twig" %}
     {% endblock %}

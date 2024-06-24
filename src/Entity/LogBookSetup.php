@@ -170,7 +170,7 @@ class LogBookSetup
         $this->setCreatedAt();
         $this->moderators = new ArrayCollection();
         $this->cycles = new ArrayCollection();
-        $this->setRetentionPolicy(30);
+        $this->setRetentionPolicy(60);
         $this->favoritedByUsers = new ArrayCollection();
         $this->cyclesCount = 0;
         $this->subscribers = new ArrayCollection();

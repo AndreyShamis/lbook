@@ -192,7 +192,7 @@ class LogBookBotController extends AbstractController
      */
     public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events, LoggerInterface $logger): Response
     {
-        $list = $cycleRepo->findByDeleteAt(500);
+        $list = $cycleRepo->findByDeleteAt(1500);
         $logger->notice('[BOT][findCyclesForDelete]  START', [
             'COUNT' => count($list)
         ]);

@@ -162,13 +162,16 @@ class SuiteExecutionSearchType extends AbstractType
 //        $builder->get('verdict')->addModelTransformer($nulTransformer);
         $builder->get('setup')->addModelTransformer($nulTransformer);
 
-        $prob = rand(1, 100);
-        if ($prob == 69 || $prob == 16) {
+        $prob = rand(1, 50);
+        if ($prob == 2 || $prob == 10) {
             $chips = $this->entityManager->getRepository(SuiteExecution::class)->getUniqChips();
             /** @var StorageStringRepository $storage */
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($chips as $chip) {
                 try {
+                    if ($chip === null || $chip === ''){
+                        continue;
+                    }
                     $storage->findOneOrCreate(
                         [
                             'vname' => $chip,
@@ -187,6 +190,9 @@ class SuiteExecutionSearchType extends AbstractType
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($platforms as $platform) {
                 try {
+                    if ($platform === null || $platform === ''){
+                        continue;
+                    }
                     $storage->findOneOrCreate(
                         [
                             'vname' => $platform,
@@ -208,6 +214,9 @@ class SuiteExecutionSearchType extends AbstractType
                 if (count($tmp_arr) > 1) {
                     foreach ($tmp_arr as $tmp_component) {
                         try {
+                            if ($tmp_component === null || $tmp_component === ''){
+                                continue;
+                            }
                             $storage->findOneOrCreate(
                                 [
                                     'vname' => $tmp_component,
@@ -222,6 +231,9 @@ class SuiteExecutionSearchType extends AbstractType
                     }
                 } else {
                     try {
+                        if ($component === null || $component === ''){
+                            continue;
+                        }
                         $storage->findOneOrCreate(
                             [
                                 'vname' => $component,
@@ -242,6 +254,9 @@ class SuiteExecutionSearchType extends AbstractType
             $storage = $this->entityManager->getRepository(StorageString::class);
             foreach ($jobNames as $jobName) {
                 try {
+                    if ($jobName === null || $jobName === ''){
+                        continue;
+                    }
                     $storage->findOneOrCreate(
                         [
                             'vname' => $jobName,

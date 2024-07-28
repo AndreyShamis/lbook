@@ -19,17 +19,17 @@ class PagePaginator
      *
      * Pass through a query object, current page & limit
      * the offset is calculated from the page and limit
-     * returns an `Paginator` instance, which you can call the following on:
+     * returns a `Paginator` instance, which you can call the following on:
      *
      *     $paginator->getIterator()->count() # Total fetched (ie: `5` posts)
      *     $paginator->count() # Count of ALL posts (ie: `20` posts)
      *     $paginator->getIterator() # ArrayIterator
      *
-     * @param Query|QueryBuilder $dql  A Doctrine ORM query or query builder.
-     * @param integer            $page  Current page (defaults to 1)
-     * @param integer            $limit The total number per page (defaults to 5)
+     * @param Query|QueryBuilder $dql   A Doctrine ORM query or query builder.
+     * @param int                $page  Current page (defaults to 1)
+     * @param int                $limit The total number per page (defaults to 20)
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     public function paginate($dql, $page = 1, $limit = 20): Paginator
     {

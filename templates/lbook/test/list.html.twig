@@ -1,12 +1,4 @@
 
-{% extends 'lbook/default/index.html.twig' %}
-
-{% block content %}
-    <h1>Tests list</h1>
-    <div>Count : {{ size }}</div>
-    {% include "lbook/search.html.twig" %}
-    {% set pagePath = "test_index" %}
-    {% include "lbook/paginator.html.twig" %}
     {% apply spaceless %}
     <div id="testsList"></div>
     <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered" id="testsListTable"
@@ -60,12 +52,3 @@
         </tbody>
     </table>
     {% endapply %}
-    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
-        <div>Super admin option</div>
-        <ul>
-            <li>
-                <a href="{{ path('test_new') }}">Create a new test</a>
-            </li>
-        </ul>
-    {% endif %}
-{% endblock %}

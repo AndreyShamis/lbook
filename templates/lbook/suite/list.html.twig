@@ -2,187 +2,131 @@
 
 {% apply spaceless %}
     <input type="button" id="btnCurrentSuitesToPivot" value="Build Pivot from current table" />
-    <table class="records_list table table-striped table-condensed table-hover" data-classes="table table-no-bordered"
-           id="suiteTable" data-pagination="true" data-search="true" data-toggle="table"
+    <table class="records_list table table-striped table-condensed table-hover" 
+           id="suiteTable" 
+           data-pagination="true" 
+           data-search="true" 
+           data-toggle="table"
            data-toolbar="#suiteExecutionToolBar"
            data-show-refresh="true"
            data-key-events="true"
            data-show-footer="true"
-            {#data-show-toggle="true"#}
            data-show-export="true"
            data-show-columns="true"
            data-advanced-search="true"
-            {#data-id-table="advancedTable"#}
-            data-cookie="true" data-cookie-cookies-enabled="['bs.table.columns']" data-cookie-id-table="suiteList"
-           data-page-size="15" data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" data-sort-order="desc">
+           data-cookie="true" 
+           data-cookie-cookies-enabled="['bs.table.columns']" 
+           data-cookie-id-table="suiteList"
+           data-page-size="15" 
+           data-page-list="[10, 15, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]" 
+           data-sort-order="desc">
         <thead>
-        <tr>
-{#            <th data-sortable="true" title="Updated image" class="time_diff_icon" data-switchable="false">&nbsp;</th>#}
-            <th data-sortable="true" data-switchable="false">ID</th>
-            <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
-            <th data-sorter="htmlSorter" data-sortable="true" title="Full Suite Name" data-switchable="false" data-footer-formatter="totalFormatter">SuiteName</th>
-            <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
-            <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
-            <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">CycleID</th>
-            <th data-field="Duration" data-sorter="dataTitleIntSorter" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
-            <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Tests</th>
-            <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="false">Enabled</th>
-            <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>
-{#            <th data-sortable="true" title="Total Executed: Tests and PreSuite and PostSuite count in logbook" data-switchable="true" data-visible="true">Tot.Exec</th>#}
-            <th data-field="PassRate" data-sortable="true" data-sorter="dataPercentSorter" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PassRate</th>
-            <th data-field="FailRate" data-sortable="true" data-sorter="dataPercentSorter" title="Fail Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">FR</th>
-            <th data-field="ErrorRate" data-sortable="true" data-sorter="dataPercentSorter" title="Error Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">ER</th>
-            <th data-field="OtherRate" data-sortable="true" data-sorter="dataPercentSorter" title="Other Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">OR</th>
-            <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
-            <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fail</th>
-            <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Error</th>
-            <th data-field="Other" data-sortable="true" title="Other Count[NA,etc]" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Other</th>
-            <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
-            <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
-            <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
-            <th data-sortable="true" title="Build Flavor" data-switchable="true">BF</th>
-            <th data-sortable="true" title="Job Name" data-switchable="true">JobName</th>
-            <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>
-            <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
-            <th data-sortable="true" title="Components" data-switchable="true">Components</th>
-            <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI URL</th>
-            <th data-sortable="true" title="CI TAG" data-switchable="true" data-visible="false">CI tag</th>
-            <th data-sortable="true" title="Jira Test Set URL" data-switchable="true" data-visible="false">TS</th>
-            <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="true">Created</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="false">Updated</th>
-            <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time diff">UpdDiff</th>
-            <th data-sortable="true" title="Node" data-switchable="true">Node</th>
-            <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true" data-visible="false">S</th>
-            <th data-sortable="true" title="Owners" data-switchable="true" data-visible="false">Owner</th>
-            <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true" data-footer-formatter="totalFormatter">Pub</th>
-{#            <th class="suite_list_options_column">Options</th>#}
-        </tr>
+            <tr>
+                <th data-sortable="true" data-switchable="false">ID</th>
+                <th data-sortable="true" title="Suite UUID" data-switchable="true" data-visible="false">UUID</th>
+                <th data-sortable="true" title="Full Suite Name" data-switchable="false" data-footer-formatter="totalFormatter">SuiteName</th>
+                <th data-sortable="true" title="Product version" data-switchable="true">ProductVersion</th>
+                <th data-sortable="true" title="Testing Level" data-switchable="true">Level</th>
+                <th data-sortable="true" title="Cycle" data-switchable="true">CycleName</th>
+                <th data-sortable="true" title="Cycle" data-switchable="true" data-visible="false">CycleID</th>
+                <th data-field="Duration" data-sortable="true" title="Time duration between First test start-time and Last test end-time" data-footer-formatter="timeSumFormatter">Duration</th>
+                <th data-sortable="true" title="Tests count" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Tests</th>
+                <th data-sortable="true" title="Tests count which enabled" data-switchable="true" data-visible="false">Enabled</th>
+                <th data-sortable="true" title="Tests count in logbook" data-switchable="true" data-visible="true" data-footer-formatter="totalFormatter">Executed</th>
+                <th data-field="PassRate" data-sortable="true" title="Pass Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">PassRate</th>
+                <th data-field="FailRate" data-sortable="true" title="Fail Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">FR</th>
+                <th data-field="ErrorRate" data-sortable="true" title="Error Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">ER</th>
+                <th data-field="OtherRate" data-sortable="true" title="Other Rate" data-switchable="true" data-visible="true" data-footer-formatter="avgPercentFormatter">OR</th>
+                <th data-field="Pass" data-sortable="true" title="Pass Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Pass</th>
+                <th data-field="Fail" data-sortable="true" title="Fail Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Fail</th>
+                <th data-field="Error" data-sortable="true" title="Error Count" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Error</th>
+                <th data-field="Other" data-sortable="true" title="Other Count[NA,etc]" data-switchable="true" data-visible="true" data-footer-formatter="sumFormatter">Other</th>
+                <th data-sortable="true" title="Suite Summary" data-switchable="true" data-visible="false">Summary</th>
+                <th data-sortable="true" title="Platform" data-switchable="true">Platform</th>
+                <th data-sortable="true" title="Chip" data-switchable="true">Chip</th>
+                <th data-sortable="true" title="Build Flavor" data-switchable="true">BF</th>
+                <th data-sortable="true" title="Job Name" data-switchable="true">JobName</th>
+                <th data-sortable="true" title="Branch" data-switchable="true">Branch</th>
+                <th data-sortable="true" title="Mode" data-switchable="true">Mode</th>
+                <th data-sortable="true" title="Components" data-switchable="true">Components</th>
+                <th data-sortable="true" title="CI URL" data-switchable="true" data-visible="false">CI URL</th>
+                <th data-sortable="true" title="CI TAG" data-switchable="true" data-visible="false">CI tag</th>
+                <th data-sortable="true" title="Jira Test Set URL" data-switchable="true" data-visible="false">TS</th>
+                <th data-sortable="true" title="Jira Test Plan URL" data-switchable="true" data-visible="false">TP</th>
+                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Created time" data-visible="true">Created</th>
+                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time timestamp" data-visible="false">Updated</th>
+                <th data-sorter="dataTitleDateSorter" data-sortable="true" title="Update time diff">UpdDiff</th>
+                <th data-sortable="true" title="Node" data-switchable="true">Node</th>
+                <th data-sortable="true" title="Status X=Closed, O-Open" data-switchable="true" data-visible="false">S</th>
+                <th data-sortable="true" title="Owners" data-switchable="true" data-visible="false">Owner</th>
+                <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true" data-footer-formatter="totalFormatter">Pub</th>
+            </tr>
         </thead>
         <tbody class="searchable">
-        {% if selectedSuiteId is not defined %}
-        {% set selectedSuiteId = 0 %}
-        {% endif %}
-        {% set suite_progress = 0 %}
-        {% set suite_done = 0 %}
-        {% set suitesCount = 0 %}
-        {% set suitesCount = iterator|length  %}
-        {% for suiteExecution in iterator | slice(0, 50000)%}
-            {% set suite_css = '' %}
-            {% if not suiteExecution.closed %}
-                {% set suite_css = ' suite_wip ' %}
-                {% set suite_progress = suite_progress + 1  %}
-            {% else %}
-                {% set suite_done = suite_done + 1  %}
+            {% if selectedSuiteId is not defined %}
+                {% set selectedSuiteId = 0 %}
             {% endif %}
-            {% if selectedSuiteId == suiteExecution.id %}
-                {% set suite_css = suite_css ~ ' suiteSelected ' %}
-            {% endif %}
-            <tr class="{{ suite_css }}">
-{#                <td class="font6" title="Updated {{ suiteExecution.updatedAt|time_diff }}">#}
-{#                    {% if date(suiteExecution.updatedAt) > date('-5 minutes') %}#}
-{#                        <i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>#}
-{#                    {% elseif date(suiteExecution.updatedAt) > date('-30 minutes') %}#}
-{#                        <i class="normal-icon ace-icon fa fa-clock-o pink smaller-80"></i>#}
-{#                    {% elseif date(suiteExecution.updatedAt) > date('-60 minutes') %}#}
-{#                        <i class="normal-icon ace-icon fa fa-clock-o blue smaller-70"></i>#}
-{#                    {% elseif date(suiteExecution.updatedAt) > date('-12 hours') %}#}
-{#                        <i class="normal-icon ace-icon fa fa-clock-o yellow smaller-70"></i>#}
-{#                    {% endif %}#}
-{#                </td>#}
-                <td class="font8"><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.id }}</a></td>
-                <td class="font8">{{ suiteExecution.uuid }}</td>
-                <td>{% if suiteExecution.cycle is not null and suiteExecution.cycle.id is not null %}
-                        <a href="{{ path('cycle_suite_show_first', { 'cycle': suiteExecution.cycle.id, 'suite': suiteExecution.id }) }}">{{ suiteExecution.name }}</a>
-                    {% else %}
-                        {{ suiteExecution.name }}
-                    {% endif %}
-                <td class="font9">{{ suiteExecution.productVersion }}</td>
-                <td class="font10">{{ suiteExecution.testingLevel }}</td>
-                <td class="font9">
-                    {% if suiteExecution.cycle.id is defined and suiteExecution.cycle.name is defined %}
-                        <a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
-                    {% else %}
-                        NOT_FOUND
-                    {% endif %}
-                </td>
-                <td class="font9">{% if suiteExecution.cycle.id is defined %}{{ suiteExecution.cycle.id }}{% endif %}</td>
-                <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime |  executionTimeGenericShort}}</span></td>
-                <td>{{ suiteExecution.testsCount }}</td>
-                <td>{{ suiteExecution.testsCountEnabled }}</td>
-                <td>{{ suiteExecution.totalExecutedTests}}</td>
-{#                <td>{{ suiteExecution.tests | length}}</td>#}
-                <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.failRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
-                <td><span class="{{ passRateToColor(100 - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.otherRate }}">{{ suiteExecution.otherRate }}%</span></td>
-                <td class="passClass">{{ suiteExecution.passCount }}</td>
-                <td class="failClass">{{ suiteExecution.failCount }}</td>
-                <td class="errorClass">{{ suiteExecution.errorCount }}</td>
-                <td class="errorClass">{{ suiteExecution.otherCount }}</td>
-                <td>{{ suiteExecution.summary }}</td>
-                <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
-                <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
-                <td class="font9">{{ suiteExecution.buildType }}</td>
-                <td class="font9">{{ suiteExecution.jobName }}</td>
-                <td class="font9">{{ suiteExecution.branch }}</td>
-                <td class="font9">{{ suiteExecution.packageMode | replace({'_mode': ''}) }}</td>
-                <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
-                <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
-                <td class="font9">{{ suiteExecution.buildTag }}</td>
-                <td>{% if suiteExecution.testSetUrl != '' %}<a href="{{ suiteExecution.testSetUrl }}" target="_blank">{{ suiteExecution.testSetUrl | jiraKey }}</a>{% endif %}</td>
-                <td>{% if suiteExecution.testPlanUrl != '' %}<a href="{{ suiteExecution.testPlanUrl }}" target="_blank">{{ suiteExecution.testPlanUrl | jiraKey }}</a>{% endif %}</td>
-                <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
-                <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|date('Y/m/d H:i:s')}}</span></td>
-                <td><span class="font8" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
-                <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
-                <td class="font6">{{ suiteExecution.closed ? 'X':'O'  }}</td>
-                <td class="font8">{{ suiteExecution.owners | arrayToString(', ') }}</td>
-                <td class="font6">{{ suiteExecution.publish }}</td>
-{#                <td>#}
-{#                    <div class="hidden-sm hidden-xs action-buttons">#}
-{#                        <a class="blue" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}" title="Show">#}
-{#                            <i class="ace-icon fa fa-search-plus bigger-130"></i>#}
-{#                        </a>#}
-{#                        #}{#                                {% if is_granted('edit', suiteExecution) %}#}
-{#                        #}{#                                    <a class="green" href="{{ path('suite_edit', { 'id': suiteExecution.id }) }}" title="Edit">#}
-{#                        <i class="ace-icon fa fa-pencil bigger-130"></i>#}
-{#                        #}{#                                    </a>#}
-{#                        #}{#                                {% endif %}#}
-{#                        #}{#<a class="red" href="#" title="Delete">#}
-{#                        #}{#<i class="ace-icon fa fa-trash-o bigger-130"></i>#}
-{#                        #}{#</a>#}
-{#                    </div>#}
-{#                </td>#}
-            </tr>
-        {% endfor %}
+            {% set suite_progress = 0 %}
+            {% set suite_done = 0 %}
+            {% set suitesCount = iterator|length %}
+            {% for suiteExecution in iterator | slice(0, 50000) %}
+                {% set suite_css = suiteExecution.closed ? '' : ' suite_wip ' %}
+                {% set suite_css = selectedSuiteId == suiteExecution.id ? suite_css ~ ' suiteSelected ' : suite_css %}
+                <tr class="{{ suite_css }}">
+                    <td class="font8"><a title="{{ suiteExecution.summary }}" href="{{ path('suite_show', { 'id': suiteExecution.id }) }}">{{ suiteExecution.id }}</a></td>
+                    <td class="font8">{{ suiteExecution.uuid }}</td>
+                    <td>{% if suiteExecution.cycle is not null and suiteExecution.cycle.id is not null %}
+                            <a href="{{ path('cycle_suite_show_first', { 'cycle': suiteExecution.cycle.id, 'suite': suiteExecution.id }) }}">{{ suiteExecution.name }}</a>
+                        {% else %}
+                            {{ suiteExecution.name }}
+                        {% endif %}
+                    </td>
+                    <td class="font9">{{ suiteExecution.productVersion }}</td>
+                    <td class="font10">{{ suiteExecution.testingLevel }}</td>
+                    <td class="font9">
+                        {% if suiteExecution.cycle.id is defined and suiteExecution.cycle.name is defined %}
+                            <a href="{{ path('cycle_show_first', { 'id': suiteExecution.cycle.id }) }}">{{ suiteExecution.cycle.name|default('!NOT_FOUND') }}</a>
+                        {% else %}
+                            NOT_FOUND
+                        {% endif %}
+                    </td>
+                    <td class="font9">{% if suiteExecution.cycle.id is defined %}{{ suiteExecution.cycle.id }}{% endif %}</td>
+                    <td><span data-title="{{ suiteExecution.runTime }}">{{ suiteExecution.runTime | executionTimeGenericShort}}</span></td>
+                    <td>{{ suiteExecution.testsCount }}</td>
+                    <td>{{ suiteExecution.testsCountEnabled }}</td>
+                    <td>{{ suiteExecution.totalExecutedTests}}</td>
+                    <td><span class="{{ passRateToColor(suiteExecution.passRate) }}" data-percent="{{ suiteExecution.passRate }}">{{ suiteExecution.passRate }}%</span></td>
+                    <td><span class="{{ passRateToColor(100 - suiteExecution.failRate) }}" data-percent="{{ suiteExecution.failRate }}">{{ suiteExecution.failRate }}%</span></td>
+                    <td><span class="{{ passRateToColor(100 - suiteExecution.errorRate) }}" data-percent="{{ suiteExecution.errorRate }}">{{ suiteExecution.errorRate }}%</span></td>
+                    <td><span class="{{ passRateToColor(100 - suiteExecution.otherRate) }}" data-percent="{{ suiteExecution.otherRate }}">{{ suiteExecution.otherRate }}%</span></td>
+                    <td class="passClass">{{ suiteExecution.passCount }}</td>
+                    <td class="failClass">{{ suiteExecution.failCount }}</td>
+                    <td class="errorClass">{{ suiteExecution.errorCount }}</td>
+                    <td class="errorClass">{{ suiteExecution.otherCount }}</td>
+                    <td>{{ suiteExecution.summary }}</td>
+                    <td style="color: {{ stringToColor(suiteExecution.platform) }} !important;">{{ suiteExecution.platform }}</td>
+                    <td style="color: {{ stringToColor(suiteExecution.chip) }} !important;">{{ suiteExecution.chip }}</td>
+                    <td class="font9">{{ suiteExecution.buildType }}</td>
+                    <td class="font9">{{ suiteExecution.jobName }}</td>
+                    <td class="font9">{{ suiteExecution.branch }}</td>
+                    <td class="font9">{{ suiteExecution.packageMode | replace({'_mode': ''}) }}</td>
+                    <td class="font9">{{ suiteExecution.components|arrayToString(', ') }}</td>
+                    <td class="font9"><a href="{{ suiteExecution.ciUrl }}" target="_blank">{{ suiteExecution.ciUrl | replace({'https://': ''}) }}</a></td>
+                    <td class="font9">{{ suiteExecution.buildTag }}</td>
+                    <td>{% if suiteExecution.testSetUrl != '' %}<a href="{{ suiteExecution.testSetUrl }}" target="_blank">{{ suiteExecution.testSetUrl | jiraKey }}</a>{% endif %}</td>
+                    <td>{% if suiteExecution.testPlanUrl != '' %}<a href="{{ suiteExecution.testPlanUrl }}" target="_blank">{{ suiteExecution.testPlanUrl | jiraKey }}</a>{% endif %}</td>
+                    <td><span data-title="{{ suiteExecution.createdAt|date('ymdHis') }}" title="Created at {{ suiteExecution.createdAt|date('d/m/Y H:i:s') }}">{{ suiteExecution.createdAt|time_diff}}</span></td>
+                    <td><span class="font9" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|date('Y/m/d H:i:s')}}</span></td>
+                    <td><span class="font8" data-title="{{ suiteExecution.updatedAt|date('ymdHis') }}">{{ suiteExecution.updatedAt|time_diff}}</span></td>
+                    <td class="font9">{% if suiteExecution.host.name is defined %}<a href="{{ path('host_show', {'id': suiteExecution.host.id}) }}" target="_blank">{{ suiteExecution.host.name }}</a>{% endif %}</td>
+                    <td class="font6">{{ suiteExecution.closed ? 'X':'O'  }}</td>
+                    <td class="font8">{{ suiteExecution.owners | arrayToString(', ') }}</td>
+                    <td class="font6">{{ suiteExecution.publish }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
-{#        <tfoot>#}
-{#        <tr>#}
-{#            <th title="Total suites count"><strong>{{ suitesCount }}</strong></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th></th>#}
-{#            <th>Host</th>#}
-{#            <th title="Suites Done/WIP">{{ suite_done }}/#}
-{#                {% if suite_progress > 0 %}#}
-{#                    <strong>{{ suite_progress }}</strong>#}
-{#                {% else %}#}
-{#                    {{ suite_progress }}#}
-{#                {% endif %}#}
-{#            </th>#}
-{#            <th></th>#}
-{#        </tr>#}
-{#        </tfoot>#}
     </table>
+
     <table>
         <tr>
             <td style="width: 100px;" class="suite_wip">SUITE WIP</td>
@@ -190,63 +134,32 @@
         </tr>
     </table>
     <input type="button" id="btnCurrentSuitesToPivotDown" value="Build Pivot from current table" />
+
     <script type="text/javascript">
-        $(function(){
+        $(document).ready(function(){
             function buildPivotTable() {
-                $(function(){
-                    // var tpl = $.pivotUtilities.aggregatorTemplates;
-                    $("#suitePivotTableOutput").pivotUI($("#suiteTable"),
-                        {
-                            renderers: $.extend(
-                                $.pivotUtilities.renderers,
-                                // $.pivotUtilities.c3_renderers,
-                                // $.pivotUtilities.d3_renderers,
-                                $.pivotUtilities.plotly_renderers,
-                                $.pivotUtilities.export_renderers,
-                                $.pivotUtilities.gchart_renderers,
-                                // $.pivotUtilities.derivers
-                            ),
-                            cols: ["Platform", "Chip"],
-                            rows: ["ProductVersion"],
-                            vals: ["PassRate"],
-                            aggregatorName: ["Average"],
-                            // aggregators: {
-                            //     "PassRate": function() { return tpl.average()(["PassRate"])}
-                            // },
-                        });
-                });
-                //window.scrollTo(0,document.body.scrollHeight);
-                //window.scrollTo(0, 0);
+                $("#suitePivotTableOutput").pivotUI(
+                    $("#suiteTable"),
+                    {
+                        renderers: $.extend(
+                            $.pivotUtilities.renderers,
+                            $.pivotUtilities.plotly_renderers,
+                            $.pivotUtilities.export_renderers,
+                            $.pivotUtilities.gchart_renderers
+                        ),
+                        cols: ["Platform", "Chip"],
+                        rows: ["ProductVersion"],
+                        vals: ["PassRate"],
+                        aggregatorName: ["Average"]
+                    }
+                );
                 document.getElementById("suitePivotTableOutput").scrollIntoView();
             }
-            $( "#btnCurrentSuitesToPivot" ).bind( "click", buildPivotTable);
-            $( "#btnCurrentSuitesToPivotDown" ).bind( "click", buildPivotTable);
-            // var testTable = $('#suiteTable');
-            // testTable.bootstrapTable({
-            //     classes: "table-no-bordered",
-            //     pageList : [10 ,20, 25 ,30 ,120, 200, 'ALL']
-            // });
-            // This example loads data from the HTML table below.
 
-
-            // var derivers = $.pivotUtilities.derivers;
-
-            // $.getJSON("mps.json", function(mps) {
-            //     $("#output").pivotUI(mps, {
-            //         derivedAttributes: {
-            //             "Age Bin": derivers.bin("Age", 10),
-            //             "Gender Imbalance": function(mp) {
-            //                 return mp["Gender"] == "Male" ? 1 : -1;
-            //             }
-            //         },
-            //         rows: ["Province"],
-            //         cols: ["Party"],
-            //         aggregatorName: "Integer Sum",
-            //         vals: ["Age"],
-            //         rendererName: "Heatmap"
-            //     });
-            // });
+            $("#btnCurrentSuitesToPivot").click(buildPivotTable);
+            $("#btnCurrentSuitesToPivotDown").click(buildPivotTable);
         });
+    </script>
 
-</script>
+    {% include "log_book_test_info/list.html.twig" %}
 {% endapply %}

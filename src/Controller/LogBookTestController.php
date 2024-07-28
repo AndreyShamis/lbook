@@ -88,7 +88,7 @@ class LogBookTestController extends AbstractController
      * Lists all Tests entities.
      *
      * @Route("/page/{page}", name="test_index", methods={"GET"})
-     * @Template(template="lbook/test/list.html.twig")
+     * @Template(template="lbook/test/index.html.twig")
      * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
@@ -182,7 +182,7 @@ class LogBookTestController extends AbstractController
 
     /**
      * @Route("/migration", name="migration", methods={"GET"})
-     * @Template(template="lbook/test/list.html.twig")
+     * @Template(template="lbook/test/index.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testsRepo
      * @param LogBookTestInfoRepository $testInfoRepo
@@ -565,7 +565,7 @@ class LogBookTestController extends AbstractController
      * Lists all Tests entities.
      *
      * @Route("/", name="test_index_first", methods={"GET"})
-     * @Template(template="lbook/test/list.html.twig")
+     * @Template(template="lbook/test/index.html.twig")
      * @param PagePaginator $pagePaginator
      * @param LogBookTestRepository $testRepo
      * @return array

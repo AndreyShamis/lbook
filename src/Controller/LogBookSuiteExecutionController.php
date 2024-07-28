@@ -19,6 +19,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\LogBookService;
+
 
 /**
  * Class LogBookSuiteExecutionController
@@ -34,9 +36,10 @@ class LogBookSuiteExecutionController extends AbstractController
      * @Route("/search", name="suite_search", methods={"GET|POST"})
      * @param Request $request
      * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookService $logBookService
      * @return Response
      */
-    public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo): Response
+    public function search(Request $request, LogBookCycleRepository $cycleRepo, SuiteExecutionRepository $suitesRepo, LogBookService $logBookService): Response
     {
         $new_tests = array();
         $sql = '';
@@ -208,11 +211,23 @@ class LogBookSuiteExecutionController extends AbstractController
                 }
             }
         }
+                // Fetch tests for each suite
+        $all_tests = [];
+        foreach ($new_tests as $suite) {
+            $tests = $suite->getTests(); // Assuming getTests() returns the list of tests in the suite
+            foreach ($tests as $test) {
+                $all_tests[] = $test;
+            }
+        }
+        $uniqueKeys = $logBookService->getUniqueKeys($all_tests);
         return $this->render('lbook/suite/search.html.twig', array(
             'iterator' => $new_tests,
             'tests_count' => \count($new_tests),
             'sql' => $sql,
             'form' => $form->createView(),
+            'uniqueKeys' => array_keys($uniqueKeys),
+            'all_tests' => $all_tests, // Pass the tests to the template
+
         ));
     }
 

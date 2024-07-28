@@ -1,0 +1,19 @@
+
+{# {% extends 'lbook/default/index.html.twig' %} #}
+
+{% block content %}
+    <h1>Tests list</h1>
+    <div>Count : {{ size }}</div>
+    {% include "lbook/search.html.twig" %}
+    {% set pagePath = "test_index" %}
+    {% include "lbook/paginator.html.twig" %}
+    {% include "lbook/test/list.html.twig" %}
+    {% if app.user.roles is defined and 'ROLE_SUPER_ADMIN' in app.user.roles %}
+        <div>Super admin option</div>
+        <ul>
+            <li>
+                <a href="{{ path('test_new') }}">Create a new test</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}

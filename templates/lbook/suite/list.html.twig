@@ -59,7 +59,6 @@
             <th data-sortable="true" title="Publish suite execution results to JIRA" data-switchable="true" data-footer-formatter="totalFormatter">Pub</th>
 {#            <th class="suite_list_options_column">Options</th>#}
         </tr>
-        </thead>
         <tbody class="searchable">
         {% if selectedSuiteId is not defined %}
         {% set selectedSuiteId = 0 %}
@@ -183,8 +182,11 @@
 {#        </tr>#}
 {#        </tfoot>#}
     </table>
+
+
     <table>
         <tr>
+        </thead>
             <td style="width: 100px;" class="suite_wip">SUITE WIP</td>
             <td style="width: 100px;" class="suiteSelected">Current suite</td>
         </tr>
@@ -249,4 +251,6 @@
         });
 
 </script>
+
+    {% include "log_book_test_info/list.html.twig" %}
 {% endapply %}

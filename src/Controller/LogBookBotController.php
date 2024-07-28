@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\LogBookCycle;
+use App\Entity\LogBookCycleReport;
 use App\Entity\LogBookSetup;
 use App\Model\EventStatus;
 use App\Model\EventType;
 use App\Repository\EventRepository;
 use App\Repository\LogBookCycleRepository;
+use App\Repository\LogBookCycleReportRepository;
 use App\Repository\LogBookSetupRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NativeQuery;
@@ -187,10 +189,11 @@ class LogBookBotController extends AbstractController
      * @param LogBookCycleRepository $cycleRepo
      * @param EventRepository $events
      * @param LoggerInterface $logger
+     * @param LogBookCycleReportRepository $cycleReportRepo
      * @return Response
      * @throws \Exception
      */
-    public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events, LoggerInterface $logger): Response
+    public function findCyclesForDelete(LogBookCycleRepository $cycleRepo, EventRepository $events, LoggerInterface $logger, LogBookCycleReportRepository $cycleReportRepo): Response
     {
         $list = $cycleRepo->findByDeleteAt(1500);
         $logger->notice('[BOT][findCyclesForDelete]  START', [
@@ -205,6 +208,9 @@ class LogBookBotController extends AbstractController
             $cycleReports = $cycle->getLogBookCycleReports();
             if ($cycleReports === null) {
                 $cycleReports = [];
+            }
+            foreach($cycleReports as $report){
+                $cycleReportRepo->delete($report);
             }
             if ( count($cycleReports) === 0 ) {
                 $msg = $cycle->getDeleteAt()->format('Y-m-d H:i:s') . ' <= ' . $now->format('Y-m-d H:i:s');

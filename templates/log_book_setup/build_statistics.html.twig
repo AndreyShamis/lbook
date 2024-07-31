@@ -1,0 +1,34 @@
+{% extends 'lbook/default/index.html.twig' %}
+{% block title %}Build Statistics{% endblock %}
+{% block content %}
+<h1>Build Statistics</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Build</th>
+            <th>Total Cycles</th>
+            <th>Pass Rate</th>
+            <th>Fail Rate</th>
+            <th>Error Rate</th>
+            <th>Warning Rate</th>
+            <th>Last Seen Cycle</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for build in builds %}
+        <tr>
+            <td>{%if build.buildId is not empty %}<a href="{{ path('build_show_cycles_first', {'id': build.buildId}) }}">{{ build.buildName }}</a>{%endif%}</td>
+            <td>{{ build.totalCycles }}</td>
+            <td>{{ build.avgPassRate|number_format(2) }}%</td>
+            <td>{{ build.avgFailRate|number_format(2) }}%</td>
+            <td>{{ build.avgErrorRate|number_format(2) }}%</td>
+            <td>{{ build.avgWarningRate|number_format(2) }}%</td>
+            <td>{{ build.lastSeenCycle|date('Y-m-d H:i:s') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

@@ -957,6 +957,41 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
 
     /**
      *
+     * @Route("/setup/showpv/{id}/statistics", name="show_build_statistics", methods={"GET"})
+     * @param LogBookSetup|null $setup
+     * @return Response
+     */
+    public function showBuildStatistics(LogBookSetup $setup = null): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $logBookCycleRepository = $entityManager->getRepository(LogBookCycle::class);
+    
+        // Use QueryBuilder to fetch and group data by build
+        $queryBuilder = $logBookCycleRepository->createQueryBuilder('cycle')
+            ->select('build.id as buildId', 'build.name as buildName')
+            ->addSelect('COUNT(cycle.id) as totalCycles')
+            ->addSelect('AVG(cycle.passRate) as avgPassRate')
+            ->addSelect('AVG(cycle.failRate) as avgFailRate')
+            ->addSelect('AVG(cycle.errorRate) as avgErrorRate')
+            ->addSelect('AVG(cycle.warningRate) as avgWarningRate')
+            ->addSelect('MAX(cycle.createdAt) as lastSeenCycle')
+            ->leftJoin('cycle.build', 'build')
+            ->where('cycle.setup = :setup')
+            ->setParameter('setup', $setup)
+            ->groupBy('build.id')
+            ->orderBy('lastSeenCycle', 'DESC');
+    
+        $results = $queryBuilder->getQuery()->getResult();
+    
+        return $this->render('log_book_setup/build_statistics.html.twig', [
+            'builds' => $results
+        ]);
+    }
+
+
+
+    /**
+     *
      * @Route("/unsubscribe/{id}", name="setup_unsubscribe", methods={"GET"})
      * @param LogBookSetup|null $setup
      * @return Response

@@ -11,8 +11,15 @@
         </div>
         <div class="col-xs-3">
             <span style="float: right;">
+            {% if app.user is not null and setup.id is defined  %}
+                    <button class="btn btn-white btn-info btn-bold" id="show_build_statistics">
+                    <i class="ace-icon fa fa-flag bigger-110 blue"></i>
+                    Build Stats
+                </button>
+                {% endif %}
+
                 {% if app.user is not null and setup.id is defined and  setup.subscribers.contains(app.user)  %}
-                                <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
+                    <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
                     <i class="ace-icon fa fa-flag bigger-110 blue"></i>
                     Unsubscribe
                 </button>
@@ -304,6 +311,9 @@
                 ace.settings.sidebar_fixed(document.getElementById('sidebar'), true, true);
             } catch (e) {}
         {% if setup.id is defined %}
+            $( "#show_build_statistics" ).bind( "click", function() {
+                window.location.href = "{{ path('show_build_statistics', { 'id': setup.id }) }}";
+            });
             $( "#unsubscribe" ).bind( "click", function() {
                 window.location.href = "{{ path('setup_unsubscribe', { 'id': setup.id }) }}";
             });

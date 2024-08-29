@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\DependencyInjection\ContainerInterface as Container;
 
 /**
  * Setup controller.
@@ -41,7 +42,19 @@ class LogBookSetupController extends AbstractController
 {
     protected $index_size = 500;
     protected $show_cycle_size = 500;
+    /** @var EntityManagerInterface */
+    protected $em;
 
+    /**
+     * @param Container $container
+     * @throws \LogicException
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+        $this->em = $this->getDoctrine()->getManager();
+
+    }
 
     /**
      * Finds and displays a setup entity.
@@ -157,7 +170,6 @@ class LogBookSetupController extends AbstractController
                 }
             }
 
-            $em = $this->getDoctrine()->getManager();
 
             /** @var LogBookTest $test */
             foreach ($tests as $test) {
@@ -185,14 +197,14 @@ class LogBookSetupController extends AbstractController
                 if ($test->getVerdict()->getName() !== 'PASS' && $test->getVerdict()->getName() !== 'UNKNOWN') {
                     if ($test->getFailDescription() == ' ') {
                         $test->parseFailDescription();
-                        $em->persist($test);
+                        $this->em->persist($test);
                     }
                 }
             }
             foreach ($cycles as $cycle) {
                 $cycle->setCalculateStatistic(false);
             }
-            $em->flush();
+            $this->em->flush();
             $removed_tests_counter = 0;
             foreach ($testNames as $testName) {
                 $issue_found = false;
@@ -348,6 +360,86 @@ class LogBookSetupController extends AbstractController
         $response->setJson($json);
         $response->setEncodingOptions(JSON_PRETTY_PRINT);
         return $response;
+    }
+
+    private function getTableInfo(int $setupId): array
+    {
+        $databaseName = $this->em->getConnection()->getDatabase();
+        $sql = "
+            SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = :databaseName AND TABLE_NAME = :tableName 
+            ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC
+        ";
+
+        $result = $this->em->getConnection()->executeQuery($sql, [
+            'databaseName' => $databaseName,
+            'tableName' => "log_book_message_$setupId"
+        ])->fetchAssociative();
+
+        return $result ?: ['table_name' => '', 'table_size' => 0];
+    }    
+
+    
+    private function updateSetupLogsSize(LogBookSetup $setup, int $tableSize): void
+    {
+        $setup->setLogsSize($tableSize);
+        $this->em->flush();
+    }
+
+    /**
+     *
+     * @Route("/dashboard/{id}", name="setup_dashboard_show", methods={"GET"})
+     * @param LoggerInterface $logger
+     * @param LogBookSetupRepository $setupRepo
+     * @param LogBookSetup $setup
+     * @return Response
+     */
+    public function dashboard(Request $request, LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, LogBookSetup $setup = null, LogBookCycleRepository $cycleRepo = null, LogBookTestRepository $testRepository = null): Response
+    {
+        try {
+            if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
+                throw new \RuntimeException('');
+            }
+            $tableInfo = $this->getTableInfo($setup->getId());
+            $this->updateSetupLogsSize($setup, $tableInfo['table_size']);
+
+            $qb = $cycleRepo->createQueryBuilder('t')
+                ->where('t.setup = :setup')
+                ->orderBy('t.timeEnd', 'DESC')
+                ->addOrderBy('t.updatedAt', 'DESC')
+                ->setParameter('setup', $setup->getId());
+            $query = $qb->getQuery();
+            $cycles = $query->execute();
+            //dump($request->query->all());   // For GET
+
+            $minExecutions = $request->query->getInt('min_executions', 2);
+            $startTime = $request->query->get('start_time') ? new \DateTime($request->query->get('start_time')) : null;
+            $endTime = $request->query->get('end_time') ? new \DateTime($request->query->get('end_time')) : null;
+            $suiteFilters = $request->query->get('suite_filters', []);
+            $testMetadataFilters = $request->query->get('md_f', []);
+        
+            $statistics = $testRepository->getTestStatisticsForSetup(
+                $setup->getId(), 
+                $minExecutions, 
+                $startTime, 
+                $endTime, 
+                $suiteFilters, 
+                $testMetadataFilters
+            );
+
+            return $this->render('log_book_setup/dashboard_show.html.twig', [
+                'setup' => $setup,
+                'size' => count($cycles),
+                'table_size' => $tableInfo['table_size'],
+                'table_name' => $tableInfo['table_name'],
+                'statistics' => $statistics,
+                'suiteFilters' => $suiteFilters
+            ]);
+        } catch (\Throwable $ex) {
+            return $this->setupNotFound($ex, $setup);
+        }
+
     }
 
     /**
@@ -550,9 +642,8 @@ class LogBookSetupController extends AbstractController
         } else {
             $setup->addFavoritedByUser($user);
         }
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($setup);
-        $em->flush();
+        $$this->em->persist($setup);
+        $$this->em->flush();
         /** @var  $referer */
         $referer = $request->headers->get('referer');
         if ($referer === null) {
@@ -612,9 +703,8 @@ class LogBookSetupController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($obj);
-            $em->flush();
+            $$this->em->persist($obj);
+            $$this->em->flush();
 
             return $this->redirectToRoute('setup_show', array('id' => $obj->getId()));
         }
@@ -629,64 +719,34 @@ class LogBookSetupController extends AbstractController
      * Finds and displays a setup entity.
      *
      * @Route("/{id}", name="setup_show_first", methods={"GET"})
-     * @param LoggerInterface $logger
      * @param LogBookSetup $setup
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFullFirst(LoggerInterface $logger, LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFullFirst(LogBookSetup $setup = null, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
-        return $this->showFull($logger, $setup, 1, $pagePaginator, $cycleRepo);
+        return $this->showFull($setup, 1, $pagePaginator, $cycleRepo);
     }
 
     /**
      * Finds and displays a setup entity.
      *
      * @Route("/{id}/page/{page}", name="setup_show", methods={"GET"})
-     * @param LoggerInterface $logger
      * @param LogBookSetup $setup
      * @param int $page
      * @param PagePaginator $pagePaginator
      * @param LogBookCycleRepository $cycleRepo
      * @return Response
      */
-    public function showFull(LoggerInterface $logger, LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
+    public function showFull(LogBookSetup $setup = null, $page = 1, PagePaginator $pagePaginator = null, LogBookCycleRepository $cycleRepo = null): ?Response
     {
-        $table_name = '';
-        $table_size = 0;
         try {
             if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
                 throw new \RuntimeException('');
             }
-            try{
-                $em = $this->getDoctrine()->getManager();
-                $databaseName = $em->getConnection()->getDatabase();
-                $sql = '
-SELECT TABLE_NAME AS `table_name`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `table_size` 
-FROM information_schema.TABLES 
-WHERE TABLE_SCHEMA = "'. $databaseName. '" AND TABLE_NAME = "log_book_message_'. $setup->getId() .'" 
-ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
-
-                /** @var \Doctrine\DBAL\Statement $statment */
-                $statment = $em->getConnection()->prepare($sql);
-                $statment->execute();
-                $res = $statment->fetchAll();
-                try {
-                    $table_size = $res[0]['table_size'];
-                    $table_name = $res[0]['table_name'];
-                } catch (\Throwable $ex) {
-                    $logger->critical('showFull:Cannot get tabl size : SQL: ' . $sql );
-                }
-                try {
-                    $setup->setLogsSize($table_size);
-                    $em->flush();
-                } catch (\Throwable $ex) {
-                    $logger->critical('showFull:Cannot update table size for : ' . $table_name . ' : SQL: ' . $sql );
-                }
-            } catch (\Throwable $ex) {
-                $logger->critical('showFull:Update table size due: ' . $ex->getMessage() );
-            }
+            $tableInfo = $this->getTableInfo($setup->getId());
+            $this->updateSetupLogsSize($setup, $tableInfo['table_size']);
 
             $qb = $cycleRepo->createQueryBuilder('t')
                 ->where('t.setup = :setup')
@@ -703,7 +763,6 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             $show_build = $this->showBuild($paginator);
             $show_user = $this->showUsers($paginator);
 
-
             return $this->render('lbook/setup/show.full.html.twig', [
                 'setup' => $setup,
                 'size' => $totalPosts,
@@ -714,8 +773,8 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
                 'delete_form' => $deleteForm->createView(),
                 'show_build' => $show_build,
                 'show_user' => $show_user,
-                'table_size' => $table_size,
-                'table_name' => $table_name
+                'table_size' => $tableInfo['table_size'],
+                'table_name' => $tableInfo['table_name']
             ]);
         } catch (\Throwable $ex) {
             return $this->setupNotFound($ex, $setup);
@@ -926,7 +985,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
 
             if ($editForm->isSubmitted() && $editForm->isValid()) {
                 $obj->setUpdatedAt();
-                $this->getDoctrine()->getManager()->flush();
+                $this->em->flush();
                 return $this->redirectToRoute('setup_edit', array('id' => $obj->getId()));
             }
 
@@ -951,7 +1010,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->addSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $this->em->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
@@ -963,8 +1022,8 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
      */
     public function showBuildStatistics(LogBookSetup $setup = null): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $logBookCycleRepository = $entityManager->getRepository(LogBookCycle::class);
+
+        $logBookCycleRepository = $this->em->getRepository(LogBookCycle::class);
     
         // Use QueryBuilder to fetch and group data by build
         $queryBuilder = $logBookCycleRepository->createQueryBuilder('cycle')
@@ -1000,7 +1059,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $setup->removeSubscriber($user);
-        $this->getDoctrine()->getManager()->flush();
+        $this->em->flush();
         return $this->redirectToRoute('setup_show_first', ['id' => $setup->getId()]);
     }
 
@@ -1029,9 +1088,8 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH)  DESC;';
             $form->handleRequest($request);
 
             if ($env === 'test' || ($form->isSubmitted() && $form->isValid())) {
-                $em = $this->getDoctrine()->getManager();
                 /** @var LogBookSetupRepository $setupRepo */
-                $setupRepo = $em->getRepository('App:LogBookSetup');
+                $setupRepo = $this->em->getRepository('App:LogBookSetup');
                 $setupRepo->delete($obj);
             }
 

@@ -1,47 +1,20 @@
 {% extends 'lbook/default/index.html.twig' %}
-{% block title %}Setup [{{ setup.id | default('') }}:{{ setup.name| default('')  }}] {% endblock %}
+{% block title %}DASHBOARD Setup [{{ setup.id | default('') }}:{{ setup.name| default('')  }}] {% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-xs-9">
         {% if decoded_url is defined %}
             <h3 style="margin-top: 0 !important;">Cycles with CI_URL={{decoded_url}}</h3>
         {% else %}
-            <h3 style="margin-top: 0 !important;">Setup [{{ setup.id| default('')  }}] : {{ setup.name| default('')  }}</h3>
+            <h3 style="margin-top: 0 !important;">DASHBOARD for Setup {{ setup.name| default('')  }}- [{{ setup.id| default('')  }}]</h3>
         {% endif %}
         </div>
         <div class="col-xs-3">
             <span style="float: right;">
                 {% if app.user is not null and setup.id is defined  %}
-                <button class="btn btn-white btn-info btn-bold" id="show_dashboard">
-                    <i class="ace-icon fa fa-camera bigger-110 blue"></i>
-                    DASHBOARD
-                </button>
                 <button class="btn btn-white btn-info btn-bold" id="show_build_statistics">
                     <i class="ace-icon fa fa-check bigger-110 blue"></i>
                     Build Stats
-                </button>
-                {% endif %}
-
-                {% if app.user is not null and setup.id is defined and  setup.subscribers.contains(app.user)  %}
-                <button class="btn btn-white btn-info btn-bold" id="unsubscribe">
-                    <i class="ace-icon fa fa-flag bigger-110 blue"></i>
-                    Unsubscribe
-                </button>
-                {% else %}
-                <button class="btn btn-white btn-warning btn-bold" id="subscribe">
-                    <i class="ace-icon fa fa-flag-o bigger-110 orange"></i>
-                    Subscribe
-                </button>
-                {% endif %}
-                {% if app.user is not null and setup.id is defined and setup.favoritedByUsers.contains(app.user) %}
-                    <button class="btn btn-white btn-info btn-bold" id="unfavorite">
-                    <i class="ace-icon fa fa-bookmark bigger-110 blue"></i>
-                    Unfavorite
-                </button>
-                {% else %}
-                    <button class="btn btn-white btn-warning btn-bold" id="favorite">
-                    <i class="ace-icon fa fa-bookmark-o bigger-110 orange"></i>
-                    Favorite
                 </button>
                 {% endif %}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -134,13 +107,150 @@
     {% endif %}
 
     {% endapply %}
-    {% set pagePath = "setup_show" %}
+
+
+
+
+
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Test Statistics for Setup</h1>
+
+        <form method="get" class="mb-4">
+
+        </form>
+
+    </div>
+
+
+
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Test Statistics for Setup</h1>
+
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="start_time">Start Time:</label>
+                        <input type="datetime-local" id="start_time" name="start_time" class="form-control" 
+                            {% if statistics.start_time %}
+                                value="{{ statistics.start_time|date('Y-m-d\\TH:i') }}"
+                            {% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="end_time">End Time:</label>
+                        <input type="datetime-local" id="end_time" name="end_time" class="form-control" 
+                            {% if statistics.end_time %}
+                                value="{{ statistics.end_time|date('Y-m-d\\TH:i') }}"
+                            {% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="min_executions">Minimum Executions:</label>
+                        <input style="width:100px;" type="number" id="min_executions" name="min_executions" class="form-control" value="{{ statistics.min_executions }}">
+                    </div>
+                {# </div>
+                    <div class="form-group">
+                    [{{suiteFilters | join(', ')  }}]
+                    <label for="suite_filters">Suite Filters:</label>
+                    <input type="text" id="suite_filters" name="suite_filters[]" class="form-control" placeholder="Enter Suite IDs">
+                </div>
+
+                <!-- Add test metadata filters -->
+                <div class="form-group">
+                    <label for="md_f">Test Metadata Filters:</label>
+                    <input type="text" id="md_f" name="md_f[keyword]" class="form-control" placeholder="Enter Metadata Keyword">
+                </div> #}
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary mt-4">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Summary</h5>
+                <p class="card-text">Total Test Executions: {{ statistics.total_tests }}</p>
+                <p class="card-text">Unique Tests (executed {{ statistics.min_executions }} or more times): {{ statistics.unique_tests }}</p>
+                <p class="card-text">Minimum Executions Threshold: {{ statistics.min_executions }}</p>
+                {% if statistics.start_time %}
+                    <p class="card-text">Start Time: {{ statistics.start_time|date('Y-m-d H:i:s') }}</p>
+                {% endif %}
+                {% if statistics.end_time %}
+                    <p class="card-text">End Time: {{ statistics.end_time|date('Y-m-d H:i:s') }}</p>
+                {% endif %}
+                {% if statistics.suite_filters %}
+                    <p class="card-text">Suite Filters: {{ statistics.suite_filters|join(', ') }}</p>
+                {% endif %}
+                {% if statistics.test_metadata_filters %}
+                    <p class="card-text">Test Metadata Filters: 
+                        {% for key, value in statistics.test_metadata_filters %}
+                            {{ key }}: {{ value }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="mb-3">Test Details ({{ statistics.min_executions }}+ executions)</h2>
+        {% if statistics.test_details is empty %}
+            <p class="alert alert-info">No tests found with {{ statistics.min_executions }} or more executions in the selected time range.</p>
+        {% else %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Execution Count</th>
+                        <th>Pass</th>
+                        <th>Fail</th>
+                        <th>Error</th>
+                        <th>Other</th>
+                        <th>Last Run</th>
+                        <th>Avg. Execution Time</th>
+                        <th>Percentage of Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in statistics.test_details %}
+                        <tr>
+                            <td>{{ test.test_name }}</td>
+                            <td>{{ test.test_execution_count }}</td>
+                            <td>{{ test.pass_count }}</td>
+                            <td>{{ test.fail_count }}</td>
+                            <td>{{ test.error_count }}</td>
+                            <td>{{ test.other_count }}</td>
+                            <td>{{ test.last_run_time|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ (test.avg_execution_time / 1000)|round(2) }} sec</td>
+                            <td>
+                                {% set percentage = (test.test_execution_count / statistics.total_tests * 100)|round(2) %}
+                                {{ percentage }}%
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
     {% set objId = setup.id | default(0) %}
-    {% include "lbook/double.paginator.html.twig" %}
     {%  set cycles = setup.cycles | default('') %}
     <div>Count : {{ size }}</div>
     {% if decoded_url is not defined %}
-    {% include "lbook/search.html.twig" %}
+    {# {% include "lbook/search.html.twig" %} #}
     {%endif%}
     <div id="toolbarSetupsList">
     </div>
@@ -164,12 +274,6 @@
             <th class="setup_cycle_tests_column" data-sortable="true">Pass</th>
             <th class="setup_cycle_tests_column" data-sortable="true">Fail</th>
             <th class="setup_cycle_tests_column" data-sortable="true">Error</th>
-            {%  if show_build %}
-            <th class="setup_cycle_build_column" data-sorter="htmlSorter" data-sortable="true">Build</th>
-            {% endif %}
-            {%  if show_user %}
-            <th class="setup_cycle_user" data-sortable="true">User</th>
-            {% endif %}
             <th class="setup_cycle_passrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Pass Rate" data-visible="true">Pass Rate</th>
             <th class="setup_cycle_failrate_column" data-sorter="dataPercentSorter" data-sortable="true" title="Fail Rate" data-visible="false">Fail Rate</th>
             <th class="setup_cycle_period_column" data-sortable="true" data-sorter="dataTitleIntSorter" title="Time duration between First test start-time and Last test end-time">Duration</th>
@@ -186,7 +290,7 @@
         </tr>
         </thead>
         <tbody class="searchable">
-        {% for cycle in iterator | slice(0, 10000) %}
+        {% for cycle in cycles | slice(0, 10) %}
             <tr>
                 <td title="Updated {{ cycle.updatedAt|time_diff }}">
                     {% if date(cycle.updatedAt) > date('-5 minutes') %}<i class="normal-icon ace-icon fa fa-clock-o red smaller-90"></i>
@@ -206,16 +310,6 @@
                 <td class="{{ passRateToColor(cycle.passRate) }}">{{ cycle.testsPass }}</td>
                 <td class="{{ passRateToColor(100 - cycle.failRate) }}">{{ cycle.testsFail }}</td>
                 <td class="{{ passRateToColor(100 - cycle.errorRate - cycle.failRate) }}">{{ cycle.testsError }}</td>
-                {%  if show_build %}
-                <td title="{{ cycle.build }}">
-                    {% if cycle.build.id is defined %}
-                        <a href="{{ path('build_show_cycles', { 'id': cycle.build.id }) }}">{{ shortString(cycle.build, 35, "...") }}</a>
-                    {% endif %}
-                </td>
-                {% endif %}
-                {%  if show_user %}
-                <td title="{{ cycle.user.FullName }}">{{ cycle.user.UserNameMedium }}</td>
-                {% endif %}
                 <td><span class="{{ passRateToColor(cycle.passRate) }}" data-percent="{{ cycle.passRate }}">{{ cycle.passRate }}%</span></td>
                 <td><span class="{{ failRateToColor(100 - cycle.failRate) }}" data-percent="{{ cycle.failRate }}">{{ cycle.failRate }}%</span></td>
                 <td><span data-title="{{ cycle.period  }}">{{ cycle.period |  ExecutionTimeGeneric}}</span></td>
@@ -310,18 +404,6 @@
             });
             $( "#show_build_statistics" ).bind( "click", function() {
                 window.location.href = "{{ path('show_build_statistics', { 'id': setup.id }) }}";
-            });
-            $( "#unsubscribe" ).bind( "click", function() {
-                window.location.href = "{{ path('setup_unsubscribe', { 'id': setup.id }) }}";
-            });
-            $( "#subscribe" ).bind( "click", function() {
-                window.location.href = "{{ path('setup_subscribe', { 'id': setup.id }) }}";
-            });
-            $( "#unfavorite" ).bind( "click", function() {
-                window.location.href = "{{ path('add_remove_setup_to_favorite', { 'setup': setup.id }) }}";
-            });
-            $( "#favorite" ).bind( "click", function() {
-                window.location.href = "{{ path('add_remove_setup_to_favorite', { 'setup': setup.id }) }}";
             });
             {% endif %}
         });

@@ -27,6 +27,83 @@ class LogBookTestRepository extends ServiceEntityRepository
         $this->logger = $logger;
     }
 
+    public function getTestStatisticsForSetup(
+        int $setupId, 
+        int $minExecutions = 2, 
+        ?\DateTime $startTime = null, 
+        ?\DateTime $endTime = null, 
+        array $suiteFilters = [], 
+        array $testMetadataFilters = []
+    ): array {
+        $qb = $this->createQueryBuilder('t')
+            ->select('
+                COUNT(DISTINCT ti.id) as total_unique_tests,
+                COUNT(t.id) as total_test_executions,
+                ti.name as test_name,
+                COUNT(t.id) as test_execution_count,
+                SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
+                SUM(CASE WHEN v.name = \'FAIL\' THEN 1 ELSE 0 END) as fail_count,
+                SUM(CASE WHEN v.name = \'ERROR\' THEN 1 ELSE 0 END) as error_count,
+                SUM(CASE WHEN v.name NOT IN (\'PASS\', \'FAIL\', \'ERROR\') THEN 1 ELSE 0 END) as other_count,
+                MAX(t.timeEnd) as last_run_time,
+                AVG(t.timeRun) as avg_execution_time
+            ')
+            ->innerJoin('t.testInfo', 'ti')
+            ->innerJoin('t.cycle', 'c')
+            ->innerJoin('c.setup', 's')
+            ->innerJoin('t.verdict', 'v')
+            ->leftJoin('t.newMetaData', 'md')
+            ->leftJoin('c.suiteExecution', 'se')
+            ->where('s.id = :setupId')
+            ->groupBy('ti.id', 'ti.name')
+            ->having('COUNT(t.id) >= :minExecutions')
+            ->orderBy('ti.name', 'ASC')
+            ->addOrderBy('test_execution_count', 'DESC')
+            ->setParameter('setupId', $setupId)
+            ->setParameter('minExecutions', $minExecutions);
+    
+        // Apply time filters
+        if ($startTime) {
+            $qb->andWhere('c.timeStart >= :startTime')
+               ->setParameter('startTime', $startTime);
+        }
+        if ($endTime) {
+            $qb->andWhere('c.timeEnd <= :endTime')
+               ->setParameter('endTime', $endTime);
+        }
+    
+        // // Apply suite execution filters
+        // if (!empty($suiteFilters) && is_array($suiteFilters) && count($suiteFilters) > 0) {
+        //     $qb->andWhere('se.id IN (:suiteFilters)')
+        //        ->setParameter('suiteFilters', $suiteFilters);
+        // }
+    
+        // Apply test metadata filters
+        if (!empty($testMetadataFilters)) {
+            foreach ($testMetadataFilters as $key => $value) {
+                $qb->andWhere("md.value LIKE :$key")
+                   ->setParameter($key, '%' . $value . '%');
+            }
+        }
+    
+        $result = $qb->getQuery()->getResult();
+    
+        $totalTests = array_sum(array_column($result, 'test_execution_count'));
+        $uniqueTests = count($result);
+    
+        return [
+            'total_tests' => $totalTests,
+            'unique_tests' => $uniqueTests,
+            'test_details' => $result,
+            'min_executions' => $minExecutions,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'suite_filters' => $suiteFilters,
+            'test_metadata_filters' => $testMetadataFilters,
+        ];
+    }
+    
+
     /**
      * @param array $criteria
      * @param bool $flush

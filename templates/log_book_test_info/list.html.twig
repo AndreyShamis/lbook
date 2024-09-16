@@ -50,6 +50,8 @@
             <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
             <th data-sortable="true">Verdict</th>
             <th data-sortable="true">Rate</th>
+            {% set uniqueKeys = uniqueKeys is defined ? uniqueKeys : [] %}
+
             {% for key in uniqueKeys %}
                 <th data-sortable="true">{{ key }}</th>
             {% endfor %}

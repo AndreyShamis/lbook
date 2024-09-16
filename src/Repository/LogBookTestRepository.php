@@ -37,8 +37,7 @@ class LogBookTestRepository extends ServiceEntityRepository
     ): array {
         $qb = $this->createQueryBuilder('t')
             ->select('
-                COUNT(DISTINCT ti.id) as total_unique_tests,
-                COUNT(t.id) as total_test_executions,
+                ti.id as test_id,
                 ti.name as test_name,
                 COUNT(t.id) as test_execution_count,
                 SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
@@ -49,11 +48,12 @@ class LogBookTestRepository extends ServiceEntityRepository
                 AVG(t.timeRun) as avg_execution_time
             ')
             ->innerJoin('t.testInfo', 'ti')
-            ->innerJoin('t.cycle', 'c')
-            ->innerJoin('c.setup', 's')
+            ->innerJoin('t.cycle', 'c') // Ensure we join with the cycle
+            ->innerJoin('c.setup', 's') // Join with the setup to filter by setupId
+            ->innerJoin('c.suiteExecution', 'se') // Adding SuiteExecution join
+            ->innerJoin('se.suiteInfo', 'si')  // Join SuiteInfo if necessary
             ->innerJoin('t.verdict', 'v')
             ->leftJoin('t.newMetaData', 'md')
-            ->leftJoin('c.suiteExecution', 'se')
             ->where('s.id = :setupId')
             ->groupBy('ti.id', 'ti.name')
             ->having('COUNT(t.id) >= :minExecutions')
@@ -72,21 +72,93 @@ class LogBookTestRepository extends ServiceEntityRepository
                ->setParameter('endTime', $endTime);
         }
     
-        // // Apply suite execution filters
-        // if (!empty($suiteFilters) && is_array($suiteFilters) && count($suiteFilters) > 0) {
-        //     $qb->andWhere('se.id IN (:suiteFilters)')
-        //        ->setParameter('suiteFilters', $suiteFilters);
-        // }
-    
+    // Apply suite execution free-text filters (assuming $suiteFilters is an array of search strings)
+    if (!empty($suiteFilters)) {
+        $orX = $qb->expr()->orX();
+        foreach ($suiteFilters as $suiteFilter) {
+            $suiteFilter = '%' . $suiteFilter . '%';  // Add wildcards for LIKE search
+            $orX->add(
+                $qb->expr()->orX(
+                    $qb->expr()->like('se.summary', ':suiteFilter'),
+                    $qb->expr()->like('se.description', ':suiteFilter'),
+                    $qb->expr()->like('se.jobName', ':suiteFilter'),
+                    $qb->expr()->like('se.productVersion', ':suiteFilter'),
+                    $qb->expr()->like('se.platform', ':suiteFilter'),
+                    $qb->expr()->like('se.chip', ':suiteFilter')
+                )
+            );
+            $qb->setParameter('suiteFilter', $suiteFilter);
+        }
+        $qb->andWhere($orX);
+    }
+
         // Apply test metadata filters
         if (!empty($testMetadataFilters)) {
-            foreach ($testMetadataFilters as $key => $value) {
-                $qb->andWhere("md.value LIKE :$key")
-                   ->setParameter($key, '%' . $value . '%');
+            $qb->leftJoin('t.newMetaData', 'md_filter');
+            foreach ($testMetadataFilters as $key => $values) {
+                if (!is_array($values)) {
+                    $values = [$values];
+                }
+        
+                $orX = $qb->expr()->orX();
+                foreach ($values as $index => $value) {
+                    $keyLength = strlen($key);
+                    $valueLength = strlen($value);
+                    $pattern = '%s:' . $keyLength . ':"' . $key . '";s:' . $valueLength . ':"' . $value . '";%';
+                    
+                    $orX->add($qb->expr()->like('md_filter.value', ':metadata_' . $key . '_' . $index));
+                    $qb->setParameter('metadata_' . $key . '_' . $index, $pattern);
+                }
+                
+                $qb->andWhere($orX);
             }
         }
-    
+        
         $result = $qb->getQuery()->getResult();
+    
+        // Fetch metadata for each test
+        $testIds = array_column($result, 'test_id');
+        $metadataQuery = $this->createQueryBuilder('t')
+            ->select('ti.id as test_id, md.value as metadata')
+            ->innerJoin('t.testInfo', 'ti')
+            ->leftJoin('t.newMetaData', 'md')
+            ->where('ti.id IN (:testIds)')
+            ->setParameter('testIds', $testIds)
+            ->getQuery();
+        
+        $metadataResults = $metadataQuery->getResult();
+    
+        // Process metadata
+        $metadataMap = [];
+        foreach ($metadataResults as $item) {
+            if (!isset($metadataMap[$item['test_id']])) {
+                $metadataMap[$item['test_id']] = [];
+            }
+            
+            // Check if metadata is an array and not null
+            if (is_array($item['metadata'])) {
+                foreach ($item['metadata'] as $metaItem) {
+                    if (is_string($metaItem)) {
+                        $parts = explode(' = ', $metaItem, 1);
+                        if (count($parts) == 2) {
+                            $metadataMap[$item['test_id']][$parts[0]] = $parts[1];
+                        }
+                    }
+                }
+            } elseif (is_string($item['metadata'])) {
+                // Handle case where metadata might be a single string
+                $parts = explode(' = ', $item['metadata'], 2);
+                if (count($parts) == 2) {
+                    $metadataMap[$item['test_id']][$parts[0]] = $parts[1];
+                }
+            }
+            // If metadata is null or any other type, we just leave it as an empty array
+        }
+
+        // Merge metadata with test results
+        foreach ($result as &$test) {
+            $test['metadata'] = $metadataMap[$test['test_id']] ?? [];
+        }
     
         $totalTests = array_sum(array_column($result, 'test_execution_count'));
         $uniqueTests = count($result);
@@ -100,9 +172,9 @@ class LogBookTestRepository extends ServiceEntityRepository
             'end_time' => $endTime,
             'suite_filters' => $suiteFilters,
             'test_metadata_filters' => $testMetadataFilters,
+            'metadataResults' => $metadataResults,
         ];
     }
-    
 
     /**
      * @param array $criteria

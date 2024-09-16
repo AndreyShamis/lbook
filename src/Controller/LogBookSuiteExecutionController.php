@@ -430,6 +430,14 @@ class LogBookSuiteExecutionController extends AbstractController
         /** @var LogBookSuiteInfoRepository $suiteInfoRepo */
         $suiteInfoRepo = $this->em->getRepository('App:LogBookSuiteInfo');
         //$suite->calculateStatistic();
+                        // Fetch tests for each suite
+        $all_tests = [];
+
+        $tests = $suite->getTests(); // Assuming getTests() returns the list of tests in the suite
+        foreach ($tests as $test) {
+            $all_tests[] = $test;
+        }
+        
         return $this->render('lbook/suite/show.html.twig',
             [
                 'suite' => $suite,
@@ -439,6 +447,7 @@ class LogBookSuiteExecutionController extends AbstractController
                 'thisPage'  => $thisPage,
                 'iterator'  => $iterator,
                 'paginator' => $paginator,
+                'all_tests' => $all_tests,
             ]);
     }
 

@@ -111,26 +111,11 @@
 
 
 
-
-
     <div class="container mt-4">
-        <h1 class="mb-4">Test Statistics for Setup</h1>
-
-        <form method="get" class="mb-4">
-
-        </form>
-
-    </div>
-
-
-
-
-    <div class="container mt-4">
-        <h1 class="mb-4">Test Statistics for Setup</h1>
-
+        <h1 class="mb-4">Test Statistics</h1>
         <form method="get" class="mb-4">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="start_time">Start Time:</label>
                         <input type="datetime-local" id="start_time" name="start_time" class="form-control" 
@@ -139,7 +124,7 @@
                             {% endif %}>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="end_time">End Time:</label>
                         <input type="datetime-local" id="end_time" name="end_time" class="form-control" 
@@ -148,31 +133,61 @@
                             {% endif %}>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="min_executions">Minimum Executions:</label>
                         <input style="width:100px;" type="number" id="min_executions" name="min_executions" class="form-control" value="{{ statistics.min_executions }}">
                     </div>
-                {# </div>
-                    <div class="form-group">
-                    [{{suiteFilters | join(', ')  }}]
-                    <label for="suite_filters">Suite Filters:</label>
-                    <input type="text" id="suite_filters" name="suite_filters[]" class="form-control" placeholder="Enter Suite IDs">
                 </div>
-
-                <!-- Add test metadata filters -->
-                <div class="form-group">
-                    <label for="md_f">Test Metadata Filters:</label>
-                    <input type="text" id="md_f" name="md_f[keyword]" class="form-control" placeholder="Enter Metadata Keyword">
-                </div> #}
-                <div class="col-md-3">
+ 
+                <div class="col-md-2">
+                    <div class="form-group">
+                    <label for="suite_filters">Suite Filters:</label>
+                    <input type="text" name="suite_filters" value="{{ suiteFilters|join(',') }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-primary mt-4">Apply Filters</button>
                 </div>
+                <!-- Reset Filters Button -->
+                <div class="col-md-2">
+                    <a href="{{ path('setup_dashboard_show', { id: setup.id }) }}" class="btn btn-secondary mt-4">Reset Filters</a>
+                </div>
             </div>
+
+            <!-- Test Metadata Filters -->
+            <div class="col-md-12">
+                <h4>Test Metadata Filters:</h4>
+                <div class="row">
+                    {% set black_list = ['TESTME_NODE_ID', 'Logfile'] %}
+                    {% for key in uniqueKeys %}
+                        {% if key not in black_list %}
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="md_f_{{ key }}">{{ key }}</label>
+                                    <select id="md_f_{{ key }}" name="md_f[{{ key }}][]" class="form-control" multiple>
+                                        <!-- Multiple select now enabled -->
+                                        {% for value in uniqueKeyValues[key] %}
+                                            <option value="{{ value }}"
+                                                {% if testMetadataFilters[key] is defined and testMetadataFilters[key] is iterable and value in testMetadataFilters[key] %}
+                                                    selected
+                                                {% endif %}
+                                            >{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+
         </form>
+        
         <div class="card mb-4">
             <div class="card-body">
-                <h5 class="card-title">Summary</h5>
+            
                 <p class="card-text">Total Test Executions: {{ statistics.total_tests }}</p>
                 <p class="card-text">Unique Tests (executed {{ statistics.min_executions }} or more times): {{ statistics.unique_tests }}</p>
                 <p class="card-text">Minimum Executions Threshold: {{ statistics.min_executions }}</p>
@@ -182,20 +197,25 @@
                 {% if statistics.end_time %}
                     <p class="card-text">End Time: {{ statistics.end_time|date('Y-m-d H:i:s') }}</p>
                 {% endif %}
+
                 {% if statistics.suite_filters %}
                     <p class="card-text">Suite Filters: {{ statistics.suite_filters|join(', ') }}</p>
                 {% endif %}
                 {% if statistics.test_metadata_filters %}
                     <p class="card-text">Test Metadata Filters: 
                         {% for key, value in statistics.test_metadata_filters %}
-                            {{ key }}: {{ value }}{% if not loop.last %}, {% endif %}
+{{ key }}: {{ value is iterable ? value|join(', ') : value }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </p>
                 {% endif %}
             </div>
         </div>
 
-        <h2 class="mb-3">Test Details ({{ statistics.min_executions }}+ executions)</h2>
+
+
+
+
+
         {% if statistics.test_details is empty %}
             <p class="alert alert-info">No tests found with {{ statistics.min_executions }} or more executions in the selected time range.</p>
         {% else %}
@@ -235,17 +255,34 @@
         {% endif %}
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
+{% if debug_show_md %}
+<table border="1">
+    <thead>
+        <tr>
+            <th>Test ID</th>
+            {% for key in uniqueKeys %}
+                <th>{{ key }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in statistics.metadataResults %}
+            <tr>
+                <td>{{ result.test_id }}</td>
+                {% for key in uniqueKeys %}
+                    <td>
+                        {% if result.metadata[key] is defined %}
+                            {{ result.metadata[key] }}
+                        {% else %}
+                           
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
     {% set objId = setup.id | default(0) %}
     {%  set cycles = setup.cycles | default('') %}
     <div>Count : {{ size }}</div>
@@ -356,27 +393,8 @@
     </table>
     {% endapply %}
     {% apply spaceless %}
-    {% if setup.id is defined %}
-    <ul>
-        <li>
-            <a href="{{ path('setup_index') }}">Back to setup list</a>
-        </li>
-        {% if is_granted('edit', setup) %}
-            <li><a href="{{ path('setup_edit', { 'id': setup.id }) }}">Edit</a></li>
-            <div class="well">
-                <h4 class="green smaller lighter">Edit information</h4>
-                Only setup owner and setup administrator can edit this setup
-            </div>
-        {% endif %}
-        {#{% if is_granted('delete', setup) %}#}
-        {#<li>#}
-        {#{{ form_start(delete_form) }}#}
-        {#<input type="submit" value="Delete" onclick="return confirm('Are you sure about delete this setup?')">#}
-        {#{{ form_end(delete_form) }}#}
-        {#</li>#}
-        {#{% endif %}#}
-    </ul>
-    {% endif %}
+
+
     <script>
         function detailFormatter(index, row) {
             var html = [];

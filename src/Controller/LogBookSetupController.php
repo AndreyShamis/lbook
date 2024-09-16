@@ -387,20 +387,64 @@ class LogBookSetupController extends AbstractController
         $this->em->flush();
     }
 
+    private function parseDateTime(?string $dateString): ?\DateTime
+    {
+        if (!$dateString) {
+            return null;
+        }
+        try {
+            return new \DateTime($dateString);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function parseArrayParameter(string $param): array
+    {
+        if (empty($param)) {
+            return [];
+        }
+        return explode(',', $param);
+    }
+
+    private function parseMetadataFilters(string $param): array
+    {
+        $filters = [];
+        $pairs = explode(',', $param);
+        foreach ($pairs as $pair) {
+            $keyValue = explode(':', $pair, 2);
+            if (count($keyValue) === 2) {
+                $filters[trim($keyValue[0])] = trim($keyValue[1]);
+            }
+        }
+        return $filters;
+    }
+
     /**
-     *
      * @Route("/dashboard/{id}", name="setup_dashboard_show", methods={"GET"})
+     * @param Request $request
      * @param LoggerInterface $logger
+     * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
      * @param LogBookSetup $setup
+     * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookTestRepository $testRepository
      * @return Response
      */
-    public function dashboard(Request $request, LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, LogBookSetup $setup = null, LogBookCycleRepository $cycleRepo = null, LogBookTestRepository $testRepository = null): Response
-    {
+    public function dashboard(
+        Request $request,
+        LoggerInterface $logger,
+        PagePaginator $pagePaginator,
+        LogBookSetupRepository $setupRepo,
+        LogBookSetup $setup = null,
+        LogBookCycleRepository $cycleRepo = null,
+        LogBookTestRepository $testRepository = null
+    ): Response {
         try {
-            if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
-                throw new \RuntimeException('');
+            if ($setup === null || $cycleRepo === null || $pagePaginator === null || $testRepository === null) {
+                throw new \RuntimeException('Required dependencies are not available.');
             }
+
             $tableInfo = $this->getTableInfo($setup->getId());
             $this->updateSetupLogsSize($setup, $tableInfo['table_size']);
 
@@ -411,20 +455,21 @@ class LogBookSetupController extends AbstractController
                 ->setParameter('setup', $setup->getId());
             $query = $qb->getQuery();
             $cycles = $query->execute();
-            //dump($request->query->all());   // For GET
 
-            $minExecutions = $request->query->getInt('min_executions', 2);
-            $startTime = $request->query->get('start_time') ? new \DateTime($request->query->get('start_time')) : null;
-            $endTime = $request->query->get('end_time') ? new \DateTime($request->query->get('end_time')) : null;
-            $suiteFilters = $request->query->get('suite_filters', []);
-            $testMetadataFilters = $request->query->get('md_f', []);
-        
+            // Parse and validate query parameters
+            $minExecutions = max(1, $request->query->getInt('min_executions', 2));
+            $startTime = $this->parseDateTime($request->query->get('start_time'));
+            $endTime = $this->parseDateTime($request->query->get('end_time'));
+            $suiteFilters = $this->parseArrayParameter($request->query->get('suite_filters', ''));
+            $testMetadataFilters = $this->parseMetadataFilters($request->query->get('md_f', ''));
+
+                
             $statistics = $testRepository->getTestStatisticsForSetup(
-                $setup->getId(), 
-                $minExecutions, 
-                $startTime, 
-                $endTime, 
-                $suiteFilters, 
+                $setup->getId(),
+                $minExecutions,
+                $startTime,
+                $endTime,
+                $suiteFilters,
                 $testMetadataFilters
             );
 
@@ -434,12 +479,16 @@ class LogBookSetupController extends AbstractController
                 'table_size' => $tableInfo['table_size'],
                 'table_name' => $tableInfo['table_name'],
                 'statistics' => $statistics,
-                'suiteFilters' => $suiteFilters
+                'suiteFilters' => $suiteFilters,
+                'testMetadataFilters' => $testMetadataFilters,
+                'minExecutions' => $minExecutions,
+                'startTime' => $startTime,
+                'endTime' => $endTime,
             ]);
         } catch (\Throwable $ex) {
+            $logger->error('Error in dashboard method: ' . $ex->getMessage(), ['exception' => $ex]);
             return $this->setupNotFound($ex, $setup);
         }
-
     }
 
     /**

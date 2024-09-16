@@ -37,8 +37,7 @@ class LogBookTestRepository extends ServiceEntityRepository
     ): array {
         $qb = $this->createQueryBuilder('t')
             ->select('
-                COUNT(DISTINCT ti.id) as total_unique_tests,
-                COUNT(t.id) as total_test_executions,
+                ti.id as test_id,
                 ti.name as test_name,
                 COUNT(t.id) as test_execution_count,
                 SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
@@ -72,21 +71,67 @@ class LogBookTestRepository extends ServiceEntityRepository
                ->setParameter('endTime', $endTime);
         }
     
-        // // Apply suite execution filters
-        // if (!empty($suiteFilters) && is_array($suiteFilters) && count($suiteFilters) > 0) {
-        //     $qb->andWhere('se.id IN (:suiteFilters)')
-        //        ->setParameter('suiteFilters', $suiteFilters);
-        // }
+        // Apply suite execution filters
+        if (!empty($suiteFilters)) {
+            $qb->andWhere('se.id IN (:suiteFilters)')
+               ->setParameter('suiteFilters', $suiteFilters);
+        }
     
         // Apply test metadata filters
         if (!empty($testMetadataFilters)) {
+            $qb->leftJoin('t.newMetaData', 'md_filter');
             foreach ($testMetadataFilters as $key => $value) {
-                $qb->andWhere("md.value LIKE :$key")
-                   ->setParameter($key, '%' . $value . '%');
+                $qb->andWhere('md_filter.value LIKE :metadata_' . $key)
+                   ->setParameter('metadata_' . $key, '%' . $key . ' = ' . $value . '%');
             }
         }
     
         $result = $qb->getQuery()->getResult();
+    
+        // Fetch metadata for each test
+        $testIds = array_column($result, 'test_id');
+        $metadataQuery = $this->createQueryBuilder('t')
+            ->select('ti.id as test_id, md.value as metadata')
+            ->innerJoin('t.testInfo', 'ti')
+            ->leftJoin('t.newMetaData', 'md')
+            ->where('ti.id IN (:testIds)')
+            ->setParameter('testIds', $testIds)
+            ->getQuery();
+        
+        $metadataResults = $metadataQuery->getResult();
+    
+        // Process metadata
+        $metadataMap = [];
+        foreach ($metadataResults as $item) {
+            if (!isset($metadataMap[$item['test_id']])) {
+                $metadataMap[$item['test_id']] = [];
+            }
+            
+            // Check if metadata is an array and not null
+            if (is_array($item['metadata'])) {
+                foreach ($item['metadata'] as $metaItem) {
+                    if (is_string($metaItem)) {
+                        $parts = explode(' = ', $metaItem, 2);
+                        if (count($parts) == 2) {
+                            $metadataMap[$item['test_id']][$parts[0]] = $parts[1];
+                        }
+                    }
+                }
+            } elseif (is_string($item['metadata'])) {
+                // Handle case where metadata might be a single string
+                $parts = explode(' = ', $item['metadata'], 2);
+                if (count($parts) == 2) {
+                    $metadataMap[$item['test_id']][$parts[0]] = $parts[1];
+                }
+            }
+            // If metadata is null or any other type, we just leave it as an empty array
+        }
+
+    
+        // Merge metadata with test results
+        foreach ($result as &$test) {
+            $test['metadata'] = $metadataMap[$test['test_id']] ?? [];
+        }
     
         $totalTests = array_sum(array_column($result, 'test_execution_count'));
         $uniqueTests = count($result);
@@ -102,7 +147,6 @@ class LogBookTestRepository extends ServiceEntityRepository
             'test_metadata_filters' => $testMetadataFilters,
         ];
     }
-    
 
     /**
      * @param array $criteria

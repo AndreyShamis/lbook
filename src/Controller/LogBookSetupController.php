@@ -387,20 +387,85 @@ class LogBookSetupController extends AbstractController
         $this->em->flush();
     }
 
+    private function parseDateTime(?string $dateString): ?\DateTime
+    {
+        if (!$dateString) {
+            return null;
+        }
+        try {
+            return new \DateTime($dateString);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function parseArrayParameter(string $param): array
+    {
+        if (empty($param)) {
+            return [];
+        }
+        return explode(',', $param);
+    }
+
+    private function parseMetadataFilters($param): array
+    {
+        $filters = [];
+    
+        // If $param is a string, assume it's a serialized filter string (like "key1:value1,key2:value2")
+        if (is_string($param)) {
+            $pairs = explode(',', $param); // Split the string by commas
+    
+            foreach ($pairs as $pair) {
+                $keyValue = explode(':', $pair, 2); // Split each key-value pair by the colon
+                if (count($keyValue) === 2) {
+                    $filters[trim($keyValue[0])] = trim($keyValue[1]);
+                }
+            }
+        }
+        // If $param is an array (for multi-select inputs), process it directly
+        elseif (is_array($param)) {
+            foreach ($param as $key => $value) {
+                // If the value is an array, assume multiple selections (multi-select input)
+                if (is_array($value)) {
+                    $filters[trim($key)] = array_map('trim', $value);
+                }
+                // If the value is a single string, process it as a regular filter
+                elseif (!empty($value)) {
+                    $filters[trim($key)] = trim($value);
+                }
+            }
+        }
+    
+        return $filters;
+    }
+    
+    
+    
     /**
-     *
      * @Route("/dashboard/{id}", name="setup_dashboard_show", methods={"GET"})
+     * @param Request $request
      * @param LoggerInterface $logger
+     * @param PagePaginator $pagePaginator
      * @param LogBookSetupRepository $setupRepo
      * @param LogBookSetup $setup
+     * @param LogBookCycleRepository $cycleRepo
+     * @param LogBookTestRepository $testRepository
      * @return Response
      */
-    public function dashboard(Request $request, LoggerInterface $logger, PagePaginator $pagePaginator, LogBookSetupRepository $setupRepo, LogBookSetup $setup = null, LogBookCycleRepository $cycleRepo = null, LogBookTestRepository $testRepository = null): Response
-    {
+    public function dashboard(
+        Request $request,
+        LoggerInterface $logger,
+        PagePaginator $pagePaginator,
+        LogBookSetupRepository $setupRepo,
+        LogBookSetup $setup = null,
+        LogBookCycleRepository $cycleRepo = null,
+        LogBookTestRepository $testRepository = null
+    ): Response {
         try {
-            if ($setup === null || $cycleRepo === null || $pagePaginator === null) {
-                throw new \RuntimeException('');
+            if ($setup === null || $cycleRepo === null || $pagePaginator === null || $testRepository === null) {
+                throw new \RuntimeException('Required dependencies are not available.');
             }
+
             $tableInfo = $this->getTableInfo($setup->getId());
             $this->updateSetupLogsSize($setup, $tableInfo['table_size']);
 
@@ -411,35 +476,64 @@ class LogBookSetupController extends AbstractController
                 ->setParameter('setup', $setup->getId());
             $query = $qb->getQuery();
             $cycles = $query->execute();
-            //dump($request->query->all());   // For GET
 
-            $minExecutions = $request->query->getInt('min_executions', 2);
-            $startTime = $request->query->get('start_time') ? new \DateTime($request->query->get('start_time')) : null;
-            $endTime = $request->query->get('end_time') ? new \DateTime($request->query->get('end_time')) : null;
-            $suiteFilters = $request->query->get('suite_filters', []);
-            $testMetadataFilters = $request->query->get('md_f', []);
-        
+            // Parse and validate query parameters
+            $minExecutions = max(1, $request->query->getInt('min_executions', 2));
+            $startTime = $this->parseDateTime($request->query->get('start_time'));
+            $endTime = $this->parseDateTime($request->query->get('end_time'));
+            $suiteFilters = $this->parseArrayParameter($request->query->get('suite_filters', ''));
+            $testMetadataFilters = $this->parseMetadataFilters($request->query->get('md_f', []));
+
+
+                
             $statistics = $testRepository->getTestStatisticsForSetup(
-                $setup->getId(), 
-                $minExecutions, 
-                $startTime, 
-                $endTime, 
-                $suiteFilters, 
+                $setup->getId(),
+                $minExecutions,
+                $startTime,
+                $endTime,
+                $suiteFilters,
                 $testMetadataFilters
             );
+            $uniqueKeys = [];
+            $uniqueKeyValues = [];
 
+            foreach ($statistics['metadataResults'] as $result) {
+                if (isset($result['metadata']) && is_array($result['metadata'])) {
+                    foreach (array_keys($result['metadata']) as $key) {
+                        $uniqueKeys[$key] = true; // Use array as a set to ensure uniqueness
+                    }
+                    foreach ($result['metadata'] as $key => $value) {
+                        if (!isset($uniqueKeyValues[$key])) {
+                            $uniqueKeyValues[$key] = [];
+                        }
+                        if (!in_array($value, $uniqueKeyValues[$key])) {
+                            $uniqueKeyValues[$key][] = $value; // Collect unique values for each key
+                        }
+                    }
+                }
+            }
+
+            
+            $uniqueKeys = array_keys($uniqueKeys); // Extract the unique keys as an array
             return $this->render('log_book_setup/dashboard_show.html.twig', [
                 'setup' => $setup,
                 'size' => count($cycles),
                 'table_size' => $tableInfo['table_size'],
                 'table_name' => $tableInfo['table_name'],
                 'statistics' => $statistics,
-                'suiteFilters' => $suiteFilters
+                'suiteFilters' => $suiteFilters,
+                'testMetadataFilters' => $testMetadataFilters,
+                'minExecutions' => $minExecutions,
+                'startTime' => $startTime,
+                'endTime' => $endTime,
+                'uniqueKeys' => $uniqueKeys,
+                'uniqueKeyValues' => $uniqueKeyValues,
+                'debug_show_md' => false,
             ]);
         } catch (\Throwable $ex) {
+            $logger->error('Error in dashboard method: ' . $ex->getMessage(), ['exception' => $ex]);
             return $this->setupNotFound($ex, $setup);
         }
-
     }
 
     /**

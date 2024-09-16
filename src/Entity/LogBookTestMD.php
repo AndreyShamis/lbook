@@ -70,4 +70,31 @@ class LogBookTestMD
     {
         return implode(';;', $this->getValue());
     }
+    
+
+    /**
+     * Retrieve the value by key with an optional default if the key is not found.
+     *
+     * @param string $key
+     * @param string|null $default
+     * @return string|null
+     */
+    public function get(string $key, ?string $default = null): ?string
+    {
+        return $this->value[$key] ?? $default;
+    }
+
+    /**
+     * Set or update a key-value pair in the metadata array.
+     *
+     * @param string $key
+     * @param string $value
+     * @return self
+     */
+    public function set(string $key, string $value): self
+    {
+        $this->value[$key] = $value;
+
+        return $this;
+    }
 }

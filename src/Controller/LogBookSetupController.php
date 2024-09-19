@@ -496,7 +496,8 @@ class LogBookSetupController extends AbstractController
             );
             $uniqueKeys = [];
             $uniqueKeyValues = [];
-
+            // $uniqueKeys['chip'] = true;
+            // $uniqueKeys['platform'] = true;
             foreach ($statistics['metadataResults'] as $result) {
                 if (isset($result['metadata']) && is_array($result['metadata'])) {
                     foreach (array_keys($result['metadata']) as $key) {
@@ -511,6 +512,54 @@ class LogBookSetupController extends AbstractController
                         }
                     }
                 }
+                
+            }
+            // Merge metadata results into the test details
+            $metadataResults = $statistics['metadataResults'];
+
+            foreach ($statistics['test_details'] as &$testDetail) {
+                $testId = $testDetail['test_id'];
+                
+                // Initialize metadata as an empty array if it doesn't exist
+                if (!isset($testDetail['metadata']) || !is_array($testDetail['metadata'])) {
+                    $testDetail['metadata'] = [];
+                }
+
+                // Iterate over metadata results and add all matching metadata for this test
+                foreach ($metadataResults as $metadataResult) {
+                    if ($metadataResult['test_id'] === $testId) {
+                        // Ensure the metadata from the result is also an array
+                        if (is_array($metadataResult['metadata'])) {
+                            // Merge the metadata entry into the test's metadata array
+                            $testDetail['metadata'] = array_merge($testDetail['metadata'], $metadataResult['metadata']);
+                        }
+                    }
+                }
+            }
+
+
+            // Group test details by Chip, Platform, and Metadata keys
+            $metadataKeys = ['BOARD', 'PROJECT', 'BRAIN', 'FLOW_NAME', 'PRODUCT_VERSION'];
+            $groupedTestDetails = [];
+
+            foreach ($statistics['test_details'] as $detail) {
+                $chip = $detail['chip'] ?? 'Unknown Chip';
+                $platform = $detail['platform'] ?? 'Unknown Platform';
+
+                // Initialize a pointer to the groupedTestDetails for the current test name, chip, and platform
+                $pointer = &$groupedTestDetails[$detail['test_name']][$chip][$platform];
+
+                // Iterate over metadata keys and build the nested structure dynamically
+                foreach ($metadataKeys as $key) {
+                    // Assign 'Unknown {key}' if metadata is missing or not set
+                    $metadataValue = $detail['metadata'][$key] ?? 'Unknown ' . $key;
+
+                    // Set the pointer to the next level based on the metadata value
+                    $pointer = &$pointer[$metadataValue];
+                }
+
+                // Finally, assign the test details at the deepest level
+                $pointer = $detail;
             }
 
             
@@ -521,6 +570,8 @@ class LogBookSetupController extends AbstractController
                 'table_size' => $tableInfo['table_size'],
                 'table_name' => $tableInfo['table_name'],
                 'statistics' => $statistics,
+                'groupedTestDetails' => $groupedTestDetails,  // Pass grouped data to Twig
+                'metadataKeys' => $metadataKeys,              // Pass metadata keys to the Twig template
                 'suiteFilters' => $suiteFilters,
                 'testMetadataFilters' => $testMetadataFilters,
                 'minExecutions' => $minExecutions,

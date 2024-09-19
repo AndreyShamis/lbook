@@ -68,15 +68,7 @@ class LogBookTestMD
     {
         // Set the value for the serialized field (legacy support)
         $this->value = $value;
-    
-        // Convert key-value pairs into JSON format and store them in valueJson
-        $jsonArray = [];
-        foreach ($value as $key => $val) {
-            $jsonArray[] = ['key' => $key, 'val' => $val];
-        }
-    
-        // Set the JSON field with the converted key-value pairs
-        $this->setValueJson($jsonArray);
+        $this->setValueJson($value);
     
         return $this;
     }    

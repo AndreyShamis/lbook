@@ -968,9 +968,11 @@ class LogBookTest
             if ($this->getTestInfo() !== null && $this->getTestInfo()->getPath() !== null) {
                 $ret_test['metadata']['CONTROL'] = $this->getTestInfo()->getPath();
             } else {
-                $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
-                unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
-                $ret_test['metadata']['CONTROL'] = $control_path;
+                if (array_key_exists('CONTROL_FILE_SHOW_OPT', $ret_test['metadata'])) {
+                    $control_path = $ret_test['metadata']['CONTROL_FILE_SHOW_OPT'];
+                    unset($ret_test['metadata']['CONTROL_FILE_SHOW_OPT']);
+                    $ret_test['metadata']['CONTROL'] = $control_path;
+                }
             }
         } catch (\Throwable $ex) {}
         try {

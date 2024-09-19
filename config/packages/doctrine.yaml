@@ -34,5 +34,8 @@ doctrine:
         dql:
             string_functions:
                 MATCH_AGAINST: App\Doctrine\MatchAgainst
+                JSON_EXTRACT: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonExtract
+                JSON_SEARCH: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonSearch
+                JSON_UNQUOTE: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonUnquote
             numeric_functions:
                 RAND: App\Doctrine\Rand

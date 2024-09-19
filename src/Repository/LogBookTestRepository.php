@@ -36,61 +36,77 @@ class LogBookTestRepository extends ServiceEntityRepository
         array $testMetadataFilters = []
     ): array {
         $qb = $this->createQueryBuilder('t')
-            ->select('
-                ti.id as test_id,
-                ti.name as test_name,
-                COUNT(t.id) as test_execution_count,
-                SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
-                SUM(CASE WHEN v.name = \'FAIL\' THEN 1 ELSE 0 END) as fail_count,
-                SUM(CASE WHEN v.name = \'ERROR\' THEN 1 ELSE 0 END) as error_count,
-                SUM(CASE WHEN v.name NOT IN (\'PASS\', \'FAIL\', \'ERROR\') THEN 1 ELSE 0 END) as other_count,
-                MAX(t.timeEnd) as last_run_time,
-                AVG(t.timeRun) as avg_execution_time
-            ')
-            ->innerJoin('t.testInfo', 'ti')
-            ->innerJoin('t.cycle', 'c') // Ensure we join with the cycle
-            ->innerJoin('c.setup', 's') // Join with the setup to filter by setupId
-            ->innerJoin('c.suiteExecution', 'se') // Adding SuiteExecution join
-            ->innerJoin('se.suiteInfo', 'si')  // Join SuiteInfo if necessary
-            ->innerJoin('t.verdict', 'v')
-            ->leftJoin('t.newMetaData', 'md')
-            ->where('s.id = :setupId')
-            ->groupBy('ti.id', 'ti.name')
-            ->having('COUNT(t.id) >= :minExecutions')
-            ->orderBy('ti.name', 'ASC')
-            ->addOrderBy('test_execution_count', 'DESC')
-            ->setParameter('setupId', $setupId)
-            ->setParameter('minExecutions', $minExecutions);
-    
+        ->select('
+            ti.id as test_id,
+            ti.name as test_name,
+            se.chip as chip,
+            se.platform as platform,
+            JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, \'$.BOARD\')) as board,
+            JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, \'$.PROJECT\')) as project,
+            JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, \'$.BRAIN\')) as brain,
+            JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, \'$.FLOW_NAME\')) as flow_name,
+            JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, \'$.PRODUCT_VERSION\')) as product_version,
+            COUNT(t.id) as test_execution_count,
+            SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
+            SUM(CASE WHEN v.name = \'FAIL\' THEN 1 ELSE 0 END) as fail_count,
+            SUM(CASE WHEN v.name = \'ERROR\' THEN 1 ELSE 0 END) as error_count,
+            SUM(CASE WHEN v.name NOT IN (\'PASS\', \'FAIL\', \'ERROR\') THEN 1 ELSE 0 END) as other_count,
+            MAX(t.timeEnd) as last_run_time,
+            AVG(t.timeRun) as avg_execution_time
+        ')
+        ->innerJoin('t.testInfo', 'ti')
+        ->innerJoin('t.cycle', 'c') // Ensure we join with the cycle
+        ->innerJoin('c.setup', 's') // Join with the setup to filter by setupId
+        ->innerJoin('c.suiteExecution', 'se') // Adding SuiteExecution join
+        ->innerJoin('se.suiteInfo', 'si')  // Join SuiteInfo if necessary
+        ->innerJoin('t.verdict', 'v')
+        ->leftJoin('t.newMetaData', 'md')
+        ->where('s.id = :setupId')
+        ->groupBy(
+            'ti.name', 
+            'se.chip', 
+            'se.platform', 
+            'board', 
+            'project', 
+            'brain', 
+            'flow_name', 
+            'product_version'
+        )
+        ->having('COUNT(t.id) >= :minExecutions')
+        ->orderBy('ti.name', 'ASC')
+        ->addOrderBy('test_execution_count', 'DESC')
+        ->setParameter('setupId', $setupId)
+        ->setParameter('minExecutions', $minExecutions);
+
         // Apply time filters
         if ($startTime) {
             $qb->andWhere('c.timeStart >= :startTime')
-               ->setParameter('startTime', $startTime);
+            ->setParameter('startTime', $startTime);
         }
         if ($endTime) {
             $qb->andWhere('c.timeEnd <= :endTime')
-               ->setParameter('endTime', $endTime);
+            ->setParameter('endTime', $endTime);
         }
     
-    // Apply suite execution free-text filters (assuming $suiteFilters is an array of search strings)
-    if (!empty($suiteFilters)) {
-        $orX = $qb->expr()->orX();
-        foreach ($suiteFilters as $suiteFilter) {
-            $suiteFilter = '%' . $suiteFilter . '%';  // Add wildcards for LIKE search
-            $orX->add(
-                $qb->expr()->orX(
-                    $qb->expr()->like('se.summary', ':suiteFilter'),
-                    $qb->expr()->like('se.description', ':suiteFilter'),
-                    $qb->expr()->like('se.jobName', ':suiteFilter'),
-                    $qb->expr()->like('se.productVersion', ':suiteFilter'),
-                    $qb->expr()->like('se.platform', ':suiteFilter'),
-                    $qb->expr()->like('se.chip', ':suiteFilter')
-                )
-            );
-            $qb->setParameter('suiteFilter', $suiteFilter);
+        // Apply suite execution free-text filters (assuming $suiteFilters is an array of search strings)
+        if (!empty($suiteFilters)) {
+            $orX = $qb->expr()->orX();
+            foreach ($suiteFilters as $suiteFilter) {
+                $suiteFilter = '%' . $suiteFilter . '%';  // Add wildcards for LIKE search
+                $orX->add(
+                    $qb->expr()->orX(
+                        $qb->expr()->like('se.summary', ':suiteFilter'),
+                        $qb->expr()->like('se.description', ':suiteFilter'),
+                        $qb->expr()->like('se.jobName', ':suiteFilter'),
+                        $qb->expr()->like('se.productVersion', ':suiteFilter'),
+                        $qb->expr()->like('se.platform', ':suiteFilter'),
+                        $qb->expr()->like('se.chip', ':suiteFilter')
+                    )
+                );
+                $qb->setParameter('suiteFilter', $suiteFilter);
+            }
+            $qb->andWhere($orX);
         }
-        $qb->andWhere($orX);
-    }
 
         // Apply test metadata filters
         if (!empty($testMetadataFilters)) {

@@ -212,7 +212,91 @@
         </div>
 
 
+ <pre>{{ dump(groupedTestDetails) }}</pre> 
+{% if groupedTestDetails is empty %}
+    <p class="alert alert-info">No tests found with {{ statistics.min_executions }} or more executions in the selected time range.</p>
+{% else %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Test Name</th>
+                {# Generate the headers dynamically in the same loop #}
+                {% set headers = [] %}
+                {% for testName, chips in groupedTestDetails %}
+                    {% for chip, platforms in chips %}
+                        {% for platform, boards in platforms %}
+                            {% for board, projects in boards %}
+                                {% for project, brains in projects %}
+                                    {% for brain, flowNames in brains %}
+                                        {% for flowName, productVersions in flowNames %}
+                                            {% for productVersion, details in productVersions %}
+                                                {# Generate header string and add it only if it is unique #}
+                                                {% set combination = chip ~ ' / ' ~ platform ~ ' / ' ~ board ~ ' / ' ~ project ~ ' / ' ~ brain ~ ' / ' ~ flowName ~ ' / ' ~ productVersion %}
+                                                {% if combination not in headers %}
+                                                    {% set headers = headers|merge([combination]) %}
+                                                    <th>{{ combination }}</th>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {# Loop through the tests and their details in the same process #}
+            {% for testName, chips in groupedTestDetails %}
+                <tr>
+                    <td>{{ testName }}</td>
 
+                    {# Loop through the dynamically generated headers #}
+                    {% for header in headers %}
+                        {% set values = header|split(' / ') %}
+                        {% set chip = values[0] %}
+                        {% set platform = values[1] %}
+                        {% set board = values[2] %}
+                        {% set project = values[3] %}
+                        {% set brain = values[4] %}
+                        {% set flowName = values[5] %}
+                        {% set productVersion = values[6] %}
+
+                        <td>
+                            {# Ensure that we are displaying the correct details based on the current Chip/Platform/Metadata combination #}
+                            {% if chips[chip] is defined and chips[chip][platform] is defined and chips[chip][platform][board] is defined and chips[chip][platform][board][project] is defined and chips[chip][platform][board][project][brain] is defined and chips[chip][platform][board][project][brain][flowName] is defined and chips[chip][platform][board][project][brain][flowName][productVersion] is defined %}
+                                {% set detail = chips[chip][platform][board][project][brain][flowName][productVersion] %}
+
+                                {# Display key metrics in a more visually organized way #}
+                                <span title="Total tests"><strong>{{ detail.test_execution_count }}</strong></span> 
+                                Pass: {{ detail.pass_count }}
+
+                                {% if detail.fail_count > 0 %}
+                                    <span class="text-danger">Fail: <strong>{{ detail.fail_count }}</strong></span>
+                                {% endif %}
+
+                                {% if detail.error_count > 0 %}
+                                    <span class="text-warning"><strong>Error: {{ detail.error_count }}</strong></span>
+                                {% endif %}
+
+                                {% if detail.other_count > 0 %}
+                                    <span class="text-info">Other: <strong>{{ detail.other_count }}</strong></span>
+                                {% endif %}
+
+                                <br>
+                                Last: {{ detail.last_run_time|date('Y-m-d H:i') }} <br>
+                                Avg.ime: {{ (detail.avg_execution_time / 1000)|round(2) }} sec
+                            {% else %}
+                                (No executions)
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 
 
 

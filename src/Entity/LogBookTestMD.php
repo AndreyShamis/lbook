@@ -4,12 +4,13 @@ namespace App\Entity;
 
 use App\Repository\LogBookTestMDRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index;
+
 
 /**
  * @ORM\Entity(repositoryClass=LogBookTestMDRepository::class)
  * @ORM\Table(name="lbook_test_meta_data", indexes={
- *     @Index(name="fulltext_metadata", columns={"value"}, flags={"fulltext"})})
+ *     @ORM\Index(name="fulltext_metadata", columns={"value"}, flags={"fulltext"}))
+ * })
  */
 class LogBookTestMD
 {
@@ -27,6 +28,11 @@ class LogBookTestMD
     private $value;
 
     /**
+     * @ORM\Column(name="valueJson", type="json", nullable=true)
+     */
+    private $valueJson;
+    
+    /**
      * @ORM\OneToOne(targetEntity=LogBookTest::class, inversedBy="newMetaData", cascade={"persist"})
      * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
@@ -35,6 +41,17 @@ class LogBookTestMD
     public function __construct()
     {
         $this->value = [];
+    }
+
+    public function getValueJson(): ?array
+    {
+        return $this->valueJson;
+    }
+
+    public function setValueJson(?array $valueJson): self
+    {
+        $this->valueJson = $valueJson;
+        return $this;
     }
 
     public function getId(): ?int
@@ -49,10 +66,20 @@ class LogBookTestMD
 
     public function setValue(array $value): self
     {
+        // Set the value for the serialized field (legacy support)
         $this->value = $value;
-
+    
+        // Convert key-value pairs into JSON format and store them in valueJson
+        $jsonArray = [];
+        foreach ($value as $key => $val) {
+            $jsonArray[] = ['key' => $key, 'val' => $val];
+        }
+    
+        // Set the JSON field with the converted key-value pairs
+        $this->setValueJson($jsonArray);
+    
         return $this;
-    }
+    }    
 
     public function getTest(): ?LogBookTest
     {

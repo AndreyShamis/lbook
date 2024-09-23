@@ -212,16 +212,92 @@
         </div>
 
 
- <pre>{{ dump(groupedTestDetails) }}</pre> 
-{% if groupedTestDetails is empty %}
-    <p class="alert alert-info">No tests found with {{ statistics.min_executions }} or more executions in the selected time range.</p>
-{% else %}
-    <table class="table table-striped">
+
+
+
+<div class="container">
+    <h2>Grouped Columns Test Statistics Table</h2>
+
+    <table id="test-table" class="table table-bordered table-striped" data-toggle="table" data-group-by="true">
         <thead>
+            {# First row: Chip headers (each chip header spans the number of columns for its permutations) #}
             <tr>
-                <th>Test Name</th>
-                {# Generate the headers dynamically in the same loop #}
-                {% set headers = [] %}
+                <th rowspan="4">Test Name</th>
+                {% set chip_count = {} %}
+                {% for testName, chips in groupedTestDetails %}
+                    {% for chip, platforms in chips %}
+                        {% if chip_count[chip] is not defined %}
+                            {% set chip_count = chip_count | merge({ (chip): 0 }) %}
+                        {% endif %}
+                        {% for platform, boards in platforms %}
+                            {% for board, projects in boards %}
+                                {% for project, brains in projects %}
+                                    {% for brain, flowNames in brains %}
+                                        {% for flowName, productVersions in flowNames %}
+                                            {% for productVersion, details in productVersions %}
+                                                {% set chip_count = chip_count | merge({ (chip): chip_count[chip] + 1 }) %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+                {# Output Chip headers with the appropriate colspan #}
+                {% for chip, count in chip_count %}
+                    <th colspan="{{ count }}">{{ chip }}</th>
+                {% endfor %}
+            </tr>
+
+            {# Second row: Platform headers (spanning the correct number of columns) #}
+            <tr>
+                {% for testName, chips in groupedTestDetails %}
+                    {% for chip, platforms in chips %}
+                        {% for platform, boards in platforms %}
+                            {% set colspan_platform = 0 %}
+                            {% for board, projects in boards %}
+                                {% for project, brains in projects %}
+                                    {% for brain, flowNames in brains %}
+                                        {% for flowName, productVersions in flowNames %}
+                                            {% for productVersion, details in productVersions %}
+                                                {% set colspan_platform = colspan_platform + 1 %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                            <th colspan="{{ colspan_platform }}">{{ platform }}</th>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+
+            {# Third row: Board headers #}
+            <tr>
+                {% for testName, chips in groupedTestDetails %}
+                    {% for chip, platforms in chips %}
+                        {% for platform, boards in platforms %}
+                            {% for board, projects in boards %}
+                                {% set colspan_board = 0 %}
+                                {% for project, brains in projects %}
+                                    {% for brain, flowNames in brains %}
+                                        {% for flowName, productVersions in flowNames %}
+                                            {% for productVersion, details in productVersions %}
+                                                {% set colspan_board = colspan_board + 1 %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                                <th colspan="{{ colspan_board }}">{{ board }}</th>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+
+            {# Fourth row: Flow Name / Product Version headers #}
+            <tr>
                 {% for testName, chips in groupedTestDetails %}
                     {% for chip, platforms in chips %}
                         {% for platform, boards in platforms %}
@@ -230,12 +306,7 @@
                                     {% for brain, flowNames in brains %}
                                         {% for flowName, productVersions in flowNames %}
                                             {% for productVersion, details in productVersions %}
-                                                {# Generate header string and add it only if it is unique #}
-                                                {% set combination = chip ~ ' / ' ~ platform ~ ' / ' ~ board ~ ' / ' ~ project ~ ' / ' ~ brain ~ ' / ' ~ flowName ~ ' / ' ~ productVersion %}
-                                                {% if combination not in headers %}
-                                                    {% set headers = headers|merge([combination]) %}
-                                                    <th>{{ combination }}</th>
-                                                {% endif %}
+                                                <th>{{ flowName }} / {{ productVersion }}</th>
                                             {% endfor %}
                                         {% endfor %}
                                     {% endfor %}
@@ -246,60 +317,64 @@
                 {% endfor %}
             </tr>
         </thead>
+
         <tbody>
-            {# Loop through the tests and their details in the same process #}
+            {# Loop through test details to generate the rows #}
             {% for testName, chips in groupedTestDetails %}
                 <tr>
                     <td>{{ testName }}</td>
+                    {# Nested loop for data (make sure each `td` aligns with the corresponding `th`) #}
+                    {% for chip, platforms in chips %}
+                        {% for platform, boards in platforms %}
+                            {% for board, projects in boards %}
+                                {% for project, brains in projects %}
+                                    {% for brain, flowNames in brains %}
+                                        {% for flowName, productVersions in flowNames %}
+                                            {% for productVersion, details in productVersions %}
+                                                <td>
+                                                    <span title="Total tests"><strong>{{ details.test_execution_count }}</strong></span>
+                                                    Pass: {{ details.pass_count }}
 
-                    {# Loop through the dynamically generated headers #}
-                    {% for header in headers %}
-                        {% set values = header|split(' / ') %}
-                        {% set chip = values[0] %}
-                        {% set platform = values[1] %}
-                        {% set board = values[2] %}
-                        {% set project = values[3] %}
-                        {% set brain = values[4] %}
-                        {% set flowName = values[5] %}
-                        {% set productVersion = values[6] %}
+                                                    {% if details.fail_count > 0 %}
+                                                        <br><span class="text-danger">Fail: <strong>{{ details.fail_count }}</strong></span>
+                                                    {% endif %}
 
-                        <td>
-                            {# Ensure that we are displaying the correct details based on the current Chip/Platform/Metadata combination #}
-                            {% if chips[chip] is defined and chips[chip][platform] is defined and chips[chip][platform][board] is defined and chips[chip][platform][board][project] is defined and chips[chip][platform][board][project][brain] is defined and chips[chip][platform][board][project][brain][flowName] is defined and chips[chip][platform][board][project][brain][flowName][productVersion] is defined %}
-                                {% set detail = chips[chip][platform][board][project][brain][flowName][productVersion] %}
+                                                    {% if details.error_count > 0 %}
+                                                        <br><span class="text-warning">Error: <strong>{{ details.error_count }}</strong></span>
+                                                    {% endif %}
 
-                                {# Display key metrics in a more visually organized way #}
-                                <span title="Total tests"><strong>{{ detail.test_execution_count }}</strong></span> 
-                                Pass: {{ detail.pass_count }}
-
-                                {% if detail.fail_count > 0 %}
-                                    <span class="text-danger">Fail: <strong>{{ detail.fail_count }}</strong></span>
-                                {% endif %}
-
-                                {% if detail.error_count > 0 %}
-                                    <span class="text-warning"><strong>Error: {{ detail.error_count }}</strong></span>
-                                {% endif %}
-
-                                {% if detail.other_count > 0 %}
-                                    <span class="text-info">Other: <strong>{{ detail.other_count }}</strong></span>
-                                {% endif %}
-
-                                <br>
-                                Last: {{ detail.last_run_time|date('Y-m-d H:i') }} <br>
-                                Avg.ime: {{ (detail.avg_execution_time / 1000)|round(2) }} sec
-                            {% else %}
-                                (No executions)
-                            {% endif %}
-                        </td>
+                                                    {% if details.other_count > 0 %}
+                                                        <br><span class="text-info">Other: <strong>{{ details.other_count }}</strong></span>
+                                                    {% endif %}
+                                                    <br>
+                                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                        <span style="border-right: 1px solid #ccc; padding-right: 10px; cursor: pointer;" 
+                                                            title="Last Run Time: {{ details.last_run_time|date('Y-m-d H:i') }}">
+                                                            {{ details.last_run_time|date('M d H:i') }}
+                                                        </span>
+                                                        <span style="padding-left: 10px; cursor: pointer;" 
+                                                            title="Average Execution Time: {{ (details.avg_execution_time / 1000)|round(2) }} seconds">
+                                                            {{ (details.avg_execution_time / 1000)|round(2) }}s
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
                     {% endfor %}
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-{% endif %}
+</div>
+
+ {# <pre>{{ dump(groupedTestDetails) }}</pre>  #}
 
 
-
+ {# <pre>{{ dump(statistics.test_details) }}</pre> #}
         {% if statistics.test_details is empty %}
             <p class="alert alert-info">No tests found with {{ statistics.min_executions }} or more executions in the selected time range.</p>
         {% else %}
@@ -307,6 +382,12 @@
                 <thead>
                     <tr>
                         <th>Test Name</th>
+                        <th>CP</th>
+                        <th>BOARD</th>
+                        <th>PROJECT</th>
+                        <th>BRAIN</th>
+                        <th>FN</th>
+                        <th>PV</th>
                         <th>Execution Count</th>
                         <th>Pass</th>
                         <th>Fail</th>
@@ -315,22 +396,32 @@
                         <th>Last Run</th>
                         <th>Avg. Execution Time</th>
                         <th>Percentage of Total</th>
+
                     </tr>
                 </thead>
                 <tbody>
                     {% for test in statistics.test_details %}
                         <tr>
                             <td>{{ test.test_name }}</td>
+                            <td>{{ test.chip_platform }}</td>
+                            <td>{{ test.board }}</td>
+                            <td>{{ test.project }}</td>
+                            <td>{{ test.brain }}</td>
+                            <td>{{ test.flow_name }}</td>
+                            <td>{{ test.md_pv }}</td>
                             <td>{{ test.test_execution_count }}</td>
                             <td>{{ test.pass_count }}</td>
                             <td>{{ test.fail_count }}</td>
                             <td>{{ test.error_count }}</td>
                             <td>{{ test.other_count }}</td>
-                            <td>{{ test.last_run_time|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ test.last_run_time|date('m-d H:i') }}</td>
                             <td>{{ (test.avg_execution_time / 1000)|round(2) }} sec</td>
                             <td>
                                 {% set percentage = (test.test_execution_count / statistics.total_tests * 100)|round(2) %}
                                 {{ percentage }}%
+                            </td>
+                            <td> 
+
                             </td>
                         </tr>
                     {% endfor %}

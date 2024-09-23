@@ -514,45 +514,45 @@ class LogBookSetupController extends AbstractController
                 }
                 
             }
-            // Merge metadata results into the test details
-            $metadataResults = $statistics['metadataResults'];
+            // // Merge metadata results into the test details
+            // $metadataResults = $statistics['metadataResults'];
 
-            foreach ($statistics['test_details'] as &$testDetail) {
-                $testId = $testDetail['test_id'];
+            // foreach ($statistics['test_details'] as &$testDetail) {
+            //     $testId = $testDetail['test_id'];
                 
-                // Initialize metadata as an empty array if it doesn't exist
-                if (!isset($testDetail['metadata']) || !is_array($testDetail['metadata'])) {
-                    $testDetail['metadata'] = [];
-                }
+            //     // Initialize metadata as an empty array if it doesn't exist
+            //     if (!isset($testDetail['metadata']) || !is_array($testDetail['metadata'])) {
+            //         $testDetail['metadata'] = [];
+            //     }
 
-                // Iterate over metadata results and add all matching metadata for this test
-                foreach ($metadataResults as $metadataResult) {
-                    if ($metadataResult['test_id'] === $testId) {
-                        // Ensure the metadata from the result is also an array
-                        if (is_array($metadataResult['metadata'])) {
-                            // Merge the metadata entry into the test's metadata array
-                            $testDetail['metadata'] = array_merge($testDetail['metadata'], $metadataResult['metadata']);
-                        }
-                    }
-                }
-            }
+            //     // Iterate over metadata results and add all matching metadata for this test
+            //     foreach ($metadataResults as $metadataResult) {
+            //         if ($metadataResult['test_id'] === $testId) {
+            //             // Ensure the metadata from the result is also an array
+            //             if (is_array($metadataResult['metadata'])) {
+            //                 // Merge the metadata entry into the test's metadata array
+            //                 $testDetail['metadata'] = array_merge($testDetail['metadata'], $metadataResult['metadata']);
+            //             }
+            //         }
+            //     }
+            // }
 
 
             // Group test details by Chip, Platform, and Metadata keys
-            $metadataKeys = ['BOARD', 'PROJECT', 'BRAIN', 'FLOW_NAME', 'PRODUCT_VERSION'];
+            $metadataKeys = ['board', 'project', 'brain', 'flow_name', 'md_pv']; // Adjust keys to match new field names
             $groupedTestDetails = [];
 
             foreach ($statistics['test_details'] as $detail) {
-                $chip = $detail['chip'] ?? 'Unknown Chip';
-                $platform = $detail['platform'] ?? 'Unknown Platform';
+                $chip = $detail['chip'] ?? 'Chip';
+                $platform = $detail['platform'] ?? 'Platform';
 
                 // Initialize a pointer to the groupedTestDetails for the current test name, chip, and platform
                 $pointer = &$groupedTestDetails[$detail['test_name']][$chip][$platform];
 
-                // Iterate over metadata keys and build the nested structure dynamically
+                // Iterate over new metadata keys (now directly in $detail)
                 foreach ($metadataKeys as $key) {
-                    // Assign 'Unknown {key}' if metadata is missing or not set
-                    $metadataValue = $detail['metadata'][$key] ?? 'Unknown ' . $key;
+                    // Check if the metadata value exists, otherwise set a default
+                    $metadataValue = $detail[$key] ?? ' ';// . strtoupper($key);
 
                     // Set the pointer to the next level based on the metadata value
                     $pointer = &$pointer[$metadataValue];
@@ -561,7 +561,6 @@ class LogBookSetupController extends AbstractController
                 // Finally, assign the test details at the deepest level
                 $pointer = $detail;
             }
-
             
             $uniqueKeys = array_keys($uniqueKeys); // Extract the unique keys as an array
             return $this->render('log_book_setup/dashboard_show.html.twig', [

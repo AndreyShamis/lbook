@@ -38,7 +38,14 @@ class LogBookTestRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('t')
             ->select('
                 ti.id as test_id,
+                t.id as real_test_id,
+                c.name as cycle_name,
+                c.id as cycle_id,
                 ti.name as test_name,
+                se.chip as chip,
+                se.platform as platform,
+                CONCAT(se.chip, \'/\', se.platform) as chip_platform, 
+                se.productVersion as s_pv,
                 COUNT(t.id) as test_execution_count,
                 SUM(CASE WHEN v.name = \'PASS\' THEN 1 ELSE 0 END) as pass_count,
                 SUM(CASE WHEN v.name = \'FAIL\' THEN 1 ELSE 0 END) as fail_count,
@@ -46,8 +53,25 @@ class LogBookTestRepository extends ServiceEntityRepository
                 SUM(CASE WHEN v.name NOT IN (\'PASS\', \'FAIL\', \'ERROR\') THEN 1 ELSE 0 END) as other_count,
                 MAX(t.timeEnd) as last_run_time,
                 AVG(t.timeRun) as avg_execution_time
-            ')
-            ->innerJoin('t.testInfo', 'ti')
+            ');
+
+        // Define the JSON fields you want to extract dynamically
+        $jsonFields = [
+            'BOARD' => 'board',
+            'PROJECT' => 'project',
+            'BRAIN' => 'brain',
+            'FLOW_NAME' => 'flow_name',
+            'PRODUCT_VERSION' => 'md_pv',
+        ];
+
+        // Dynamically add JSON_UNQUOTE for each metadata field in both SELECT and GROUP BY clauses
+        foreach ($jsonFields as $jsonKey => $alias) {
+            // Add to SELECT clause
+            $qb->addSelect("JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, '$.$jsonKey')) as $alias");
+        }
+
+        // Continue with the rest of the query building
+        $qb->innerJoin('t.testInfo', 'ti')
             ->innerJoin('t.cycle', 'c') // Ensure we join with the cycle
             ->innerJoin('c.setup', 's') // Join with the setup to filter by setupId
             ->innerJoin('c.suiteExecution', 'se') // Adding SuiteExecution join
@@ -55,64 +79,76 @@ class LogBookTestRepository extends ServiceEntityRepository
             ->innerJoin('t.verdict', 'v')
             ->leftJoin('t.newMetaData', 'md')
             ->where('s.id = :setupId')
-            ->groupBy('ti.id', 'ti.name')
-            ->having('COUNT(t.id) >= :minExecutions')
+            ->groupBy('ti.name, chip_platform'); // Fixed group by fields first
+
+        // Add dynamic fields to GROUP BY
+        foreach ($jsonFields as $jsonKey => $alias) {
+            $qb->addGroupBy($alias);
+        }
+        // Apply filters and ordering
+        $qb->having('COUNT(t.id) >= :minExecutions')
             ->orderBy('ti.name', 'ASC')
             ->addOrderBy('test_execution_count', 'DESC')
             ->setParameter('setupId', $setupId)
             ->setParameter('minExecutions', $minExecutions);
-    
+            
         // Apply time filters
         if ($startTime) {
             $qb->andWhere('c.timeStart >= :startTime')
-               ->setParameter('startTime', $startTime);
+            ->setParameter('startTime', $startTime);
         }
         if ($endTime) {
             $qb->andWhere('c.timeEnd <= :endTime')
-               ->setParameter('endTime', $endTime);
+            ->setParameter('endTime', $endTime);
         }
     
-    // Apply suite execution free-text filters (assuming $suiteFilters is an array of search strings)
-    if (!empty($suiteFilters)) {
-        $orX = $qb->expr()->orX();
-        foreach ($suiteFilters as $suiteFilter) {
-            $suiteFilter = '%' . $suiteFilter . '%';  // Add wildcards for LIKE search
-            $orX->add(
-                $qb->expr()->orX(
-                    $qb->expr()->like('se.summary', ':suiteFilter'),
-                    $qb->expr()->like('se.description', ':suiteFilter'),
-                    $qb->expr()->like('se.jobName', ':suiteFilter'),
-                    $qb->expr()->like('se.productVersion', ':suiteFilter'),
-                    $qb->expr()->like('se.platform', ':suiteFilter'),
-                    $qb->expr()->like('se.chip', ':suiteFilter')
-                )
-            );
-            $qb->setParameter('suiteFilter', $suiteFilter);
+        // Apply suite execution free-text filters (assuming $suiteFilters is an array of search strings)
+        if (!empty($suiteFilters)) {
+            $orX = $qb->expr()->orX();
+            foreach ($suiteFilters as $suiteFilter) {
+                $suiteFilter = '%' . $suiteFilter . '%';  // Add wildcards for LIKE search
+                $orX->add(
+                    $qb->expr()->orX(
+                        $qb->expr()->like('se.summary', ':suiteFilter'),
+                        $qb->expr()->like('se.description', ':suiteFilter'),
+                        $qb->expr()->like('se.jobName', ':suiteFilter'),
+                        $qb->expr()->like('se.productVersion', ':suiteFilter'),
+                        $qb->expr()->like('se.platform', ':suiteFilter'),
+                        $qb->expr()->like('se.chip', ':suiteFilter')
+                    )
+                );
+                $qb->setParameter('suiteFilter', $suiteFilter);
+            }
+            $qb->andWhere($orX);
         }
-        $qb->andWhere($orX);
-    }
 
         // Apply test metadata filters
         if (!empty($testMetadataFilters)) {
-            $qb->leftJoin('t.newMetaData', 'md_filter');
             foreach ($testMetadataFilters as $key => $values) {
                 if (!is_array($values)) {
                     $values = [$values];
                 }
-        
+
+                // Create a group of OR conditions for the current key
                 $orX = $qb->expr()->orX();
                 foreach ($values as $index => $value) {
-                    $keyLength = strlen($key);
-                    $valueLength = strlen($value);
-                    $pattern = '%s:' . $keyLength . ':"' . $key . '";s:' . $valueLength . ':"' . $value . '";%';
-                    
-                    $orX->add($qb->expr()->like('md_filter.value', ':metadata_' . $key . '_' . $index));
-                    $qb->setParameter('metadata_' . $key . '_' . $index, $pattern);
+                    // Extract the JSON field dynamically based on the key
+                    $jsonPath = '$.' . $key;
+                    $orX->add(
+                        $qb->expr()->like(
+                            'JSON_UNQUOTE(JSON_EXTRACT(md.valueJson, :jsonPath_' . $key . '_' . $index . '))',
+                            ':metadataValue_' . $key . '_' . $index
+                        )
+                    );
+                    $qb->setParameter('jsonPath_' . $key . '_' . $index, $jsonPath);
+                    $qb->setParameter('metadataValue_' . $key . '_' . $index, '%' . $value . '%');
                 }
                 
+                // Add the OR condition to the query
                 $qb->andWhere($orX);
             }
         }
+
         
         $result = $qb->getQuery()->getResult();
     
@@ -155,10 +191,10 @@ class LogBookTestRepository extends ServiceEntityRepository
             // If metadata is null or any other type, we just leave it as an empty array
         }
 
-        // Merge metadata with test results
-        foreach ($result as &$test) {
-            $test['metadata'] = $metadataMap[$test['test_id']] ?? [];
-        }
+        // // Merge metadata with test results
+        // foreach ($result as &$test) {
+        //     $test['metadata'] = $metadataMap[$test['test_id']] ?? [];
+        // }
     
         $totalTests = array_sum(array_column($result, 'test_execution_count'));
         $uniqueTests = count($result);

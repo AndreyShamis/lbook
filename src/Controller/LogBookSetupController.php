@@ -513,6 +513,53 @@ class LogBookSetupController extends AbstractController
                 }
             }
 
+            // // Merge metadata results into the test details
+            // $metadataResults = $statistics['metadataResults'];
+
+            // foreach ($statistics['test_details'] as &$testDetail) {
+            //     $testId = $testDetail['test_id'];
+                
+            //     // Initialize metadata as an empty array if it doesn't exist
+            //     if (!isset($testDetail['metadata']) || !is_array($testDetail['metadata'])) {
+            //         $testDetail['metadata'] = [];
+            //     }
+
+            //     // Iterate over metadata results and add all matching metadata for this test
+            //     foreach ($metadataResults as $metadataResult) {
+            //         if ($metadataResult['test_id'] === $testId) {
+            //             // Ensure the metadata from the result is also an array
+            //             if (is_array($metadataResult['metadata'])) {
+            //                 // Merge the metadata entry into the test's metadata array
+            //                 $testDetail['metadata'] = array_merge($testDetail['metadata'], $metadataResult['metadata']);
+            //             }
+            //         }
+            //     }
+            // }
+
+
+            // Group test details by Chip, Platform, and Metadata keys
+            $metadataKeys = ['board', 'project', 'brain', 'flow_name', 'md_pv']; // Adjust keys to match new field names
+            $groupedTestDetails = [];
+
+            foreach ($statistics['test_details'] as $detail) {
+                $chip = $detail['chip'] ?? 'Chip';
+                $platform = $detail['platform'] ?? 'Platform';
+
+                // Initialize a pointer to the groupedTestDetails for the current test name, chip, and platform
+                $pointer = &$groupedTestDetails[$detail['test_name']][$chip][$platform];
+
+                // Iterate over new metadata keys (now directly in $detail)
+                foreach ($metadataKeys as $key) {
+                    // Check if the metadata value exists, otherwise set a default
+                    $metadataValue = $detail[$key] ?? ' ';// . strtoupper($key);
+
+                    // Set the pointer to the next level based on the metadata value
+                    $pointer = &$pointer[$metadataValue];
+                }
+
+                // Finally, assign the test details at the deepest level
+                $pointer = $detail;
+            }
             
             $uniqueKeys = array_keys($uniqueKeys); // Extract the unique keys as an array
             return $this->render('log_book_setup/dashboard_show.html.twig', [
@@ -521,6 +568,8 @@ class LogBookSetupController extends AbstractController
                 'table_size' => $tableInfo['table_size'],
                 'table_name' => $tableInfo['table_name'],
                 'statistics' => $statistics,
+                'groupedTestDetails' => $groupedTestDetails,  // Pass grouped data to Twig
+                'metadataKeys' => $metadataKeys,              // Pass metadata keys to the Twig template
                 'suiteFilters' => $suiteFilters,
                 'testMetadataFilters' => $testMetadataFilters,
                 'minExecutions' => $minExecutions,

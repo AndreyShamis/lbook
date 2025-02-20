@@ -656,7 +656,7 @@ class LogBookUploaderController extends AbstractController
      * @return RedirectResponse|Response
      * @throws Exception
      */
-    public function newCli(Request $request, LoggerInterface $logger)
+    public function newCli(Request $request, LoggerInterface $logger, HostRepository $hosts)
     {
         $remote_ip = $request->getClientIp();
         //curl --noproxy "127.0.0.1" --max-time 120 --form setup=DELL-KUBUNTU --form 'UPTIME_START=720028.73 2685347.68' --form 'UPTIME_END=720028.73 2685347.68' --form NIC=TEST --form DUTIP=172.17.0.1 --form PlatformName=Platf --form k_ver= --form Kernel=4.4.0-112-generic --form testCaseName=sa --form testSetName=sa --form build=A:_S:_I: --form testCount=2  --form file=@autoserv.DEBUG --form setup='SUPER SETUP' --form cycle='1' --form token=2602161043  http://127.0.0.1:8080/upload/new_cli
@@ -961,7 +961,15 @@ class LogBookUploaderController extends AbstractController
                 $test->resetMetaData('SUITE_SHOW');
                 $test->resetMetaData('CHIP');
                 $test->resetMetaData('PLATFORM');
-                $test->resetMetaData('HOSTNAME');
+                if ($test->getSuiteExecution() !== null && $test->getSuiteExecution()->getHost() !== null) {
+                    $md_host = $test->getFromMetaData('HOSTNAME');
+                    if ($md_host !== null && $md_host !== ''){
+                        if($test->getSuiteExecution()->getHost()->getName() !== $md_host  ) {
+                            $newSuiteHost = $hosts->findOneOrCreate(['name' => $md_host, 'ip' => $remote_ip]);
+                            $test->getSuiteExecution()->setHost($newSuiteHost);   
+                        }
+                    }
+                }
                 $test->resetMetaData('TEST_FILENAME');
                 $test->resetMetaData('TEST_VER');
                 $test->resetMetaData('CONTROL_VER');

@@ -160,6 +160,7 @@
             $("#btnCurrentSuitesToPivotDown").click(buildPivotTable);
         });
     </script>
-
+    {% if all_tests is defined %}
     {% include "log_book_test_info/list.html.twig" %}
+    {% endif %} 
 {% endapply %}

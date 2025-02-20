@@ -575,7 +575,15 @@ Cycle [{{ cycle.id }}:{{ cycle.name }}]
                     <td>{% if test.suiteExecution.id is defined and test.suiteExecution.platform is defined %}<span style="color: {{ stringToColor(test.suiteExecution.platform) }} !important;">{{ test.suiteExecution.platform }}</span>{% endif %}</td>
                     <td>{% if test.suiteExecution.id is defined and test.suiteExecution.chip is defined %}<span style="color: {{ stringToColor(test.suiteExecution.chip) }} !important;">{{ test.suiteExecution.chip }}</span>{% endif %}</td>
                     <td>{% if test.suiteExecution.id is defined and test.suiteExecution.components is defined %}{{ test.suiteExecution.components|join(', ') }}{% endif %}</td>
-                    <td>{% if test.suiteExecution.id is defined and test.suiteExecution.host is defined and test.suiteExecution.host.name is defined %}{{ test.suiteExecution.host.name }}{% endif %}</td>
+                    <td>
+                    {% if test.suiteExecution.id is defined and test.suiteExecution.host is defined and test.suiteExecution.host.name is defined %}
+                        {% if test.metaData['HOSTNAME'] is defined and test.metaData['HOSTNAME'] != '' and test.metaData['HOSTNAME'] != test.suiteExecution.host.name %}
+                            {{ test.metaData['HOSTNAME'] }}
+                        {% else %}
+                            {{ test.suiteExecution.host.name }}
+                        {% endif %}
+                    {% endif %}
+                    </td>
                 {% endif %}
                 {% endif %}
                 {% if show_metadata == true %}

@@ -723,6 +723,67 @@ class LogBookSetupController extends AbstractController
     }
 
     /**
+     * @Route("/api/{id}/info", name="setup_info", methods={"GET"})
+     * @param int $id
+     * @param LogBookSetupRepository $setupRepo
+     * @return JsonResponse
+     */
+    public function getSetupInfo(
+        int $id,
+        LogBookSetupRepository $setupRepo
+    ): JsonResponse {
+        $setup = $setupRepo->find($id);
+        if (!$setup) {
+            return new JsonResponse(['error' => 'Setup not found'], 404);
+        }
+
+        // Assuming toJson() is a method on the LogBookSetup entity
+        $setupData = $setup->toJson();
+        return new JsonResponse($setupData, 200);
+    }
+
+    /**
+     * @Route("/api/{id}/cycles", name="setup_cycles", methods={"GET"})
+     * @param int $id
+     * @param LogBookCycleRepository $cycleRepo
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getSetupCycles(
+        int $id,
+        LogBookCycleRepository $cycleRepo,
+        Request $request
+    ): JsonResponse {
+        $params = $request->query->all();
+
+        $qb = $cycleRepo->createQueryBuilder('c')
+            ->where('c.setup = :setup_id')
+            ->setParameter('setup_id', $id);
+
+        // Add filters as needed, based on request parameters
+        if (isset($params['name'])) {
+            $qb->andWhere('c.name LIKE :name')
+                ->setParameter('name', '%' . $params['name'] . '%');
+        }
+
+        if (isset($params['start_date']) && isset($params['end_date'])) {
+            $qb->andWhere('c.timeStart >= :start_date')
+                ->andWhere('c.timeEnd <= :end_date')
+                ->setParameter('start_date', new \DateTime($params['start_date']))
+                ->setParameter('end_date', new \DateTime($params['end_date']));
+        }
+
+        $cycles = $qb->getQuery()->getResult();
+
+        // Assuming toJson() is a method on the LogBookCycle entity
+        $cyclesData = array_map(fn(LogBookCycle $cycle) => $cycle->toJson(), $cycles);
+
+        return new JsonResponse(['cycles' => $cyclesData], 200);
+    }
+
+
+
+    /**
      * Lists all setup entities.
      *
      * @Route("/favorite/report", name="setup_favorite_report", methods={"GET"})

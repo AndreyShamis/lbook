@@ -754,11 +754,15 @@ class LogBookSetupController extends AbstractController
         LogBookCycleRepository $cycleRepo,
         Request $request
     ): JsonResponse {
+        set_time_limit(300); // 5 minutes
+
         $params = $request->query->all();
 
         $qb = $cycleRepo->createQueryBuilder('c')
-            ->where('c.setup = :setup_id')
-            ->setParameter('setup_id', $id);
+        ->where('c.setup = :setup_id')
+        ->setParameter('setup_id', $id)
+        ->orderBy('c.id', 'DESC')  // Order by ID descending
+        ->setMaxResults(2000);
 
         // Add filters as needed, based on request parameters
         if (isset($params['name'])) {

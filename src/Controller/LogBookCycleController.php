@@ -16,6 +16,7 @@ use App\Repository\LogBookCycleRepository;
 use App\Repository\LogBookTestRepository;
 use App\Repository\SuiteExecutionRepository;
 use App\Repository\TestFilterApplyRepository;
+use App\Repository\LogBookMessageRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Psr\Log\LoggerInterface;
@@ -689,27 +690,12 @@ class LogBookCycleController extends AbstractController
                 throw new \RuntimeException('Cycle not found');
             }
 
-            $cycleInfo = [
-                'id' => $cycle->getId(),
-                'name' => $cycle->getName(),
-                'setup' => $cycle->getSetup()->getName(),
-                'time_start' => $cycle->getTimeStart()->format(\DateTime::ATOM),
-                'time_end' => $cycle->getTimeEnd()->format(\DateTime::ATOM),
-                'tests_total' => $cycle->getTestsCount(),
-                'tests_pass' => $cycle->getTestsPass(),
-                'tests_fail' => $cycle->getTestsFail(),
-                'tests_error' => $cycle->getTestsError(),
-                'tests_unknown' => $cycle->getTestsUnknown(),
-                'tests_warning' => $cycle->getTestsWarning(),
-                'tests_na' => $cycle->getTestsNa(),
-                'metadata' => $cycle->getMetaData(),
-            ];
-
-            return new JsonResponse($cycleInfo, Response::HTTP_OK);
+            return new JsonResponse($cycle->toJson(), Response::HTTP_OK);
         } catch (\Throwable $ex) {
             return new JsonResponse(['error' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     /**
      * @Route("/api/{id}/tests", name="cycle_api_tests", methods={"GET", "POST"})
@@ -744,6 +730,65 @@ class LogBookCycleController extends AbstractController
             return new JsonResponse(['error' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * @Route("/api/{id}/tests_logs", name="cycle_api_tests_logs", methods={"GET", "POST"})
+     * @param LogBookCycle $cycle
+     * @param LogBookTestRepository $testRepo
+     * @param LogBookMessageRepository $logRepo
+     * @return JsonResponse
+     */
+    public function getCycleTestsWithLogs(LogBookCycle $cycle, LogBookTestRepository $testRepo, LogBookMessageRepository $logRepo): JsonResponse
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('Cycle not found');
+            }
+
+            $tests = $testRepo->findBy(['cycle' => $cycle, 'disabled' => 0], ['executionOrder' => 'ASC']);
+            if (!$tests) {
+                return new JsonResponse(['tests' => []], Response::HTTP_OK);
+            }
+            $testList = [];
+            foreach ($tests as $test) {
+                // Set the correct table for logs based on test
+                $logRepo->setCustomTable($test->getDbNameWithPrefix());
+
+                // Fetch logs from the dynamically set table
+                $logs = $logRepo->createQueryBuilder('log')
+                    ->where('log.test = :test')
+                    ->setParameter('test', $test->getId())
+                    ->orderBy('log.chain', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+
+                // Find the first log time
+                $firstLogTime = count($logs) > 0 ? $logs[0]->getLogTime() : $test->getTimeStart();
+
+                // Convert logs to JSON with relative time
+                $logsArray = array_map(fn($log) => $log->toJsonWithRelativeTime($firstLogTime), $logs);
+
+                // Build test data with logs
+                $testList[] = [
+                    'id' => $test->getId(),
+                    'name' => $test->getName(),
+                    'verdict' => $test->getVerdict()->getName(),
+                    'execution_order' => $test->getExecutionOrder(),
+                    'time_start' => $test->getTimeStart()->format(\DateTime::ATOM),
+                    'time_end' => $test->getTimeEnd()->format(\DateTime::ATOM),
+                    'metadata' => $test->getMetaData(),
+                    'logs_count' => count($logsArray),
+                    'logs' => $logsArray, // Include logs with relative time
+                ];
+            }
+
+            return new JsonResponse(['tests' => $testList], Response::HTTP_OK);
+        } catch (\Throwable $ex) {
+            return new JsonResponse(['error' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
     /**

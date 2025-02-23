@@ -164,6 +164,17 @@ class LogBookMessage
         ];
         return $ret;
     }
+
+    public function toJsonWithRelativeTime(\DateTime $firstLogTime)
+    {
+        return [
+            'msg' => $this->getMessage(),
+            'type' => $this->getMsgType()->getName(),
+            'order' => $this->getChain(),
+            'period' => $this->getLogTime()->getTimestamp() - $firstLogTime->getTimestamp()
+        ];
+    }
+
 }
 
 

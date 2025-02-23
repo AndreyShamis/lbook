@@ -678,6 +678,75 @@ class LogBookCycleController extends AbstractController
     }
 
     /**
+     * @Route("/api/{id}/info", name="cycle_api_info", methods={"GET", "POST"})
+     * @param LogBookCycle $cycle
+     * @return JsonResponse
+     */
+    public function getCycleInfo(LogBookCycle $cycle): JsonResponse
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('Cycle not found');
+            }
+
+            $cycleInfo = [
+                'id' => $cycle->getId(),
+                'name' => $cycle->getName(),
+                'setup' => $cycle->getSetup()->getName(),
+                'time_start' => $cycle->getTimeStart()->format(\DateTime::ATOM),
+                'time_end' => $cycle->getTimeEnd()->format(\DateTime::ATOM),
+                'tests_total' => $cycle->getTestsCount(),
+                'tests_pass' => $cycle->getTestsPass(),
+                'tests_fail' => $cycle->getTestsFail(),
+                'tests_error' => $cycle->getTestsError(),
+                'tests_unknown' => $cycle->getTestsUnknown(),
+                'tests_warning' => $cycle->getTestsWarning(),
+                'tests_na' => $cycle->getTestsNa(),
+                'metadata' => $cycle->getMetaData(),
+            ];
+
+            return new JsonResponse($cycleInfo, Response::HTTP_OK);
+        } catch (\Throwable $ex) {
+            return new JsonResponse(['error' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @Route("/api/{id}/tests", name="cycle_api_tests", methods={"GET", "POST"})
+     * @param LogBookCycle $cycle
+     * @param LogBookTestRepository $testRepo
+     * @return JsonResponse
+     */
+    public function getCycleTests(LogBookCycle $cycle, LogBookTestRepository $testRepo): JsonResponse
+    {
+        try {
+            if (!$cycle) {
+                throw new \RuntimeException('Cycle not found');
+            }
+
+            $tests = $testRepo->findBy(['cycle' => $cycle, 'disabled' => 0], ['executionOrder' => 'ASC']);
+
+            $testList = [];
+            foreach ($tests as $test) {
+                $testList[] = [
+                    'id' => $test->getId(),
+                    'name' => $test->getName(),
+                    'verdict' => $test->getVerdict()->getName(),
+                    'execution_order' => $test->getExecutionOrder(),
+                    'time_start' => $test->getTimeStart()->format(\DateTime::ATOM),
+                    'time_end' => $test->getTimeEnd()->format(\DateTime::ATOM),
+                    'metadata' => $test->getMetaData(),
+                ];
+            }
+
+            return new JsonResponse(['tests' => $testList], Response::HTTP_OK);
+        } catch (\Throwable $ex) {
+            return new JsonResponse(['error' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    /**
      * @param LogBookCycle $cycle
      * @return array
      */

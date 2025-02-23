@@ -937,11 +937,11 @@ class LogBookCycleController extends AbstractController
         $response->headers->set('Accept-Encoding', 'gzip,compress');
         $response->headers->set('Content-Disposition', 'attachment; filename="'. $file_name . '"');
 
-        try {
-            $fs = new \Symfony\Component\Filesystem\Filesystem();
-            $fs->dumpFile('/var/www/lbook/downloads/' . $file_name, $resp);
-        }
-        catch(IOException $e) {}
+        // try {
+        //     $fs = new \Symfony\Component\Filesystem\Filesystem();
+        //     $fs->dumpFile('/var/www/lbook/downloads/' . $file_name, $resp);
+        // }
+        // catch(IOException $e) {}
         return $response;
     }
 

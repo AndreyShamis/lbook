@@ -768,18 +768,12 @@ class LogBookCycleController extends AbstractController
                 // Convert logs to JSON with relative time
                 $logsArray = array_map(fn($log) => $log->toJsonWithRelativeTime($firstLogTime), $logs);
 
-                // Build test data with logs
-                $testList[] = [
-                    'id' => $test->getId(),
-                    'name' => $test->getName(),
-                    'verdict' => $test->getVerdict()->getName(),
-                    'execution_order' => $test->getExecutionOrder(),
-                    'time_start' => $test->getTimeStart()->format(\DateTime::ATOM),
-                    'time_end' => $test->getTimeEnd()->format(\DateTime::ATOM),
-                    'metadata' => $test->getMetaData(),
-                    'logs_count' => count($logsArray),
-                    'logs' => $logsArray, // Include logs with relative time
-                ];
+                // Use optimized toJson() and add logs dynamically
+                $testData = $test->toJson();
+                $testData['logs_count'] = count($logsArray);
+                $testData['logs'] = $logsArray;
+
+                $testList[] = $testData;
             }
 
             return new JsonResponse(['tests' => $testList], Response::HTTP_OK);

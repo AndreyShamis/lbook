@@ -461,7 +461,15 @@ class LogBookTest
     public function calculateRunTime(): void
     {
         $run_time = abs($this->getTimeEnd()->getTimestamp() - $this->getTimeStart()->getTimestamp());
-        $this->setTimeRun($run_time);
+        // Define the maximum allowed run time (31 days in seconds)
+        $maxRunTime = 3600 * 24 * 31; // 2678400
+
+        // Check for negative or out-of-range values
+        if ($run_time < 0 || $run_time > $maxRunTime) {
+            $this->setTimeRun(0);
+        } else {
+            $this->setTimeRun($run_time);
+        }
     }
 
     /**

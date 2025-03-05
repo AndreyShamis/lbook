@@ -49,6 +49,7 @@
             <th data-sortable="true" data-visible="false">End</th>
             <th data-sortable="true" data-visible="false" title="Runtime % in cycle">%</th>
             <th data-sortable="true">Verdict</th>
+            <th data-sortable="true">FailReason</th>
             <th data-sortable="true">Rate</th>
             {% set uniqueKeys = uniqueKeys is defined ? uniqueKeys : [] %}
 
@@ -113,7 +114,9 @@
                         {{ log_book_test.verdict }}
                     </span>
                 </td>
+                <td>{{ log_book_test.failDesc }}</td>
                 <td>{% if log_book_test.verdict == "PASS" %}1.0{%endif%}{% if log_book_test.verdict == "FAIL" %}0.0{%endif%}{% if log_book_test.verdict == "ERROR" %}0.1{%endif%}</td>
+                
                 {% for key in uniqueKeys %}
                     {% set metaData = log_book_test.newMetaData %}
                     {% set value = metaData ? metaData.value[key] ?? '-' : '-' %}

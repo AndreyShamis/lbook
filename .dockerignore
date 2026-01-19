@@ -1,0 +1,6 @@
+# Docker-related files
+/.env.local
+/docker/nginx/*.log
+
+# Database data
+/db_data/
